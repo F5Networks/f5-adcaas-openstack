@@ -27,6 +27,7 @@
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/test/**/*.js && npm run posttest",
     "coverage": "lb-nyc --reporter=text --reporter=lcov npm test",
+    "coveralls": "lb-nyc report --reporter=text-lcov | coveralls",
     "prestart": "npm run build",
     "start": "node .",
     "prepublishOnly": "npm run test"
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@loopback/build": "^1.0.1",
     "@loopback/testlab": "^1.0.1",
-    "@types/node": "^10.11.2"
+    "@types/node": "^10.11.2",
+    "coveralls": "^3.0.0"
   }
 }

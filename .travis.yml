@@ -11,4 +11,4 @@ jobs:
       install:
         - npm install
       script:
-        - npm test
+        - npm test && npm run coverage && npm run coveralls
