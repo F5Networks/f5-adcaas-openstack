@@ -27,7 +27,7 @@
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/test/**/*.js && npm run posttest",
     "coverage": "lb-nyc --reporter=text --reporter=lcov npm test",
-    "coveralls": "lb-nyc report --reporter=text-lcov | coveralls",
+    "coveralls": "lb-nyc report --reporter=text-lcov | coveralls ../../",
     "prestart": "npm run build",
     "start": "node .",
     "prepublishOnly": "npm run test"
