@@ -1,0 +1,40 @@
+
+which docker > /dev/null
+if [ $? -ne 0 ]; then
+  echo "Error: docker package not installed."
+  exit 1
+fi
+
+# ================ POSTGRES SETTINGS ================
+
+# postgres data folder
+postgres_data_directory=$(cd .; pwd)/../../data
+
+# postgres username
+postgres_user=postgres
+
+# postgres password
+postgres_password=postgres
+
+# postgres port
+postgres_port=5432
+
+# postgres db name
+postgres_db=postgres
+
+# postgres hostname / container name
+postgres_hostname=postgres-server
+
+# ================ APPLICATION SETTINGS ================
+
+# application folder
+application_folder=$(cd .; pwd)/../..
+
+# application docker container name
+application_hostname=wafaas-dev-container
+
+# application port
+application_port=3000
+
+# version of node in docker
+node_version=11.6.0
