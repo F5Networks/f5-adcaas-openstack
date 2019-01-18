@@ -1,0 +1,10 @@
+{
+  "name": "db",
+  "connector": "postgresql",
+  "url": "postgres://postgres:postgres@postgres-server:5432/postgres",
+  "host": "postgres-server",
+  "port": 5432,
+  "user": "postgres",
+  "password": "postgres",
+  "database": "postgres"
+}
