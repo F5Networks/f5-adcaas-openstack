@@ -1,0 +1,57 @@
+version: "3"
+services:
+  waf:
+    image: wafaas-env:latest
+    build:
+      context: .
+    container_name: wafaas-dev-container
+    command: ["bash", "-c", "cd /root/app_dir && npm install && npm start"]
+ 
+    volumes:
+      - ../..:/root/app_dir
+    ports:
+      - 3000:3000
+
+    depends_on:
+      - postgres
+      - AS3
+
+    links:
+      - postgres:postgres-server
+      - AS3:as3-server
+
+  postgres:
+    image: postgres:11.1
+    container_name: postgres-server
+    ports:
+      - 5432:5432
+    volumes:
+      - ../../data:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${postgres-postgres}
+      POSTGRES_DB: postgres
+
+  AS3:
+    image: f5devcentral/f5-as3-container:3.7.0
+    container_name: as3-server
+    ports:
+      - 8443:443
+      - 8080:80
+
+#   # TODO: enable logging.
+#   LOG:
+#     image: balabit/syslog-ng:latest
+#     container_name: syslog-server
+#     volumes:
+#       - path/to/log-volumes:/var/log/syslog
+#     ports:
+#       - 514:514/udp
+#       - 601:601
+  
+# x-logging:
+#   &default-logging
+#   driver: syslog
+#   options:
+#     syslog-address: "tcp://syslog-server:514"
