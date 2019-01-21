@@ -6,9 +6,9 @@ node_js:
 jobs:
   include:
     - stage: test-app-waf
-      before_install:
-        - cd app/waf
       install:
-        - npm install
+        - npm --prefix app/waf install
       script:
-        - npm test
+        - npm --prefix app/waf test
+        - npm --prefix app/waf run coverage
+        - npm --prefix app/waf run coveralls
