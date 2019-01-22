@@ -8,7 +8,10 @@ import {testdb} from '../fixtures/datasources/testdb.datasource';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
-    rest: givenHttpServerConfig(),
+    rest: givenHttpServerConfig({
+      host: '0.0.0.0',
+      port: 3000,
+    }),
   });
   app.dataSource(testdb);
 
