@@ -1,6 +1,7 @@
-import {expect} from '@loopback/testlab';
-import {WafApplication, main} from '../..';
+import {WafApplication} from '../..';
+import {testdb} from '../fixtures/datasources/testdb.datasource';
 
+/*
 describe('WAF Application main function', () => {
   let app: WafApplication;
 
@@ -15,18 +16,21 @@ describe('WAF Application main function', () => {
     await app.stop();
   });
 });
+*/
 
 describe('WAF Application', () => {
   let app: WafApplication;
 
   it('construct app without parameter', async () => {
     app = new WafApplication();
+    app.dataSource(testdb);
     await app.start();
     await app.stop();
   });
 
   it('construct app with a parameter', async () => {
     app = new WafApplication({});
+    app.dataSource(testdb);
     await app.start();
     await app.stop();
   });
