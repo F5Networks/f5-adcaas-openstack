@@ -19,13 +19,15 @@ import {
 import {Wafpolicy} from '../models';
 import {WafpolicyRepository} from '../repositories';
 
+const prefix = '/adcaas/v1';
+
 export class WafpolicyController {
   constructor(
     @repository(WafpolicyRepository)
     public wafpolicyRepository: WafpolicyRepository,
   ) {}
 
-  @post('/wafpolicies', {
+  @post(prefix + '/wafpolicies', {
     responses: {
       '200': {
         description: 'Wafpolicy model instance',
@@ -37,7 +39,7 @@ export class WafpolicyController {
     return await this.wafpolicyRepository.create(wafpolicy);
   }
 
-  @get('/wafpolicies/count', {
+  @get(prefix + '/wafpolicies/count', {
     responses: {
       '200': {
         description: 'Wafpolicy model count',
@@ -51,7 +53,7 @@ export class WafpolicyController {
     return await this.wafpolicyRepository.count(where);
   }
 
-  @get('/wafpolicies', {
+  @get(prefix + '/wafpolicies', {
     responses: {
       '200': {
         description: 'Array of Wafpolicy model instances',
@@ -70,7 +72,7 @@ export class WafpolicyController {
     return await this.wafpolicyRepository.find(filter);
   }
 
-  @patch('/wafpolicies', {
+  @patch(prefix + '/wafpolicies', {
     responses: {
       '200': {
         description: 'Wafpolicy PATCH success count',
@@ -85,7 +87,7 @@ export class WafpolicyController {
     return await this.wafpolicyRepository.updateAll(wafpolicy, where);
   }
 
-  @get('/wafpolicies/{id}', {
+  @get(prefix + '/wafpolicies/{id}', {
     responses: {
       '200': {
         description: 'Wafpolicy model instance',
@@ -97,7 +99,7 @@ export class WafpolicyController {
     return await this.wafpolicyRepository.findById(id);
   }
 
-  @patch('/wafpolicies/{id}', {
+  @patch(prefix + '/wafpolicies/{id}', {
     responses: {
       '204': {
         description: 'Wafpolicy PATCH success',
@@ -111,7 +113,7 @@ export class WafpolicyController {
     await this.wafpolicyRepository.updateById(id, wafpolicy);
   }
 
-  @put('/wafpolicies/{id}', {
+  @put(prefix + '/wafpolicies/{id}', {
     responses: {
       '204': {
         description: 'Wafpolicy PUT success',
@@ -125,7 +127,7 @@ export class WafpolicyController {
     await this.wafpolicyRepository.replaceById(id, wafpolicy);
   }
 
-  @del('/wafpolicies/{id}', {
+  @del(prefix + '/wafpolicies/{id}', {
     responses: {
       '204': {
         description: 'Wafpolicy DELETE success',
