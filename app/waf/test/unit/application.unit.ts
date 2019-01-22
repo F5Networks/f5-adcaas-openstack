@@ -1,9 +1,17 @@
-import {WafApplication} from '../..';
+import {expect, sinon} from '@loopback/testlab';
+import {WafApplication, main} from '../..';
 import {testdb} from '../fixtures/datasources/testdb.datasource';
 
-/*
 describe('WAF Application main function', () => {
   let app: WafApplication;
+
+  before('stub WafApplication', async () => {
+    sinon.stub(WafApplication.prototype, 'migrateSchema');
+  });
+
+  after('restore WafApplication', async () => {
+    sinon.restore();
+  });
 
   it('invoke main without configuration', async () => {
     app = await main();
@@ -16,7 +24,6 @@ describe('WAF Application main function', () => {
     await app.stop();
   });
 });
-*/
 
 describe('WAF Application', () => {
   let app: WafApplication;
