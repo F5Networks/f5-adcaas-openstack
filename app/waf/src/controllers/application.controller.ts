@@ -19,13 +19,15 @@ import {
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
 
+const prefix = '/adcaas/v1';
+
 export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
   ) {}
 
-  @post('/applications', {
+  @post(prefix + '/applications', {
     responses: {
       '200': {
         description: 'Application model instance',
@@ -37,7 +39,7 @@ export class ApplicationController {
     return await this.applicationRepository.create(application);
   }
 
-  @get('/applications/count', {
+  @get(prefix + '/applications/count', {
     responses: {
       '200': {
         description: 'Application model count',
@@ -51,7 +53,7 @@ export class ApplicationController {
     return await this.applicationRepository.count(where);
   }
 
-  @get('/applications', {
+  @get(prefix + '/applications', {
     responses: {
       '200': {
         description: 'Array of Application model instances',
@@ -70,7 +72,7 @@ export class ApplicationController {
     return await this.applicationRepository.find(filter);
   }
 
-  @patch('/applications', {
+  @patch(prefix + '/applications', {
     responses: {
       '200': {
         description: 'Application PATCH success count',
@@ -85,7 +87,7 @@ export class ApplicationController {
     return await this.applicationRepository.updateAll(application, where);
   }
 
-  @get('/applications/{id}', {
+  @get(prefix + '/applications/{id}', {
     responses: {
       '200': {
         description: 'Application model instance',
@@ -97,7 +99,7 @@ export class ApplicationController {
     return await this.applicationRepository.findById(id);
   }
 
-  @patch('/applications/{id}', {
+  @patch(prefix + '/applications/{id}', {
     responses: {
       '204': {
         description: 'Application PATCH success',
@@ -111,7 +113,7 @@ export class ApplicationController {
     await this.applicationRepository.updateById(id, application);
   }
 
-  @put('/applications/{id}', {
+  @put(prefix + '/applications/{id}', {
     responses: {
       '204': {
         description: 'Application PUT success',
@@ -125,7 +127,7 @@ export class ApplicationController {
     await this.applicationRepository.replaceById(id, application);
   }
 
-  @del('/applications/{id}', {
+  @del(prefix + '/applications/{id}', {
     responses: {
       '204': {
         description: 'Application DELETE success',
