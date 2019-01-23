@@ -10,12 +10,12 @@ export class DbDataSource extends juggler.DataSource {
     dsConfig: {
       name: string;
       connector: string;
-      url: string;
-      host: string;
-      port: number;
-      user: string;
-      password: string;
-      database: string;
+      url?: string;
+      host?: string;
+      port?: number;
+      user?: string;
+      password?: string;
+      database?: string;
     } = config,
   ) {
     // Use env variable values to overwrite dsConfig default values
