@@ -6,6 +6,8 @@ import {Wafpolicy} from '../../src/models';
 import {Application} from '../../src/models';
 import {v4 as uuid} from 'uuid';
 import {WafApplication} from '../../src';
+import {AdcRepository} from '../../src/repositories/adc.repository';
+import {Adc} from '../../src/models/adc.model';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
@@ -13,6 +15,9 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const apprepo = await wafapp.getRepository(ApplicationRepository);
   await apprepo.deleteAll();
+
+  const adcrepo = await wafapp.getRepository(AdcRepository);
+  await adcrepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -60,4 +65,26 @@ export async function givenApplicationData(
 ) {
   const apprepo = await wafapp.getRepository(ApplicationRepository);
   return await apprepo.create(createApplicationObject(data));
+}
+
+export function createAdcObject(data?: Partial<Adc>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      name: 'adc target',
+      host: '1.2.3.4',
+      port: 8443,
+      username: 'admin',
+      passphrase: 'admin',
+    },
+    data,
+  );
+}
+
+export async function givenAdcData(
+  wafapp: WafApplication,
+  data?: Partial<Adc>,
+) {
+  const adcpepo = await wafapp.getRepository(AdcRepository);
+  return await adcpepo.create(createAdcObject(data));
 }
