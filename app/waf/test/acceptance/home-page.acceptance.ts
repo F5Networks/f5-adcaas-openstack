@@ -5,18 +5,18 @@
 
 import {Client} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from './test-helper';
+import {setupApplication} from '../helpers/test-helper';
 
 describe('HomePage', () => {
-  let app: WafApplication;
+  let wafapp: WafApplication;
   let client: Client;
 
   before('setupApplication', async () => {
-    ({app, client} = await setupApplication());
+    ({wafapp, client} = await setupApplication());
   });
 
   after(async () => {
-    await app.stop();
+    await wafapp.stop();
   });
 
   it('exposes a default home page', async () => {

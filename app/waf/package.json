@@ -54,8 +54,10 @@
     "@loopback/rest": "^1.4.0",
     "@loopback/rest-explorer": "^1.1.2",
     "@loopback/service-proxy": "^1.0.3",
+    "@types/uuid": "^3.4.4",
+    "loopback-connector-postgresql": "^3.5.0",
     "loopback-connector-rest": "^3.4.1",
-    "loopback-connector-postgresql": "^3.5.0"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@loopback/build": "^1.0.1",
