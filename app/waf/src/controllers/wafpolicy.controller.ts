@@ -35,7 +35,9 @@ export class WafpolicyController {
       },
     },
   })
-  async create(@requestBody() wafpolicy: Wafpolicy): Promise<Wafpolicy> {
+  async create(
+    @requestBody() wafpolicy: Partial<Wafpolicy>,
+  ): Promise<Wafpolicy> {
     return await this.wafpolicyRepository.create(wafpolicy);
   }
 
@@ -81,7 +83,7 @@ export class WafpolicyController {
     },
   })
   async updateAll(
-    @requestBody() wafpolicy: Wafpolicy,
+    @requestBody() wafpolicy: Partial<Wafpolicy>,
     @param.query.object('where', getWhereSchemaFor(Wafpolicy)) where?: Where,
   ): Promise<Count> {
     return await this.wafpolicyRepository.updateAll(wafpolicy, where);
@@ -95,7 +97,7 @@ export class WafpolicyController {
       },
     },
   })
-  async findById(@param.path.number('id') id: string): Promise<Wafpolicy> {
+  async findById(@param.path.string('id') id: string): Promise<Wafpolicy> {
     return await this.wafpolicyRepository.findById(id);
   }
 
@@ -107,8 +109,8 @@ export class WafpolicyController {
     },
   })
   async updateById(
-    @param.path.number('id') id: string,
-    @requestBody() wafpolicy: Wafpolicy,
+    @param.path.string('id') id: string,
+    @requestBody() wafpolicy: Partial<Wafpolicy>,
   ): Promise<void> {
     await this.wafpolicyRepository.updateById(id, wafpolicy);
   }
@@ -121,9 +123,10 @@ export class WafpolicyController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: string,
-    @requestBody() wafpolicy: Wafpolicy,
+    @param.path.string('id') id: string,
+    @requestBody() wafpolicy: Partial<Wafpolicy>,
   ): Promise<void> {
+    wafpolicy.id = id;
     await this.wafpolicyRepository.replaceById(id, wafpolicy);
   }
 
@@ -134,7 +137,7 @@ export class WafpolicyController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.wafpolicyRepository.deleteById(id);
   }
 }
