@@ -35,7 +35,9 @@ export class ApplicationController {
       },
     },
   })
-  async create(@requestBody() application: Application): Promise<Application> {
+  async create(
+    @requestBody() application: Partial<Application>,
+  ): Promise<Application> {
     return await this.applicationRepository.create(application);
   }
 
@@ -81,7 +83,7 @@ export class ApplicationController {
     },
   })
   async updateAll(
-    @requestBody() application: Application,
+    @requestBody() application: Partial<Application>,
     @param.query.object('where', getWhereSchemaFor(Application)) where?: Where,
   ): Promise<Count> {
     return await this.applicationRepository.updateAll(application, where);
@@ -95,7 +97,7 @@ export class ApplicationController {
       },
     },
   })
-  async findById(@param.path.number('id') id: string): Promise<Application> {
+  async findById(@param.path.string('id') id: string): Promise<Application> {
     return await this.applicationRepository.findById(id);
   }
 
@@ -107,8 +109,8 @@ export class ApplicationController {
     },
   })
   async updateById(
-    @param.path.number('id') id: string,
-    @requestBody() application: Application,
+    @param.path.string('id') id: string,
+    @requestBody() application: Partial<Application>,
   ): Promise<void> {
     await this.applicationRepository.updateById(id, application);
   }
@@ -121,9 +123,10 @@ export class ApplicationController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: string,
-    @requestBody() application: Application,
+    @param.path.string('id') id: string,
+    @requestBody() application: Partial<Application>,
   ): Promise<void> {
+    application.id = id;
     await this.applicationRepository.replaceById(id, application);
   }
 
@@ -134,7 +137,7 @@ export class ApplicationController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.applicationRepository.deleteById(id);
   }
 }

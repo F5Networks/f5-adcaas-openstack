@@ -1,17 +1,17 @@
 import {Client} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from './test-helper';
+import {setupApplication} from '../helpers/test-helper';
 
 describe('Unknown path', () => {
-  let app: WafApplication;
+  let wafapp: WafApplication;
   let client: Client;
 
   before('setupApplication', async () => {
-    ({app, client} = await setupApplication());
+    ({wafapp, client} = await setupApplication());
   });
 
   after(async () => {
-    await app.stop();
+    await wafapp.stop();
   });
 
   it('invokes GET /does-not-exist', async () => {

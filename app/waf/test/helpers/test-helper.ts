@@ -4,26 +4,27 @@ import {
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
-import {testdb} from '../fixtures/datasources/testdb.datasource';
+import {testdb_config, testdb} from '../fixtures/datasources/testdb.datasource';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
     rest: givenHttpServerConfig({
-      host: '0.0.0.0',
+      host: 'localhost',
       port: 3000,
     }),
   });
   app.dataSource(testdb);
 
   await app.boot();
+  app.bind('datasources.config.db').to(testdb_config);
   await app.start();
 
   const client = createRestAppClient(app);
 
-  return {app, client};
+  return {wafapp: app, client: client};
 }
 
 export interface AppWithClient {
-  app: WafApplication;
+  wafapp: WafApplication;
   client: Client;
 }

@@ -2,67 +2,62 @@ import {
   WafpolicyRepository,
   ApplicationRepository,
 } from '../../src/repositories';
-import {testdb} from '../fixtures/datasources/testdb.datasource';
 import {Wafpolicy} from '../../src/models';
 import {Application} from '../../src/models';
+import {v4 as uuid} from 'uuid';
+import {WafApplication} from '../../src';
 
-export async function givenEmptyDatabase() {
-  await new WafpolicyRepository(testdb).deleteAll();
-  await new ApplicationRepository(testdb).deleteAll();
+export async function givenEmptyDatabase(wafapp: WafApplication) {
+  const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
+  await wafpolicyrepo.deleteAll();
+
+  const apprepo = await wafapp.getRepository(ApplicationRepository);
+  await apprepo.deleteAll();
 }
 
-export function givenWafpolicyData1(data?: Partial<Wafpolicy>) {
+export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
-      id: '4225f224-df91-30b2-258c0e766b2a',
-      name: 'test waf policy 1',
+      id: uuid(),
+      name: 'test waf policy',
       content:
-        '<?xml version="1.0" encoding="utf-8"?>' +
-        '<policy bigip_version="11.6.0" integrity_check=' +
-        '"6d097acbaa3d38a61152dab35e74e52e" ' +
-        'name="/Common/linux-high">' +
-        '  <policy_version>' +
-        '<timestamp>2015-05-29T14:53:17Z</timestamp>' +
-        '<device_name>bigip1</device_name>' +
-        '<policy_name>/Common/linux-high</policy_name>' +
-        '<last_change>Policy Attributes  [update]: ' +
-        'Policy Builder determined that security policy ' +
-        '"/Common/linux-high" is unstable. { audit: component = ' +
-        'Policy Builder }</last_change>' +
-        '</policy_version>' +
-        '</policy>',
+        '<?xml version="1.0" encoding="utf-8"?>' + '<policy>any</policy>',
       shared: false,
-      tenant: 'admin',
-      created_at: '2019-01-21 05:03:45.502',
+      tenant: ['adminz'],
+      created_at: '2019-01-21T05:03:45.502Z',
     },
     data,
   );
 }
 
-export async function givenWafpolicyData(data?: Partial<Wafpolicy>) {
-  return await new WafpolicyRepository(testdb).create(
-    givenWafpolicyData1(data),
-  );
+export async function givenWafpolicyData(
+  wafapp: WafApplication,
+  data?: Partial<Wafpolicy>,
+) {
+  const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
+  return await wafpolicyrepo.create(createWafpolicyObject(data));
 }
 
-export function givenApplicationData1(data?: Partial<Application>) {
+export function createApplicationObject(data?: Partial<Application>) {
   return Object.assign(
     {
-      id: '',
-      name: 'test application 1',
+      id: uuid(),
+      name: 'test application',
       description: 'application test data',
       declaration: '{"class": "ADC"}',
       status: 'Done',
-      created_at: '2019-01-21 05:03:52.046',
-      updated_at: '2019-01-21 05:03:52.063',
+      created_at: '2019-01-22T05:03:45.502Z',
+      updated_at: '2019-01-23T05:03:45.502Z',
       wafpolicy_id: '4225f224-df91-30b2-258c0e766b2a',
     },
     data,
   );
 }
 
-export async function givenApplicationData(data?: Partial<Application>) {
-  return await new ApplicationRepository(testdb).create(
-    givenApplicationData1(data),
-  );
+export async function givenApplicationData(
+  wafapp: WafApplication,
+  data?: Partial<Application>,
+) {
+  const apprepo = await wafapp.getRepository(ApplicationRepository);
+  return await apprepo.create(createApplicationObject(data));
 }
