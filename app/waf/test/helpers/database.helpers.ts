@@ -2,9 +2,15 @@ import {
   WafpolicyRepository,
   ApplicationRepository,
   TenantAssociationRepository,
+  ServiceRepository,
 } from '../../src/repositories';
-import {Application, Wafpolicy, TenantAssociation} from '../../src/models';
-import {v4 as uuid} from 'uuid';
+import {
+  Application,
+  Wafpolicy,
+  TenantAssociation,
+  Service,
+} from '../../src/models';
+import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {AdcRepository} from '../../src/repositories/adc.repository';
 import {Adc} from '../../src/models/adc.model';
@@ -21,6 +27,9 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const tenantRepo = await wafapp.getRepository(TenantAssociationRepository);
   await tenantRepo.deleteAll();
+
+  const serviceRepo = await wafapp.getRepository(ServiceRepository);
+  await serviceRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -109,6 +118,37 @@ export function createTenantAssociationObject(
       adcId: uuid(),
       createdAt: '2019-01-22T05:03:45.502Z',
       updatedAt: '2019-01-23T05:03:45.502Z',
+    },
+    data,
+  );
+}
+
+export async function giveServiceData(
+  wafapp: WafApplication,
+  data?: Partial<Service>,
+) {
+  const repo = await wafapp.getRepository(ServiceRepository);
+  return await repo.create(createServiceObjectWithID(data));
+}
+
+export function createServiceObjectWithID(data?: Partial<Service>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      class: 'Service_HTTP',
+      virtualAddresses: ['10.0.1.11'],
+      pool: 'web_pool',
+    },
+    data,
+  );
+}
+
+export function createServiceObjectWithoutID(data?: Partial<Service>) {
+  return Object.assign(
+    {
+      class: 'Service_HTTP',
+      virtualAddresses: ['10.0.1.11'],
+      pool: 'web_pool',
     },
     data,
   );
