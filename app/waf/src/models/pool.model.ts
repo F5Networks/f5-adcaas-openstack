@@ -10,27 +10,32 @@ export class Pool extends Entity {
 
   @property({
     type: 'string',
-    default: 'Pool',
+    required: false,
   })
-  class?: string;
+  name?: string;
 
   @property({
     type: 'string',
+    required: false,
     default: 'round-robin',
   })
-  loadBalancingMode?: string;
+  loadBalancingMode: string;
 
   @property({
     type: 'array',
     itemType: 'string',
+    required: false,
+    default: [],
   })
-  members?: string[];
+  members: string[];
 
   @property({
     type: 'array',
     itemType: 'string',
+    required: false,
+    default: [],
   })
-  monitors?: string[];
+  monitors: string[];
 
   constructor(data?: Partial<Pool>) {
     super(data);

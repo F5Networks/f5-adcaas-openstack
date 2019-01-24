@@ -27,6 +27,12 @@ export class Wafpolicy extends Entity {
   shared: boolean;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  url: string;
+
+  @property({
     type: 'array',
     itemType: 'string',
   })

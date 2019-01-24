@@ -16,6 +16,16 @@
       "functions": {
         "info": ["host", "port"]
       }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/appsvcs/declare",
+        "body": "{body}"
+      },
+      "functions": {
+        "deploy": ["host", "port","body"]
+      }
     }
   ]
 }

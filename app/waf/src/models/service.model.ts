@@ -5,14 +5,15 @@ export class Service extends Entity {
   @property({
     type: 'string',
     id: true,
+    required: false,
   })
-  id?: string;
+  id: string;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  class: string;
+  name?: string;
 
   @property({
     type: 'array',
@@ -23,11 +24,13 @@ export class Service extends Entity {
 
   @property({
     type: 'number',
+    required: false,
   })
   virtualPort?: number;
 
   @property({
     type: 'string',
+    required: false,
   })
   pool?: string;
 

@@ -3,33 +3,52 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Client, expect, toJSON} from '@loopback/testlab';
+import {Client, expect, sinon, toJSON} from '@loopback/testlab';
+import {HttpErrors} from '@loopback/rest';
+import {AS3DeployRequest} from '../../src/models';
 import {WafApplication} from '../..';
+import {ApplicationController} from '../../src/controllers';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
+  givenAdcData,
+  givenTenantAssociationData,
+  givenServiceData,
+  givenPoolData,
+  givenMemberData,
   createApplicationObject,
-  givenWafpolicyData,
 } from '../helpers/database.helpers';
 import {Application} from '../../src/models';
 import uuid = require('uuid');
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;
+  let controller: ApplicationController;
   let client: Client;
+  let deployStub: sinon.SinonStub;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
     ({wafapp, client} = await setupApplication());
+
+    controller = await wafapp.get<ApplicationController>(
+      'controllers.ApplicationController',
+    );
   });
+
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
+    deployStub = sinon.stub(controller.as3Service, 'deploy');
   });
 
   after(async () => {
     await teardownApplication(wafapp);
+  });
+
+  afterEach(async () => {
+    deployStub.restore();
   });
 
   it('post ' + prefix + '/applications: with id', async () => {
@@ -65,51 +84,6 @@ describe('ApplicationController', () => {
       .post(prefix + '/applications')
       .send(application)
       .expect(400);
-  });
-
-  it('post ' + prefix + '/applications: no wafpolicy assocated', async () => {
-    const application = new Application(
-      createApplicationObject({
-        wafpolicyId: undefined,
-      }),
-    );
-
-    const response = await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(application));
-  });
-
-  it('post ' + prefix + '/applications: wafpolicy not ready', async () => {
-    const application = new Application(
-      createApplicationObject({
-        wafpolicyId: uuid(),
-      }),
-    );
-
-    await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(404);
-  });
-
-  it('post ' + prefix + '/applications: wafpolicy ready', async () => {
-    const wafpolicy = await givenWafpolicyData(wafapp);
-
-    const application = new Application(
-      createApplicationObject({
-        wafpolicyId: wafpolicy.id,
-      }),
-    );
-
-    const response = await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
@@ -264,4 +238,112 @@ describe('ApplicationController', () => {
       .send(application)
       .expect(404);
   });
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{id}/deploy: no ADC associated with application',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: application has no service',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+      const adc = await givenAdcData(wafapp);
+      await givenTenantAssociationData(wafapp, {
+        tenantId: 'default',
+        adcId: adc.id,
+      });
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: deploy as3 config',
+    async () => {
+      const adc = await givenAdcData(wafapp);
+      await givenTenantAssociationData(wafapp, {
+        tenantId: 'default',
+        adcId: adc.id,
+      });
+      let member = await givenMemberData(wafapp);
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+        members: [member.id],
+      });
+      let service = await givenServiceData(wafapp, {
+        pool: pool.id,
+      });
+      let application = await givenApplicationData(wafapp, {
+        services: [service.id],
+      });
+
+      deployStub.returns(Promise.resolve('Hello'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(200);
+
+      let req = <AS3DeployRequest>deployStub.getCall(0).args[2];
+      req.declaration.toJSON();
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: no member in pool',
+    async () => {
+      const adc = await givenAdcData(wafapp);
+      await givenTenantAssociationData(wafapp, {
+        tenantId: 'default',
+        adcId: adc.id,
+      });
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+        members: [],
+      });
+      let service = await givenServiceData(wafapp, {
+        pool: pool.id,
+      });
+      let application = await givenApplicationData(wafapp, {
+        services: [service.id],
+      });
+
+      deployStub.returns(Promise.resolve('Hello'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(200);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: unprocessable declaration',
+    async () => {
+      const adc = await givenAdcData(wafapp);
+      await givenTenantAssociationData(wafapp, {
+        tenantId: 'default',
+        adcId: adc.id,
+      });
+      let service = await givenServiceData(wafapp);
+      let application = await givenApplicationData(wafapp, {
+        services: [service.id],
+      });
+
+      deployStub.throws(new HttpErrors.UnprocessableEntity('something wrong'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(422);
+    },
+  );
 });
