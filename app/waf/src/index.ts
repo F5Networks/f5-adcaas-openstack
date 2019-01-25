@@ -8,7 +8,11 @@ const prefix = '/adcaas/v1';
 export async function main(options: ApplicationConfig = {}) {
   const app = new WafApplication(options);
   await app.boot();
-  await app.migrateSchema();
+  // Asynchronously perform the 'migrateSchema' action.
+  // Delay the execution to make sure the dependent datasource is ready.
+  setTimeout(async () => {
+    await app.migrateSchema();
+  }, 5000).unref();
   await app.start();
 
   const url = app.restServer.url;

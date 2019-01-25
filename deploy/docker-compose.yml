@@ -1,0 +1,60 @@
+version: "3"
+services:
+  waf:
+    image: f5devcentral/f5-wafaas-openstack:latest
+    container_name: f5-wafaas-openstack-server
+    env_file:
+      - ./appcluster.rc
+
+    ports:
+      - ${WAF_APP_PORT:-3000}:3000
+    depends_on:
+      - postgres
+      - AS3
+    links:
+      - postgres:postgres-server
+      - AS3:as3-server
+
+  postgres:
+    image: postgres:11.1
+    container_name: postgres-server
+    environment:
+      - POSTGRES_USER=${DATABASE_USER:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - POSTGRES_DB=${DATABASE_DB:-postgres}
+    ports:
+      - ${DATABASE_PORT:-5432}:5432
+    volumes:
+      - ${DATABASE_DATA_DIRECTORY:?err}:/var/lib/postgresql/data
+
+  AS3:
+    image: f5devcentral/f5-as3-container:3.7.0
+    container_name: as3-server
+    ports:
+      - 8443:443
+      - 8080:80
+
+# networks:
+#   app_net:
+#     driver: bridge
+#     ipam:
+#       driver: default
+#       config:
+#       - subnet: ${WAF_APP_NETWORK-172.16.238.0/24}
+
+#   # TODO: enable logging.
+#   LOG:
+#     image: balabit/syslog-ng:latest
+#     container_name: syslog-server
+#     volumes:
+#       - path/to/log-volumes:/var/log/syslog
+#     ports:
+#       - 514:514/udp
+#       - 601:601
+  
+# x-logging:
+#   &default-logging
+#   driver: syslog
+#   options:
+#     syslog-address: "tcp://syslog-server:514"
+
