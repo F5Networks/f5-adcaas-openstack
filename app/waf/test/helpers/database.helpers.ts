@@ -3,12 +3,14 @@ import {
   ApplicationRepository,
   TenantAssociationRepository,
   ServiceRepository,
+  PoolRepository,
 } from '../../src/repositories';
 import {
   Application,
   Wafpolicy,
   TenantAssociation,
   Service,
+  Pool,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -30,6 +32,9 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const serviceRepo = await wafapp.getRepository(ServiceRepository);
   await serviceRepo.deleteAll();
+
+  const poolRepo = await wafapp.getRepository(PoolRepository);
+  await poolRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -149,6 +154,49 @@ export function createServiceObjectWithoutID(data?: Partial<Service>) {
       class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11'],
       pool: 'web_pool',
+    },
+    data,
+  );
+}
+
+export async function givePoolData(
+  wafapp: WafApplication,
+  data?: Partial<Pool>,
+) {
+  const repo = await wafapp.getRepository(PoolRepository);
+  return await repo.create(createPoolObjectWithID(data));
+}
+
+export function createPoolObjectWithID(data?: Partial<Pool>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      class: 'Pool',
+      loadBalancingMode: 'round-robin',
+      members: [
+        {
+          servicePort: 80,
+          serverAddresses: ['192.0.1.22', '192.0.1.23'],
+        },
+      ],
+      monitors: ['http'],
+    },
+    data,
+  );
+}
+
+export function createPoolObjectWithoutID(data?: Partial<Pool>) {
+  return Object.assign(
+    {
+      class: 'Pool',
+      loadBalancingMode: 'round-robin',
+      members: [
+        {
+          servicePort: 80,
+          serverAddresses: ['192.0.1.22', '192.0.1.23'],
+        },
+      ],
+      monitors: ['http'],
     },
     data,
   );

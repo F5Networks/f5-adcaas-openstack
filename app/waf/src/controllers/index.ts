@@ -4,3 +4,4 @@ export * from './tenantassoc.controller';
 export * from './wafpolicy.controller';
 export * from './adc.controller';
 export * from './service.controller';
+export * from './pool.controller';
