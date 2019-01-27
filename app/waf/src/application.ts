@@ -9,6 +9,8 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
+import {LOG_BINDING} from './keys';
+import {factory} from './log4ts';
 
 export class WafApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -27,6 +29,8 @@ export class WafApplication extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
+
+    this.bind(LOG_BINDING.LOGGER_GENERATOR).to(factory);
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here

@@ -57,6 +57,7 @@
     "@types/uuid": "^3.4.4",
     "loopback-connector-postgresql": "^3.5.0",
     "loopback-connector-rest": "^3.4.1",
+    "typescript-logging": "^0.6.3",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

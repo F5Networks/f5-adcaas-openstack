@@ -18,7 +18,7 @@ import {
 } from '@loopback/rest';
 import {Service} from '../models';
 import {ServiceRepository} from '../repositories';
-import {v4 as uuid} from 'uuid';
+import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
