@@ -15,9 +15,11 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Adc} from '../models';
 import {AdcRepository} from '../repositories';
+import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
@@ -36,7 +38,15 @@ export class AdcController {
     },
   })
   async create(@requestBody() adc: Partial<Adc>): Promise<Adc> {
-    return await this.adcRepository.create(adc);
+    if (!adc.id) {
+      adc.id = uuid();
+    }
+
+    try {
+      return await this.adcRepository.create(adc);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.detail);
+    }
   }
 
   @get(prefix + '/adcs/count', {

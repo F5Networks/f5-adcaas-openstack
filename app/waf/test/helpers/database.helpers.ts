@@ -2,9 +2,17 @@ import {
   WafpolicyRepository,
   ApplicationRepository,
   TenantAssociationRepository,
+  ServiceRepository,
+  PoolRepository,
 } from '../../src/repositories';
-import {Application, Wafpolicy, TenantAssociation} from '../../src/models';
-import {v4 as uuid} from 'uuid';
+import {
+  Application,
+  Wafpolicy,
+  TenantAssociation,
+  Service,
+  Pool,
+} from '../../src/models';
+import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {AdcRepository} from '../../src/repositories/adc.repository';
 import {Adc} from '../../src/models/adc.model';
@@ -21,18 +29,23 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const tenantRepo = await wafapp.getRepository(TenantAssociationRepository);
   await tenantRepo.deleteAll();
+
+  const serviceRepo = await wafapp.getRepository(ServiceRepository);
+  await serviceRepo.deleteAll();
+
+  const poolRepo = await wafapp.getRepository(PoolRepository);
+  await poolRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'test waf policy',
       content:
         '<?xml version="1.0" encoding="utf-8"?>' + '<policy>any</policy>',
       shared: false,
       tenant: ['adminz'],
-      created_at: '2019-01-21T05:03:45.502Z',
+      createdAt: '2019-01-21T05:03:45.502Z',
     },
     data,
   );
@@ -43,20 +56,20 @@ export async function givenWafpolicyData(
   data?: Partial<Wafpolicy>,
 ) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
-  return await wafpolicyrepo.create(createWafpolicyObject(data));
+  const obj = createWafpolicyObject(data);
+  obj.id = uuid();
+  return await wafpolicyrepo.create(obj);
 }
 
 export function createApplicationObject(data?: Partial<Application>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'test application',
       description: 'application test data',
       declaration: '{"class": "ADC"}',
       status: 'Done',
-      created_at: '2019-01-22T05:03:45.502Z',
-      updated_at: '2019-01-23T05:03:45.502Z',
-      wafpolicy_id: '4225f224-df91-30b2-258c0e766b2a',
+      createdAt: '2019-01-22T05:03:45.502Z',
+      updatedAt: '2019-01-23T05:03:45.502Z',
     },
     data,
   );
@@ -67,13 +80,14 @@ export async function givenApplicationData(
   data?: Partial<Application>,
 ) {
   const apprepo = await wafapp.getRepository(ApplicationRepository);
-  return await apprepo.create(createApplicationObject(data));
+  const obj = createApplicationObject(data);
+  obj.id = uuid();
+  return await apprepo.create(obj);
 }
 
 export function createAdcObject(data?: Partial<Adc>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'adc target',
       host: '1.2.3.4',
       port: 8443,
@@ -89,7 +103,9 @@ export async function givenAdcData(
   data?: Partial<Adc>,
 ) {
   const adcpepo = await wafapp.getRepository(AdcRepository);
-  return await adcpepo.create(createAdcObject(data));
+  const obj = createAdcObject(data);
+  obj.id = uuid();
+  return await adcpepo.create(obj);
 }
 
 export async function givenTenantAssociationData(
@@ -109,6 +125,80 @@ export function createTenantAssociationObject(
       adcId: uuid(),
       createdAt: '2019-01-22T05:03:45.502Z',
       updatedAt: '2019-01-23T05:03:45.502Z',
+    },
+    data,
+  );
+}
+
+export async function giveServiceData(
+  wafapp: WafApplication,
+  data?: Partial<Service>,
+) {
+  const repo = await wafapp.getRepository(ServiceRepository);
+  return await repo.create(createServiceObjectWithID(data));
+}
+
+export function createServiceObjectWithID(data?: Partial<Service>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      class: 'Service_HTTP',
+      virtualAddresses: ['10.0.1.11'],
+      pool: 'web_pool',
+    },
+    data,
+  );
+}
+
+export function createServiceObjectWithoutID(data?: Partial<Service>) {
+  return Object.assign(
+    {
+      class: 'Service_HTTP',
+      virtualAddresses: ['10.0.1.11'],
+      pool: 'web_pool',
+    },
+    data,
+  );
+}
+
+export async function givePoolData(
+  wafapp: WafApplication,
+  data?: Partial<Pool>,
+) {
+  const repo = await wafapp.getRepository(PoolRepository);
+  return await repo.create(createPoolObjectWithID(data));
+}
+
+export function createPoolObjectWithID(data?: Partial<Pool>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      class: 'Pool',
+      loadBalancingMode: 'round-robin',
+      members: [
+        {
+          servicePort: 80,
+          serverAddresses: ['192.0.1.22', '192.0.1.23'],
+        },
+      ],
+      monitors: ['http'],
+    },
+    data,
+  );
+}
+
+export function createPoolObjectWithoutID(data?: Partial<Pool>) {
+  return Object.assign(
+    {
+      class: 'Pool',
+      loadBalancingMode: 'round-robin',
+      members: [
+        {
+          servicePort: 80,
+          serverAddresses: ['192.0.1.22', '192.0.1.23'],
+        },
+      ],
+      monitors: ['http'],
     },
     data,
   );

@@ -31,7 +31,7 @@ describe('WafpolicyController', () => {
     await wafapp.stop();
   });
 
-  it('post ' + prefix + '/wafpolicies', async () => {
+  it('post ' + prefix + '/wafpolicies: with id', async () => {
     const wafpolicy = new Wafpolicy(createWafpolicyObject({id: uuid()}));
 
     const response = await client
@@ -40,6 +40,26 @@ describe('WafpolicyController', () => {
       .expect(200);
 
     expect(response.body).to.containDeep(toJSON(wafpolicy));
+  });
+
+  it('post ' + prefix + '/wafpolicies: with no id', async () => {
+    const wafpolicy = new Wafpolicy(createWafpolicyObject());
+
+    const response = await client
+      .post(prefix + '/wafpolicies')
+      .send(wafpolicy)
+      .expect(200);
+
+    expect(response.body).to.containDeep(toJSON(wafpolicy));
+  });
+
+  it('post ' + prefix + '/wafpolicies: with duplicate id', async () => {
+    const wafpolicy = await givenWafpolicyData(wafapp);
+
+    await client
+      .post(prefix + '/wafpolicies')
+      .send(wafpolicy)
+      .expect(400);
   });
 
   it('get ' + prefix + '/wafpolicies: of all', async () => {

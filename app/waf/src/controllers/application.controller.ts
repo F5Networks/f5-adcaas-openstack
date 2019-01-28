@@ -15,9 +15,11 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Application} from '../models';
-import {ApplicationRepository} from '../repositories';
+import {ApplicationRepository, WafpolicyRepository} from '../repositories';
+import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
@@ -25,6 +27,8 @@ export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
+    @repository(WafpolicyRepository)
+    public wafpolicyRepository: WafpolicyRepository,
   ) {}
 
   @post(prefix + '/applications', {
@@ -38,7 +42,18 @@ export class ApplicationController {
   async create(
     @requestBody() application: Partial<Application>,
   ): Promise<Application> {
-    return await this.applicationRepository.create(application);
+    if (!application.id) {
+      application.id = uuid();
+    }
+    if (application.wafpolicyId) {
+      await this.wafpolicyRepository.findById(application.wafpolicyId);
+    }
+
+    try {
+      return await this.applicationRepository.create(application);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.detail);
+    }
   }
 
   @get(prefix + '/applications/count', {

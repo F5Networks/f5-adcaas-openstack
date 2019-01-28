@@ -33,17 +33,17 @@ export class Application extends Entity {
   @property({
     type: 'date',
   })
-  created_at?: string;
+  createdAt?: string;
 
   @property({
     type: 'date',
   })
-  updated_at?: string;
+  updatedAt?: string;
 
   @property({
     type: 'string',
   })
-  wafpolicy_id?: string;
+  wafpolicyId?: string;
 
   constructor(data?: Partial<Application>) {
     super(data);
