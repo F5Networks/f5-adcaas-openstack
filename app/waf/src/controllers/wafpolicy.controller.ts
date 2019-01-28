@@ -15,9 +15,11 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Wafpolicy} from '../models';
 import {WafpolicyRepository} from '../repositories';
+import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
@@ -38,7 +40,15 @@ export class WafpolicyController {
   async create(
     @requestBody() wafpolicy: Partial<Wafpolicy>,
   ): Promise<Wafpolicy> {
-    return await this.wafpolicyRepository.create(wafpolicy);
+    if (!wafpolicy.id) {
+      wafpolicy.id = uuid();
+    }
+
+    try {
+      return await this.wafpolicyRepository.create(wafpolicy);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.detail);
+    }
   }
 
   @get(prefix + '/wafpolicies/count', {

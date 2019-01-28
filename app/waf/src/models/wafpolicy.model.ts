@@ -35,7 +35,7 @@ export class Wafpolicy extends Entity {
   @property({
     type: 'date',
   })
-  created_at?: string;
+  createdAt?: string;
 
   constructor(data?: Partial<Wafpolicy>) {
     super(data);

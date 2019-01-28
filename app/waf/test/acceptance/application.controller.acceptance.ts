@@ -10,6 +10,7 @@ import {
   givenEmptyDatabase,
   givenApplicationData,
   createApplicationObject,
+  givenWafpolicyData,
 } from '../helpers/database.helpers';
 import {Application} from '../../src/models';
 import {v4 as uuid} from 'uuid';
@@ -31,8 +32,77 @@ describe('ApplicationController', () => {
     await wafapp.stop();
   });
 
-  it('post ' + prefix + '/applications', async () => {
-    const application = new Application(createApplicationObject({id: uuid()}));
+  it('post ' + prefix + '/applications: with id', async () => {
+    const application = new Application(
+      createApplicationObject({
+        id: uuid(),
+      }),
+    );
+
+    const response = await client
+      .post(prefix + '/applications')
+      .send(application)
+      .expect(200);
+
+    expect(response.body).to.containDeep(toJSON(application));
+  });
+
+  it('post ' + prefix + '/applications: with no id', async () => {
+    const application = new Application(createApplicationObject());
+
+    const response = await client
+      .post(prefix + '/applications')
+      .send(application)
+      .expect(200);
+
+    expect(response.body).to.containDeep(toJSON(application));
+  });
+
+  it('post ' + prefix + '/applications: with duplicate id', async () => {
+    const application = await givenApplicationData(wafapp);
+
+    await client
+      .post(prefix + '/applications')
+      .send(application)
+      .expect(400);
+  });
+
+  it('post ' + prefix + '/applications: no wafpolicy assocated', async () => {
+    const application = new Application(
+      createApplicationObject({
+        wafpolicyId: undefined,
+      }),
+    );
+
+    const response = await client
+      .post(prefix + '/applications')
+      .send(application)
+      .expect(200);
+
+    expect(response.body).to.containDeep(toJSON(application));
+  });
+
+  it('post ' + prefix + '/applications: wafpolicy not ready', async () => {
+    const application = new Application(
+      createApplicationObject({
+        wafpolicyId: uuid(),
+      }),
+    );
+
+    await client
+      .post(prefix + '/applications')
+      .send(application)
+      .expect(404);
+  });
+
+  it('post ' + prefix + '/applications: wafpolicy ready', async () => {
+    const wafpolicy = await givenWafpolicyData(wafapp);
+
+    const application = new Application(
+      createApplicationObject({
+        wafpolicyId: wafpolicy.id,
+      }),
+    );
 
     const response = await client
       .post(prefix + '/applications')

@@ -40,13 +40,12 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'test waf policy',
       content:
         '<?xml version="1.0" encoding="utf-8"?>' + '<policy>any</policy>',
       shared: false,
       tenant: ['adminz'],
-      created_at: '2019-01-21T05:03:45.502Z',
+      createdAt: '2019-01-21T05:03:45.502Z',
     },
     data,
   );
@@ -57,20 +56,20 @@ export async function givenWafpolicyData(
   data?: Partial<Wafpolicy>,
 ) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
-  return await wafpolicyrepo.create(createWafpolicyObject(data));
+  const obj = createWafpolicyObject(data);
+  obj.id = uuid();
+  return await wafpolicyrepo.create(obj);
 }
 
 export function createApplicationObject(data?: Partial<Application>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'test application',
       description: 'application test data',
       declaration: '{"class": "ADC"}',
       status: 'Done',
-      created_at: '2019-01-22T05:03:45.502Z',
-      updated_at: '2019-01-23T05:03:45.502Z',
-      wafpolicy_id: '4225f224-df91-30b2-258c0e766b2a',
+      createdAt: '2019-01-22T05:03:45.502Z',
+      updatedAt: '2019-01-23T05:03:45.502Z',
     },
     data,
   );
@@ -81,13 +80,14 @@ export async function givenApplicationData(
   data?: Partial<Application>,
 ) {
   const apprepo = await wafapp.getRepository(ApplicationRepository);
-  return await apprepo.create(createApplicationObject(data));
+  const obj = createApplicationObject(data);
+  obj.id = uuid();
+  return await apprepo.create(obj);
 }
 
 export function createAdcObject(data?: Partial<Adc>) {
   return Object.assign(
     {
-      id: uuid(),
       name: 'adc target',
       host: '1.2.3.4',
       port: 8443,
@@ -103,7 +103,9 @@ export async function givenAdcData(
   data?: Partial<Adc>,
 ) {
   const adcpepo = await wafapp.getRepository(AdcRepository);
-  return await adcpepo.create(createAdcObject(data));
+  const obj = createAdcObject(data);
+  obj.id = uuid();
+  return await adcpepo.create(obj);
 }
 
 export async function givenTenantAssociationData(
