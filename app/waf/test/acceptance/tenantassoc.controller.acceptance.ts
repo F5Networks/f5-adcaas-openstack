@@ -5,12 +5,12 @@
 
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from '../helpers/test-helper';
+import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenTenantAssociationData,
 } from '../helpers/database.helpers';
-import {v4 as uuid} from 'uuid';
+import uuid = require('uuid');
 
 describe('TenantAssociationController', () => {
   let wafapp: WafApplication;
@@ -27,7 +27,7 @@ describe('TenantAssociationController', () => {
   });
 
   after(async () => {
-    await wafapp.stop();
+    await teardownApplication(wafapp);
   });
 
   it('post ' + prefix + '/tenantassocs', async () => {

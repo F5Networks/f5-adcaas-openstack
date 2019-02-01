@@ -1,6 +1,6 @@
 import {Client} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from '../helpers/test-helper';
+import {setupApplication, teardownApplication} from '../helpers/test-helper';
 
 describe('Unknown path', () => {
   let wafapp: WafApplication;
@@ -11,7 +11,7 @@ describe('Unknown path', () => {
   });
 
   after(async () => {
-    await wafapp.stop();
+    await teardownApplication(wafapp);
   });
 
   it('invokes GET /does-not-exist', async () => {

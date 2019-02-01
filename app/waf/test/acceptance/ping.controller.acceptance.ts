@@ -1,7 +1,7 @@
 import {Client, expect, sinon} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {PingController} from '../../src/controllers';
-import {setupApplication} from '../helpers/test-helper';
+import {setupApplication, teardownApplication} from '../helpers/test-helper';
 
 const prefix = '/adcaas/v1';
 
@@ -18,7 +18,7 @@ describe('PingController', () => {
   });
 
   after(async () => {
-    await wafapp.stop();
+    await teardownApplication(wafapp);
     sinon.restore();
   });
 

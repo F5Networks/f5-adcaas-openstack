@@ -5,7 +5,7 @@
 
 import {Client} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from '../helpers/test-helper';
+import {setupApplication, teardownApplication} from '../helpers/test-helper';
 
 describe('HomePage', () => {
   let wafapp: WafApplication;
@@ -16,7 +16,7 @@ describe('HomePage', () => {
   });
 
   after(async () => {
-    await wafapp.stop();
+    await teardownApplication(wafapp);
   });
 
   it('exposes a default home page', async () => {

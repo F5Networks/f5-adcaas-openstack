@@ -5,7 +5,7 @@
 
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication} from '../helpers/test-helper';
+import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
@@ -13,7 +13,7 @@ import {
   givenWafpolicyData,
 } from '../helpers/database.helpers';
 import {Application} from '../../src/models';
-import {v4 as uuid} from 'uuid';
+import uuid = require('uuid');
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;
@@ -29,7 +29,7 @@ describe('ApplicationController', () => {
   });
 
   after(async () => {
-    await wafapp.stop();
+    await teardownApplication(wafapp);
   });
 
   it('post ' + prefix + '/applications: with id', async () => {
