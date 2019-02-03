@@ -1,6 +1,6 @@
 import {inject} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-import * as config from './as3.datasource.json';
+import * as config from './as-3.datasource.json';
 
 export class AS3DataSource extends juggler.DataSource {
   static dataSourceName = 'AS3';
