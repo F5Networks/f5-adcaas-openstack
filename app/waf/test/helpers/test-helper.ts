@@ -15,14 +15,14 @@ export async function setupApplication(): Promise<AppWithClient> {
     }),
   });
   app.dataSource(testdb);
+  app.bind('datasources.config.db').to(testdb_config);
+
+  stubLogging();
 
   await app.boot();
-  app.bind('datasources.config.db').to(testdb_config);
-  stubLogging();
   await app.start();
 
   const client = createRestAppClient(app);
-
   return {wafapp: app, client: client};
 }
 

@@ -63,7 +63,9 @@
   "devDependencies": {
     "@loopback/build": "^1.0.1",
     "@loopback/testlab": "^1.0.1",
+    "@types/express": "^4.16.1",
     "@types/node": "^10.11.2",
-    "coveralls": "^3.0.0"
+    "coveralls": "^3.0.0",
+    "express": "^4.16.4"
   }
 }
