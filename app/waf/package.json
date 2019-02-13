@@ -45,6 +45,11 @@
     "dist/index*",
     "src"
   ],
+  "nyc": {
+    "exclude": [
+      "dist/test/**"
+    ]
+  },
   "dependencies": {
     "@loopback/boot": "^1.0.6",
     "@loopback/context": "^1.2.0",
