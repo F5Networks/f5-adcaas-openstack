@@ -3,6 +3,7 @@ import {MySequence} from '../../src/sequence';
 
 let logRequest: sinon.SinonStub;
 let logResponse: sinon.SinonStub;
+let consoleLog: sinon.SinonStub;
 
 export function stubLogging(): void {
   logRequest = sinon.stub(MySequence.prototype, 'logRequest');
@@ -15,4 +16,13 @@ export function stubLogging(): void {
 export function restoreLogging(): void {
   logRequest.restore();
   logResponse.restore();
+}
+
+export function stubConsoleLog(): void {
+  consoleLog = sinon.stub(console, 'log');
+  consoleLog.callsFake(() => {});
+}
+
+export function restoreConsoleLog(): void {
+  consoleLog.restore();
 }

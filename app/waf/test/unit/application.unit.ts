@@ -1,12 +1,16 @@
 import {expect, sinon} from '@loopback/testlab';
 import {WafApplication, main} from '../..';
 import {testdb} from '../fixtures/datasources/testdb.datasource';
+import {stubConsoleLog, restoreConsoleLog} from '../helpers/logging.helpers';
 
-describe('WAF Application main function', () => {
+describe('WAFApplication main logic', () => {
   let app: WafApplication;
 
   before('stub WafApplication', async () => {
     sinon.stub(WafApplication.prototype, 'migrateSchema');
+    sinon.stub(WafApplication.prototype, 'boot');
+    sinon.stub(WafApplication.prototype, 'start');
+    sinon.stub(WafApplication.prototype, 'stop');
   });
 
   after('restore WafApplication', async () => {
@@ -14,18 +18,21 @@ describe('WAF Application main function', () => {
   });
 
   it('invoke main without configuration', async () => {
+    stubConsoleLog();
     app = await main();
-    await app.stop();
+    expect(app.options).to.eql({});
+    restoreConsoleLog();
   });
 
   it('invoke main with a port number', async () => {
+    stubConsoleLog();
     app = await main({port: 9999});
     expect(app.options).to.containEql({port: 9999});
-    await app.stop();
+    restoreConsoleLog();
   });
 });
 
-describe('WAF Application', () => {
+describe('WAFApplication constructor', () => {
   let app: WafApplication;
 
   it('construct app without parameter', async () => {
