@@ -18,7 +18,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {inject} from '@loopback/context';
-import {Application, AS3DeployRequest} from '../models';
+import {Application, AS3DeployRequest, Endpointpolicy, Rule} from '../models';
 import {
   ApplicationRepository,
   AdcRepository,
@@ -26,6 +26,9 @@ import {
   ServiceRepository,
   PoolRepository,
   MemberRepository,
+  WafpolicyRepository,
+  EndpointpolicyRepository,
+  RuleRepository,
 } from '../repositories';
 import {AS3Service} from '../services';
 import uuid = require('uuid');
@@ -49,6 +52,12 @@ export class ApplicationController {
     public poolRepository: PoolRepository,
     @repository(MemberRepository)
     public memberRepository: MemberRepository,
+    @repository(WafpolicyRepository)
+    public wafpolicyRepository: WafpolicyRepository,
+    @repository(EndpointpolicyRepository)
+    public endpointpolicyRepository: EndpointpolicyRepository,
+    @repository(RuleRepository)
+    public ruleRepository: RuleRepository,
     @inject('services.AS3Service') public as3Service: AS3Service,
   ) {}
 
@@ -248,6 +257,32 @@ export class ApplicationController {
       } else {
         params.members = [];
       }
+    }
+
+    params.service = service;
+
+    if (service.endpointpolicy) {
+      params.endpointpolicy = await this.endpointpolicyRepository.findById(
+        service.endpointpolicy,
+      );
+
+      params.rules = await this.ruleRepository.find({
+        where: {
+          id: {
+            inq: (<Endpointpolicy>params.endpointpolicy).rules,
+          },
+        },
+      });
+
+      params.wafs = await this.wafpolicyRepository.find({
+        where: {
+          id: {
+            inq: (<Array<Rule>>params.rules).map(v => {
+              return v.wafpolicy;
+            }),
+          },
+        },
+      });
     }
 
     let req = new AS3DeployRequest(params);

@@ -14,7 +14,7 @@
         "url": "https://{host}:{port}/mgmt/shared/appsvcs/info"
       },
       "functions": {
-        "info": ["host", "port"]
+        "info": ["host","port"]
       }
     },
     {
@@ -24,7 +24,7 @@
         "body": "{body}"
       },
       "functions": {
-        "deploy": ["host", "port","body"]
+        "deploy": ["host","port","body"]
       }
     }
   ]
