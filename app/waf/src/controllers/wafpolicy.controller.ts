@@ -15,12 +15,10 @@ import {
   put,
   del,
   requestBody,
-  HttpErrors,
 } from '@loopback/rest';
 import {Wafpolicy} from '../models';
 import {WafpolicyRepository} from '../repositories';
 import uuid = require('uuid');
-
 const prefix = '/adcaas/v1';
 
 export class WafpolicyController {
@@ -43,12 +41,7 @@ export class WafpolicyController {
     if (!wafpolicy.id) {
       wafpolicy.id = uuid();
     }
-
-    try {
-      return await this.wafpolicyRepository.create(wafpolicy);
-    } catch (error) {
-      throw new HttpErrors.BadRequest(error.detail);
-    }
+    return await this.wafpolicyRepository.create(wafpolicy);
   }
 
   @get(prefix + '/wafpolicies/count', {
@@ -136,7 +129,6 @@ export class WafpolicyController {
     @param.path.string('id') id: string,
     @requestBody() wafpolicy: Partial<Wafpolicy>,
   ): Promise<void> {
-    wafpolicy.id = id;
     await this.wafpolicyRepository.replaceById(id, wafpolicy);
   }
 

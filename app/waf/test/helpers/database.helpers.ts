@@ -42,11 +42,7 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
       name: 'test waf policy',
-      content:
-        '<?xml version="1.0" encoding="utf-8"?>' + '<policy>any</policy>',
-      shared: false,
-      tenant: ['adminz'],
-      createdAt: '2019-01-21T05:03:45.502Z',
+      url: 'http://1.2.3.4/policy.xml',
     },
     data,
   );

@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class Wafpolicy extends Entity {
+export class Rule extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -16,12 +16,25 @@ export class Wafpolicy extends Entity {
   name: string;
 
   @property({
+    type: 'boolean',
+    required: true,
+    default: false,
+  })
+  default: boolean;
+
+  @property({
     type: 'string',
     required: true,
   })
-  url: string;
+  pattern: string;
 
-  constructor(data?: Partial<Wafpolicy>) {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  wafpolicy: string;
+
+  constructor(data?: Partial<Rule>) {
     super(data);
   }
 }
