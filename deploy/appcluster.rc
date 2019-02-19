@@ -1,0 +1,9 @@
+
+export WAF_APP_PORT=3000
+
+export DATABASE_USER=postgres
+export DATABASE_PASSWORD=postgres
+export DATABASE_DB=postgres
+
+export DATABASE_PORT=5432
+export DATABASE_DATA_DIRECTORY=
