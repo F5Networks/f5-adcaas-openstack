@@ -8,7 +8,7 @@ import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
-  givePoolData,
+  givenPoolData,
   createPoolObjectWithoutID,
 } from '../helpers/database.helpers';
 
@@ -44,7 +44,7 @@ describe('PoolController', () => {
   });
 
   it('get ' + prefix + '/pools/count', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     const response = await client
       .get(prefix + '/pools/count')
@@ -55,7 +55,7 @@ describe('PoolController', () => {
   });
 
   it('get ' + prefix + '/pools', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     await client
       .get(prefix + '/pools')
@@ -64,7 +64,7 @@ describe('PoolController', () => {
   });
 
   it('get ' + prefix + '/pools', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     await client
       .get(prefix + '/pools')
@@ -75,7 +75,7 @@ describe('PoolController', () => {
   it('patch ' + prefix + '/pools', async () => {
     const poolObject = createPoolObjectWithoutID();
 
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     // pzhang(NOTE): return a count
     const response = await client
@@ -95,7 +95,7 @@ describe('PoolController', () => {
   });
 
   it('get ' + prefix + '/pools/{id}', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     await client.get(prefix + `/pools/${pool.id}`).expect(200, toJSON(pool));
   });
@@ -103,7 +103,7 @@ describe('PoolController', () => {
   it('patch ' + prefix + '/pools/{id}', async () => {
     const poolObject = createPoolObjectWithoutID();
 
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
     // pzhang(NOTE): return no content
     await client
       .patch(prefix + `/pools/${pool.id}`)
@@ -119,7 +119,7 @@ describe('PoolController', () => {
   });
 
   it('put ' + prefix + '/pools/{id}', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     const poolObject = createPoolObjectWithoutID();
 
@@ -136,7 +136,7 @@ describe('PoolController', () => {
   });
 
   it('delete ' + prefix + '/pools/{id}', async () => {
-    const pool = await givePoolData(wafapp);
+    const pool = await givenPoolData(wafapp);
 
     await client.del(prefix + `/pools/${pool.id}`).expect(204);
 

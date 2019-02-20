@@ -4,6 +4,7 @@ import {
   TenantAssociationRepository,
   ServiceRepository,
   PoolRepository,
+  MemberRepository,
 } from '../../src/repositories';
 
 import {
@@ -12,6 +13,7 @@ import {
   TenantAssociation,
   Service,
   Pool,
+  Member,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -36,6 +38,9 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const poolRepo = await wafapp.getRepository(PoolRepository);
   await poolRepo.deleteAll();
+
+  const memberRepo = await wafapp.getRepository(MemberRepository);
+  await memberRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -162,7 +167,7 @@ export function createServiceObjectWithoutID(data?: Partial<Service>) {
   );
 }
 
-export async function givePoolData(
+export async function givenPoolData(
   wafapp: WafApplication,
   data?: Partial<Pool>,
 ) {
@@ -176,12 +181,7 @@ export function createPoolObjectWithID(data?: Partial<Pool>) {
       id: uuid(),
       class: 'Pool',
       loadBalancingMode: 'round-robin',
-      members: [
-        {
-          servicePort: 80,
-          serverAddresses: ['192.0.1.22', '192.0.1.23'],
-        },
-      ],
+      members: [uuid(), uuid()],
       monitors: ['http'],
     },
     data,
@@ -193,13 +193,37 @@ export function createPoolObjectWithoutID(data?: Partial<Pool>) {
     {
       class: 'Pool',
       loadBalancingMode: 'round-robin',
-      members: [
-        {
-          servicePort: 80,
-          serverAddresses: ['192.0.1.22', '192.0.1.23'],
-        },
-      ],
+      members: [uuid(), uuid()],
       monitors: ['http'],
+    },
+    data,
+  );
+}
+
+export async function givenMemberData(
+  wafapp: WafApplication,
+  data?: Partial<Member>,
+) {
+  const repo = await wafapp.getRepository(MemberRepository);
+  return await repo.create(createMemberObjectWithID(data));
+}
+
+export function createMemberObjectWithID(data?: Partial<Member>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      address: '192.0.1.23',
+      port: 80,
+    },
+    data,
+  );
+}
+
+export function createMemberObjectWithoutID(data?: Partial<Member>) {
+  return Object.assign(
+    {
+      address: '192.0.1.24',
+      port: 80,
     },
     data,
   );
