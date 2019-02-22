@@ -15,9 +15,11 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
-import {Pool} from '../models';
-import {PoolRepository} from '../repositories';
+import {Pool, Member} from '../models';
+import {PoolRepository, MemberRepository} from '../repositories';
+import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
@@ -25,6 +27,8 @@ export class PoolController {
   constructor(
     @repository(PoolRepository)
     public poolRepository: PoolRepository,
+    @repository(MemberRepository)
+    public memberRepository: MemberRepository,
   ) {}
 
   @post(prefix + '/pools', {
@@ -135,5 +139,142 @@ export class PoolController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.poolRepository.deleteById(id);
+  }
+
+  /**
+   * These member control functions are moved to pool controller,
+   * it is because of this issues:
+   * https://github.com/strongloop/loopback/issues/4142
+   */
+
+  @get(prefix + '/members/count', {
+    responses: {
+      '200': {
+        description: 'Member model count',
+        content: {'application/json': {schema: CountSchema}},
+      },
+    },
+  })
+  async countMembers(
+    @param.query.object('where', getWhereSchemaFor(Member)) where?: Where,
+  ): Promise<Count> {
+    return await this.memberRepository.count(where);
+  }
+
+  @get(prefix + '/members', {
+    responses: {
+      '200': {
+        description: 'Array of Member model instances',
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: {'x-ts-type': Member}},
+          },
+        },
+      },
+    },
+  })
+  async findMembers(
+    @param.query.object('filter', getFilterSchemaFor(Member)) filter?: Filter,
+  ): Promise<Member[]> {
+    return await this.memberRepository.find(filter);
+  }
+
+  @post(prefix + '/pools/{pool_id}/members', {
+    responses: {
+      '200': {
+        description: 'Member add to Pool success',
+        content: {'application/json': {schema: {'x-ts-type': Member}}},
+      },
+    },
+  })
+  async createPoolMember(
+    @param.path.string('pool_id') pool_id: string,
+    @requestBody() member: Partial<Member>,
+  ): Promise<Member> {
+    let pool: Pool = await this.poolRepository.findById(pool_id);
+
+    member.id = uuid();
+    let saved_member: Member = await this.memberRepository.create(member);
+
+    if (pool.members) {
+      pool.members.push(saved_member.id);
+    } else {
+      pool.members = [saved_member.id];
+    }
+
+    await this.poolRepository.replaceById(pool.id, pool);
+    return saved_member;
+  }
+
+  @get(prefix + '/pools/{pool_id}/members/{member_id}', {
+    responses: {
+      '200': {
+        description: 'Member model instance',
+        content: {'application/json': {schema: {'x-ts-type': Member}}},
+      },
+    },
+  })
+  async getMemberByID(
+    @param.path.string('pool_id') pool_id: string,
+    @param.path.string('member_id') member_id: string,
+  ): Promise<Member> {
+    let pool: Pool = await this.poolRepository.findById(pool_id);
+    if (pool.members && pool.members.includes(member_id)) {
+      return await this.memberRepository.findById(member_id);
+    } else {
+      throw new HttpErrors.NotFound(`can not find member ${member_id}
+       in pool ${pool_id}`);
+    }
+  }
+
+  @del(prefix + '/pools/{pool_id}/members/{member_id}', {
+    responses: {
+      '204': {
+        description: 'Member DELETE success',
+      },
+    },
+  })
+  async deleteMemberByID(
+    @param.path.string('pool_id') pool_id: string,
+    @param.path.string('member_id') member_id: string,
+  ) {
+    let pool: Pool = await this.poolRepository.findById(pool_id);
+    if (pool.members && pool.members.includes(member_id)) {
+      let index: number = pool.members.indexOf(member_id);
+      pool.members.splice(index, 1);
+
+      await this.poolRepository.replaceById(pool_id, pool);
+      await this.memberRepository.deleteById(member_id);
+    } else {
+      throw new HttpErrors.NotFound(`can not find member ${member_id}
+       in pool ${pool_id}`);
+    }
+  }
+
+  @get(prefix + '/pools/{pool_id}/members', {
+    responses: {
+      '200': {
+        description: 'Array of Member model instances',
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: {'x-ts-type': Member}},
+          },
+        },
+      },
+    },
+  })
+  async getMembers(
+    @param.path.string('pool_id') pool_id: string,
+  ): Promise<Member[]> {
+    let pool: Pool = await this.poolRepository.findById(pool_id);
+    if (pool.members) {
+      let members: Member[] = [];
+      for (let mbr of pool.members) {
+        members.push(await this.memberRepository.findById(mbr));
+      }
+      return members;
+    } else {
+      return [] as Member[];
+    }
   }
 }

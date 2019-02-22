@@ -22,9 +22,9 @@ export class Pool extends Entity {
 
   @property({
     type: 'array',
-    itemType: 'object',
+    itemType: 'string',
   })
-  members?: object[];
+  members?: string[];
 
   @property({
     type: 'array',
