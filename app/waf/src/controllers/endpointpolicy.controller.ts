@@ -18,7 +18,7 @@ import {
 } from '@loopback/rest';
 import {Endpointpolicy} from '../models';
 import {EndpointpolicyRepository} from '../repositories';
-
+import uuid = require('uuid');
 const prefix = '/adcaas/v1';
 export class EndpointpolicyController {
   constructor(
@@ -35,8 +35,11 @@ export class EndpointpolicyController {
     },
   })
   async create(
-    @requestBody() endpointpolicy: Endpointpolicy,
+    @requestBody() endpointpolicy: Partial<Endpointpolicy>,
   ): Promise<Endpointpolicy> {
+    if (!endpointpolicy.id){
+      endpointpolicy.id=uuid();
+    }
     return await this.endpointpolicyRepository.create(endpointpolicy);
   }
 

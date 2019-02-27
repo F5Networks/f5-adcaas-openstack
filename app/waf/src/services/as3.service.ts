@@ -7,6 +7,7 @@ export interface AS3Service {
   // mapped to the SOAP operations as stated in the datasource
   // json file.
   info(host: string, port: number): Promise<string>;
+  deploy(host: string, port:number, body: Object): Promise<string>;
 }
 
 export class AS3ServiceProvider implements Provider<AS3Service> {

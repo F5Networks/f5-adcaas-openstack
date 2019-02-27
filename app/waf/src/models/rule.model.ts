@@ -17,20 +17,22 @@ export class Rule extends Entity {
 
   @property({
     type: 'boolean',
-    required: true,
+    required: false,
     default: false,
   })
   default: boolean;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
+    default:'',
   })
   pattern: string;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
+    default: '',
   })
   wafpolicy: string;
 

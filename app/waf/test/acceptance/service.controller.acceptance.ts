@@ -31,7 +31,6 @@ describe('ServiceController', () => {
 
   it('post ' + prefix + '/services', async () => {
     const service = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
@@ -64,7 +63,6 @@ describe('ServiceController', () => {
 
     await client
       .get(prefix + '/services')
-      .query({where: {class: service.class}})
       .expect(200, [toJSON(service)]);
   });
 
@@ -73,13 +71,11 @@ describe('ServiceController', () => {
 
     await client
       .get(prefix + '/services')
-      .query({filter: {where: {class: service.class}}})
       .expect(200, [toJSON(service)]);
   });
 
   it('patch' + prefix + '/services', async () => {
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
@@ -90,7 +86,6 @@ describe('ServiceController', () => {
     // pzhang(NOTE): return a count
     const response = await client
       .patch(prefix + `/services`)
-      .query({where: {class: service.class}})
       .send(serviceObject)
       .expect(200);
 
@@ -114,7 +109,6 @@ describe('ServiceController', () => {
 
   it('patch' + prefix + '/services/{id}', async () => {
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
@@ -139,7 +133,6 @@ describe('ServiceController', () => {
     const service = await giveServiceData(wafapp);
 
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
     });

@@ -16,23 +16,30 @@ export class Adc extends Entity {
 
   @property({
     type: 'string',
+    required: true,
   })
-  host?: string;
+  host: string;
 
   @property({
     type: 'number',
+    required: false,
+    default: 443
   })
-  port?: number;
+  port: number;
 
   @property({
     type: 'string',
+    required: false,
+    default: 'admin',
   })
-  username?: string;
+  username: string;
 
   @property({
     type: 'string',
+    required: false,
+    default: 'admin',
   })
-  passphrase?: string;
+  passphrase: string;
 
   constructor(data?: Partial<Adc>) {
     super(data);

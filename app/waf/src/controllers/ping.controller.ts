@@ -2,8 +2,8 @@ import {Request, RestBindings, get, ResponseObject} from '@loopback/rest';
 import {inject} from '@loopback/context';
 import {AS3Service} from '../services';
 
-const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
-const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
+const AS3_HOST: string = process.env.AS3_HOST || '10.128.0.149';
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 443;
 
 /**
  * OpenAPI response for ping()
@@ -51,7 +51,7 @@ export class PingController {
   async ping(): Promise<object> {
     // Reply with a greeting, the current time, the url, and request headers
     return {
-      greeting: 'Hello from LoopBack',
+      greeting: 'Hello from F5 ADCaas for openstack',
       date: new Date(),
       url: this.req.url,
       headers: Object.assign({}, this.req.headers),

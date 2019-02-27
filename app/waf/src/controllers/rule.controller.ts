@@ -18,6 +18,7 @@ import {
 } from '@loopback/rest';
 import {Rule} from '../models';
 import {RuleRepository} from '../repositories';
+import uuid = require('uuid');
 const prefix = '/adcaas/v1';
 
 export class RuleController {
@@ -34,7 +35,10 @@ export class RuleController {
       },
     },
   })
-  async create(@requestBody() rule: Rule): Promise<Rule> {
+  async create(@requestBody() rule: Partial<Rule>): Promise<Rule> {
+    if(!rule.id){
+      rule.id = uuid();
+    }
     return await this.ruleRepository.create(rule);
   }
 

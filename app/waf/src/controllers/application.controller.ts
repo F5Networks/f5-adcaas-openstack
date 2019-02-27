@@ -17,9 +17,23 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Application} from '../models';
-import {ApplicationRepository, WafpolicyRepository} from '../repositories';
+import {inject} from '@loopback/context';
+import {Application, Adc, Wafpolicy, AS3DeployRequest,Rule} from '../models';
+import {
+  ApplicationRepository,
+  AdcRepository,
+  TenantAssociationRepository,
+  ServiceRepository,
+  WafpolicyRepository,
+  EndpointpolicyRepository,
+  RuleRepository,
+} from '../repositories';
+import {AS3Service} from '../services';
 import uuid = require('uuid');
+import { isNullOrUndefined } from 'util';
+
+const AS3_HOST: string = process.env.AS3_HOST || '10.128.0.149';
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 443;
 
 const prefix = '/adcaas/v1';
 
@@ -27,8 +41,19 @@ export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
+    @repository(AdcRepository)
+    public adcRepository: AdcRepository,
+    @repository(TenantAssociationRepository)
+    public tenantAssociationRepository: TenantAssociationRepository,
+    @repository(ServiceRepository)
+    public serviceRepository: ServiceRepository,
     @repository(WafpolicyRepository)
     public wafpolicyRepository: WafpolicyRepository,
+    @repository(EndpointpolicyRepository)
+    public endpointpolicyRepository: EndpointpolicyRepository,
+    @repository(RuleRepository)
+    public ruleRepository: RuleRepository,
+    @inject('services.AS3Service') private as3Service: AS3Service,
   ) {}
 
   @post(prefix + '/applications', {
@@ -154,5 +179,76 @@ export class ApplicationController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.applicationRepository.deleteById(id);
+  }
+
+ @post(prefix + '/applications/{id}/deploy', {
+    responses: {
+      '204': {
+        description: 'Application deploy success',
+      },
+    },
+  })
+  async deployById(@param.path.string('id') id: string): Promise<Object> {
+    let application = await this.applicationRepository.findById(id);
+
+    let tenantAssoc = await this.tenantAssociationRepository.findById(
+      // application.tenant_id,
+      'default',
+    );
+
+    let adc = await this.adcRepository.findById(tenantAssoc.adcId);
+
+    let params: {[key: string]: Object} = {
+      adc: adc,
+      application: application,
+    };
+
+    let rules = [];
+    let wafs = [];
+    if (application.services.length > 0) {
+      let serviceId = application.services[0];
+      let service = await this.serviceRepository.findById(serviceId);
+      if (service) {
+        params.service = service;
+        let endpointpolicyId = service.endpointpolicy;
+        if (endpointpolicyId != null) {
+          let endpointpolicy = await this.endpointpolicyRepository.findById(endpointpolicyId);
+          if (endpointpolicy) {
+            params.endpointpolicy = endpointpolicy;
+            if (endpointpolicy.rules!=null) {
+              for (let ruleId of endpointpolicy.rules) {
+                let rule = await this.ruleRepository.findById(ruleId);
+		            if (rule) {
+                  let wafId = rule.wafpolicy;
+		              if (wafId != null && wafId != "") { 	
+		     	          let waf = await this.wafpolicyRepository.findById(wafId);
+		     	          if (waf) {
+		 		              wafs.push(waf);
+		     	          }
+	       	        }			
+                  rules.push(rule);
+          	    } 
+              }
+              params.rules=rules;
+              params.wafs=wafs; 
+            }
+          }
+          
+        }
+      }
+    } 	
+
+    /*if (application.wafpolicyId) {
+      let waf = await this.wafpolicyRepository.findById(
+        application.wafpolicyId,
+      );
+      if (waf) {
+        params.waf = waf;
+      }
+    }*/
+
+    let req = new AS3DeployRequest(params);
+    console.log('zhaoqin req is ' + JSON.stringify(req));
+    return await this.as3Service.deploy(AS3_HOST,AS3_PORT, req);
   }
 }

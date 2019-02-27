@@ -4,6 +4,7 @@ import {
   TenantAssociationRepository,
   ServiceRepository,
   PoolRepository,
+  RuleRepository,
 } from '../../src/repositories';
 
 import {
@@ -12,6 +13,7 @@ import {
   TenantAssociation,
   Service,
   Pool,
+  Rule,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -42,10 +44,32 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
       name: 'test waf policy',
-      url: 'http://1.2.3.4/policy.xml',
+      url: 'http://unknown',
     },
     data,
   );
+}
+
+export function createRuleObject(data?: Partial<Rule>) {
+  return Object.assign(
+    {
+      name: 'test',
+      default: false,
+      pattern: 'test',
+      wafpolicy: '1',
+    },
+    data,
+  );
+}
+
+export async function givenRuleData(
+  wafapp: WafApplication,
+  data?: Partial<Rule>,
+) {
+  const rulerepo = await wafapp.getRepository(RuleRepository);
+  const obj = createRuleObject(data);
+  obj.id = uuid();
+  return await rulerepo.create(obj);
 }
 
 export async function givenWafpolicyData(
@@ -63,7 +87,6 @@ export function createApplicationObject(data?: Partial<Application>) {
     {
       name: 'test application',
       description: 'application test data',
-      declaration: '{"class": "ADC"}',
       status: 'Done',
       createdAt: '2019-01-22T05:03:45.502Z',
       updatedAt: '2019-01-23T05:03:45.502Z',
@@ -139,7 +162,6 @@ export function createServiceObjectWithID(data?: Partial<Service>) {
   return Object.assign(
     {
       id: uuid(),
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11'],
       pool: 'web_pool',
     },
@@ -150,7 +172,6 @@ export function createServiceObjectWithID(data?: Partial<Service>) {
 export function createServiceObjectWithoutID(data?: Partial<Service>) {
   return Object.assign(
     {
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11'],
       pool: 'web_pool',
     },
@@ -187,7 +208,6 @@ export function createPoolObjectWithID(data?: Partial<Pool>) {
 export function createPoolObjectWithoutID(data?: Partial<Pool>) {
   return Object.assign(
     {
-      class: 'Pool',
       loadBalancingMode: 'round-robin',
       members: [
         {

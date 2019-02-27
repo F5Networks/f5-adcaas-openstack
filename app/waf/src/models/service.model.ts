@@ -10,9 +10,9 @@ export class Service extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  class: string;
+  name?: string;
 
   @property({
     type: 'array',
@@ -23,14 +23,22 @@ export class Service extends Entity {
 
   @property({
     type: 'number',
+    required: false,
   })
   virtualPort?: number;
 
   @property({
     type: 'string',
+    required: false,
   })
   pool?: string;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  endpointpolicy: string;
+  
   constructor(data?: Partial<Service>) {
     super(data);
   }

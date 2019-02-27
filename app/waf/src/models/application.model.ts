@@ -23,8 +23,16 @@ export class Application extends Entity {
     type: 'string',
     required: true,
   })
-  declaration: string;
-
+  tenantId: string;
+  
+  @property({
+    type: 'array',
+    itemType: 'string',
+    required: false,
+    default: [],
+  })
+  services: string[];
+  
   @property({
     type: 'string',
   })

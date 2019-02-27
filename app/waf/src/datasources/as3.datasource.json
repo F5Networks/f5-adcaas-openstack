@@ -11,10 +11,20 @@
     {
       "template": {
         "method": "GET",
-        "url": "https://{host}:{port}/mgmt/shared/appsvcs/info"
+        "url": "https://admin:admin@{host}:{port}/mgmt/shared/appsvcs/info"
       },
       "functions": {
-        "info": ["host", "port"]
+        "info": ["host","port"]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://admin:admin@{host}:{port}/mgmt/shared/appsvcs/declare",
+        "body": "{body}"
+      },
+      "functions": {
+        "deploy": ["host","port","body"]
       }
     }
   ]

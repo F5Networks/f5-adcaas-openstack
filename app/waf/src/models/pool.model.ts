@@ -10,9 +10,9 @@ export class Pool extends Entity {
 
   @property({
     type: 'string',
-    default: 'Pool',
+    required: false,
   })
-  class?: string;
+  name?: string;
 
   @property({
     type: 'string',
