@@ -8,7 +8,7 @@ import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
-  giveServiceData,
+  givenServiceData,
   createServiceObjectWithoutID,
 } from '../helpers/database.helpers';
 
@@ -31,7 +31,6 @@ describe('ServiceController', () => {
 
   it('post ' + prefix + '/services', async () => {
     const service = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
@@ -49,7 +48,7 @@ describe('ServiceController', () => {
   });
 
   it('get' + prefix + '/services/count', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
     const response = await client
       .get(prefix + '/services/count')
@@ -60,37 +59,29 @@ describe('ServiceController', () => {
   });
 
   it('get' + prefix + '/services', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
-    await client
-      .get(prefix + '/services')
-      .query({where: {class: service.class}})
-      .expect(200, [toJSON(service)]);
+    await client.get(prefix + '/services').expect(200, [toJSON(service)]);
   });
 
   it('get' + prefix + '/services', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
-    await client
-      .get(prefix + '/services')
-      .query({filter: {where: {class: service.class}}})
-      .expect(200, [toJSON(service)]);
+    await client.get(prefix + '/services').expect(200, [toJSON(service)]);
   });
 
   it('patch' + prefix + '/services', async () => {
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
     });
 
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
     // pzhang(NOTE): return a count
     const response = await client
       .patch(prefix + `/services`)
-      .query({where: {class: service.class}})
       .send(serviceObject)
       .expect(200);
 
@@ -105,7 +96,7 @@ describe('ServiceController', () => {
   });
 
   it('get' + prefix + '/services/{id}', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
     await client
       .get(prefix + `/services/${service.id}`)
@@ -114,13 +105,12 @@ describe('ServiceController', () => {
 
   it('patch' + prefix + '/services/{id}', async () => {
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
     });
 
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
     // pzhang(NOTE): return no content
     await client
       .patch(prefix + `/services/${service.id}`)
@@ -136,10 +126,9 @@ describe('ServiceController', () => {
   });
 
   it('put' + prefix + '/services/{id}', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
     const serviceObject = createServiceObjectWithoutID({
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
     });
@@ -157,7 +146,7 @@ describe('ServiceController', () => {
   });
 
   it('delete' + prefix + '/services/{id}', async () => {
-    const service = await giveServiceData(wafapp);
+    const service = await givenServiceData(wafapp);
 
     await client.del(prefix + `/services/${service.id}`).expect(204);
 

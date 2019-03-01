@@ -17,9 +17,21 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Application} from '../models';
-import {ApplicationRepository, WafpolicyRepository} from '../repositories';
+import {inject} from '@loopback/context';
+import {Application, AS3DeployRequest} from '../models';
+import {
+  ApplicationRepository,
+  AdcRepository,
+  TenantAssociationRepository,
+  ServiceRepository,
+  PoolRepository,
+  MemberRepository,
+} from '../repositories';
+import {AS3Service} from '../services';
 import uuid = require('uuid');
+
+const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
 
 const prefix = '/adcaas/v1';
 
@@ -27,8 +39,17 @@ export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
-    @repository(WafpolicyRepository)
-    public wafpolicyRepository: WafpolicyRepository,
+    @repository(AdcRepository)
+    public adcRepository: AdcRepository,
+    @repository(TenantAssociationRepository)
+    public tenantAssociationRepository: TenantAssociationRepository,
+    @repository(ServiceRepository)
+    public serviceRepository: ServiceRepository,
+    @repository(PoolRepository)
+    public poolRepository: PoolRepository,
+    @repository(MemberRepository)
+    public memberRepository: MemberRepository,
+    @inject('services.AS3Service') public as3Service: AS3Service,
   ) {}
 
   @post(prefix + '/applications', {
@@ -44,9 +65,6 @@ export class ApplicationController {
   ): Promise<Application> {
     if (!application.id) {
       application.id = uuid();
-    }
-    if (application.wafpolicyId) {
-      await this.wafpolicyRepository.findById(application.wafpolicyId);
     }
 
     try {
@@ -154,5 +172,85 @@ export class ApplicationController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.applicationRepository.deleteById(id);
+  }
+
+  @post(prefix + '/applications/{id}/deploy', {
+    responses: {
+      '204': {
+        description: 'Application deploy success',
+      },
+    },
+  })
+  async deployById(@param.path.string('id') id: string): Promise<Object> {
+    let application = await this.applicationRepository.findById(id);
+
+    if (application.services.length === 0) {
+      throw new HttpErrors.UnprocessableEntity(
+        'No service in Application ' + application.id,
+      );
+    }
+
+    let params: {[key: string]: Object} = {
+      application: application,
+    };
+
+    let tenantAssocs = await this.tenantAssociationRepository.find({
+      limit: 1,
+      where: {
+        tenantId: application.tenantId,
+      },
+    });
+
+    if (tenantAssocs.length === 0) {
+      tenantAssocs = await this.tenantAssociationRepository.find({
+        limit: 1,
+        where: {
+          tenantId: 'default',
+        },
+      });
+
+      if (tenantAssocs.length === 0) {
+        throw new HttpErrors.UnprocessableEntity(
+          'No ADC associated with Application ' + application.id,
+        );
+      }
+    }
+
+    let adcs = await this.adcRepository.find({
+      where: {
+        id: tenantAssocs[0].adcId,
+      },
+    });
+
+    if (adcs.length === 0) {
+      throw new HttpErrors.UnprocessableEntity(
+        'Can not find the ADC associated with Application ' + application.id,
+      );
+    }
+    params.adc = adcs[0];
+
+    let serviceId = application.services[0];
+    let service = await this.serviceRepository.findById(serviceId);
+
+    params.service = service;
+
+    if (service.pool) {
+      let pool = await this.poolRepository.findById(service.pool);
+      params.pool = pool;
+
+      if (pool.members.length > 0) {
+        let members = [];
+        for (let member_id of pool.members) {
+          let m = await this.memberRepository.findById(member_id);
+          members.push(m);
+        }
+        params.members = members;
+      } else {
+        params.members = [];
+      }
+    }
+
+    let req = new AS3DeployRequest(params);
+    return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
   }
 }

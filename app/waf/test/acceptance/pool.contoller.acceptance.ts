@@ -57,19 +57,13 @@ describe('PoolController', () => {
   it('get ' + prefix + '/pools', async () => {
     const pool = await givenPoolData(wafapp);
 
-    await client
-      .get(prefix + '/pools')
-      .query({where: {class: pool.class}})
-      .expect(200, [toJSON(pool)]);
+    await client.get(prefix + '/pools').expect(200, [toJSON(pool)]);
   });
 
   it('get ' + prefix + '/pools', async () => {
     const pool = await givenPoolData(wafapp);
 
-    await client
-      .get(prefix + '/pools')
-      .query({filter: {where: {class: pool.class}}})
-      .expect(200, [toJSON(pool)]);
+    await client.get(prefix + '/pools').expect(200, [toJSON(pool)]);
   });
 
   it('patch ' + prefix + '/pools', async () => {
@@ -80,7 +74,6 @@ describe('PoolController', () => {
     // pzhang(NOTE): return a count
     const response = await client
       .patch(prefix + `/pools`)
-      .query({where: {class: pool.class}})
       .send(poolObject)
       .expect(200);
 

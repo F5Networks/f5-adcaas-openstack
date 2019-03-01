@@ -51,6 +51,7 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
         '<?xml version="1.0" encoding="utf-8"?>' + '<policy>any</policy>',
       shared: false,
       tenant: ['adminz'],
+      url: 'http://unknown',
       createdAt: '2019-01-21T05:03:45.502Z',
     },
     data,
@@ -72,8 +73,8 @@ export function createApplicationObject(data?: Partial<Application>) {
     {
       name: 'test application',
       description: 'application test data',
-      declaration: '{"class": "ADC"}',
       status: 'Done',
+      tenantId: 'TBD',
       createdAt: '2019-01-22T05:03:45.502Z',
       updatedAt: '2019-01-23T05:03:45.502Z',
     },
@@ -136,7 +137,7 @@ export function createTenantAssociationObject(
   );
 }
 
-export async function giveServiceData(
+export async function givenServiceData(
   wafapp: WafApplication,
   data?: Partial<Service>,
 ) {
@@ -148,9 +149,7 @@ export function createServiceObjectWithID(data?: Partial<Service>) {
   return Object.assign(
     {
       id: uuid(),
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11'],
-      pool: 'web_pool',
     },
     data,
   );
@@ -159,9 +158,7 @@ export function createServiceObjectWithID(data?: Partial<Service>) {
 export function createServiceObjectWithoutID(data?: Partial<Service>) {
   return Object.assign(
     {
-      class: 'Service_HTTP',
       virtualAddresses: ['10.0.1.11'],
-      pool: 'web_pool',
     },
     data,
   );
@@ -179,7 +176,6 @@ export function createPoolObjectWithID(data?: Partial<Pool>) {
   return Object.assign(
     {
       id: uuid(),
-      class: 'Pool',
       loadBalancingMode: 'round-robin',
       members: [uuid(), uuid()],
       monitors: ['http'],
@@ -191,7 +187,6 @@ export function createPoolObjectWithID(data?: Partial<Pool>) {
 export function createPoolObjectWithoutID(data?: Partial<Pool>) {
   return Object.assign(
     {
-      class: 'Pool',
       loadBalancingMode: 'round-robin',
       members: [uuid(), uuid()],
       monitors: ['http'],

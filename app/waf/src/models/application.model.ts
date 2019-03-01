@@ -16,6 +16,7 @@ export class Application extends Entity {
 
   @property({
     type: 'string',
+    required: false,
   })
   description?: string;
 
@@ -23,7 +24,15 @@ export class Application extends Entity {
     type: 'string',
     required: true,
   })
-  declaration: string;
+  tenantId: string;
+
+  @property({
+    type: 'array',
+    itemType: 'string',
+    required: false,
+    default: [],
+  })
+  services: string[];
 
   @property({
     type: 'string',
@@ -39,11 +48,6 @@ export class Application extends Entity {
     type: 'date',
   })
   updatedAt?: string;
-
-  @property({
-    type: 'string',
-  })
-  wafpolicyId?: string;
 
   constructor(data?: Partial<Application>) {
     super(data);
