@@ -1,3 +1,4 @@
+export * from './common.model';
 export * from './application.model';
 export * from './tenantassoc.model';
 export * from './adc.model';

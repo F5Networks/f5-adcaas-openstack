@@ -1,18 +1,13 @@
-import {Entity, model, property} from '@loopback/repository';
+import {model, property} from '@loopback/repository';
+import {CommonEntity, CommonResponse, CommonCollectionResponse} from '.';
 
 @model()
-export class Adc extends Entity {
+export class Adc extends CommonEntity {
   @property({
     type: 'string',
-    id: true,
     required: true,
   })
-  id: string;
-
-  @property({
-    type: 'string',
-  })
-  name?: string;
+  type: string;
 
   @property({
     type: 'string',
@@ -43,5 +38,17 @@ export class Adc extends Entity {
 
   constructor(data?: Partial<Adc>) {
     super(data);
+  }
+}
+
+export class AdcResponse extends CommonResponse {
+  constructor(data: Adc) {
+    super('adc', data);
+  }
+}
+
+export class AdcCollectionResponse extends CommonCollectionResponse {
+  constructor(data: Adc[]) {
+    super('adcs', data);
   }
 }
