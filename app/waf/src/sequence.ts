@@ -8,9 +8,12 @@ import {
   RestBindings,
   Send,
   SequenceHandler,
+  Request,
+  HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
 import uuid = require('uuid');
+import {AuthWithOSIdentity} from './services';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -23,6 +26,8 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.REJECT) public reject: Reject,
     @inject('logger', {optional: true})
     private logger = factory.getLogger('api.call'),
+    @inject('services.openstack.AuthWithOSIdentity')
+    private authWithOSIdentity: AuthWithOSIdentity,
   ) {}
 
   async handle(context: RequestContext) {
@@ -32,6 +37,9 @@ export class MySequence implements SequenceHandler {
     let result: object = {};
     try {
       const {request, response} = context;
+
+      //await this.authRequest(request);
+
       const route = this.findRoute(request);
       const args = await this.parseParams(request, route);
 
@@ -41,7 +49,7 @@ export class MySequence implements SequenceHandler {
       this.reject(context, err);
     }
 
-    //await this.logResponse(logUuid, context, result);
+    await this.logResponse(logUuid, context, result);
   }
 
   async logRequest(logUuid: string, context: RequestContext): Promise<void> {
@@ -63,9 +71,7 @@ export class MySequence implements SequenceHandler {
     context: RequestContext,
     result: object,
   ): Promise<void> {
-    console.log(RestBindings.Http.RESPONSE);
     const res = await context.get(RestBindings.Http.RESPONSE);
-    console.log('post of ' + RestBindings.Http.RESPONSE);
 
     const logObj = {
       uuid: logUuid,
@@ -76,5 +82,29 @@ export class MySequence implements SequenceHandler {
     };
 
     this.logger.info('Response: ' + JSON.stringify(logObj));
+  }
+
+  async authRequest(request: Request) {
+    if (!process.env.PRODUCT_RELEASE) return;
+
+    this.logger.debug('start to authenticate user');
+
+    let userToken = request.header('X-Auth-Token');
+    if (typeof userToken !== typeof '') {
+      throw new HttpErrors.Unauthorized(
+        'Unauthorized: invalid X-Auth-Token header.',
+      );
+    }
+
+    await this.authWithOSIdentity.validateUserToken(<string>userToken).then(
+      authedObj => {
+        // ...
+        this.logger.debug('Authenticated OK');
+        this.logger.debug(JSON.stringify(authedObj));
+      },
+      notAuthed => {
+        throw new HttpErrors.Unauthorized('Unauthorized: invalid user token.');
+      },
+    );
   }
 }
