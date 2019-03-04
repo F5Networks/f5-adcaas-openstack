@@ -1,11 +1,10 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class Wafpolicy extends Entity {
+export class Rule extends Entity {
   @property({
     type: 'string',
     id: true,
-    required: false,
   })
   id: string;
 
@@ -17,28 +16,26 @@ export class Wafpolicy extends Entity {
 
   @property({
     type: 'boolean',
-    required: true,
+    required: false,
+    default: false,
   })
-  shared: boolean;
+  default: boolean;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
+    default: '',
   })
-  url: string;
+  pattern: string;
 
   @property({
-    type: 'array',
-    itemType: 'string',
+    type: 'string',
+    required: false,
+    default: '',
   })
-  tenant?: string[];
+  wafpolicy: string;
 
-  @property({
-    type: 'date',
-  })
-  createdAt?: string;
-
-  constructor(data?: Partial<Wafpolicy>) {
+  constructor(data?: Partial<Rule>) {
     super(data);
   }
 }

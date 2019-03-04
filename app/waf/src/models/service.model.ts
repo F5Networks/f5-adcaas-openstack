@@ -34,6 +34,12 @@ export class Service extends Entity {
   })
   pool?: string;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  endpointpolicy: string;
+
   constructor(data?: Partial<Service>) {
     super(data);
   }

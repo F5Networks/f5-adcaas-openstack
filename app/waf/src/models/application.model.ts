@@ -25,7 +25,6 @@ export class Application extends Entity {
     required: true,
   })
   tenantId: string;
-
   @property({
     type: 'array',
     itemType: 'string',
@@ -33,7 +32,6 @@ export class Application extends Entity {
     default: [],
   })
   services: string[];
-
   @property({
     type: 'string',
   })

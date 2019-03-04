@@ -59,7 +59,7 @@ describe('WafpolicyController', () => {
     await client
       .post(prefix + '/wafpolicies')
       .send(wafpolicy)
-      .expect(400);
+      .expect(409);
   });
 
   it('get ' + prefix + '/wafpolicies: of all', async () => {
@@ -116,7 +116,7 @@ describe('WafpolicyController', () => {
     await givenWafpolicyData(wafapp);
     await givenWafpolicyData(wafapp);
 
-    const patch_condition = {content: 'the only one to patch'};
+    const patch_condition = {url: 'the only one to patch'};
     const patched_name = {name: 'updated waf policy name'};
 
     await givenWafpolicyData(wafapp, patch_condition);
