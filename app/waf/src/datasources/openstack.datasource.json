@@ -1,0 +1,153 @@
+{
+  "name": "openstack",
+  "connector": "rest",
+  "baseURL": "",
+  "crud": true,
+  "options": {
+    "accept": "application/json",
+    "content-type": "application/json"
+  },
+  "operations": [
+    {
+      "description": "identity v2 get auth token with user/password",
+      "template": {
+        "method": "POST",
+        "url": "{url}/tokens",
+        "responsePath": "$",
+        "body": {
+          "auth": {
+            "passwordCredentials": {
+              "username": "{osUsername}",
+              "password": "{osPassword}"
+            },
+            "tenantName": "{tenantName}"
+          }
+        }
+      },
+      "functions": {
+        "v2AuthToken": [
+          "url",
+          "osUsername",
+          "osPassword",
+          "tenantName"
+        ]
+      }
+    },
+    {
+      "description": "identity v2 validate user's token.",
+      "template": {
+        "method": "POST",
+        "url": "{url}/tokens",
+        "responsePath": "$",
+        "body": "{userTokenRequestBody}"
+      },
+      "functions": {
+        "v2ValidateToken": [
+          "url",
+          "userTokenRequestBody"
+        ]
+      }
+    },
+    {
+      "description": "identity v3 get auth token with user/password",
+      "template": {
+        "method": "POST",
+        "url": "{url}/auth/tokens",
+        "responsePath": "$",
+        "body": {
+          "auth": {
+            "identity": {
+              "methods": [
+                "password"
+              ],
+              "password": {
+                "user": {
+                  "name": "{osUsername}",
+                  "password": "{osPassword}",
+                  "domain": {
+                    "name": "{domainName}"
+                  }
+                }
+              }
+            },
+            "scope": {
+              "project": {
+                "domain": {
+                  "name": "{domainName}"
+                },
+                "name": "{tenantName}"
+              }
+            }
+          }
+        }
+      },
+      "functions": {
+        "v3AuthToken": [
+          "url",
+          "osUsername",
+          "osPassword",
+          "tenantName",
+          "domainName"
+        ]
+      }
+    },
+    {
+      "description": "identity v3 validate user's token.",
+      "template": {
+        "method": "GET",
+        "headers": {
+          "X-Auth-Token": "{adminToken}",
+          "X-Subject-Token": "{userToken}"
+        },
+        "url": "{url}/auth/tokens",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v3ValidateToken": [
+          "url",
+          "adminToken",
+          "userToken"
+        ]
+      }
+    },
+    {
+      "description": "call compute to create virtual server.",
+      "template": {
+        "method": "POST",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}/servers",
+        "body": "{createVSBody}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2CreateVirtualServer": [
+          "url",
+          "userToken",
+          "createVSBody"
+        ]
+      }
+    },
+    {
+      "description": "get detail of a created virtual server.",
+      "template": {
+        "method": "GET",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}/servers/{serverId}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2VirtualServerDetail": [
+          "url",
+          "userToken",
+          "serverId"
+        ]
+      }
+    }
+  ]
+}

@@ -8,6 +8,7 @@ const prefix = '/adcaas/v1';
 export async function main(options: ApplicationConfig = {}) {
   const app = new WafApplication(options);
   await app.boot();
+  app.keepAliveAdminToken();
   // Asynchronously perform the 'migrateSchema' action.
   // Delay the execution to make sure the dependent datasource is ready.
   setTimeout(async () => {
