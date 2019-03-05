@@ -21,6 +21,12 @@ export class Member extends Entity {
   })
   port: number;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  poolId: string;
+
   constructor(data?: Partial<Member>) {
     super(data);
   }

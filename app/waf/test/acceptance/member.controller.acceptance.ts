@@ -5,8 +5,9 @@ import {
   givenEmptyDatabase,
   givenMemberData,
   givenPoolData,
-  createMemberObjectWithoutID,
+  createMemberObject,
 } from '../helpers/database.helpers';
+import uuid = require('uuid');
 
 describe('MemberController', () => {
   let wafapp: WafApplication;
@@ -26,7 +27,7 @@ describe('MemberController', () => {
   });
 
   it('get ' + prefix + '/members/count', async () => {
-    const member = await givenMemberData(wafapp);
+    const member = await givenMemberData(wafapp, {id: uuid(), poolId: uuid()});
 
     const response = await client
       .get(prefix + '/members/count')
@@ -37,7 +38,7 @@ describe('MemberController', () => {
   });
 
   it('get ' + prefix + '/members', async () => {
-    const member = await givenMemberData(wafapp);
+    const member = await givenMemberData(wafapp, {id: uuid(), poolId: uuid()});
 
     await client
       .get(prefix + '/members')
@@ -46,7 +47,7 @@ describe('MemberController', () => {
   });
 
   it('get ' + prefix + '/members', async () => {
-    const member = await givenMemberData(wafapp);
+    const member = await givenMemberData(wafapp, {id: uuid(), poolId: uuid()});
 
     await client
       .get(prefix + '/members')
@@ -56,7 +57,7 @@ describe('MemberController', () => {
 
   it('post ' + prefix + '/pools/{pool_id}/members', async () => {
     const pool = await givenPoolData(wafapp);
-    const member = createMemberObjectWithoutID();
+    const member = createMemberObject({id: uuid()});
 
     const response = await client
       .post(prefix + `/pools/${pool.id}/members`)
@@ -69,8 +70,8 @@ describe('MemberController', () => {
   });
 
   it('get ' + prefix + '/pools/{pool_id}/members/{member_id}', async () => {
-    const member = await givenMemberData(wafapp);
-    const pool = await givenPoolData(wafapp, {members: [member.id]});
+    const pool = await givenPoolData(wafapp);
+    const member = await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
 
     const response = await client
       .get(prefix + `/pools/${pool.id}/members/${member.id}`)
@@ -82,11 +83,9 @@ describe('MemberController', () => {
   });
 
   it('get ' + prefix + '/pools/{pool_id}/members', async () => {
-    const aMember = await givenMemberData(wafapp);
-    const bMember = await givenMemberData(wafapp);
-    const pool = await givenPoolData(wafapp, {
-      members: [aMember.id, bMember.id],
-    });
+    const pool = await givenPoolData(wafapp);
+    await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
+    await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
 
     const response = await client
       .get(prefix + `/pools/${pool.id}/members`)
@@ -98,8 +97,8 @@ describe('MemberController', () => {
   });
 
   it('delete ' + prefix + '/pools/{pool_id}/members/{member_id}', async () => {
-    const member = await givenMemberData(wafapp);
-    const pool = await givenPoolData(wafapp, {members: [member.id]});
+    const pool = await givenPoolData(wafapp);
+    const member = await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
 
     await client
       .del(prefix + `/pools/${pool.id}/members/${member.id}`)
@@ -107,6 +106,25 @@ describe('MemberController', () => {
 
     await client
       .get(prefix + `/pools/${pool.id}/members/${member.id}`)
-      .expect(404);
+      .expect(204);
+  });
+
+  it('put ' + prefix + '/pools/{pool_id}/members/{member_id}', async () => {
+    const pool = await givenPoolData(wafapp);
+    const memberInDb = await givenMemberData(wafapp, {
+      id: uuid(),
+      poolId: pool.id,
+    });
+    const member = createMemberObject({
+      id: memberInDb.id,
+      port: 4789,
+    });
+
+    const response = await client
+      .put(prefix + `/pools/${pool.id}/members/${member.id}`)
+      .send(member)
+      .expect(200);
+
+    expect(response.body.count).to.eql(1);
   });
 });

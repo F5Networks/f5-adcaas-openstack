@@ -247,16 +247,7 @@ export class ApplicationController {
       let pool = await this.poolRepository.findById(service.pool);
       params.pool = pool;
 
-      if (pool.members.length > 0) {
-        let members = [];
-        for (let member_id of pool.members) {
-          let m = await this.memberRepository.findById(member_id);
-          members.push(m);
-        }
-        params.members = members;
-      } else {
-        params.members = [];
-      }
+      params.members = await this.poolRepository.members(pool.id).find();
     }
 
     params.service = service;

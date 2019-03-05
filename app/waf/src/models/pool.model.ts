@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Member} from './member.model';
+import {Entity, model, property, hasMany} from '@loopback/repository';
 
 @model()
 export class Pool extends Entity {
@@ -21,13 +22,8 @@ export class Pool extends Entity {
   })
   loadBalancingMode: string;
 
-  @property({
-    type: 'array',
-    itemType: 'string',
-    required: false,
-    default: [],
-  })
-  members: string[];
+  @hasMany(() => Member, {keyTo: 'poolId'})
+  members?: Member[];
 
   @property({
     type: 'array',

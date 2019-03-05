@@ -230,7 +230,6 @@ export function createPoolObjectWithID(data?: Partial<Pool>) {
     {
       id: uuid(),
       loadBalancingMode: 'round-robin',
-      members: [uuid(), uuid()],
       monitors: ['http'],
     },
     data,
@@ -241,7 +240,6 @@ export function createPoolObjectWithoutID(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
-      members: [uuid(), uuid()],
       monitors: ['http'],
     },
     data,
@@ -253,24 +251,13 @@ export async function givenMemberData(
   data?: Partial<Member>,
 ) {
   const repo = await wafapp.getRepository(MemberRepository);
-  return await repo.create(createMemberObjectWithID(data));
+  return await repo.create(createMemberObject(data));
 }
 
-export function createMemberObjectWithID(data?: Partial<Member>) {
+export function createMemberObject(data?: Partial<Member>) {
   return Object.assign(
     {
-      id: uuid(),
       address: '192.0.1.23',
-      port: 80,
-    },
-    data,
-  );
-}
-
-export function createMemberObjectWithoutID(data?: Partial<Member>) {
-  return Object.assign(
-    {
-      address: '192.0.1.24',
       port: 80,
     },
     data,
