@@ -41,7 +41,7 @@ export class MySequence implements SequenceHandler {
       this.reject(context, err);
     }
 
-    //await this.logResponse(logUuid, context, result);
+    await this.logResponse(logUuid, context, result);
   }
 
   async logRequest(logUuid: string, context: RequestContext): Promise<void> {

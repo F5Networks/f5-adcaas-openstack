@@ -15,11 +15,9 @@ import {
   put,
   del,
   requestBody,
-  HttpErrors,
 } from '@loopback/rest';
 import {Pool, Member} from '../models';
 import {PoolRepository, MemberRepository} from '../repositories';
-import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
 
@@ -191,19 +189,7 @@ export class PoolController {
     @param.path.string('pool_id') pool_id: string,
     @requestBody() member: Partial<Member>,
   ): Promise<Member> {
-    let pool: Pool = await this.poolRepository.findById(pool_id);
-
-    member.id = uuid();
-    let saved_member: Member = await this.memberRepository.create(member);
-
-    if (pool.members) {
-      pool.members.push(saved_member.id);
-    } else {
-      pool.members = [saved_member.id];
-    }
-
-    await this.poolRepository.replaceById(pool.id, pool);
-    return saved_member;
+    return await this.poolRepository.members(pool_id).create(member);
   }
 
   @get(prefix + '/pools/{pool_id}/members/{member_id}', {
@@ -218,37 +204,10 @@ export class PoolController {
     @param.path.string('pool_id') pool_id: string,
     @param.path.string('member_id') member_id: string,
   ): Promise<Member> {
-    let pool: Pool = await this.poolRepository.findById(pool_id);
-    if (pool.members && pool.members.includes(member_id)) {
-      return await this.memberRepository.findById(member_id);
-    } else {
-      throw new HttpErrors.NotFound(`can not find member ${member_id}
-       in pool ${pool_id}`);
-    }
-  }
-
-  @del(prefix + '/pools/{pool_id}/members/{member_id}', {
-    responses: {
-      '204': {
-        description: 'Member DELETE success',
-      },
-    },
-  })
-  async deleteMemberByID(
-    @param.path.string('pool_id') pool_id: string,
-    @param.path.string('member_id') member_id: string,
-  ) {
-    let pool: Pool = await this.poolRepository.findById(pool_id);
-    if (pool.members && pool.members.includes(member_id)) {
-      let index: number = pool.members.indexOf(member_id);
-      pool.members.splice(index, 1);
-
-      await this.poolRepository.replaceById(pool_id, pool);
-      await this.memberRepository.deleteById(member_id);
-    } else {
-      throw new HttpErrors.NotFound(`can not find member ${member_id}
-       in pool ${pool_id}`);
-    }
+    const result = await this.poolRepository
+      .members(pool_id)
+      .find({where: {id: member_id}});
+    return result[0];
   }
 
   @get(prefix + '/pools/{pool_id}/members', {
@@ -266,15 +225,38 @@ export class PoolController {
   async getMembers(
     @param.path.string('pool_id') pool_id: string,
   ): Promise<Member[]> {
-    let pool: Pool = await this.poolRepository.findById(pool_id);
-    if (pool.members) {
-      let members: Member[] = [];
-      for (let mbr of pool.members) {
-        members.push(await this.memberRepository.findById(mbr));
-      }
-      return members;
-    } else {
-      return [] as Member[];
-    }
+    return await this.poolRepository.members(pool_id).find();
+  }
+
+  @del(prefix + '/pools/{pool_id}/members/{member_id}', {
+    responses: {
+      '204': {
+        description: 'Member DELETE success',
+      },
+    },
+  })
+  async deleteMemberByID(
+    @param.path.string('pool_id') pool_id: string,
+    @param.path.string('member_id') member_id: string,
+  ) {
+    await this.poolRepository.members(pool_id).delete({id: member_id});
+  }
+
+  @put(prefix + '/pools/{pool_id}/members/{member_id}', {
+    responses: {
+      '200': {
+        description: 'Member model instance',
+        content: {'application/json': {schema: {'x-ts-type': Member}}},
+      },
+    },
+  })
+  async updateMemberByID(
+    @param.path.string('pool_id') pool_id: string,
+    @param.path.string('member_id') member_id: string,
+    @requestBody() member: Partial<Member>,
+  ): Promise<Count> {
+    return await this.poolRepository
+      .members(pool_id)
+      .patch(member, {id: member_id});
   }
 }

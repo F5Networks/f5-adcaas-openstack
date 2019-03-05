@@ -279,10 +279,12 @@ describe('ApplicationController', () => {
         tenantId: 'default',
         adcId: adc.id,
       });
-      let member = await givenMemberData(wafapp);
       let pool = await givenPoolData(wafapp, {
         name: 'pool1',
-        members: [member.id],
+      });
+      await givenMemberData(wafapp, {
+        id: uuid(),
+        poolId: pool.id,
       });
       let waf1 = await givenWafpolicyData(wafapp, {
         name: 'rule1',
@@ -335,11 +337,10 @@ describe('ApplicationController', () => {
         tenantId: 'default',
         adcId: adc.id,
       });
-      let member = await givenMemberData(wafapp);
       let pool = await givenPoolData(wafapp, {
         name: 'pool1',
-        members: [member.id],
       });
+      await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
       let waf1 = await givenWafpolicyData(wafapp, {
         name: 'rule1',
         url: 'http://1.2.3.4/a.xml',
@@ -382,13 +383,13 @@ describe('ApplicationController', () => {
       req.declaration.toJSON();
     },
   );
+
   it('post ' + prefix + '/applications/{id}/deploy: no adcId', async () => {
     await givenTenantAssociationData(wafapp, {
       tenantId: 'default',
     });
     let pool = await givenPoolData(wafapp, {
       name: 'pool1',
-      members: [],
     });
     let service = await givenServiceData(wafapp, {
       pool: pool.id,
@@ -413,7 +414,6 @@ describe('ApplicationController', () => {
       });
       let pool = await givenPoolData(wafapp, {
         name: 'pool1',
-        members: [],
       });
       let service = await givenServiceData(wafapp, {
         pool: pool.id,
