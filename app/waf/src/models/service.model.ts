@@ -40,6 +40,12 @@ export class Service extends Entity {
   })
   endpointpolicy: string;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  applicationId: string;
+
   constructor(data?: Partial<Service>) {
     super(data);
   }

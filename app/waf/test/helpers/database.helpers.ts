@@ -192,23 +192,14 @@ export function createTenantAssociationObject(
 
 export async function givenServiceData(
   wafapp: WafApplication,
+  appId: string,
   data?: Partial<Service>,
 ) {
-  const repo = await wafapp.getRepository(ServiceRepository);
-  return await repo.create(createServiceObjectWithID(data));
+  const appRepo = await wafapp.getRepository(ApplicationRepository);
+  return await appRepo.services(appId).create(createServiceObject(data));
 }
 
-export function createServiceObjectWithID(data?: Partial<Service>) {
-  return Object.assign(
-    {
-      id: uuid(),
-      virtualAddresses: ['10.0.1.11'],
-    },
-    data,
-  );
-}
-
-export function createServiceObjectWithoutID(data?: Partial<Service>) {
+export function createServiceObject(data?: Partial<Service>) {
   return Object.assign(
     {
       virtualAddresses: ['10.0.1.11'],

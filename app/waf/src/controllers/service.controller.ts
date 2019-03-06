@@ -11,13 +11,11 @@ import {
   get,
   getFilterSchemaFor,
   getWhereSchemaFor,
-  patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
 import {Service} from '../models';
-import {ServiceRepository} from '../repositories';
+import {ServiceRepository, ApplicationRepository} from '../repositories';
 import uuid = require('uuid');
 
 const prefix = '/adcaas/v1';
@@ -26,21 +24,9 @@ export class ServiceController {
   constructor(
     @repository(ServiceRepository)
     public serviceRepository: ServiceRepository,
+    @repository(ApplicationRepository)
+    public applicationRepository: ApplicationRepository,
   ) {}
-
-  @post(prefix + '/services', {
-    responses: {
-      '200': {
-        description: 'Service model instance',
-        content: {'application/json': {schema: {'x-ts-type': Service}}},
-      },
-    },
-  })
-  async create(@requestBody() service: Service): Promise<Service> {
-    // pzhang(NOTE) more data sanitize in the future
-    service.id = uuid();
-    return await this.serviceRepository.create(service);
-  }
 
   @get(prefix + '/services/count', {
     responses: {
@@ -74,22 +60,7 @@ export class ServiceController {
     return await this.serviceRepository.find(filter);
   }
 
-  @patch(prefix + '/services', {
-    responses: {
-      '200': {
-        description: 'Service PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody() service: Service,
-    @param.query.object('where', getWhereSchemaFor(Service)) where?: Where,
-  ): Promise<Count> {
-    return await this.serviceRepository.updateAll(service, where);
-  }
-
-  @get(prefix + '/services/{id}', {
+  @get(prefix + '/services/{service_id}', {
     responses: {
       '200': {
         description: 'Service model instance',
@@ -97,46 +68,37 @@ export class ServiceController {
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Service> {
-    return await this.serviceRepository.findById(id);
+  async findById(
+    @param.path.string('service_id') service_id: string,
+  ): Promise<Service> {
+    return await this.serviceRepository.findById(service_id);
   }
 
-  @patch(prefix + '/services/{id}', {
+  @post(prefix + '/services', {
     responses: {
-      '204': {
-        description: 'Service PATCH success',
+      '200': {
+        description: 'Service model instance',
+        content: {'application/json': {schema: {'x-ts-type': Service}}},
       },
     },
   })
-  async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() service: Service,
-  ): Promise<void> {
-    await this.serviceRepository.updateById(id, service);
+  async create(@requestBody() service: Service): Promise<Service> {
+    service.id = uuid();
+    const appId = service.applicationId;
+    delete service.applicationId;
+    return await this.applicationRepository.services(appId).create(service);
   }
 
-  @put(prefix + '/services/{id}', {
-    responses: {
-      '204': {
-        description: 'Service PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() service: Service,
-  ): Promise<void> {
-    await this.serviceRepository.replaceById(id, service);
-  }
-
-  @del(prefix + '/services/{id}', {
+  @del(prefix + '/services/{service_id}', {
     responses: {
       '204': {
         description: 'Service DELETE success',
       },
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.serviceRepository.deleteById(id);
+  async deleteById(
+    @param.path.string('service_id') service_id: string,
+  ): Promise<void> {
+    await this.serviceRepository.deleteById(service_id);
   }
 }
