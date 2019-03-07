@@ -1,0 +1,3187 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "F5 ADCaaS for OpenStack",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/adcaas/v1/adcs/count": {
+      "get": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "count",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "ADC resource count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/adcs/{id}": {
+      "put": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Adc PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update ADC resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "statusCode",
+                    "name",
+                    "message"
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "ENTITY_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "ADC resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My BIG-IP"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "findById",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully update ADC resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "statusCode",
+                    "name",
+                    "message"
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "ENTITY_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete ADC resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "statusCode",
+                    "name",
+                    "message"
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "ENTITY_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/adcs": {
+      "post": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "create",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "host": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "integer"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "id": "11111111-2222-3333-4444-555555555555",
+                    "name": "My BIG-IP",
+                    "type": "HW",
+                    "host": "192.168.0.1",
+                    "port": 8443,
+                    "createdAt": "2019-03-05T08:40:25.000Z",
+                    "updatedAt": "2019-03-05T08:40:25.100Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "statusCode",
+                    "name",
+                    "message"
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "BadRequestError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "statusCode",
+                    "name",
+                    "message"
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 422
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "UnprocessableEntityError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The request body is invalid. See error object `details` property for more info."
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "VALIDATION_FAILED"
+                    },
+                    "details": {
+                      "type": "array",
+                      "example": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "ADC resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "host"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "type": "integer"
+                  }
+                },
+                "example": {
+                  "name": "My BIG-IP",
+                  "type": "HW",
+                  "host": "192.168.0.1",
+                  "port": 8443
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Adc PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "find",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve ADC resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "host": {
+                        "type": "string"
+                      },
+                      "port": {
+                        "type": "integer"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      }
+                    },
+                    "example": {
+                      "id": "11111111-2222-3333-4444-555555555555",
+                      "name": "My BIG-IP",
+                      "type": "HW",
+                      "host": "192.168.0.1",
+                      "port": 8443,
+                      "createdAt": "2019-03-05T08:40:25.000Z",
+                      "updatedAt": "2019-03-05T08:40:25.100Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "type": "boolean"
+                    },
+                    "host": {
+                      "type": "boolean"
+                    },
+                    "port": {
+                      "type": "boolean"
+                    },
+                    "username": {
+                      "type": "boolean"
+                    },
+                    "passphrase": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/applications/count": {
+      "get": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "count",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Application model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/applications/{id}/deploy": {
+      "post": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "deployById",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Application deploy success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/applications/{id}": {
+      "put": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Application PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Application PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "findById",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Application model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Application DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/applications": {
+      "post": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "create",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Application model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Application PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "find",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Application model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Application"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "services": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/endpointpolicies/count": {
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "count",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpointpolicy model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/endpointpolicies/{id}": {
+      "put": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Endpointpolicy PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Endpointpolicy PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "findById",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpointpolicy model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpointpolicy"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Endpointpolicy DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/endpointpolicies": {
+      "post": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "create",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpointpolicy model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpointpolicy"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpointpolicy PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "find",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Endpointpolicy model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Endpointpolicy"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "rules": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/members/count": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "countMembers",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Member model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/members": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findMembers",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Member model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "type": "boolean"
+                    },
+                    "port": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/ping": {
+      "get": {
+        "x-controller-name": "PingController",
+        "x-operation-name": "ping",
+        "tags": [
+          "PingController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ping Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "greeting": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "properties": {
+                        "Content-Type": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adcaas/v1/pools/count": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "count",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Pool model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/pools/{pool_id}/members/{member_id}": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "getMemberByID",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Member model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pool_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "deleteMemberByID",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Member DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "pool_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/pools/{pool_id}/members": {
+      "post": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "createPoolMember",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Member add to Pool success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pool_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "getMembers",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Member model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pool_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/pools/{id}": {
+      "put": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Pool PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pool"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Pool PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pool"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findById",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Pool model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pool"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Pool DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/pools": {
+      "post": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "create",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Pool model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pool"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pool"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Pool PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pool"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "find",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Pool model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pool"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "loadBalancingMode": {
+                      "type": "boolean"
+                    },
+                    "members": {
+                      "type": "boolean"
+                    },
+                    "monitors": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/rules/count": {
+      "get": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "count",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/rules/{id}": {
+      "put": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Rule PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rule"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Rule PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rule"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "findById",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Rule DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/rules": {
+      "post": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "create",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rule"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "find",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Rule model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rule"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "default": {
+                      "type": "boolean"
+                    },
+                    "pattern": {
+                      "type": "boolean"
+                    },
+                    "wafpolicy": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/services/count": {
+      "get": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "count",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/services/{id}": {
+      "put": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Service PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Service PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "findById",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Service DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/services": {
+      "post": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "create",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "find",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Service model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Service"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "virtualAddresses": {
+                      "type": "boolean"
+                    },
+                    "virtualPort": {
+                      "type": "boolean"
+                    },
+                    "pool": {
+                      "type": "boolean"
+                    },
+                    "endpointpolicy": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/tenantassocs/count": {
+      "get": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "count",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "TenantAssociation model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/tenantassocs/{tenantId}": {
+      "patch": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "TenantAssociation PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "findById",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "TenantAssociation model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantAssociation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "TenantAssociation DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/tenantassocs": {
+      "post": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "create",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "TenantAssociation model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantAssociation"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "TenantAssociationController",
+        "x-operation-name": "find",
+        "tags": [
+          "TenantAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of TenantAssociation model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantAssociation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "adcId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/wafpolicies/count": {
+      "get": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "count",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Wafpolicy model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/wafpolicies/{id}": {
+      "put": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "replaceById",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Wafpolicy PUT success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "patch": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Wafpolicy PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        }
+      },
+      "get": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "findById",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Wafpolicy model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wafpolicy"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Wafpolicy DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/adcaas/v1/wafpolicies": {
+      "post": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "create",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Wafpolicy model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wafpolicy"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "updateAll",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Wafpolicy PATCH success count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "find",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Wafpolicy model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Wafpolicy"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "shared": {
+                      "type": "boolean"
+                    },
+                    "url": {
+                      "type": "boolean"
+                    },
+                    "tenant": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Application": {
+        "title": "Application",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "name",
+          "tenantId"
+        ]
+      },
+      "Endpointpolicy": {
+        "title": "Endpointpolicy",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "rules"
+        ]
+      },
+      "Pool": {
+        "title": "Pool",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "loadBalancingMode": {
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "monitors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Member": {
+        "title": "Member",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "port"
+        ]
+      },
+      "Rule": {
+        "title": "Rule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "wafpolicy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Service": {
+        "title": "Service",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "virtualAddresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "virtualPort": {
+            "type": "number"
+          },
+          "pool": {
+            "type": "string"
+          },
+          "endpointpolicy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "virtualAddresses"
+        ]
+      },
+      "TenantAssociation": {
+        "title": "TenantAssociation",
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "adcId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tenantId",
+          "adcId"
+        ]
+      },
+      "Wafpolicy": {
+        "title": "Wafpolicy",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "tenant": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "name",
+          "shared",
+          "url"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:3000"
+    }
+  ]
+}
