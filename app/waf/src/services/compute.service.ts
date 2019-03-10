@@ -1,10 +1,10 @@
-import { getService } from '@loopback/service-proxy';
-import { inject, Provider, CoreBindings } from '@loopback/core';
-import { OpenstackDataSource } from '../datasources';
-import { RestApplication } from '@loopback/rest';
-import { factory } from '../log4ts';
-import { bindingKeyAdminAuthedToken } from '../components';
-import { AuthedToken } from './identity.service';
+import {getService} from '@loopback/service-proxy';
+import {inject, Provider, CoreBindings} from '@loopback/core';
+import {OpenstackDataSource} from '../datasources';
+import {RestApplication} from '@loopback/rest';
+import {factory} from '../log4ts';
+import {bindingKeyAdminAuthedToken} from '../components';
+import {AuthedToken} from './identity.service';
 
 export interface ComputeService {
   v2CreateVirtualServer(
@@ -12,11 +12,7 @@ export interface ComputeService {
     userToken: string,
     serversRequestBody: object,
   ): Promise<object>;
-  v2VirtualServerDetail(
-    url: string,
-    userToken: string,
-    serverId: string,
-  ): Promise<object>;
+  v2VirtualServerDetail(url: string, userToken: string): Promise<object>;
 }
 
 export class ComputeServiceProvider implements Provider<ComputeService> {
@@ -24,17 +20,16 @@ export class ComputeServiceProvider implements Provider<ComputeService> {
     // openstack must match the name property in the datasource json file
     @inject('datasources.openstack')
     protected dataSource: OpenstackDataSource = new OpenstackDataSource(),
-  ) { }
+  ) {}
 
   value(): Promise<ComputeService> {
     return getService(this.dataSource);
   }
 }
 
-abstract class ComputeManager {
-  protected meta: { version: string };
-  @inject(CoreBindings.APPLICATION_INSTANCE)
-  protected application: RestApplication;
+export abstract class ComputeManager {
+  protected meta: {version: string} = {version: 'abstract'};
+
   // @inject('services.ComputeService')
   protected computeService: ComputeService;
 
@@ -42,12 +37,24 @@ abstract class ComputeManager {
     'compute.process.ComputeManager.' + this.meta.version,
   );
 
-  // NOTE: define abstract member functions when we plan to do dynamic selection
-  // between compute v2 and v3.
-  // abstract createVirtualServer(): Promise<object>;
-  // abstract queryVSState(serverId: string): Promise<object>;
+  constructor(
+    @inject(CoreBindings.APPLICATION_INSTANCE)
+    protected application: RestApplication,
+  ) {}
 
-  async bindComputeService() {
+  abstract createVirtualServer(
+    userToken: string,
+    serversParams: ServersParams,
+  ): Promise<string>;
+
+  abstract virtualServerDetail(
+    userToken: string,
+    serverId: string,
+    tenantId?: string,
+    regionName?: string,
+  ): Promise<ServerDetail>;
+
+  async bindComputeService(): Promise<ComputeManager> {
     // TODO: use bind/inject to use bindComputeService:
     // @inject('services.bindComputeService') works differently within/outside
     // of Controller. It doesn't work outside of Controller. So here we make
@@ -55,6 +62,8 @@ abstract class ComputeManager {
     await new ComputeServiceProvider().value().then(cmptServ => {
       this.computeService = cmptServ;
     });
+
+    return Promise.resolve(this);
   }
 }
 
@@ -81,10 +90,13 @@ export class ComputeManagerV2 extends ComputeManager {
         .then(serversResponse => {
           const obj = JSON.parse(JSON.stringify(serversResponse))[0];
           this.logger.debug('Created server: ' + JSON.stringify(obj));
-          return Promise.resolve(obj['servers']['id']);
+          return Promise.resolve(obj['server']['id']);
         });
     } catch (error) {
-      throw new Error('Failed to create server: ' + error);
+      let newErr = new Error('Failed to create server.');
+      newErr.message += '\n' + error.message;
+      newErr.stack += '\n' + error.stack;
+      throw newErr;
     }
   }
 
@@ -100,11 +112,8 @@ export class ComputeManagerV2 extends ComputeManager {
     try {
       return await this.serversEndpoint(tenantId, regionName)
         .then(computeUrl => {
-          return this.computeService.v2VirtualServerDetail(
-            computeUrl,
-            userToken,
-            serverId,
-          );
+          let fullUrl = computeUrl + '/servers/' + serverId;
+          return this.computeService.v2VirtualServerDetail(fullUrl, userToken);
         })
         .then(response => {
           return this.parseDetailResponse(response);
@@ -146,18 +155,22 @@ export class ComputeManagerV2 extends ComputeManager {
 
               for (let e of c.endpoints) {
                 let eJson = JSON.parse(JSON.stringify(e));
-                if (eJson['region'] === regionName) continue;
+                if (eJson['region'] !== regionName) continue;
 
                 let url = <string>eJson['internalURL'];
                 return url.slice(0, url.lastIndexOf('/')) + '/' + userTenantId;
               }
             }
+            throw new Error('Not found the endpoint.');
           })();
         });
     } catch (error) {
-      throw new Error(
-        'Failed to get compute endpoint from admin token.' + error,
+      let newErr = new Error(
+        'Failed to get compute endpoint from admin token.',
       );
+      newErr.message += '\n' + error.message;
+      newErr.stack += '\n' + error.stack;
+      throw newErr;
     }
 
     if (!endpoint) throw new Error('Not found compute url.');
@@ -167,28 +180,40 @@ export class ComputeManagerV2 extends ComputeManager {
   async assembleRequestBody(
     serversParams: ServersParams,
   ): Promise<ServersRequestBody> {
-    let serversRequestBody = new ServersRequestBody();
-    serversRequestBody.server.available_zone = serversParams.availableZoneName;
-    serversRequestBody.server.flavorRef = serversParams.flavorRef;
-    serversRequestBody.server.imageRef = serversParams.imageRef;
-    serversRequestBody.server.networks.push({ uuid: serversParams.networkId });
-    serversRequestBody.server.security_groups.push({
-      name: serversParams.securityGroupName,
-    });
-    serversRequestBody.server.userData = serversParams.userData;
+    let serversRequestBody: ServersRequestBody = {
+      server: {
+        flavorRef: serversParams.flavorRef,
+        imageRef: serversParams.imageRef,
+        networks: [{uuid: ''}],
+        security_groups: [{name: serversParams.securityGroupName}],
+        name: serversParams.vmName,
+        'OS-DCF:diskConfig': 'AUTO',
+      },
+    };
+    if (serversParams.availableZoneName)
+      serversRequestBody.server.available_zone =
+        serversParams.availableZoneName;
+    if (serversParams.userData)
+      serversRequestBody.server.userData = serversParams.userData;
+    if (serversParams.networkId) {
+      // TODO: support multiple networks/ports.
+      serversRequestBody.server.networks[0].uuid = serversParams.networkId;
+    } else if (serversParams.portId) {
+      delete serversRequestBody.server.networks[0].uuid;
+      serversRequestBody.server.networks[0].port = <string>serversParams.portId;
+      // if (serversParams.fixedIp) // TODO: support fixed ip.
+    }
     return Promise.resolve(serversRequestBody);
   }
 }
 
 // TODO: "type": "computev3", -- to support compute v3.
-export class ComputeManagerV3 extends ComputeManager { }
+//export class ComputeManagerV3 extends ComputeManager { }
 
 class ServersRequestBody {
   server: {
-    networks: [
-      { uuid: string } | { port: string; fixed_ip: string; }
-    ];
-    name?: string;
+    networks: [{uuid?: string; port?: string; fixed_ip?: string}];
+    name: string;
     imageRef: string;
     flavorRef: string;
     available_zone?: string;
@@ -196,7 +221,7 @@ class ServersRequestBody {
     metadata?: {
       [key: string]: string;
     };
-    security_groups: [{ name: string }];
+    security_groups: [{name: string}];
     userData?: string;
   };
 }
@@ -204,14 +229,16 @@ class ServersRequestBody {
 export class ServersParams {
   userTenantId: string;
   networkId: string;
-  name?: string;
+  vmName: string;
   imageRef: string;
   flavorRef: string;
   securityGroupName: string;
   userData?: string;
-  regionName: string = 'RegionOne';
+  regionName: string;
   availableZoneName?: string;
-  metadata?: { [key: string]: string };
+  metadata?: {[key: string]: string};
+  portId?: string;
+  fixedIp?: string;
 }
 
 export class ServerDetail {

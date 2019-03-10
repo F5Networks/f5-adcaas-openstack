@@ -8,7 +8,17 @@
       "program": "${workspaceFolder}/index.js",
       "args": [],
       "cwd": "${workspaceFolder}",
-      "protocol": "inspector"
+      "protocol": "inspector",
+      "env": {
+        "TEST_OPENSTACK_INTEGRATION": "1"
+        // "PRODUCT_RELEASE": "1",
+        // "OS_AUTH_URL": "http://10.145.116.217:35357/v2.0",
+        // "OS_USERNAME": "wafaas",
+        // "OS_PASSWORD": "91153c85b8dd4147",
+        // "OS_TENANT_NAME": "services",
+        // "OS_DOMAIN_NAME": "Default"
+      },
+      "preLaunchTask": "Single Build"
     }
   ]
 }

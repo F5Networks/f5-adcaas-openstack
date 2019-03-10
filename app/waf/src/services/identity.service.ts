@@ -1,9 +1,10 @@
 import {getService} from '@loopback/service-proxy';
-import {inject, Provider, CoreBindings} from '@loopback/core';
+import {inject, Provider} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {factory} from '../log4ts';
-import {RestApplication} from '@loopback/rest';
+//import { RestApplication } from '@loopback/rest';
 import {bindingKeyAdminAuthedToken} from '../components';
+import {RestApplication} from '@loopback/rest';
 
 export interface IdentityService {
   v2AuthToken(
@@ -43,16 +44,18 @@ export class IdentityServiceProvider implements Provider<IdentityService> {
 }
 
 export abstract class AuthWithOSIdentity {
-  @inject('services.IdentityService')
-  protected identityService: IdentityService;
-  @inject(CoreBindings.APPLICATION_INSTANCE)
-  protected application: RestApplication;
+  // @inject('services.IdentityService')
+  // protected identityService: IdentityService;
 
   protected logger = factory.getLogger(
     'auth.process.AuthWithOSIdentity.' + this.authConfig.version,
   );
 
-  constructor(protected authConfig: AuthConfig) {}
+  constructor(
+    protected authConfig: AuthConfig,
+    protected application: RestApplication,
+    protected identityService: IdentityService,
+  ) {}
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
@@ -60,15 +63,15 @@ export abstract class AuthWithOSIdentity {
     tenantName?: string,
   ): Promise<AuthedToken>;
 
-  async bindIdentityService() {
-    // TODO: use bind/inject to use IdentityService:
-    // @inject('services.IdentityService') works differently within/outside of
-    // Controller. It doesn't work outside of Controller. So here we make call
-    // to Provider explicitly.
-    await new IdentityServiceProvider().value().then(idenServ => {
-      this.identityService = idenServ;
-    });
-  }
+  // async bindIdentityService() {
+  //   // TODO: use bind/inject to use IdentityService:
+  //   // @inject('services.IdentityService') works differently within/outside of
+  //   // Controller. It doesn't work outside of Controller. So here we make call
+  //   // to Provider explicitly.
+  //   await new IdentityServiceProvider().value().then(idenServ => {
+  //     this.identityService = idenServ;
+  //   });
+  // }
 }
 
 class AuthWithIdentityV2 extends AuthWithOSIdentity {
@@ -83,27 +86,16 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           this.authConfig.osPassword,
           this.authConfig.osTenantName,
         )
-        .then(
-          response => {
-            this.logger.debug('adminAuthToken');
-            //this.logger.debug(JSON.stringify(response));
-            try {
-              adminToken = this.parseAuthResponseNoException(response);
-              this.application.bind(bindingKeyAdminAuthedToken).to(adminToken);
-            } catch (e) {
-              throw new Error(
-                'Failed to parse response from /v2.0/token: ' + e,
-              );
-            }
-          },
-          reason => {
-            throw new Error('Failed to request /v2.0/tokens' + reason);
-          },
-        );
+        .then(response => {
+          this.logger.debug('adminAuthToken done.');
+          //this.logger.debug(JSON.stringify(response));
+          adminToken = this.parseAuthResponseNoException(response);
+        });
 
+      this.application.bind(bindingKeyAdminAuthedToken).to(adminToken);
       return Promise.resolve(adminToken);
     } catch (error) {
-      throw new Error('Failed to request /v2.0/tokens' + error);
+      throw new Error('Failed to request /v2.0/tokens: ' + error.message);
     }
   }
 
@@ -113,27 +105,19 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
   ): Promise<AuthedToken> {
     let authedToken = new AuthedToken();
 
-    let reqBody = new UserTokenRequestBody();
-    reqBody.auth.token.id = userToken;
+    //let reqBody = new UserTokenRequestBody();
+    //reqBody.auth.token.id = userToken;
+    let reqBody: UserTokenRequestBody = {
+      auth: {token: {id: userToken}},
+    };
     if (tenantName) reqBody.auth.tenantName = tenantName;
 
     try {
       await this.identityService
         .v2ValidateToken(this.authConfig.osAuthUrl, reqBody)
-        .then(
-          response => {
-            try {
-              authedToken = this.parseAuthResponseNoException(response);
-            } catch (e) {
-              throw new Error(
-                'Failed to parse response from identity service: ' + e,
-              );
-            }
-          },
-          reason => {
-            throw new Error('Failed to request identity service: ' + reason);
-          },
-        );
+        .then(response => {
+          authedToken = this.parseAuthResponseNoException(response);
+        });
 
       return Promise.resolve(authedToken);
     } catch (error) {
@@ -171,16 +155,9 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
           this.authConfig.osTenantName,
           <string>this.authConfig.osDomainName,
         )
-        .then(
-          response => {
-            adminToken = this.parseAuthResponseNoException(response);
-          },
-          reason => {
-            throw new Error(
-              'Failed to request from identity service: ' + reason,
-            );
-          },
-        );
+        .then(response => {
+          adminToken = this.parseAuthResponseNoException(response);
+        });
 
       return Promise.resolve(adminToken);
     } catch (e) {
@@ -201,18 +178,9 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
       );
       await this.identityService
         .v3ValidateToken(this.authConfig.osAuthUrl, adminToken.token, userToken)
-        .then(
-          response => {
-            try {
-              authedToken = this.parseAuthResponseNoException(response);
-            } catch (e) {
-              throw new Error('Failed to request from identity service: ' + e);
-            }
-          },
-          reason => {
-            throw new Error('Failed to request identity service' + reason);
-          },
-        );
+        .then(response => {
+          authedToken = this.parseAuthResponseNoException(response);
+        });
 
       return Promise.resolve(authedToken);
     } catch (error) {
@@ -228,7 +196,7 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
     let token = respJson[0]['token'];
     authedToken.issuedAt = new Date(token['issued_at']);
     authedToken.expiredAt = new Date(token['expires_at']);
-    authedToken.token = ''; // from header.
+    authedToken.token = ''; // TODO: find it from header.
     authedToken.userId = token['user']['id'];
     authedToken.catalog = token['catalog'];
 
@@ -248,7 +216,10 @@ export class AuthWithIdentityUnknown extends AuthWithOSIdentity {
 export class AuthManager {
   private authConfig: AuthConfig = new AuthConfig();
 
-  constructor() {
+  constructor(
+    private application: RestApplication,
+    private identityService: IdentityService,
+  ) {
     let authProps: string[];
     let emptyProps: string[] = [];
 
@@ -288,21 +259,33 @@ export class AuthManager {
     return this;
   }
 
-  async createAuthWorker(): Promise<AuthWithOSIdentity> {
+  createAuthWorker(): AuthWithOSIdentity {
     let authWithOSIdentity: AuthWithOSIdentity;
 
     switch (this.authConfig.version) {
       case 'v2.0':
-        authWithOSIdentity = new AuthWithIdentityV2(this.authConfig);
+        authWithOSIdentity = new AuthWithIdentityV2(
+          this.authConfig,
+          this.application,
+          this.identityService,
+        );
         break;
       case 'v3':
-        authWithOSIdentity = new AuthWithIdentityV3(this.authConfig);
+        authWithOSIdentity = new AuthWithIdentityV3(
+          this.authConfig,
+          this.application,
+          this.identityService,
+        );
         break;
       default:
-        authWithOSIdentity = new AuthWithIdentityUnknown(this.authConfig);
+        authWithOSIdentity = new AuthWithIdentityUnknown(
+          this.authConfig,
+          this.application,
+          this.identityService,
+        );
         break;
     }
-    await authWithOSIdentity.bindIdentityService();
+    //await authWithOSIdentity.bindIdentityService();
 
     return authWithOSIdentity;
   }

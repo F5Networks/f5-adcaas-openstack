@@ -138,14 +138,33 @@
           "X-Auth-Token": "{userToken}",
           "content-type": "application/json"
         },
-        "url": "{url}/servers/{serverId}",
+        "url": "{url}",
         "responsePath": "$"
       },
       "functions": {
         "v2VirtualServerDetail": [
           "url",
+          "userToken"
+        ]
+      }
+    },
+    {
+      "description": "create a port within the specific network.",
+      "template": {
+        "method": "POST",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}/v2.0/ports",
+        "body": "{portCreationBody}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2CreatePort": [
+          "url",
           "userToken",
-          "serverId"
+          "portCreationBody"
         ]
       }
     }

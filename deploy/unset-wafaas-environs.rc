@@ -1,0 +1,22 @@
+#!/bin/bash 
+
+unset PRODUCT_RELEASE
+unset WAF_APP_PORT
+
+unset DATABASE_USER
+unset DATABASE_PASSWORD
+unset DATABASE_DB
+
+unset DATABASE_PORT
+unset DATABASE_DATA_DIRECTORY
+
+unset OS_AUTH_URL
+unset OS_USERNAME
+unset OS_PASSWORD
+unset OS_TENANT_NAME
+# Required if identity version is v3
+unset OS_DOMAIN_NAME
+
+# Possible useful variable.
+#unset OS_REGION_NAME
+#unset OS_AVAILABLE_ZONE

@@ -6,7 +6,13 @@ import {
   BindingKey,
 } from '@loopback/core';
 import {RestApplication} from '@loopback/rest';
-import {AuthManager} from './services';
+import {
+  AuthManager,
+  ComputeManagerV2,
+  IdentityServiceProvider,
+} from './services';
+import {NetworkDriver} from './services/network.service';
+import {factory} from './log4ts';
 
 export const bindingKeyAuthWithOSIdentity = BindingKey.create(
   'services.openstack.AuthWithOSIdentity',
@@ -16,10 +22,21 @@ export const bindingKeyAdminAuthedToken = BindingKey.create(
   'services.openstack.AdminAuthedToken',
 );
 
+export const bindingKeyComputeManager = BindingKey.create(
+  'services.openstack.ComputeManager',
+);
+
+export const bindingKeyNetworkDriver = BindingKey.create(
+  'services.openstack.NetworkDriver',
+);
+
 export class OpenStackComponent implements Component {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: RestApplication,
+    // @inject('services.IdentityService')
+    // private identityService: IdentityService,
+    private logger = factory.getLogger('components.openstack'),
   ) {}
 
   // TODO: make it work or find out the reason of not working.
@@ -29,23 +46,30 @@ export class OpenStackComponent implements Component {
 
   bindingAuth = Binding.bind(bindingKeyAuthWithOSIdentity).toDynamicValue(
     async () => {
-      let bindingKey = BindingKey.create(
-        'services.openstack.InternalBindinng.AuthWithOSIdentitySingleton',
-      );
-
       try {
-        return await this.application.get(bindingKey);
-      } catch (e) {
-        try {
-          let authWithOSIdentity = await new AuthManager().createAuthWorker();
-          this.application.bind(bindingKey).to(authWithOSIdentity);
-          return authWithOSIdentity;
-        } catch (e) {
-          return {};
-        }
+        const identityService = await new IdentityServiceProvider().value();
+        return new AuthManager(
+          this.application,
+          identityService,
+        ).createAuthWorker();
+      } catch (error) {
+        return {}; // TODO: consider the better return in exception.
       }
     },
   );
 
-  bindings = [this.bindingAuth];
+  bindingNetwork = Binding.bind(bindingKeyNetworkDriver).toDynamicValue(
+    async () => {
+      // NOTE: this is not singleton instance.
+      return await new NetworkDriver(this.application).bindNetworkService();
+    },
+  );
+
+  bindingCompute = Binding.bind(bindingKeyComputeManager).toDynamicValue(
+    async () => {
+      return await new ComputeManagerV2(this.application).bindComputeService();
+    },
+  );
+
+  bindings = [this.bindingAuth, this.bindingNetwork, this.bindingCompute];
 }
