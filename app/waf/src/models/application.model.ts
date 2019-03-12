@@ -7,7 +7,7 @@ export class Application extends Entity {
     type: 'string',
     id: true,
   })
-  id?: string;
+  id: string;
 
   @property({
     type: 'string',

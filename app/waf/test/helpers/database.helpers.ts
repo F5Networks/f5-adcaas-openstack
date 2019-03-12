@@ -7,6 +7,8 @@ import {
   MemberRepository,
   RuleRepository,
   EndpointpolicyRepository,
+  ConditionRepository,
+  ActionRepository,
 } from '../../src/repositories';
 
 import {
@@ -18,6 +20,8 @@ import {
   Member,
   Rule,
   Endpointpolicy,
+  Condition,
+  Action,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -81,14 +85,28 @@ export function createRuleObject(data?: Partial<Rule>) {
   return Object.assign(
     {
       name: 'test',
-      default: false,
-      pattern: 'test',
-      wafpolicy: '1',
     },
     data,
   );
 }
 
+export function createConditionObject(data?: Partial<Condition>) {
+  return Object.assign(
+    {
+      type: 'httpUri',
+      path: {operand: 'contains', values: ['/test1/']},
+    },
+    data,
+  );
+}
+export function createActionObject(data?: Partial<Action>) {
+  return Object.assign(
+    {
+      type: 'waf',
+    },
+    data,
+  );
+}
 export async function givenEndpointpolicyData(
   wafapp: WafApplication,
   data?: Partial<Endpointpolicy>,
@@ -98,6 +116,7 @@ export async function givenEndpointpolicyData(
   );
   const obj = createEndpointpolicyObject(data);
   obj.id = uuid();
+
   return await endpointpolicyrepo.create(obj);
 }
 
@@ -111,6 +130,26 @@ export async function givenRuleData(
   return await rulerepo.create(obj);
 }
 
+export async function givenConditionData(
+  wafapp: WafApplication,
+  data?: Partial<Condition>,
+) {
+  const conditionrepo = await wafapp.getRepository(ConditionRepository);
+  const obj = createConditionObject(data);
+  obj.id = uuid();
+  return await conditionrepo.create(obj);
+}
+
+export async function givenActionData(
+  wafapp: WafApplication,
+  data?: Partial<Action>,
+) {
+  const actionrepo = await wafapp.getRepository(ActionRepository);
+  const obj = createActionObject(data);
+  obj.id = uuid();
+  return await actionrepo.create(obj);
+}
+
 export async function givenWafpolicyData(
   wafapp: WafApplication,
   data?: Partial<Wafpolicy>,
@@ -118,6 +157,7 @@ export async function givenWafpolicyData(
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
   const obj = createWafpolicyObject(data);
   obj.id = uuid();
+
   return await wafpolicyrepo.create(obj);
 }
 

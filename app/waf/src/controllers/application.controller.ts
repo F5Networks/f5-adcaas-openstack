@@ -248,7 +248,6 @@ export class ApplicationController {
     if (service.pool) {
       let pool = await this.poolRepository.findById(service.pool);
       params.pool = pool;
-
       params.members = await this.poolRepository.members(pool.id).find();
     }
 
@@ -257,23 +256,23 @@ export class ApplicationController {
         service.endpointpolicy,
       );
 
-      params.rules = await this.ruleRepository.find({
-        where: {
-          id: {
-            inq: (<Endpointpolicy>params.endpointpolicy).rules,
+      if (params.endpointpolicy) {
+        params.rules = await this.ruleRepository.find({
+          where: {
+            id: {
+              inq: (<Endpointpolicy>params.endpointpolicy).rules,
+            },
           },
-        },
-      });
-
-      params.wafs = await this.wafpolicyRepository.find({
-        where: {
-          id: {
-            inq: (<Array<Rule>>params.rules).map(v => {
-              return v.wafpolicy;
-            }),
-          },
-        },
-      });
+        });
+        let rules = <Rule[]>params.rules;
+        for (let rule of rules) {
+          rule.conditions = await this.ruleRepository
+            .conditions(rule.id)
+            .find();
+          rule.actions = await this.ruleRepository.actions(rule.id).find();
+        }
+        params.wafs = await this.wafpolicyRepository.find();
+      }
     }
 
     let req = new AS3DeployRequest(params);

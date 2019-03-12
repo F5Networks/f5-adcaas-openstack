@@ -1,13 +1,43 @@
-import {DefaultCrudRepository} from '@loopback/repository';
-import {Rule} from '../models';
+import {
+  DefaultCrudRepository,
+  HasManyRepositoryFactory,
+  repository,
+} from '@loopback/repository';
+import {Rule, Condition, Action} from '../models';
 import {DbDataSource} from '../datasources';
-import {inject} from '@loopback/core';
+import {inject, Getter} from '@loopback/core';
+import {ConditionRepository} from './condition.repository';
+import {ActionRepository} from './action.repository';
 
 export class RuleRepository extends DefaultCrudRepository<
   Rule,
   typeof Rule.prototype.id
 > {
-  constructor(@inject('datasources.db') dataSource: DbDataSource) {
+  public readonly conditions: HasManyRepositoryFactory<
+    Condition,
+    typeof Rule.prototype.id
+  >;
+  public readonly actions: HasManyRepositoryFactory<
+    Action,
+    typeof Rule.prototype.id
+  >;
+  constructor(
+    @inject('datasources.db')
+    dataSource: DbDataSource,
+    @repository.getter('ConditionRepository')
+    getConditionRepository: Getter<ConditionRepository>,
+    @repository.getter('ActionRepository')
+    getActionRepository: Getter<ActionRepository>,
+  ) {
     super(Rule, dataSource);
+    this.conditions = this.createHasManyRepositoryFactoryFor(
+      'conditions',
+      getConditionRepository,
+    );
+
+    this.actions = this.createHasManyRepositoryFactoryFor(
+      'actions',
+      getActionRepository,
+    );
   }
 }

@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Condition, Action} from '../models';
+import {Entity, model, property, hasMany} from '@loopback/repository';
 
 @model()
 export class Rule extends Entity {
@@ -14,26 +15,11 @@ export class Rule extends Entity {
   })
   name: string;
 
-  @property({
-    type: 'boolean',
-    required: false,
-    default: false,
-  })
-  default: boolean;
+  @hasMany(() => Condition, {keyTo: 'ruleId'})
+  conditions?: Condition[];
 
-  @property({
-    type: 'string',
-    required: false,
-    default: '',
-  })
-  pattern: string;
-
-  @property({
-    type: 'string',
-    required: false,
-    default: '',
-  })
-  wafpolicy: string;
+  @hasMany(() => Action, {keyTo: 'ruleId'})
+  actions?: Action[];
 
   constructor(data?: Partial<Rule>) {
     super(data);

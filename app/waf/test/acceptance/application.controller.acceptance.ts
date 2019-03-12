@@ -18,9 +18,11 @@ import {
   givenPoolData,
   givenMemberData,
   givenRuleData,
-  givenWafpolicyData,
+  givenConditionData,
+  givenActionData,
   givenEndpointpolicyData,
   createApplicationObject,
+  givenWafpolicyData,
 } from '../helpers/database.helpers';
 import {Application} from '../../src/models';
 import uuid = require('uuid');
@@ -272,7 +274,7 @@ describe('ApplicationController', () => {
   );
 
   it(
-    'post ' + prefix + '/applications/{id}/deploy: deploy as3 config',
+    'post ' + prefix + '/applications/{id}/deploy: deploy without wap config',
     async () => {
       const adc = await givenAdcData(wafapp);
       await givenTenantAssociationData(wafapp, {
@@ -286,79 +288,35 @@ describe('ApplicationController', () => {
         id: uuid(),
         poolId: pool.id,
       });
-      let waf1 = await givenWafpolicyData(wafapp, {
-        name: 'rule1',
-        url: 'http://1.2.3.4/a.xml',
-      });
-      let waf2 = await givenWafpolicyData(wafapp, {
-        name: 'rule2',
-        url: 'http://1.2.3.4/a.xml',
-      });
+
       let rule1 = await givenRuleData(wafapp, {
+        id: '1234',
         name: 'rule1',
-        default: true,
-        pattern: 'test1',
-        wafpolicy: waf1.id,
       });
       let rule2 = await givenRuleData(wafapp, {
+        id: '2345',
         name: 'rule2',
-        default: false,
-        pattern: 'test2',
-        wafpolicy: waf2.id,
       });
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-        rules: [rule1.id, rule2.id],
-      });
-      let application = await givenApplicationData(wafapp);
-      await givenServiceData(wafapp, <string>application.id, {
-        pool: pool.id,
-        endpointpolicy: epp.id,
+      await givenConditionData(wafapp, {
+        ruleId: '1234',
+        type: 'httpUri',
+        path: {operand: 'contains', values: ['/test1/']},
       });
 
-      deployStub.returns(Promise.resolve('Hello'));
+      await givenConditionData(wafapp, {
+        ruleId: '1234',
+        type: 'httpUri',
+      });
+      await givenConditionData(wafapp, {
+        ruleId: '1234',
+        type: 'test',
+      });
+      await givenActionData(wafapp, {
+        ruleId: '2345',
+        type: 'waf',
+        policy: {wafpolicy: '12345678'},
+      });
 
-      await client
-        .post(prefix + '/applications/' + application.id + '/deploy')
-        .expect(200);
-
-      let req = <AS3DeployRequest>deployStub.getCall(0).args[2];
-      req.declaration.toJSON();
-    },
-  );
-
-  it(
-    'post ' + prefix + '/applications/{id}/deploy: more than one default rules',
-    async () => {
-      const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
-        tenantId: 'default',
-        adcId: adc.id,
-      });
-      let pool = await givenPoolData(wafapp, {
-        name: 'pool1',
-      });
-      await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});
-      let waf1 = await givenWafpolicyData(wafapp, {
-        name: 'rule1',
-        url: 'http://1.2.3.4/a.xml',
-      });
-      let waf2 = await givenWafpolicyData(wafapp, {
-        name: 'rule2',
-        url: 'http://1.2.3.4/a.xml',
-      });
-      let rule1 = await givenRuleData(wafapp, {
-        name: 'rule1',
-        default: true,
-        pattern: 'test1',
-        wafpolicy: waf1.id,
-      });
-      let rule2 = await givenRuleData(wafapp, {
-        name: 'rule2',
-        default: true,
-        pattern: 'test2',
-        wafpolicy: waf2.id,
-      });
       let epp = await givenEndpointpolicyData(wafapp, {
         name: 'epp1',
         rules: [rule1.id, rule2.id],
@@ -437,6 +395,97 @@ describe('ApplicationController', () => {
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
         .expect(422);
+    },
+  );
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: deploy with wap config',
+    async () => {
+      const adc = await givenAdcData(wafapp);
+      await givenTenantAssociationData(wafapp, {
+        tenantId: 'default',
+        adcId: adc.id,
+      });
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+      });
+      await givenMemberData(wafapp, {
+        id: uuid(),
+        poolId: pool.id,
+      });
+
+      let rule1 = await givenRuleData(wafapp, {
+        name: 'rule1',
+      });
+      let rule2 = await givenRuleData(wafapp, {
+        name: 'rule2',
+      });
+
+      let waf = await givenWafpolicyData(wafapp, {
+        url: 'http://1.2.3.4/test.xml',
+      });
+
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'httpUri',
+        path: {operand: 'contains', values: ['/test1/']},
+      });
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'httpUri',
+      });
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'httpUri',
+      });
+      await givenConditionData(wafapp, {
+        ruleId: rule2.id,
+        type: 'httpUri',
+      });
+      await givenActionData(wafapp, {
+        ruleId: rule2.id,
+        type: 'waf',
+        policy: {wafpolicy: waf.id},
+      });
+      await givenActionData(wafapp, {
+        ruleId: rule2.id,
+        type: 'waf',
+        policy: {wafpolicy: '12345678'},
+      });
+      await givenActionData(wafapp, {
+        ruleId: rule2.id,
+        type: 'waf',
+        policy: {wafpolicy: waf.id},
+      });
+      await givenActionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'waf',
+        policy: {wafpolicy: waf.id},
+      });
+      await givenActionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'test',
+        policy: {wafpolicy: '12345678'},
+      });
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+        rules: [rule1.id, rule2.id],
+      });
+
+      let application = await givenApplicationData(wafapp, {});
+
+      await givenServiceData(wafapp, application.id, {
+        pool: pool.id,
+        endpointpolicy: epp.id,
+      });
+
+      deployStub.returns(Promise.resolve('Hello'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(200);
+
+      let req = <AS3DeployRequest>deployStub.getCall(0).args[2];
+      req.declaration.toJSON();
     },
   );
 });
