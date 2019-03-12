@@ -8,3 +8,4 @@ export * from './pool.controller';
 export * from './endpointpolicy.controller';
 export * from './rule.controller';
 export * from './wafpolicy.controller';
+export * from './monitor.controller';
