@@ -1,121 +1,113 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getWhereSchemaFor,
-  patch,
-  del,
-  requestBody,
-} from '@loopback/rest';
-import {TenantAssociation} from '../models';
-import {TenantAssociationRepository} from '../repositories';
+import {repository} from '@loopback/repository';
+import {post, param, get, del, HttpErrors} from '@loopback/rest';
+import {Adc} from '../models';
+import {AdcTenantAssociationRepository, AdcRepository} from '../repositories';
+import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
 
 export class TenantAssociationController {
   constructor(
-    @repository(TenantAssociationRepository)
-    public tenantAssociationRepository: TenantAssociationRepository,
+    @repository(AdcTenantAssociationRepository)
+    public adcTenantAssociationRepository: AdcTenantAssociationRepository,
+    @repository(AdcRepository)
+    public adcRepository: AdcRepository,
   ) {}
 
-  @post(prefix + '/tenantassocs', {
+  @post(prefix + '/tenants/{tenantId}/adcs/{adcId}', {
     responses: {
-      '200': {
-        description: 'TenantAssociation model instance',
-        content: {
-          'application/json': {schema: {'x-ts-type': TenantAssociation}},
-        },
-      },
+      '204': Schema.emptyResponse('Successfully associate ADC and Tenant'),
+      '404': Schema.notFound('Cannot find ADC resource'),
     },
   })
-  async create(
-    @requestBody() tenantAssoc: Partial<TenantAssociation>,
-  ): Promise<TenantAssociation> {
-    return await this.tenantAssociationRepository.create(tenantAssoc);
+  async associateAdc(
+    @param(Schema.pathParameter('tenantId', 'OpenStack project ID'))
+    tenantId: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
+  ): Promise<void> {
+    // Throws HTTP 404, if ADC not found.
+    await this.adcRepository.findById(adcId);
+    await this.adcTenantAssociationRepository.create({
+      adcId: adcId,
+      tenantId: tenantId,
+    });
   }
 
-  @get(prefix + '/tenantassocs/count', {
+  @get(prefix + '/tenants/{tenantId}/adcs', {
     responses: {
-      '200': {
-        description: 'TenantAssociation model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
+      '200': Schema.collectionResponse(
+        Adc,
+        'Successfully retrieve ADCs associated with Tenant',
+      ),
     },
   })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(TenantAssociation))
-    where?: Where,
-  ): Promise<Count> {
-    return await this.tenantAssociationRepository.count(where);
-  }
+  async findAdcs(
+    @param(Schema.pathParameter('tenantId', 'OpenStack Project ID')) id: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.adcTenantAssociationRepository.find({
+      where: {
+        tenantId: id,
+      },
+    });
 
-  @get(prefix + '/tenantassocs', {
-    responses: {
-      '200': {
-        description: 'Array of TenantAssociation model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': TenantAssociation}},
+    let adcIds = assocs.map(({adcId}) => adcId);
+    return new CollectionResponse(
+      Adc,
+      await this.adcRepository.find({
+        where: {
+          id: {
+            inq: adcIds,
           },
         },
-      },
-    },
-  })
-  async find(
-    @param.query.object('filter', getFilterSchemaFor(TenantAssociation))
-    filter?: Filter,
-  ): Promise<TenantAssociation[]> {
-    return await this.tenantAssociationRepository.find(filter);
+      }),
+    );
   }
 
-  @get(prefix + '/tenantassocs/{tenantId}', {
+  @get(prefix + '/tenants/{tenantId}/adcs/{adcId}', {
     responses: {
-      '200': {
-        description: 'TenantAssociation model instance',
-        content: {
-          'application/json': {schema: {'x-ts-type': TenantAssociation}},
-        },
-      },
+      '200': Schema.response(
+        Adc,
+        'Successfully retrieve ADC associated with Tenant',
+      ),
+      '404': Schema.notFound('Cannot find assoociation or ADC resource'),
     },
   })
-  async findById(
-    @param.path.string('tenantId') tenantId: string,
-  ): Promise<TenantAssociation> {
-    return await this.tenantAssociationRepository.findById(tenantId);
+  async findAdc(
+    @param(Schema.pathParameter('tenantId', 'Tenant resource ID'))
+    tenantId: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
+  ): Promise<Response> {
+    let assocs = await this.adcTenantAssociationRepository.find({
+      where: {
+        adcId: adcId,
+        tenantId: tenantId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      // Throws HTTP 404, if ADC not found
+      return new Response(
+        Adc,
+        await this.adcRepository.findById(assocs[0].adcId),
+      );
+    }
   }
 
-  @patch(prefix + '/tenantassocs/{tenantId}', {
+  @del(prefix + '/tenants/{tenantId}/adcs/{adcId}', {
     responses: {
-      '204': {
-        description: 'TenantAssociation PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully deassociate ADC and Tenant'),
     },
   })
-  async updateById(
-    @param.path.string('tenantId') tenantId: string,
-    @requestBody() tenantAssoc: Partial<TenantAssociation>,
+  async deassociateAdc(
+    @param(Schema.pathParameter('tenantId', 'OpenStack Project ID'))
+    tenantId: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
   ): Promise<void> {
-    await this.tenantAssociationRepository.updateById(tenantId, tenantAssoc);
-  }
-
-  @del(prefix + '/tenantassocs/{tenantId}', {
-    responses: {
-      '204': {
-        description: 'TenantAssociation DELETE success',
-      },
-    },
-  })
-  async deleteById(
-    @param.path.string('tenantId') tenantId: string,
-  ): Promise<void> {
-    await this.tenantAssociationRepository.deleteById(tenantId);
+    await this.adcTenantAssociationRepository.deleteAll({
+      adcId: adcId,
+      tenantId: tenantId,
+    });
   }
 }

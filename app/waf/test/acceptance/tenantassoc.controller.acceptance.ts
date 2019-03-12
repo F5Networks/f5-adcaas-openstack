@@ -8,7 +8,8 @@ import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
-  givenTenantAssociationData,
+  givenAdcData,
+  givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 
@@ -30,82 +31,75 @@ describe('TenantAssociationController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('post ' + prefix + '/tenantassocs', async () => {
-    let body = {
-      tenantId: 'abcd',
-      adcId: '1234',
-    };
-
+  it('post ' + prefix + '/tenants/{tenantId}/adcs/{adcId}', async () => {
+    let adc = await givenAdcData(wafapp);
     await client
-      .post(prefix + '/tenantassocs')
-      .send(body)
-      .expect(200);
-  });
-
-  it('get ' + prefix + '/tenantassocs: of all', async () => {
-    await client
-      .get(prefix + '/tenantassocs')
-      .expect(200)
-      .expect('Content-Type', /application\/json/);
-  });
-
-  it('get ' + prefix + '/tenantassocs/count', async () => {
-    let response = await client.get(prefix + '/tenantassocs/count').expect(200);
-    expect(response.body.count).to.eql(0);
-
-    const tenantAssoc = await givenTenantAssociationData(wafapp);
-
-    response = await client
-      .get(prefix + '/tenantassocs/count')
-      .query({where: {tenantId: tenantAssoc.tenantId}})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-  });
-
-  it('get ' + prefix + '/tenantassocs/{id}: selected item', async () => {
-    let tenantAssoc = await givenTenantAssociationData(wafapp);
-
-    await client
-      .get(prefix + '/tenantassocs/' + tenantAssoc.tenantId)
-      .expect(200, toJSON(tenantAssoc));
-  });
-
-  it('get ' + prefix + '/tenantassocs/{id}: not found', async () => {
-    await client.get(prefix + '/tenantassocs/' + uuid()).expect(404);
-  });
-
-  it('patch ' + prefix + '/tenantassocs/{id}: existing item', async () => {
-    const body = {
-      adcId: '2345',
-    };
-    const tenantAssoc = await givenTenantAssociationData(wafapp);
-
-    await client
-      .patch(prefix + '/tenantassocs/' + tenantAssoc.tenantId)
-      .send(body)
-      .expect(204, '');
-  });
-
-  it('patch ' + prefix + '/tenantassocs/{id}: non-existing item', async () => {
-    const body = {
-      adcId: '2345',
-    };
-    await client
-      .patch(prefix + '/tenantassocs/' + uuid())
-      .send(body)
-      .expect(404);
-  });
-
-  it('delete ' + prefix + '/tenantassocs/{id}: non-existing item', async () => {
-    await client.del(prefix + '/tenantassocs/' + uuid()).expect(404);
-  });
-
-  it('delete ' + prefix + '/tenantassocs/{id}: existing item', async () => {
-    const tenantAssoc = await givenTenantAssociationData(wafapp);
-
-    await client
-      .del(prefix + '/tenantassocs/' + tenantAssoc.tenantId)
+      .post(prefix + '/tenants/1234/adcs/' + adc.id)
+      .send()
       .expect(204);
   });
+
+  it(
+    'post ' + prefix + '/tenants/{tenantId}/adcs/{adcId}: non-existing ADC',
+    async () => {
+      await client
+        .post(prefix + '/tenants/1234/adcs/non-existing')
+        .send()
+        .expect(404);
+    },
+  );
+
+  it(
+    'get ' + prefix + '/tenants/{id}/adcs: find ADCs associated with a tenant',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let assoc = await givenAdcTenantAssociationData(wafapp, {adcId: adc.id});
+
+      let response = await client
+        .get(prefix + '/tenants/' + assoc.tenantId + '/adcs')
+        .expect(200);
+
+      expect(response.body.adcs[0]).to.containDeep(toJSON(adc));
+    },
+  );
+
+  it(
+    'get ' + prefix + '/tenants/{id}/adcs: no ADC associated with a tenant',
+    async () => {
+      await client.get(prefix + '/tenants/' + uuid() + '/adcs').expect(200);
+    },
+  );
+
+  it(
+    'delete' +
+      prefix +
+      '/tenant/{tenantId}/adcs/{adcId}: deassociate non-existing association',
+    async () => {
+      await client
+        .del(prefix + '/tenants/' + uuid() + '/adcs/' + uuid())
+        .expect(204);
+    },
+  );
+
+  it(
+    'delete ' +
+      prefix +
+      '/tenants/{tenantId}/adcs/{adcId}: deassociate ADC from a tenant',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let assoc = await givenAdcTenantAssociationData(wafapp, {adcId: adc.id});
+
+      await client
+        .get(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .expect(200);
+
+      await client
+        .del(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .expect(204);
+
+      await client
+        .get(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .expect(404);
+    },
+  );
 });

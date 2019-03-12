@@ -10,6 +10,7 @@ import {
   givenEmptyDatabase,
   givenAdcData,
   createAdcObject,
+  givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
 import {Adc} from '../../src/models';
 import uuid = require('uuid');
@@ -117,4 +118,68 @@ describe('AdcController', () => {
 
     await client.del(prefix + '/adcs/' + adc.id).expect(204);
   });
+
+  it(
+    'get ' + prefix + '/adcs/{adcId}/adcs: find Tenants associated with ADC',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let assoc = await givenAdcTenantAssociationData(wafapp, {
+        adcId: adc.id,
+        tenantId: '12345678',
+      });
+
+      let response = await client
+        .get(prefix + '/adcs/' + adc.id + '/tenants')
+        .expect(200);
+
+      expect(response.body.tenants[0].id).to.equal(assoc.tenantId);
+    },
+  );
+
+  it(
+    'get ' +
+      prefix +
+      '/adcs/{adcId}/adcs: Cannot find any Tenant associated with ADC',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+
+      let response = await client
+        .get(prefix + '/adcs/' + adc.id + '/tenants')
+        .expect(200);
+
+      expect(response.body.tenants.length).to.equal(0);
+    },
+  );
+
+  it(
+    'get ' +
+      prefix +
+      '/adcs/{adcId}/tenants/{tenantId}: find Tenant associated with ADC',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let assoc = await givenAdcTenantAssociationData(wafapp, {
+        adcId: adc.id,
+        tenantId: '12345678',
+      });
+
+      let response = await client
+        .get(prefix + '/adcs/' + adc.id + '/tenants/' + assoc.tenantId)
+        .expect(200);
+
+      expect(response.body.tenant.id).to.equal(assoc.tenantId);
+    },
+  );
+
+  it(
+    'get ' +
+      prefix +
+      '/adcs/{adcId}/tenants/{tenantId}: cannot find Tenant association ith ADC',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+
+      await client
+        .get(prefix + '/adcs/' + adc.id + '/tenants/' + '12345678')
+        .expect(404);
+    },
+  );
 });

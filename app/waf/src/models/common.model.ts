@@ -1,6 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, property} from '@loopback/repository';
 
-@model()
 export abstract class CommonEntity extends Entity {
   @property({
     type: 'string',

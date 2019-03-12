@@ -1,13 +1,13 @@
 import {DefaultCrudRepository} from '@loopback/repository';
-import {TenantAssociation} from '../models';
+import {AdcTenantAssociation} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
-export class TenantAssociationRepository extends DefaultCrudRepository<
-  TenantAssociation,
-  typeof TenantAssociation.prototype.tenantId
+export class AdcTenantAssociationRepository extends DefaultCrudRepository<
+  AdcTenantAssociation,
+  typeof AdcTenantAssociation.prototype.tenantId
 > {
   constructor(@inject('datasources.db') dataSource: DbDataSource) {
-    super(TenantAssociation, dataSource);
+    super(AdcTenantAssociation, dataSource);
   }
 }

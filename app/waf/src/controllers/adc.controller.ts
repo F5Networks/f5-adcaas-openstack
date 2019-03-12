@@ -16,8 +16,8 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Adc} from '../models';
-import {AdcRepository} from '../repositories';
+import {Adc, Tenant} from '../models';
+import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
@@ -26,6 +26,8 @@ export class AdcController {
   constructor(
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
+    @repository(AdcTenantAssociationRepository)
+    public adcTenantAssociationRepository: AdcTenantAssociationRepository,
   ) {}
 
   readonly createDesc = 'ADC resource that need to be created';
@@ -76,42 +78,100 @@ export class AdcController {
     return new CollectionResponse(Adc, data);
   }
 
-  @get(prefix + '/adcs/{id}', {
+  @get(prefix + '/adcs/{adcId}', {
     responses: {
       '200': Schema.response(Adc, 'Successfully retrieve ADC resource'),
       '404': Schema.notFound('Can not find ADC resource'),
     },
   })
   async findById(
-    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<Response> {
     let data = await this.adcRepository.findById(id);
     return new Response(Adc, data);
   }
 
   readonly updateDesc = 'ADC resource properties that need to be updated';
-  @patch(prefix + '/adcs/{id}', {
+  @patch(prefix + '/adcs/{adcId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully update ADC resource'),
       '404': Schema.notFound('Can not find ADC resource'),
     },
   })
   async updateById(
-    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
     @requestBody(Schema.updateRequest(Adc, this.updateDesc)) adc: Partial<Adc>,
   ): Promise<void> {
     await this.adcRepository.updateById(id, adc);
   }
 
-  @del(prefix + '/adcs/{id}', {
+  @del(prefix + '/adcs/{adcId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully delete ADC resource'),
       '404': Schema.notFound('Can not find ADC resource'),
     },
   })
   async deleteById(
-    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<void> {
     await this.adcRepository.deleteById(id);
+  }
+
+  @get(prefix + '/adcs/{adcId}/tenants', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Tenant,
+        'Successfully retrieve Tenant resources',
+      ),
+    },
+  })
+  async findTenants(
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.adcTenantAssociationRepository.find({
+      where: {
+        adcId: id,
+      },
+    });
+
+    let tenants: Tenant[] = [];
+    assocs.forEach(assoc =>
+      tenants.push(
+        new Tenant({
+          id: assoc.tenantId,
+        }),
+      ),
+    );
+
+    return new CollectionResponse(Tenant, tenants);
+  }
+
+  @get(prefix + '/adcs/{adcId}/tenants/{tenantId}', {
+    responses: {
+      '200': Schema.response(Tenant, 'Successfully retrieve Tenant resource'),
+    },
+  })
+  async findTenant(
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
+    @param(Schema.pathParameter('tenantId', 'OpenStack project ID'))
+    tenantId: string,
+  ): Promise<Response> {
+    let assocs = await this.adcTenantAssociationRepository.find({
+      where: {
+        adcId: adcId,
+        tenantId: tenantId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      return new Response(
+        Tenant,
+        new Tenant({
+          id: assocs[0].tenantId,
+        }),
+      );
+    }
   }
 }
