@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Service} from './service.model';
+import {Entity, model, property, hasMany} from '@loopback/repository';
 
 @model()
 export class Application extends Entity {
@@ -25,13 +26,10 @@ export class Application extends Entity {
     required: true,
   })
   tenantId: string;
-  @property({
-    type: 'array',
-    itemType: 'string',
-    required: false,
-    default: [],
-  })
-  services: string[];
+
+  @hasMany(() => Service, {keyTo: 'applicationId'})
+  services?: Service[];
+
   @property({
     type: 'string',
   })

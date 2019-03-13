@@ -310,12 +310,10 @@ describe('ApplicationController', () => {
         name: 'epp1',
         rules: [rule1.id, rule2.id],
       });
-      let service = await givenServiceData(wafapp, {
+      let application = await givenApplicationData(wafapp);
+      await givenServiceData(wafapp, <string>application.id, {
         pool: pool.id,
         endpointpolicy: epp.id,
-      });
-      let application = await givenApplicationData(wafapp, {
-        services: [service.id],
       });
 
       deployStub.returns(Promise.resolve('Hello'));
@@ -365,12 +363,10 @@ describe('ApplicationController', () => {
         name: 'epp1',
         rules: [rule1.id, rule2.id],
       });
-      let service = await givenServiceData(wafapp, {
+      let application = await givenApplicationData(wafapp);
+      await givenServiceData(wafapp, <string>application.id, {
         pool: pool.id,
         endpointpolicy: epp.id,
-      });
-      let application = await givenApplicationData(wafapp, {
-        services: [service.id],
       });
 
       deployStub.returns(Promise.resolve('Hello'));
@@ -391,11 +387,9 @@ describe('ApplicationController', () => {
     let pool = await givenPoolData(wafapp, {
       name: 'pool1',
     });
-    let service = await givenServiceData(wafapp, {
+    let application = await givenApplicationData(wafapp);
+    await givenServiceData(wafapp, <string>application.id, {
       pool: pool.id,
-    });
-    let application = await givenApplicationData(wafapp, {
-      services: [service.id],
     });
 
     deployStub.returns(Promise.resolve('Hello'));
@@ -415,11 +409,9 @@ describe('ApplicationController', () => {
       let pool = await givenPoolData(wafapp, {
         name: 'pool1',
       });
-      let service = await givenServiceData(wafapp, {
+      let application = await givenApplicationData(wafapp);
+      await givenServiceData(wafapp, <string>application.id, {
         pool: pool.id,
-      });
-      let application = await givenApplicationData(wafapp, {
-        services: [service.id],
       });
 
       deployStub.returns(Promise.resolve('Hello'));
@@ -437,10 +429,8 @@ describe('ApplicationController', () => {
         tenantId: 'default',
         adcId: adc.id,
       });
-      let service = await givenServiceData(wafapp);
-      let application = await givenApplicationData(wafapp, {
-        services: [service.id],
-      });
+      let application = await givenApplicationData(wafapp);
+      await givenServiceData(wafapp, <string>application.id);
 
       deployStub.throws(new HttpErrors.UnprocessableEntity('something wrong'));
 

@@ -193,7 +193,10 @@ export class ApplicationController {
   async deployById(@param.path.string('id') id: string): Promise<Object> {
     let application = await this.applicationRepository.findById(id);
 
-    if (application.services.length === 0) {
+    let services = await this.applicationRepository
+      .services(application.id)
+      .find();
+    if (services.length === 0) {
       throw new HttpErrors.UnprocessableEntity(
         'No service in Application ' + application.id,
       );
@@ -238,8 +241,7 @@ export class ApplicationController {
     }
     params.adc = adcs[0];
 
-    let serviceId = application.services[0];
-    let service = await this.serviceRepository.findById(serviceId);
+    let service = services[0];
 
     params.service = service;
 
@@ -249,8 +251,6 @@ export class ApplicationController {
 
       params.members = await this.poolRepository.members(pool.id).find();
     }
-
-    params.service = service;
 
     if (service.endpointpolicy) {
       params.endpointpolicy = await this.endpointpolicyRepository.findById(
