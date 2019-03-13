@@ -39,7 +39,7 @@ describe('AdcController', () => {
       .send(adc)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(adc));
+    expect(response.body.adc).to.containDeep(toJSON(adc));
   });
 
   it('post ' + prefix + '/adcs: with no id', async () => {
@@ -50,7 +50,7 @@ describe('AdcController', () => {
       .send(adc)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(adc));
+    expect(response.body.adc).to.containDeep(toJSON(adc));
   });
 
   it('post ' + prefix + '/adcs: with duplicate id', async () => {
@@ -65,19 +65,23 @@ describe('AdcController', () => {
   it('get ' + prefix + '/adcs: of all', async () => {
     const adc = await givenAdcData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/adcs')
-      .expect(200, [toJSON(adc)])
+      .expect(200)
       .expect('Content-Type', /application\/json/);
+
+    expect(response.body.adcs).to.containDeep([toJSON(adc)]);
   });
 
   it('get ' + prefix + '/adcs: with filter string', async () => {
     const adc = await givenAdcData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/adcs')
       .query({filter: {where: {id: adc.id}}})
-      .expect(200, [toJSON(adc)]);
+      .expect(200);
+
+    expect(response.body.adcs).to.containDeep([toJSON(adc)]);
   });
 
   it('get ' + prefix + '/adcs/count', async () => {
@@ -93,60 +97,13 @@ describe('AdcController', () => {
     expect(response.body.count).to.eql(1);
   });
 
-  it('patch ' + prefix + '/adcs: all items', async () => {
-    await givenAdcData(wafapp);
-    await givenAdcData(wafapp);
-
-    const patched_name = {name: 'new adc target'};
-    let response = await client
-      .patch(prefix + '/adcs')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/adcs/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/adcs: selected items', async () => {
-    await givenAdcData(wafapp);
-    await givenAdcData(wafapp);
-
-    const patch_condition = {passphrase: 'the only one to patch'};
-    const patched_name = {name: 'updated adc name'};
-    await givenAdcData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/adcs')
-      .query({where: patch_condition})
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/adcs/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/adcs/count')
-      .query({where: patch_condition})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-  });
-
   it('get ' + prefix + '/adcs/{id}: selected item', async () => {
     await givenAdcData(wafapp);
     const adc = await givenAdcData(wafapp);
 
-    await client.get(prefix + '/adcs/' + adc.id).expect(200, toJSON(adc));
+    let response = await client.get(prefix + '/adcs/' + adc.id).expect(200);
+
+    expect(response.body.adc).to.containDeep(toJSON(adc));
   });
 
   it('get ' + prefix + '/adcs/{id}: not found', async () => {
@@ -179,35 +136,5 @@ describe('AdcController', () => {
     const adc = await givenAdcData(wafapp);
 
     await client.del(prefix + '/adcs/' + adc.id).expect(204);
-  });
-
-  it('put' + prefix + '/adcs/{id}: existing item', async () => {
-    const adc = await givenAdcData(wafapp);
-
-    const wafpolicy_new = new Adc(
-      createAdcObject({
-        name: 'new adc name.',
-      }),
-    );
-    await client
-      .put(prefix + '/adcs/' + adc.id)
-      .send(wafpolicy_new)
-      .expect(204);
-
-    const response = await client.get(prefix + '/adcs/' + adc.id).expect(200);
-
-    expect(response.body).to.containDeep({name: 'new adc name.'});
-  });
-
-  it('put ' + prefix + '/adcs/{id}: non-existing item', async () => {
-    const adc = new Adc(
-      createAdcObject({
-        name: 'new adc name.',
-      }),
-    );
-    await client
-      .put(prefix + '/adcs/' + adc.id)
-      .send(adc)
-      .expect(404);
   });
 });

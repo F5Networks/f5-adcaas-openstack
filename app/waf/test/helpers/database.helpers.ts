@@ -149,6 +149,7 @@ export function createAdcObject(data?: Partial<Adc>) {
   return Object.assign(
     {
       name: 'adc target',
+      type: 'HW',
       host: '1.2.3.4',
       port: 8443,
       username: 'admin',
@@ -164,8 +165,7 @@ export async function givenAdcData(
 ) {
   const adcpepo = await wafapp.getRepository(AdcRepository);
   const obj = createAdcObject(data);
-  obj.id = uuid();
-  return await adcpepo.create(obj);
+  return await adcpepo.create(new Adc(obj));
 }
 
 export async function givenTenantAssociationData(

@@ -12,14 +12,13 @@ import {
   getFilterSchemaFor,
   getWhereSchemaFor,
   patch,
-  put,
   del,
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Adc} from '../models';
+import {Adc, AdcResponse, AdcCollectionResponse} from '../models';
 import {AdcRepository} from '../repositories';
-import uuid = require('uuid');
+import {AdcSchema} from '.';
 
 const prefix = '/adcaas/v1';
 
@@ -32,27 +31,33 @@ export class AdcController {
   @post(prefix + '/adcs', {
     responses: {
       '200': {
-        description: 'Adc model instance',
-        content: {'application/json': {schema: {'x-ts-type': Adc}}},
+        description: 'Successfully create ADC resource',
+        content: {'application/json': AdcSchema.adcResponse},
+      },
+      '400': {
+        description: 'Invalid ADC resource',
+        content: {'application/json': AdcSchema.BadRequest},
+      },
+      '422': {
+        description: 'Unprocessable ADC resource',
+        content: {'application/json': AdcSchema.UnprocessableEntity},
       },
     },
   })
-  async create(@requestBody() adc: Partial<Adc>): Promise<Adc> {
-    if (!adc.id) {
-      adc.id = uuid();
-    }
-
+  async create(
+    @requestBody(AdcSchema.adcCreateRequest) reqBody: Partial<Adc>,
+  ): Promise<AdcResponse> {
     try {
-      return await this.adcRepository.create(adc);
+      return new AdcResponse(await this.adcRepository.create(new Adc(reqBody)));
     } catch (error) {
-      throw new HttpErrors.BadRequest(error.detail);
+      throw new HttpErrors.BadRequest(error.message);
     }
   }
 
   @get(prefix + '/adcs/count', {
     responses: {
       '200': {
-        description: 'Adc model count',
+        description: 'ADC resource count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -66,85 +71,64 @@ export class AdcController {
   @get(prefix + '/adcs', {
     responses: {
       '200': {
-        description: 'Array of Adc model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Adc}},
-          },
-        },
+        description: 'Successfully retrieve ADC resources',
+        content: {'application/json': AdcSchema.adcCollectionResponse},
       },
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Adc)) filter?: Filter,
-  ): Promise<Adc[]> {
-    return await this.adcRepository.find(filter);
-  }
-
-  @patch(prefix + '/adcs', {
-    responses: {
-      '200': {
-        description: 'Adc PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody() adc: Partial<Adc>,
-    @param.query.object('where', getWhereSchemaFor(Adc)) where?: Where,
-  ): Promise<Count> {
-    return await this.adcRepository.updateAll(adc, where);
+  ): Promise<AdcCollectionResponse> {
+    let data = await this.adcRepository.find(filter);
+    return new AdcCollectionResponse(data);
   }
 
   @get(prefix + '/adcs/{id}', {
     responses: {
       '200': {
-        description: 'Adc model instance',
-        content: {'application/json': {schema: {'x-ts-type': Adc}}},
+        description: 'Successfully update ADC resource',
+      },
+      '404': {
+        description: 'Can not find ADC resource',
+        content: {'application/json': AdcSchema.NotFound},
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Adc> {
-    return await this.adcRepository.findById(id);
+  async findById(@param(AdcSchema.adcId) id: string): Promise<AdcResponse> {
+    let data = await this.adcRepository.findById(id);
+    return new AdcResponse(data);
   }
 
   @patch(prefix + '/adcs/{id}', {
     responses: {
       '204': {
-        description: 'Adc PATCH success',
+        description: 'Successfully update ADC resource',
+      },
+      '404': {
+        description: 'Can not find ADC resource',
+        content: {'application/json': AdcSchema.NotFound},
       },
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() adc: Partial<Adc>,
+    @param(AdcSchema.adcId) id: string,
+    @requestBody(AdcSchema.adcUpdateRequest) adc: Partial<Adc>,
   ): Promise<void> {
     await this.adcRepository.updateById(id, adc);
-  }
-
-  @put(prefix + '/adcs/{id}', {
-    responses: {
-      '204': {
-        description: 'Adc PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() adc: Partial<Adc>,
-  ): Promise<void> {
-    adc.id = id;
-    await this.adcRepository.replaceById(id, adc);
   }
 
   @del(prefix + '/adcs/{id}', {
     responses: {
       '204': {
-        description: 'Adc DELETE success',
+        description: 'Successfully delete ADC resource',
+      },
+      '404': {
+        description: 'Can not find ADC resource',
+        content: {'application/json': AdcSchema.NotFound},
       },
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param(AdcSchema.adcId) id: string): Promise<void> {
     await this.adcRepository.deleteById(id);
   }
 }

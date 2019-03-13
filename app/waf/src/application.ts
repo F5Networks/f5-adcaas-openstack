@@ -18,6 +18,15 @@ export class WafApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: 'F5 ADCaaS for OpenStack',
+        version: '1.0.0',
+      },
+      paths: {},
+    });
+
     // Set up the custom sequence
     this.sequence(MySequence);
 
