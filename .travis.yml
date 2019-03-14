@@ -21,5 +21,6 @@ jobs:
         provider: script
         on:
           branch: master
+        skip_cleanup: true
         script:
           - scripts/publish_api_ref.sh
