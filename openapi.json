@@ -39,42 +39,11 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "AdcController.count"
       }
     },
     "/adcaas/v1/adcs/{id}": {
-      "put": {
-        "x-controller-name": "AdcController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "AdcController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Adc PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        }
-      },
       "patch": {
         "x-controller-name": "AdcController",
         "x-operation-name": "updateById",
@@ -151,7 +120,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "AdcController.updateById"
       },
       "get": {
         "x-controller-name": "AdcController",
@@ -208,7 +178,8 @@
               "format": ""
             }
           }
-        ]
+        ],
+        "operationId": "AdcController.findById"
       },
       "delete": {
         "x-controller-name": "AdcController",
@@ -265,7 +236,8 @@
               "format": ""
             }
           }
-        ]
+        ],
+        "operationId": "AdcController.deleteById"
       }
     },
     "/adcaas/v1/adcs": {
@@ -296,13 +268,19 @@
                       "type": "string"
                     },
                     "port": {
-                      "type": "integer"
+                      "type": "number"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "passphrase": {
+                      "type": "string"
                     },
                     "createdAt": {
-                      "type": "string"
+                      "type": "date"
                     },
                     "updatedAt": {
-                      "type": "string"
+                      "type": "date"
                     }
                   },
                   "example": {
@@ -311,6 +289,8 @@
                     "type": "HW",
                     "host": "192.168.0.1",
                     "port": 8443,
+                    "username": "admin",
+                    "passphrase": "admin",
                     "createdAt": "2019-03-05T08:40:25.000Z",
                     "updatedAt": "2019-03-05T08:40:25.100Z"
                   }
@@ -410,63 +390,28 @@
                     "type": "string"
                   },
                   "port": {
-                    "type": "integer"
+                    "type": "number"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "passphrase": {
+                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My BIG-IP",
                   "type": "HW",
                   "host": "192.168.0.1",
-                  "port": 8443
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "x-controller-name": "AdcController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "AdcController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Adc PATCH success count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
+                  "port": 8443,
+                  "username": "admin",
+                  "passphrase": "admin"
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        }
+        "operationId": "AdcController.create"
       },
       "get": {
         "x-controller-name": "AdcController",
@@ -497,13 +442,19 @@
                         "type": "string"
                       },
                       "port": {
-                        "type": "integer"
+                        "type": "number"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "passphrase": {
+                        "type": "string"
                       },
                       "createdAt": {
-                        "type": "string"
+                        "type": "date"
                       },
                       "updatedAt": {
-                        "type": "string"
+                        "type": "date"
                       }
                     },
                     "example": {
@@ -512,6 +463,8 @@
                       "type": "HW",
                       "host": "192.168.0.1",
                       "port": 8443,
+                      "username": "admin",
+                      "passphrase": "admin",
                       "createdAt": "2019-03-05T08:40:25.000Z",
                       "updatedAt": "2019-03-05T08:40:25.100Z"
                     }
@@ -586,7 +539,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "AdcController.find"
       }
     },
     "/adcaas/v1/applications/count": {
@@ -623,7 +577,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "ApplicationController.count"
       }
     },
     "/adcaas/v1/applications/{id}/deploy": {
@@ -647,7 +602,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "ApplicationController.deployById"
       }
     },
     "/adcaas/v1/applications/{id}": {
@@ -681,7 +637,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "ApplicationController.replaceById"
       },
       "patch": {
         "x-controller-name": "ApplicationController",
@@ -713,7 +670,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "ApplicationController.updateById"
       },
       "get": {
         "x-controller-name": "ApplicationController",
@@ -742,7 +700,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "ApplicationController.findById"
       },
       "delete": {
         "x-controller-name": "ApplicationController",
@@ -764,7 +723,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "ApplicationController.deleteById"
       }
     },
     "/adcaas/v1/applications": {
@@ -794,7 +754,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "ApplicationController.create"
       },
       "patch": {
         "x-controller-name": "ApplicationController",
@@ -838,7 +799,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "ApplicationController.updateAll"
       },
       "get": {
         "x-controller-name": "ApplicationController",
@@ -887,9 +849,6 @@
                     "tenantId": {
                       "type": "boolean"
                     },
-                    "services": {
-                      "type": "boolean"
-                    },
                     "status": {
                       "type": "boolean"
                     },
@@ -918,12 +877,53 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "include": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "relation": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "properties": {
+                          "where": {
+                            "type": "object"
+                          },
+                          "fields": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "skip": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "order": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               },
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "ApplicationController.find"
       }
     },
     "/adcaas/v1/endpointpolicies/count": {
@@ -960,7 +960,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "EndpointpolicyController.count"
       }
     },
     "/adcaas/v1/endpointpolicies/{id}": {
@@ -994,7 +995,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "EndpointpolicyController.replaceById"
       },
       "patch": {
         "x-controller-name": "EndpointpolicyController",
@@ -1026,7 +1028,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "EndpointpolicyController.updateById"
       },
       "get": {
         "x-controller-name": "EndpointpolicyController",
@@ -1055,7 +1058,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "EndpointpolicyController.findById"
       },
       "delete": {
         "x-controller-name": "EndpointpolicyController",
@@ -1077,7 +1081,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "EndpointpolicyController.deleteById"
       }
     },
     "/adcaas/v1/endpointpolicies": {
@@ -1107,7 +1112,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "EndpointpolicyController.create"
       },
       "patch": {
         "x-controller-name": "EndpointpolicyController",
@@ -1151,7 +1157,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "EndpointpolicyController.updateAll"
       },
       "get": {
         "x-controller-name": "EndpointpolicyController",
@@ -1221,7 +1228,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "EndpointpolicyController.find"
       }
     },
     "/adcaas/v1/members/count": {
@@ -1258,7 +1266,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "PoolController.countMembers"
       }
     },
     "/adcaas/v1/members": {
@@ -1305,6 +1314,9 @@
                     },
                     "port": {
                       "type": "boolean"
+                    },
+                    "poolId": {
+                      "type": "boolean"
                     }
                   }
                 },
@@ -1330,7 +1342,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "PoolController.findMembers"
       }
     },
     "/adcaas/v1/ping": {
@@ -1371,7 +1384,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "PingController.ping"
       }
     },
     "/adcaas/v1/pools/count": {
@@ -1408,10 +1422,59 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "PoolController.count"
       }
     },
     "/adcaas/v1/pools/{pool_id}/members/{member_id}": {
+      "put": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "updateMemberByID",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Member model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pool_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "PoolController.updateMemberByID"
+      },
       "get": {
         "x-controller-name": "PoolController",
         "x-operation-name": "getMemberByID",
@@ -1447,7 +1510,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "PoolController.getMemberByID"
       },
       "delete": {
         "x-controller-name": "PoolController",
@@ -1477,7 +1541,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "PoolController.deleteMemberByID"
       }
     },
     "/adcaas/v1/pools/{pool_id}/members": {
@@ -1518,7 +1583,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "PoolController.createPoolMember"
       },
       "get": {
         "x-controller-name": "PoolController",
@@ -1550,7 +1616,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "PoolController.getMembers"
       }
     },
     "/adcaas/v1/pools/{id}": {
@@ -1584,7 +1651,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "PoolController.replaceById"
       },
       "patch": {
         "x-controller-name": "PoolController",
@@ -1616,7 +1684,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "PoolController.updateById"
       },
       "get": {
         "x-controller-name": "PoolController",
@@ -1645,7 +1714,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "PoolController.findById"
       },
       "delete": {
         "x-controller-name": "PoolController",
@@ -1667,7 +1737,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "PoolController.deleteById"
       }
     },
     "/adcaas/v1/pools": {
@@ -1697,7 +1768,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "PoolController.create"
       },
       "patch": {
         "x-controller-name": "PoolController",
@@ -1741,7 +1813,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "PoolController.updateAll"
       },
       "get": {
         "x-controller-name": "PoolController",
@@ -1787,9 +1860,6 @@
                     "loadBalancingMode": {
                       "type": "boolean"
                     },
-                    "members": {
-                      "type": "boolean"
-                    },
                     "monitors": {
                       "type": "boolean"
                     }
@@ -1812,12 +1882,53 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "include": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "relation": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "properties": {
+                          "where": {
+                            "type": "object"
+                          },
+                          "fields": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "skip": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "order": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               },
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "PoolController.find"
       }
     },
     "/adcaas/v1/rules/count": {
@@ -1854,7 +1965,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "RuleController.count"
       }
     },
     "/adcaas/v1/rules/{id}": {
@@ -1888,7 +2000,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "RuleController.replaceById"
       },
       "patch": {
         "x-controller-name": "RuleController",
@@ -1920,7 +2033,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "RuleController.updateById"
       },
       "get": {
         "x-controller-name": "RuleController",
@@ -1949,7 +2063,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "RuleController.findById"
       },
       "delete": {
         "x-controller-name": "RuleController",
@@ -1971,7 +2086,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "RuleController.deleteById"
       }
     },
     "/adcaas/v1/rules": {
@@ -2001,7 +2117,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "RuleController.create"
       },
       "patch": {
         "x-controller-name": "RuleController",
@@ -2045,7 +2162,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "RuleController.updateAll"
       },
       "get": {
         "x-controller-name": "RuleController",
@@ -2121,7 +2239,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "RuleController.find"
       }
     },
     "/adcaas/v1/services/count": {
@@ -2158,74 +2277,11 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "ServiceController.count"
       }
     },
-    "/adcaas/v1/services/{id}": {
-      "put": {
-        "x-controller-name": "ServiceController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "ServiceController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Service PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Service"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        }
-      },
-      "patch": {
-        "x-controller-name": "ServiceController",
-        "x-operation-name": "updateById",
-        "tags": [
-          "ServiceController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Service PATCH success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Service"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        }
-      },
+    "/adcaas/v1/services/{service_id}": {
       "get": {
         "x-controller-name": "ServiceController",
         "x-operation-name": "findById",
@@ -2246,14 +2302,15 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "service_id",
             "in": "path",
             "schema": {
               "type": "string"
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "ServiceController.findById"
       },
       "delete": {
         "x-controller-name": "ServiceController",
@@ -2268,14 +2325,15 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "service_id",
             "in": "path",
             "schema": {
               "type": "string"
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "ServiceController.deleteById"
       }
     },
     "/adcaas/v1/services": {
@@ -2305,51 +2363,8 @@
               }
             }
           }
-        }
-      },
-      "patch": {
-        "x-controller-name": "ServiceController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "ServiceController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Service PATCH success count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
         },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Service"
-              }
-            }
-          }
-        }
+        "operationId": "ServiceController.create"
       },
       "get": {
         "x-controller-name": "ServiceController",
@@ -2403,6 +2418,9 @@
                     },
                     "endpointpolicy": {
                       "type": "boolean"
+                    },
+                    "applicationId": {
+                      "type": "boolean"
                     }
                   }
                 },
@@ -2428,7 +2446,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "ServiceController.find"
       }
     },
     "/adcaas/v1/tenantassocs/count": {
@@ -2465,7 +2484,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "TenantAssociationController.count"
       }
     },
     "/adcaas/v1/tenantassocs/{tenantId}": {
@@ -2499,7 +2519,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "TenantAssociationController.updateById"
       },
       "get": {
         "x-controller-name": "TenantAssociationController",
@@ -2528,7 +2549,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "TenantAssociationController.findById"
       },
       "delete": {
         "x-controller-name": "TenantAssociationController",
@@ -2550,7 +2572,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "TenantAssociationController.deleteById"
       }
     },
     "/adcaas/v1/tenantassocs": {
@@ -2580,7 +2603,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "TenantAssociationController.create"
       },
       "get": {
         "x-controller-name": "TenantAssociationController",
@@ -2653,7 +2677,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "TenantAssociationController.find"
       }
     },
     "/adcaas/v1/wafpolicies/count": {
@@ -2690,7 +2715,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "WafpolicyController.count"
       }
     },
     "/adcaas/v1/wafpolicies/{id}": {
@@ -2724,7 +2750,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "WafpolicyController.replaceById"
       },
       "patch": {
         "x-controller-name": "WafpolicyController",
@@ -2756,7 +2783,8 @@
             }
           },
           "x-parameter-index": 1
-        }
+        },
+        "operationId": "WafpolicyController.updateById"
       },
       "get": {
         "x-controller-name": "WafpolicyController",
@@ -2785,7 +2813,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "WafpolicyController.findById"
       },
       "delete": {
         "x-controller-name": "WafpolicyController",
@@ -2807,7 +2836,8 @@
             },
             "required": true
           }
-        ]
+        ],
+        "operationId": "WafpolicyController.deleteById"
       }
     },
     "/adcaas/v1/wafpolicies": {
@@ -2837,7 +2867,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "WafpolicyController.create"
       },
       "patch": {
         "x-controller-name": "WafpolicyController",
@@ -2881,7 +2912,8 @@
               }
             }
           }
-        }
+        },
+        "operationId": "WafpolicyController.updateAll"
       },
       "get": {
         "x-controller-name": "WafpolicyController",
@@ -2960,7 +2992,8 @@
               "type": "object"
             }
           }
-        ]
+        ],
+        "operationId": "WafpolicyController.find"
       }
     }
   },
@@ -2980,12 +3013,6 @@
           },
           "tenantId": {
             "type": "string"
-          },
-          "services": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           },
           "status": {
             "type": "string"
@@ -3037,12 +3064,6 @@
           "loadBalancingMode": {
             "type": "string"
           },
-          "members": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "monitors": {
             "type": "array",
             "items": {
@@ -3062,12 +3083,16 @@
           },
           "port": {
             "type": "number"
+          },
+          "poolId": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "address",
-          "port"
+          "port",
+          "poolId"
         ]
       },
       "Rule": {
@@ -3116,10 +3141,14 @@
           },
           "endpointpolicy": {
             "type": "string"
+          },
+          "applicationId": {
+            "type": "string"
           }
         },
         "required": [
-          "virtualAddresses"
+          "virtualAddresses",
+          "applicationId"
         ]
       },
       "TenantAssociation": {
@@ -3181,7 +3210,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:3000"
+      "url": "http://localhost:3000"
     }
   ]
 }
