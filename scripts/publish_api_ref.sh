@@ -1,4 +1,4 @@
-#!/bin/bash -e -x
+#!/bin/bash -ex
 
 npm --prefix app/waf start >/dev/null 2>&1 &
 sleep 10
