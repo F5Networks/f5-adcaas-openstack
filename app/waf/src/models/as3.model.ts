@@ -7,7 +7,10 @@ import {
   Wafpolicy,
   Endpointpolicy,
   Rule,
+  Action,
+  Condition,
 } from '.';
+import {isNullOrUndefined} from 'util';
 
 export class AS3Object extends Object {
   class: string;
@@ -147,9 +150,8 @@ export class AS3Application extends AS3Object {
     }
 
     for (let waf of this.wafs) {
-      obj[waf.name] = waf;
+      obj[waf.name] = waf.toJSON();
     }
-
     return obj;
   }
 }
@@ -194,90 +196,92 @@ export class AS3ServiceHTTP extends AS3Object {
   }
 }
 
-export class AS3Path extends AS3Object {
-  operand: string;
-  values: string[];
-  keyword: string;
-  constructor(pattern: string) {
-    super();
-    this.operand = 'contains';
-    this.values = [pattern];
-  }
-}
 export class AS3Condition extends AS3Object {
   type: string;
-  path: AS3Path;
+  path: object;
 
-  constructor(pattern: string) {
+  constructor(condition: Condition) {
     super();
-    this.type = 'httpUri';
-    this.path = new AS3Path(pattern);
+    this.type = condition.type;
+    if (this.type === 'httpUri') {
+      this.path = condition.path;
+    }
   }
-}
-export class AS3Policy extends AS3Object {
-  policyname: string;
-  use: string;
-  constructor(name: string) {
-    super();
-    this.policyname = name;
-  }
-
   toJSON(): Object {
     let obj: AS3JSONObject = {
-      use: this.policyname,
+      type: this.type,
     };
+    if (this.type === 'httpUri') {
+      obj.path = this.path;
+    }
     return obj;
   }
 }
-export class AS3Action extends AS3Object {
-  type: string;
-  policy: AS3Policy;
+export class AS3USEPolicy extends AS3Object {
+  use: string;
   constructor(name: string) {
     super();
-    this.type = 'waf';
-    if (name !== '') {
-      this.policy = new AS3Policy(name);
+    this.use = name;
+  }
+}
+class classwafpolicy {
+  public wafpolicy: string;
+}
+export class AS3Action extends AS3Object {
+  type: string;
+  wafpolicy: object;
+  wafs: Wafpolicy[];
+
+  constructor(action: Action, params: {[key: string]: Object}) {
+    super();
+    this.type = action.type;
+    this.wafs = <Wafpolicy[]>params.wafs;
+    if (this.type === 'waf') {
+      this.wafpolicy = action.policy;
+      if (!isNullOrUndefined(this.wafpolicy)) {
+        let wafid = <classwafpolicy>this.wafpolicy;
+        for (let onewaf of this.wafs) {
+          if (onewaf.id === wafid.wafpolicy) {
+            this.wafpolicy = <AS3USEPolicy>new AS3USEPolicy(onewaf.name);
+            break;
+          }
+        }
+      }
     }
+  }
+  toJSON(): Object {
+    let obj: AS3JSONObject = {
+      type: this.type,
+    };
+    if (this.type === 'waf') {
+      if (!isNullOrUndefined(this.wafpolicy)) {
+        obj.policy = this.wafpolicy;
+      }
+    }
+    return obj;
   }
 }
 export class AS3Rule extends AS3Object {
   name: string;
   conditions: AS3Condition[];
   actions: AS3Action[];
-  defaultrule: boolean;
-  policyname: string;
+
   constructor(rule: Rule, params: {[key: string]: Object}) {
     super();
     this.name = rule.name;
     this.conditions = [];
-    this.defaultrule = rule.default;
     this.actions = [];
-    this.policyname = '';
-    if (this.defaultrule === false) {
-      let pattern = rule.pattern;
-      //condition means the matching pattern
-      this.conditions.push(new AS3Condition(pattern));
-    }
-    let wafpolicy = rule.wafpolicy;
-    let wafs = <Wafpolicy[]>params.wafs;
 
-    //action means the waf policy name
-    for (let waf of wafs) {
-      if (waf.id === wafpolicy) {
-        this.policyname = waf.name;
-        break;
-      }
-    }
-    this.actions.push(new AS3Action(this.policyname));
-  }
+    let conditions = <Condition[]>rule.conditions;
+    let actions = <Action[]>rule.actions;
 
-  toJSON(): Object {
-    let obj: AS3JSONObject = {
-      name: this.name,
-      conditions: this.conditions,
-      actions: this.actions,
-    };
-    return obj;
+    for (let condition of conditions) {
+      this.conditions.push(new AS3Condition(condition));
+    }
+
+    for (let action of actions) {
+      this.actions.push(new AS3Action(action, params));
+    }
   }
 }
 export class AS3EndpointPolicy extends AS3Object {
@@ -290,23 +294,9 @@ export class AS3EndpointPolicy extends AS3Object {
     this.class = 'Endpoint_Policy';
     this.name = endpointpolicy.name;
     this.rules = [];
-    //Make sure the default rule is located at the end of the list
-    let defaultrulenum = 0;
+
     for (let rule of rules) {
-      if (rule.default === false) {
-        this.rules.push(new AS3Rule(rule, params));
-      } else {
-        defaultrulenum++;
-      }
-    }
-    //TODO Do not allow more than one default rule.
-    if (defaultrulenum !== 1) {
-      console.log('Must have only one default rule.');
-    }
-    for (let rule of rules) {
-      if (rule.default === true) {
-        this.rules.push(new AS3Rule(rule, params));
-      }
+      this.rules.push(new AS3Rule(rule, params));
     }
   }
   toJSON(): Object {
