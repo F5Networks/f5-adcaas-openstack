@@ -2,6 +2,7 @@ export * from './common';
 export * from './application.repository';
 export * from './tenantassoc.repository';
 export * from './adc.repository';
+export * from './declaration.repository';
 export * from './service.repository';
 export * from './pool.repository';
 export * from './member.repository';
