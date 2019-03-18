@@ -107,55 +107,6 @@ describe('RuleController', () => {
     expect(response.body.count).to.eql(1);
   });
 
-  it('patch ' + prefix + '/rules: all items', async () => {
-    await givenRuleData(wafapp);
-    await givenRuleData(wafapp);
-
-    const patched_name = {name: 'updated rule name'};
-    let response = await client
-      .patch(prefix + '/rules')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/rules/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/rules: selected items', async () => {
-    await givenRuleData(wafapp);
-    await givenRuleData(wafapp);
-
-    const patch_condition = {id: '1'};
-    const patched_name = {name: 'updated rule name'};
-    await givenRuleData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/rules')
-      .query(patch_condition)
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(3);
-
-    response = await client
-      .get(prefix + '/rules/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(3);
-
-    response = await client
-      .get(prefix + '/rules/count')
-      .query({where: patch_condition})
-      .expect(200);
-
-    expect(response.body.count).to.eql(0);
-  });
-
   it('get ' + prefix + '/rules/{id}: selected item', async () => {
     await givenRuleData(wafapp);
     const rule = await givenRuleData(wafapp);
@@ -193,35 +144,5 @@ describe('RuleController', () => {
     const rule = await givenRuleData(wafapp);
 
     await client.del(prefix + '/rules/' + rule.id).expect(204);
-  });
-
-  it('put' + prefix + '/rules/{id}: existing item', async () => {
-    const rule = await givenRuleData(wafapp);
-
-    const rule_new = new Rule(
-      createRuleObject({
-        name: 'new rule name.',
-      }),
-    );
-    await client
-      .put(prefix + '/rules/' + rule.id)
-      .send(rule_new)
-      .expect(204);
-
-    const response = await client.get(prefix + '/rules/' + rule.id).expect(200);
-
-    expect(response.body).to.containDeep({name: 'new rule name.'});
-  });
-
-  it('put ' + prefix + '/rules/{id}: non-existing item', async () => {
-    const rule = new Rule(
-      createRuleObject({
-        name: 'new rule name.',
-      }),
-    );
-    await client
-      .put(prefix + '/rules/' + rule.id)
-      .send(rule)
-      .expect(404);
   });
 });

@@ -1,13 +1,8 @@
-import {Entity, model, property} from '@loopback/repository';
+import {model, property} from '@loopback/repository';
+import {CommonEntity} from '.';
 
 @model()
-export class Condition extends Entity {
-  @property({
-    type: 'string',
-    id: true,
-    required: true,
-  })
-  id: string;
+export class Condition extends CommonEntity {
   @property({
     type: 'object',
     required: false,
@@ -44,12 +39,6 @@ export class Condition extends Entity {
     required: false,
   })
   index: number;
-
-  @property({
-    type: 'string',
-    required: false,
-  })
-  name: string;
 
   @property({
     type: 'boolean',

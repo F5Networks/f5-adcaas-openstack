@@ -1,14 +1,8 @@
-import {Entity, model, property} from '@loopback/repository';
+import {model, property} from '@loopback/repository';
+import {CommonEntity} from '.';
 
 @model()
-export class Action extends Entity {
-  @property({
-    type: 'string',
-    id: true,
-    required: true,
-  })
-  id: string;
-
+export class Action extends CommonEntity {
   @property({
     type: 'boolean',
     required: false,
