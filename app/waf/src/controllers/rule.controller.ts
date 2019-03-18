@@ -12,7 +12,6 @@ import {
   getFilterSchemaFor,
   getWhereSchemaFor,
   patch,
-  put,
   del,
   requestBody,
   HttpErrors,
@@ -51,20 +50,6 @@ export class RuleController {
     return await this.ruleRepository.create(rule);
   }
 
-  @get(prefix + '/rules/count', {
-    responses: {
-      '200': {
-        description: 'Rule model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(Rule)) where?: Where,
-  ): Promise<Count> {
-    return await this.ruleRepository.count(where);
-  }
-
   @get(prefix + '/rules', {
     responses: {
       '200': {
@@ -83,33 +68,6 @@ export class RuleController {
     return await this.ruleRepository.find(filter);
   }
 
-  @patch(prefix + '/rules', {
-    responses: {
-      '200': {
-        description: 'Rule PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody() rule: Rule,
-    @param.query.object('where', getWhereSchemaFor(Rule)) where?: Where,
-  ): Promise<Count> {
-    return await this.ruleRepository.updateAll(rule, where);
-  }
-
-  @get(prefix + '/rules/{id}', {
-    responses: {
-      '200': {
-        description: 'Rule model instance',
-        content: {'application/json': {schema: {'x-ts-type': Rule}}},
-      },
-    },
-  })
-  async findById(@param.path.string('id') id: string): Promise<Rule> {
-    return await this.ruleRepository.findById(id);
-  }
-
   @patch(prefix + '/rules/{id}', {
     responses: {
       '204': {
@@ -124,20 +82,6 @@ export class RuleController {
     await this.ruleRepository.updateById(id, rule);
   }
 
-  @put(prefix + '/rules/{id}', {
-    responses: {
-      '204': {
-        description: 'Rule PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() rule: Rule,
-  ): Promise<void> {
-    await this.ruleRepository.replaceById(id, rule);
-  }
-
   @del(prefix + '/rules/{id}', {
     responses: {
       '204': {
@@ -148,69 +92,31 @@ export class RuleController {
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.ruleRepository.deleteById(id);
   }
-  @get(prefix + '/actions/count', {
+
+  @get(prefix + '/rules/count', {
     responses: {
       '200': {
-        description: 'Action model count',
+        description: 'Rule model count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
   })
-  async countActions(
-    @param.query.object('where', getWhereSchemaFor(Action)) where?: Where,
+  async count(
+    @param.query.object('where', getWhereSchemaFor(Rule)) where?: Where,
   ): Promise<Count> {
-    return await this.actionRepository.count(where);
+    return await this.ruleRepository.count(where);
   }
 
-  @get(prefix + '/actions', {
+  @get(prefix + '/rules/{id}', {
     responses: {
       '200': {
-        description: 'Array of Action model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Action}},
-          },
-        },
+        description: 'Rule model instance',
+        content: {'application/json': {schema: {'x-ts-type': Rule}}},
       },
     },
   })
-  async findActions(
-    @param.query.object('filter', getFilterSchemaFor(Action)) filter?: Filter,
-  ): Promise<Action[]> {
-    return await this.actionRepository.find(filter);
-  }
-
-  @get(prefix + '/conditions/count', {
-    responses: {
-      '200': {
-        description: 'Condition model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async countConditions(
-    @param.query.object('where', getWhereSchemaFor(Condition)) where?: Where,
-  ): Promise<Count> {
-    return await this.conditionRepository.count(where);
-  }
-
-  @get(prefix + '/conditions', {
-    responses: {
-      '200': {
-        description: 'Array of Condition model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Condition}},
-          },
-        },
-      },
-    },
-  })
-  async findConditions(
-    @param.query.object('filter', getFilterSchemaFor(Condition))
-    filter?: Filter,
-  ): Promise<Condition[]> {
-    return await this.conditionRepository.find(filter);
+  async findById(@param.path.string('id') id: string): Promise<Rule> {
+    return await this.ruleRepository.findById(id);
   }
 
   @post(prefix + '/rules/{rule_id}/conditions', {
@@ -222,10 +128,10 @@ export class RuleController {
     },
   })
   async createRuleCondition(
-    @param.path.string('rule_id') rule_id: string,
+    @param.path.string('rule_id') ruleId: string,
     @requestBody() condition: Partial<Condition>,
   ): Promise<Condition> {
-    return await this.ruleRepository.conditions(rule_id).create(condition);
+    return await this.ruleRepository.conditions(ruleId).create(condition);
   }
 
   @get(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
@@ -237,17 +143,17 @@ export class RuleController {
     },
   })
   async getConditionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('condition_id') condition_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('condition_id') conditionId: string,
   ): Promise<Condition> {
     const result = await this.ruleRepository
-      .conditions(rule_id)
-      .find({where: {id: condition_id}});
+      .conditions(ruleId)
+      .find({where: {id: conditionId}});
     if (result.length !== 0) {
       return result[0];
     } else {
       throw new HttpErrors.NotFound(
-        'Condition ' + condition_id + ' for ruleId ' + rule_id + ' not found.',
+        'Condition ' + conditionId + ' for ruleId ' + ruleId + ' not found.',
       );
     }
   }
@@ -265,9 +171,9 @@ export class RuleController {
     },
   })
   async getConditions(
-    @param.path.string('rule_id') rule_id: string,
+    @param.path.string('rule_id') ruleId: string,
   ): Promise<Condition[]> {
-    return await this.ruleRepository.conditions(rule_id).find();
+    return await this.ruleRepository.conditions(ruleId).find();
   }
 
   @del(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
@@ -278,10 +184,10 @@ export class RuleController {
     },
   })
   async deleteConditionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('condition_id') condition_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('condition_id') conditionId: string,
   ) {
-    await this.ruleRepository.conditions(rule_id).delete({id: condition_id});
+    await this.ruleRepository.conditions(ruleId).delete({id: conditionId});
   }
 
   @patch(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
@@ -293,13 +199,13 @@ export class RuleController {
     },
   })
   async updateCondtionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('condition_id') condition_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('condition_id') conditionId: string,
     @requestBody() condition: Partial<Condition>,
   ): Promise<Count> {
     return await this.ruleRepository
-      .conditions(rule_id)
-      .patch(condition, {id: condition_id});
+      .conditions(ruleId)
+      .patch(condition, {id: conditionId});
   }
 
   @post(prefix + '/rules/{rule_id}/actions', {
@@ -311,13 +217,13 @@ export class RuleController {
     },
   })
   async createRuleAction(
-    @param.path.string('rule_id') rule_id: string,
+    @param.path.string('rule_id') ruleId: string,
     @requestBody() action: Partial<Action>,
   ): Promise<Action> {
     if (!action.id) {
       action.id = uuid();
     }
-    return await this.ruleRepository.actions(rule_id).create(action);
+    return await this.ruleRepository.actions(ruleId).create(action);
   }
 
   @get(prefix + '/rules/{rule_id}/actions/{action_id}', {
@@ -329,17 +235,17 @@ export class RuleController {
     },
   })
   async getActionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('action_id') action_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('action_id') actionId: string,
   ): Promise<Action> {
     const result = await this.ruleRepository
-      .actions(rule_id)
-      .find({where: {id: action_id}});
+      .actions(ruleId)
+      .find({where: {id: actionId}});
     if (result.length !== 0) {
       return result[0];
     } else {
       throw new HttpErrors.NotFound(
-        'action ' + action_id + ' for ruleId ' + rule_id + ' not found.',
+        'action ' + actionId + ' for ruleId ' + ruleId + ' not found.',
       );
     }
   }
@@ -357,9 +263,9 @@ export class RuleController {
     },
   })
   async getActions(
-    @param.path.string('rule_id') rule_id: string,
+    @param.path.string('rule_id') ruleId: string,
   ): Promise<Action[]> {
-    return await this.ruleRepository.actions(rule_id).find();
+    return await this.ruleRepository.actions(ruleId).find();
   }
 
   @del(prefix + '/rules/{rule_id}/actions/{action_id}', {
@@ -370,10 +276,10 @@ export class RuleController {
     },
   })
   async deleteActionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('action_id') action_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('action_id') actionId: string,
   ) {
-    await this.ruleRepository.actions(rule_id).delete({id: action_id});
+    await this.ruleRepository.actions(ruleId).delete({id: actionId});
   }
 
   @patch(prefix + '/rules/{rule_id}/actions/{action_id}', {
@@ -385,12 +291,12 @@ export class RuleController {
     },
   })
   async updateActionByID(
-    @param.path.string('rule_id') rule_id: string,
-    @param.path.string('action_id') action_id: string,
+    @param.path.string('rule_id') ruleId: string,
+    @param.path.string('action_id') actionId: string,
     @requestBody() action: Partial<Action>,
   ): Promise<Count> {
     return await this.ruleRepository
-      .actions(rule_id)
-      .patch(action, {id: action_id});
+      .actions(ruleId)
+      .patch(action, {id: actionId});
   }
 }

@@ -1,4 +1,4 @@
-import {Client, expect, toJSON} from '@loopback/testlab';
+import {Client, expect} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
@@ -26,38 +26,9 @@ describe('ActionController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('get ' + prefix + '/actions/count', async () => {
-    const action = await givenActionData(wafapp, {id: uuid(), ruleId: uuid()});
-
-    const response = await client
-      .get(prefix + '/actions/count')
-      .query({where: {id: action.id}})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-  });
-
-  it('get ' + prefix + '/actions', async () => {
-    const action = await givenActionData(wafapp, {id: uuid(), ruleId: uuid()});
-
-    await client
-      .get(prefix + '/actions')
-      .query({filter: {where: {id: action.id}}})
-      .expect(200, [toJSON(action)]);
-  });
-
-  it('get ' + prefix + '/actions', async () => {
-    const action = await givenActionData(wafapp, {id: uuid(), ruleId: uuid()});
-
-    await client
-      .get(prefix + '/actions')
-      .query({filter: {where: {ruleId: action.ruleId}}})
-      .expect(200, [toJSON(action)]);
-  });
-
   it('post ' + prefix + '/rules/{rule_id}/actions', async () => {
     const rule = await givenRuleData(wafapp);
-    const action = createActionObject({id: uuid()});
+    const action = createActionObject();
 
     const response = await client
       .post(prefix + `/rules/${rule.id}/actions`)
@@ -75,7 +46,7 @@ describe('ActionController', () => {
 
     const response = await client
       .get(prefix + `/rules/${rule.id}/actions/${action.id}`)
-      .expect(200, toJSON(action));
+      .expect(200);
 
     expect(response.body.id)
       .to.not.empty()

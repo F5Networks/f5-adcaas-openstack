@@ -1,4 +1,4 @@
-import {Client, expect, toJSON} from '@loopback/testlab';
+import {Client, expect} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
@@ -26,44 +26,6 @@ describe('ConditionController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('get ' + prefix + '/conditions/count', async () => {
-    const condition = await givenConditionData(wafapp, {
-      id: uuid(),
-      ruleId: uuid(),
-    });
-
-    const response = await client
-      .get(prefix + '/conditions/count')
-      .query({where: {id: condition.id}})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-  });
-
-  it('get ' + prefix + '/conditions', async () => {
-    const condition = await givenConditionData(wafapp, {
-      id: uuid(),
-      ruleId: uuid(),
-    });
-
-    await client
-      .get(prefix + '/conditions')
-      .query({filter: {where: {id: condition.id}}})
-      .expect(200, [toJSON(condition)]);
-  });
-
-  it('get ' + prefix + '/conditions', async () => {
-    const condition = await givenConditionData(wafapp, {
-      id: uuid(),
-      ruleId: uuid(),
-    });
-
-    await client
-      .get(prefix + '/conditions')
-      .query({filter: {where: {ruleId: condition.ruleId}}})
-      .expect(200, [toJSON(condition)]);
-  });
-
   it('post ' + prefix + '/rules/{rule_id}/conditions', async () => {
     const rule = await givenRuleData(wafapp);
     const condition = createConditionObject({id: uuid()});
@@ -89,7 +51,7 @@ describe('ConditionController', () => {
 
       const response = await client
         .get(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
-        .expect(200, toJSON(condition));
+        .expect(200);
 
       expect(response.body.id)
         .to.not.empty()
