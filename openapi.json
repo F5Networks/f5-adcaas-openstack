@@ -5,141 +5,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/adcaas/v1/actions/count": {
-      "get": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "countActions",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Action model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "RuleController.countActions"
-      }
-    },
-    "/adcaas/v1/actions": {
-      "get": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "findActions",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of Action model instances",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Action"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "filter",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "properties": {
-                "where": {
-                  "type": "object"
-                },
-                "fields": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "boolean"
-                    },
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "event": {
-                      "type": "boolean"
-                    },
-                    "insert": {
-                      "type": "boolean"
-                    },
-                    "location": {
-                      "type": "boolean"
-                    },
-                    "policy": {
-                      "type": "boolean"
-                    },
-                    "remove": {
-                      "type": "boolean"
-                    },
-                    "replace": {
-                      "type": "boolean"
-                    },
-                    "select": {
-                      "type": "boolean"
-                    },
-                    "type": {
-                      "type": "boolean"
-                    },
-                    "ruleId": {
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "offset": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "limit": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "skip": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "order": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "RuleController.findActions"
-      }
-    },
     "/adcaas/v1/adcs/count": {
       "get": {
         "x-controller-name": "AdcController",
@@ -1059,168 +924,6 @@
           }
         ],
         "operationId": "ApplicationController.find"
-      }
-    },
-    "/adcaas/v1/conditions/count": {
-      "get": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "countConditions",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Condition model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "RuleController.countConditions"
-      }
-    },
-    "/adcaas/v1/conditions": {
-      "get": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "findConditions",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of Condition model instances",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Condition"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "filter",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "properties": {
-                "where": {
-                  "type": "object"
-                },
-                "fields": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "boolean"
-                    },
-                    "all": {
-                      "type": "boolean"
-                    },
-                    "alpn": {
-                      "type": "boolean"
-                    },
-                    "event": {
-                      "type": "boolean"
-                    },
-                    "extension": {
-                      "type": "boolean"
-                    },
-                    "host": {
-                      "type": "boolean"
-                    },
-                    "index": {
-                      "type": "boolean"
-                    },
-                    "name": {
-                      "type": "boolean"
-                    },
-                    "normalized": {
-                      "type": "boolean"
-                    },
-                    "npn": {
-                      "type": "boolean"
-                    },
-                    "path": {
-                      "type": "boolean"
-                    },
-                    "pathSegment": {
-                      "type": "boolean"
-                    },
-                    "port": {
-                      "type": "boolean"
-                    },
-                    "queryParameter": {
-                      "type": "boolean"
-                    },
-                    "queryString": {
-                      "type": "boolean"
-                    },
-                    "scheme": {
-                      "type": "boolean"
-                    },
-                    "serverName": {
-                      "type": "boolean"
-                    },
-                    "type": {
-                      "type": "boolean"
-                    },
-                    "unnamedQueryParameter": {
-                      "type": "boolean"
-                    },
-                    "ruleId": {
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "offset": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "limit": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "skip": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "order": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "RuleController.findConditions"
       }
     },
     "/adcaas/v1/endpointpolicies/count": {
@@ -2655,39 +2358,6 @@
       }
     },
     "/adcaas/v1/rules/{id}": {
-      "put": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Rule PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Rule"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
-        "operationId": "RuleController.replaceById"
-      },
       "patch": {
         "x-controller-name": "RuleController",
         "x-operation-name": "updateById",
@@ -2804,51 +2474,6 @@
           }
         },
         "operationId": "RuleController.create"
-      },
-      "patch": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Rule PATCH success count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Rule"
-              }
-            }
-          }
-        },
-        "operationId": "RuleController.updateAll"
       },
       "get": {
         "x-controller-name": "RuleController",
@@ -3825,54 +3450,22 @@
           "name"
         ]
       },
-      "Action": {
-        "title": "Action",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "event": {
-            "type": "string"
-          },
-          "insert": {
-            "type": "object"
-          },
-          "location": {
-            "type": "string"
-          },
-          "policy": {
-            "type": "object"
-          },
-          "remove": {
-            "type": "object"
-          },
-          "replace": {
-            "type": "object"
-          },
-          "select": {
-            "type": "object"
-          },
-          "type": {
-            "type": "string"
-          },
-          "ruleId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "ruleId"
-        ]
-      },
       "Condition": {
         "title": "Condition",
         "properties": {
           "id": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           },
           "all": {
             "type": "object"
@@ -3891,9 +3484,6 @@
           },
           "index": {
             "type": "number"
-          },
-          "name": {
-            "type": "string"
           },
           "normalized": {
             "type": "boolean"
@@ -3927,6 +3517,60 @@
           },
           "unnamedQueryParameter": {
             "type": "object"
+          },
+          "ruleId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "ruleId"
+        ]
+      },
+      "Action": {
+        "title": "Action",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "event": {
+            "type": "string"
+          },
+          "insert": {
+            "type": "object"
+          },
+          "location": {
+            "type": "string"
+          },
+          "policy": {
+            "type": "object"
+          },
+          "remove": {
+            "type": "object"
+          },
+          "replace": {
+            "type": "object"
+          },
+          "select": {
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
           },
           "ruleId": {
             "type": "string"
