@@ -7,24 +7,42 @@ export abstract class CommonEntity extends Entity {
     type: 'string',
     id: true,
     required: true,
+    schema: {
+      response: true,
+      example: '11111111-2222-3333-4444-555555555555',
+    },
   })
   id: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 'My name',
+    },
   })
   name?: string;
 
   @property({
     type: 'date',
     required: false,
+    schema: {
+      response: true,
+      example: '2019-03-05T08:40:25.000Z',
+    },
   })
   createdAt?: string;
 
   @property({
     type: 'date',
     required: false,
+    schema: {
+      response: true,
+      example: '2019-03-05T08:40:25.100Z',
+    },
   })
   updatedAt?: string;
 

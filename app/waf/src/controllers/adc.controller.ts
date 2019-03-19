@@ -18,7 +18,7 @@ import {
 } from '@loopback/rest';
 import {Adc, AdcResponse, AdcCollectionResponse} from '../models';
 import {AdcRepository} from '../repositories';
-import {AdcSchema} from '.';
+import {Schema} from '.';
 
 const prefix = '/adcaas/v1';
 
@@ -28,24 +28,17 @@ export class AdcController {
     public adcRepository: AdcRepository,
   ) {}
 
+  readonly createDesc = 'ADC resource that need to be created';
   @post(prefix + '/adcs', {
     responses: {
-      '200': {
-        description: 'Successfully create ADC resource',
-        content: {'application/json': AdcSchema.adcResponse},
-      },
-      '400': {
-        description: 'Invalid ADC resource',
-        content: {'application/json': AdcSchema.BadRequest},
-      },
-      '422': {
-        description: 'Unprocessable ADC resource',
-        content: {'application/json': AdcSchema.UnprocessableEntity},
-      },
+      '200': Schema.response(Adc, 'Successfully create ADC resource'),
+      '400': Schema.badRequest('Invalid ADC resource'),
+      '422': Schema.unprocessableEntity('Unprocessable ADC resource'),
     },
   })
   async create(
-    @requestBody(AdcSchema.adcCreateRequest) reqBody: Partial<Adc>,
+    @requestBody(Schema.createRequest(Adc, this.createDesc))
+    reqBody: Partial<Adc>,
   ): Promise<AdcResponse> {
     try {
       return new AdcResponse(await this.adcRepository.create(new Adc(reqBody)));
@@ -70,10 +63,10 @@ export class AdcController {
 
   @get(prefix + '/adcs', {
     responses: {
-      '200': {
-        description: 'Successfully retrieve ADC resources',
-        content: {'application/json': AdcSchema.adcCollectionResponse},
-      },
+      '200': Schema.collectionResponse(
+        Adc,
+        'Successfully retrieve ADC resources',
+      ),
     },
   })
   async find(
@@ -85,50 +78,40 @@ export class AdcController {
 
   @get(prefix + '/adcs/{id}', {
     responses: {
-      '200': {
-        description: 'Successfully update ADC resource',
-      },
-      '404': {
-        description: 'Can not find ADC resource',
-        content: {'application/json': AdcSchema.NotFound},
-      },
+      '200': Schema.response(Adc, 'Successfully retrieve ADC resource'),
+      '404': Schema.notFound('Can not find ADC resource'),
     },
   })
-  async findById(@param(AdcSchema.adcId) id: string): Promise<AdcResponse> {
+  async findById(
+    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+  ): Promise<AdcResponse> {
     let data = await this.adcRepository.findById(id);
     return new AdcResponse(data);
   }
 
+  readonly updateDesc = 'ADC resource properties that need to be updated';
   @patch(prefix + '/adcs/{id}', {
     responses: {
-      '204': {
-        description: 'Successfully update ADC resource',
-      },
-      '404': {
-        description: 'Can not find ADC resource',
-        content: {'application/json': AdcSchema.NotFound},
-      },
+      '204': Schema.emptyResponse('Successfully update ADC resource'),
+      '404': Schema.notFound('Can not find ADC resource'),
     },
   })
   async updateById(
-    @param(AdcSchema.adcId) id: string,
-    @requestBody(AdcSchema.adcUpdateRequest) adc: Partial<Adc>,
+    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+    @requestBody(Schema.updateRequest(Adc, this.updateDesc)) adc: Partial<Adc>,
   ): Promise<void> {
     await this.adcRepository.updateById(id, adc);
   }
 
   @del(prefix + '/adcs/{id}', {
     responses: {
-      '204': {
-        description: 'Successfully delete ADC resource',
-      },
-      '404': {
-        description: 'Can not find ADC resource',
-        content: {'application/json': AdcSchema.NotFound},
-      },
+      '204': Schema.emptyResponse('Successfully delete ADC resource'),
+      '404': Schema.notFound('Can not find ADC resource'),
     },
   })
-  async deleteById(@param(AdcSchema.adcId) id: string): Promise<void> {
+  async deleteById(
+    @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
+  ): Promise<void> {
     await this.adcRepository.deleteById(id);
   }
 }
