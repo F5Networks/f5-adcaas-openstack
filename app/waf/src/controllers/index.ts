@@ -1,6 +1,7 @@
 export * from './schema';
 export * from './ping.controller';
 export * from './application.controller';
+export * from './declaration.controller';
 export * from './tenantassoc.controller';
 export * from './adc.controller';
 export * from './service.controller';

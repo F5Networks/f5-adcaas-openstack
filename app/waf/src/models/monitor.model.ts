@@ -61,6 +61,7 @@ export class Monitor extends CommonEntity {
       response: true,
       example: 'tcp',
     },
+    as3: {},
   })
   monitorType: string;
 
@@ -301,5 +302,6 @@ export class Monitor extends CommonEntity {
 
   constructor(data?: Partial<Monitor>) {
     super(data);
+    this.as3Class = 'Monitor';
   }
 }

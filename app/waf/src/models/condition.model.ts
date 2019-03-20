@@ -1,11 +1,12 @@
 import {model, property} from '@loopback/repository';
-import {CommonEntity} from '.';
+import {CommonEntity, AS3Declaration} from '.';
 
 @model()
 export class Condition extends CommonEntity {
   @property({
     type: 'object',
     required: false,
+    as3: {},
   })
   all: object;
 
@@ -113,6 +114,7 @@ export class Condition extends CommonEntity {
       response: true,
       example: 'httpUri',
     },
+    as3: {},
   })
   type: string;
 
@@ -134,5 +136,13 @@ export class Condition extends CommonEntity {
 
   constructor(data?: Partial<Condition>) {
     super(data);
+  }
+
+  getAS3Declaration(): AS3Declaration {
+    let obj = super.getAS3Declaration();
+
+    obj.name = obj.label;
+    delete obj.label;
+    return obj;
   }
 }

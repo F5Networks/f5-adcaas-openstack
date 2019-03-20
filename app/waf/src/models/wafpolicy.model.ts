@@ -10,6 +10,7 @@ export class Wafpolicy extends CommonEntity {
       response: true,
       example: '/Common/my_waf',
     },
+    as3: {},
   })
   file?: string;
 
@@ -22,18 +23,18 @@ export class Wafpolicy extends CommonEntity {
 
   @property({
     type: 'string',
-    required: true,
     schema: {
       create: true,
       update: true,
       response: true,
-      required: true,
       example: 'https://raw.githubusercontent.com/wafrepo/master/my_waf.xml',
     },
+    as3: {},
   })
-  url: string;
+  url?: string;
 
   constructor(data?: Partial<Wafpolicy>) {
     super(data);
+    this.as3Class = 'WAF_Policy';
   }
 }

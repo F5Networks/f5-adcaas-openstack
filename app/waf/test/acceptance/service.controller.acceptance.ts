@@ -57,8 +57,8 @@ describe('ServiceController', () => {
       type: 'HTTPS',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
-      pool: 'web_pool',
       applicationId: uuid(),
+      defaultPoolId: uuid(),
     };
 
     const response = await client

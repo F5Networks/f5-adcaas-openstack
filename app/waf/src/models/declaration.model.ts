@@ -1,5 +1,5 @@
 import {model, property} from '@loopback/repository';
-import {CommonEntity, AS3JSONObject} from '.';
+import {CommonEntity} from '.';
 
 @model()
 export class Declaration extends CommonEntity {
@@ -21,11 +21,11 @@ export class Declaration extends CommonEntity {
       example: {},
     },
   })
-  content: AS3JSONObject;
+  content: object;
+
+  //TODO: implement something like lastError to record deploy result
 
   constructor(data?: Partial<Declaration>) {
     super(data);
-
-    this.content = {};
   }
 }
