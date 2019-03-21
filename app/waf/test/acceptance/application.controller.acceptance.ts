@@ -24,7 +24,6 @@ import {
   createApplicationObject,
   givenWafpolicyData,
 } from '../helpers/database.helpers';
-import {Application} from '../../src/models';
 import uuid = require('uuid');
 
 describe('ApplicationController', () => {
@@ -56,23 +55,8 @@ describe('ApplicationController', () => {
     deployStub.restore();
   });
 
-  it('post ' + prefix + '/applications: with id', async () => {
-    const application = new Application(
-      createApplicationObject({
-        id: uuid(),
-      }),
-    );
-
-    const response = await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(application));
-  });
-
   it('post ' + prefix + '/applications: with no id', async () => {
-    const application = new Application(createApplicationObject());
+    const application = createApplicationObject();
 
     const response = await client
       .post(prefix + '/applications')
@@ -80,15 +64,6 @@ describe('ApplicationController', () => {
       .expect(200);
 
     expect(response.body).to.containDeep(toJSON(application));
-  });
-
-  it('post ' + prefix + '/applications: with duplicate id', async () => {
-    const application = await givenApplicationData(wafapp);
-
-    await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(400);
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
@@ -119,55 +94,6 @@ describe('ApplicationController', () => {
       .get(prefix + '/applications/count')
       .query({where: {id: application.id}})
       .expect(200);
-    expect(response.body.count).to.eql(1);
-  });
-
-  it('patch ' + prefix + '/applications: all items', async () => {
-    await givenApplicationData(wafapp);
-    await givenApplicationData(wafapp);
-
-    const patched_name = {name: 'updated application name'};
-    let response = await client
-      .patch(prefix + '/applications')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/applications: selected items', async () => {
-    await givenApplicationData(wafapp);
-    await givenApplicationData(wafapp);
-
-    const patch_condition = {description: 'the only one to patch'};
-    const patched_name = {name: 'updated application name'};
-    await givenApplicationData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/applications')
-      .query({where: patch_condition})
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patch_condition})
-      .expect(200);
-
     expect(response.body.count).to.eql(1);
   });
 
@@ -210,38 +136,6 @@ describe('ApplicationController', () => {
     const application = await givenApplicationData(wafapp);
 
     await client.del(prefix + '/applications/' + application.id).expect(204);
-  });
-
-  it('put' + prefix + '/applications/{id}: existing item', async () => {
-    const application = await givenApplicationData(wafapp);
-
-    const wafpolicy_new = new Application(
-      createApplicationObject({
-        name: 'new application name.',
-      }),
-    );
-    await client
-      .put(prefix + '/applications/' + application.id)
-      .send(wafpolicy_new)
-      .expect(204);
-
-    const response = await client
-      .get(prefix + '/applications/' + application.id)
-      .expect(200);
-
-    expect(response.body).to.containDeep({name: 'new application name.'});
-  });
-
-  it('put ' + prefix + '/applications/{id}: non-existing item', async () => {
-    const application = new Application(
-      createApplicationObject({
-        name: 'new application name.',
-      }),
-    );
-    await client
-      .put(prefix + '/applications/' + application.id)
-      .send(application)
-      .expect(404);
   });
 
   it(
