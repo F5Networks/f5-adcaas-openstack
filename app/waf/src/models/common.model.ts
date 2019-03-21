@@ -27,6 +27,31 @@ export abstract class CommonEntity extends Entity {
   name?: string;
 
   @property({
+    type: 'string',
+    required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 'My description',
+    },
+  })
+  description?: string;
+
+  @property({
+    type: 'string',
+    required: false,
+    //TODO: Need to remove this default value, after we can get it from keystone.
+    default: 'default',
+    schema: {
+      create: true,
+      response: true,
+      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    },
+  })
+  tenantId: string;
+
+  @property({
     type: 'date',
     required: false,
     schema: {
