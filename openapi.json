@@ -1346,6 +1346,375 @@
         "operationId": "PoolController.findMembers"
       }
     },
+    "/adcaas/v1/monitors/count": {
+      "get": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "count",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitor model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "operationId": "MonitorController.count"
+      }
+    },
+    "/adcaas/v1/monitors/{id}": {
+      "patch": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Monitor PATCH success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Monitor"
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "MonitorController.updateById"
+      },
+      "get": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "findById",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitor model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Monitor"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "operationId": "MonitorController.findById"
+      },
+      "delete": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Monitor DELETE success"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "operationId": "MonitorController.deleteById"
+      }
+    },
+    "/adcaas/v1/monitors": {
+      "post": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "create",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitor model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Monitor"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "operationId": "MonitorController.create"
+      },
+      "get": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "find",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of Monitor model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Monitor"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "interval": {
+                      "type": "boolean"
+                    },
+                    "timeout": {
+                      "type": "boolean"
+                    },
+                    "targetAddress": {
+                      "type": "boolean"
+                    },
+                    "targetPort": {
+                      "type": "boolean"
+                    },
+                    "monitorType": {
+                      "type": "boolean"
+                    },
+                    "acceptRCODE": {
+                      "type": "boolean"
+                    },
+                    "adaptive": {
+                      "type": "boolean"
+                    },
+                    "adaptiveDivergenceMilliseconds": {
+                      "type": "boolean"
+                    },
+                    "adaptiveDivergencePercentage": {
+                      "type": "boolean"
+                    },
+                    "adaptiveDivergenceType": {
+                      "type": "boolean"
+                    },
+                    "adaptiveLimitMilliseconds": {
+                      "type": "boolean"
+                    },
+                    "adaptiveWindow": {
+                      "type": "boolean"
+                    },
+                    "answerContains": {
+                      "type": "boolean"
+                    },
+                    "arguments": {
+                      "type": "boolean"
+                    },
+                    "base": {
+                      "type": "boolean"
+                    },
+                    "chaseReferrals": {
+                      "type": "boolean"
+                    },
+                    "ciphers": {
+                      "type": "boolean"
+                    },
+                    "clientCertificate": {
+                      "type": "boolean"
+                    },
+                    "codesDown": {
+                      "type": "boolean"
+                    },
+                    "codesUp": {
+                      "type": "boolean"
+                    },
+                    "domain": {
+                      "type": "boolean"
+                    },
+                    "dscp": {
+                      "type": "boolean"
+                    },
+                    "expand": {
+                      "type": "boolean"
+                    },
+                    "filter": {
+                      "type": "boolean"
+                    },
+                    "headers": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "boolean"
+                    },
+                    "mandatoryAttributes": {
+                      "type": "boolean"
+                    },
+                    "nasIpAddress": {
+                      "type": "boolean"
+                    },
+                    "passphrase": {
+                      "type": "boolean"
+                    },
+                    "pathname": {
+                      "type": "boolean"
+                    },
+                    "protocol": {
+                      "type": "boolean"
+                    },
+                    "queryName": {
+                      "type": "boolean"
+                    },
+                    "queryType": {
+                      "type": "boolean"
+                    },
+                    "receive": {
+                      "type": "boolean"
+                    },
+                    "receiveDown": {
+                      "type": "boolean"
+                    },
+                    "remark": {
+                      "type": "boolean"
+                    },
+                    "request": {
+                      "type": "boolean"
+                    },
+                    "reverse": {
+                      "type": "boolean"
+                    },
+                    "script": {
+                      "type": "boolean"
+                    },
+                    "secret": {
+                      "type": "boolean"
+                    },
+                    "security": {
+                      "type": "boolean"
+                    },
+                    "send": {
+                      "type": "boolean"
+                    },
+                    "timeUntilUp": {
+                      "type": "boolean"
+                    },
+                    "transparent": {
+                      "type": "boolean"
+                    },
+                    "upInterval": {
+                      "type": "boolean"
+                    },
+                    "username": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "operationId": "MonitorController.find"
+      }
+    },
     "/adcaas/v1/ping": {
       "get": {
         "x-controller-name": "PingController",
@@ -3391,6 +3760,173 @@
         "required": [
           "name",
           "rules"
+        ]
+      },
+      "Monitor": {
+        "title": "Monitor",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interval": {
+            "type": "number"
+          },
+          "timeout": {
+            "type": "number"
+          },
+          "targetAddress": {
+            "type": "string"
+          },
+          "targetPort": {
+            "type": "number"
+          },
+          "monitorType": {
+            "type": "string"
+          },
+          "acceptRCODE": {
+            "type": "string"
+          },
+          "adaptive": {
+            "type": "boolean"
+          },
+          "adaptiveDivergenceMilliseconds": {
+            "type": "number"
+          },
+          "adaptiveDivergencePercentage": {
+            "type": "number"
+          },
+          "adaptiveDivergenceType": {
+            "type": "string"
+          },
+          "adaptiveLimitMilliseconds": {
+            "type": "number"
+          },
+          "adaptiveWindow": {
+            "type": "number"
+          },
+          "answerContains": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "string"
+          },
+          "base": {
+            "type": "string"
+          },
+          "chaseReferrals": {
+            "type": "boolean"
+          },
+          "ciphers": {
+            "type": "string"
+          },
+          "clientCertificate": {
+            "type": "string"
+          },
+          "codesDown": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "codesUp": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "domain": {
+            "type": "string"
+          },
+          "dscp": {
+            "type": "number"
+          },
+          "expand": {
+            "type": "boolean"
+          },
+          "filter": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "mandatoryAttributes": {
+            "type": "boolean"
+          },
+          "nasIpAddress": {
+            "type": "string"
+          },
+          "passphrase": {
+            "type": "object"
+          },
+          "pathname": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "queryName": {
+            "type": "string"
+          },
+          "queryType": {
+            "type": "string"
+          },
+          "receive": {
+            "type": "string"
+          },
+          "receiveDown": {
+            "type": "string"
+          },
+          "remark": {
+            "type": "string"
+          },
+          "request": {
+            "type": "string"
+          },
+          "reverse": {
+            "type": "boolean"
+          },
+          "script": {
+            "type": "object"
+          },
+          "secret": {
+            "type": "object"
+          },
+          "security": {
+            "type": "string"
+          },
+          "send": {
+            "type": "string"
+          },
+          "timeUntilUp": {
+            "type": "number"
+          },
+          "transparent": {
+            "type": "boolean"
+          },
+          "upInterval": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "monitorType"
         ]
       },
       "Pool": {
