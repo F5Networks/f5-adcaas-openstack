@@ -9,6 +9,7 @@ import {
   EndpointpolicyRepository,
   ConditionRepository,
   ActionRepository,
+  MonitorRepository,
 } from '../../src/repositories';
 
 import {
@@ -22,6 +23,7 @@ import {
   Endpointpolicy,
   Condition,
   Action,
+  Monitor,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -57,6 +59,9 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
     EndpointpolicyRepository,
   );
   await endpointpolicyRepo.deleteAll();
+
+  const monitorRepo = await wafapp.getRepository(MonitorRepository);
+  await monitorRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -290,6 +295,25 @@ export function createMemberObject(data?: Partial<Member>) {
     {
       address: '192.0.1.23',
       port: 80,
+    },
+    data,
+  );
+}
+
+export async function givenMonitorData(
+  wafapp: WafApplication,
+  data?: Partial<Monitor>,
+) {
+  const repo = await wafapp.getRepository(MonitorRepository);
+  return await repo.create(createMonitorObject(data));
+}
+
+export function createMonitorObject(data?: Partial<Monitor>) {
+  return Object.assign(
+    {
+      targetAddress: '192.0.1.23',
+      targetPort: 80,
+      monitorType: 'http',
     },
     data,
   );

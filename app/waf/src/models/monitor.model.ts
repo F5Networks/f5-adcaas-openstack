@@ -1,0 +1,275 @@
+import {model, property} from '@loopback/repository';
+import {CommonEntity} from './common.model';
+
+@model()
+export class Monitor extends CommonEntity {
+  @property({
+    type: 'number',
+    default: 5,
+  })
+  interval: number;
+
+  @property({
+    type: 'number',
+    default: 16,
+  })
+  timeout: number;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  targetAddress: string;
+
+  @property({
+    type: 'number',
+    default: 0,
+  })
+  targetPort: number;
+
+  @property({
+    type: 'string',
+    required: true,
+    default: 'tcp',
+  })
+  monitorType: string;
+
+  // user can specify the below attributes to create a certain type monitor
+  // TODO: separate the monitors to more specific monitor in future
+
+  @property({
+    type: 'string',
+    default: 'no-error',
+  })
+  acceptRCODE: string;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  adaptive: boolean;
+
+  @property({
+    type: 'number',
+    default: 500,
+  })
+  adaptiveDivergenceMilliseconds: number;
+
+  @property({
+    type: 'number',
+    default: 100,
+  })
+  adaptiveDivergencePercentage: number;
+
+  @property({
+    type: 'string',
+    default: 'relative',
+  })
+  adaptiveDivergenceType: string;
+
+  @property({
+    type: 'number',
+    default: 1000,
+  })
+  adaptiveLimitMilliseconds: number;
+
+  @property({
+    type: 'number',
+    default: 180,
+  })
+  adaptiveWindow: number;
+
+  @property({
+    type: 'string',
+    default: 'query-type',
+  })
+  answerContains: string;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  arguments: string;
+
+  @property({
+    type: 'string',
+  })
+  base: string;
+
+  @property({
+    type: 'boolean',
+    default: true,
+  })
+  chaseReferrals: boolean;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  ciphers: string;
+
+  @property({
+    type: 'string',
+  })
+  clientCertificate: string;
+
+  @property({
+    type: 'array',
+    itemType: 'number',
+  })
+  codesDown: number[];
+
+  @property({
+    type: 'array',
+    itemType: 'number',
+  })
+  codesUp: number[];
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  domain: string;
+
+  @property({
+    type: 'number',
+    default: 0,
+  })
+  dscp: number;
+
+  @property({
+    type: 'boolean',
+    default: true,
+  })
+  expand: boolean;
+
+  @property({
+    type: 'string',
+  })
+  filter: string;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  headers: string;
+
+  @property({
+    type: 'string',
+  })
+  label: string;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  mandatoryAttributes: boolean;
+
+  @property({
+    type: 'string',
+  })
+  nasIpAddress: string;
+
+  @property({
+    type: 'object',
+  })
+  passphrase: object;
+
+  @property({
+    type: 'string',
+  })
+  pathname: string;
+
+  @property({
+    type: 'string',
+    default: 'udp',
+  })
+  protocol: string;
+
+  @property({
+    type: 'string',
+  })
+  queryName: string;
+
+  @property({
+    type: 'string',
+    default: 'a',
+  })
+  queryType: string;
+
+  @property({
+    type: 'string',
+  })
+  receive: string;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  receiveDown: string;
+
+  @property({
+    type: 'string',
+  })
+  remark: string;
+
+  @property({
+    type: 'string',
+    default: '',
+  })
+  request: string;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  reverse: boolean;
+
+  @property({
+    type: 'object',
+  })
+  script: object;
+
+  @property({
+    type: 'object',
+  })
+  secret: object;
+
+  @property({
+    type: 'string',
+    default: 'none',
+  })
+  security: string;
+
+  @property({
+    type: 'string',
+  })
+  send: string;
+
+  @property({
+    type: 'number',
+    default: 0,
+  })
+  timeUntilUp: number;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  transparent: boolean;
+
+  @property({
+    type: 'number',
+    default: 0,
+  })
+  upInterval: number;
+
+  @property({
+    type: 'string',
+  })
+  username: string;
+
+  constructor(data?: Partial<Monitor>) {
+    super(data);
+  }
+}
