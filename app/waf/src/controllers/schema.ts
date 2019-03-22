@@ -1,181 +1,71 @@
+import {Entity} from '@loopback/repository';
 import {ParameterObject, ParameterLocation} from '@loopback/openapi-v3-types';
 import {MetadataInspector} from '@loopback/metadata';
-import {PropertyDefinition, PropertyMap} from '@loopback/repository';
-import {Adc} from '../models';
+import {PropertyDefinition} from '@loopback/repository';
 
-function buildProperties(
-  metadata: PropertyMap | undefined,
-  propNames: string[],
-): {[key: string]: object} {
-  let props: {[key: string]: object} = {};
+class SchemaProperties {
+  public create: {[key: string]: object} = {};
+  public update: {[key: string]: object} = {};
+  public response: {[key: string]: object} = {};
+  public required: string[] = [];
+  public createExample: {[key: string]: object} = {};
+  public updateExample: {[key: string]: object} = {};
+  public responseExample: {[key: string]: object} = {};
+}
 
-  if (metadata) {
-    for (let propName of propNames) {
-      props[propName] = {
-        type: metadata[propName].type,
-      };
+let schemaMap: {[key: string]: SchemaProperties} = {};
+
+function buildProperties(entity: typeof Entity): SchemaProperties {
+  let entityKey = entity.modelName;
+  let props = schemaMap[entityKey];
+
+  if (props) {
+    return props;
+  }
+
+  props = new SchemaProperties();
+
+  let metadata =
+    MetadataInspector.getAllPropertyMetadata<PropertyDefinition>(
+      'loopback:model-properties',
+      entity.prototype,
+    ) || {};
+
+  for (let key in metadata) {
+    let meta = metadata[key];
+    let schema = meta.schema;
+
+    if (schema) {
+      if (schema.create) {
+        props.create[key] = {
+          type: meta.type,
+        };
+        props.createExample[key] = schema.example;
+      }
+
+      if (schema.update) {
+        props.update[key] = {
+          type: meta.type,
+        };
+        props.updateExample[key] = schema.example;
+      }
+
+      if (schema.response) {
+        props.response[key] = {
+          type: meta.type,
+        };
+        props.responseExample[key] = schema.example;
+      }
+
+      if (schema.required) {
+        props.required.push(key);
+      }
     }
   }
 
+  schemaMap[entityKey] = props;
+
   return props;
-}
-
-const adcProperties = MetadataInspector.getAllPropertyMetadata<
-  PropertyDefinition
->('loopback:model-properties', Adc.prototype);
-
-// TODO: It is betther to have another decorator or something else
-// to specify the resource properties of request/response in model
-// definition, instead of re-define them here. Need to refactor
-// the code in the future.
-const adcCreateRequestProperties = buildProperties(adcProperties, [
-  'id',
-  'name',
-  'type',
-  'host',
-  'port',
-  'username',
-  'passphrase',
-]);
-
-const adcCreateRequestExample = {
-  name: 'My BIG-IP',
-  type: 'HW',
-  host: '192.168.0.1',
-  port: 8443,
-  username: 'admin',
-  passphrase: 'admin',
-};
-
-const adcUpdateRequestProperties = buildProperties(adcProperties, ['name']);
-
-const adcUpdateRequestExample = {
-  name: 'My BIG-IP',
-};
-
-const adcResponseProperties = buildProperties(adcProperties, [
-  'id',
-  'name',
-  'type',
-  'host',
-  'port',
-  'username',
-  'passphrase',
-  'createdAt',
-  'updatedAt',
-]);
-
-const adcResponseExample = {
-  id: '11111111-2222-3333-4444-555555555555',
-  name: 'My BIG-IP',
-  type: 'HW',
-  host: '192.168.0.1',
-  port: 8443,
-  username: 'admin',
-  passphrase: 'admin',
-  createdAt: '2019-03-05T08:40:25.000Z',
-  updatedAt: '2019-03-05T08:40:25.100Z',
-};
-
-class ErrorResponseSchema {
-  public schema = {
-    schema: {
-      type: 'object',
-      required: ['statusCode', 'name', 'message'],
-      properties: {
-        statusCode: {
-          type: 'integer',
-          example: 422,
-        },
-        name: {
-          type: 'string',
-          example: '',
-        },
-        message: {
-          type: 'string',
-          example: '',
-        },
-        code: {
-          type: 'string',
-          example: '',
-        },
-        details: {
-          type: 'array',
-          example: [{}],
-        },
-      },
-    },
-  };
-
-  private constructor() {
-    this.schema.schema.properties.details.example.shift();
-  }
-
-  public static BadRequest(): ErrorResponseSchema {
-    let s = new ErrorResponseSchema();
-
-    s.setStatusCodeExample(400);
-    s.setNameExample('BadRequestError');
-    s.removeCodeProperty();
-    s.removeDetailsProperty();
-
-    return s;
-  }
-
-  public static NotFound(): ErrorResponseSchema {
-    let s = new ErrorResponseSchema();
-
-    s.setStatusCodeExample(404);
-    s.setNameExample('Error');
-    s.setMessageExample(
-      'Entity not found: XXXX with id "11111111-2222-3333-4444-555555555555"',
-    );
-    s.setCodeExample('ENTITY_NOT_FOUND');
-    s.removeDetailsProperty();
-
-    return s;
-  }
-
-  public static UnprocessableEntity(): ErrorResponseSchema {
-    let s = new ErrorResponseSchema();
-
-    s.setStatusCodeExample(422);
-    s.setNameExample('UnprocessableEntityError');
-    s.setMessageExample(
-      'The request body is invalid. See error object `details` property for more info.',
-    );
-    s.setCodeExample('VALIDATION_FAILED');
-
-    return s;
-  }
-
-  public setStatusCodeExample(statusCode: number) {
-    this.schema.schema.properties.statusCode.example = statusCode;
-  }
-
-  public setNameExample(name: string) {
-    this.schema.schema.properties.name.example = name;
-  }
-
-  public setMessageExample(message: string) {
-    this.schema.schema.properties.message.example = message;
-  }
-
-  public setCodeExample(code: string) {
-    this.schema.schema.properties.code.example = code;
-  }
-
-  public addDetailExample(detail: object) {
-    this.schema.schema.properties.details.example.push(detail);
-  }
-
-  public removeCodeProperty() {
-    delete this.schema.schema.properties.code;
-  }
-
-  public removeDetailsProperty() {
-    delete this.schema.schema.properties.details;
-  }
 }
 
 function buildParameterSchema(
@@ -220,69 +110,176 @@ function buildRequestSchema(
   };
 }
 
-function buildResponseSchema(properties: object, example: object): object {
+function buildResponseSchema(
+  name: string,
+  properties: object,
+  example: object,
+): object {
+  let resp: {[key: string]: object} = {};
+  resp[name] = {
+    type: 'object',
+    properties: properties,
+    example: example,
+  };
+
   return {
     schema: {
       type: 'object',
-      properties: properties,
-      example: example,
+      properties: resp,
     },
   };
 }
 
 function buildCollectionResponseSchema(
+  name: string,
   properties: object,
   example: object,
 ): object {
+  let resp: {[key: string]: object} = {};
+  resp[name] = {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: properties,
+      example: example,
+    },
+  };
+
   return {
     schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: properties,
-        example: example,
+      type: 'object',
+      properties: resp,
+    },
+  };
+}
+
+function buildErrorResponseSchema(desc: string, example: object): object {
+  return {
+    description: desc,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            statusCode: {
+              type: 'integer',
+            },
+            name: {
+              type: 'string',
+            },
+            message: {
+              type: 'string',
+            },
+            code: {
+              type: 'string',
+            },
+            details: {
+              type: 'array',
+            },
+          },
+          example: example,
+        },
       },
     },
   };
 }
 
-export class AdcSchema {
-  static adcId = buildParameterSchema(
-    'id',
-    'path',
-    true,
-    'string',
-    '',
-    'ADC resource ID',
-  );
+export class Schema {
+  private constructor() {}
 
-  static adcCreateRequest = buildRequestSchema(
-    'ADC resource that need to be created',
-    ['type', 'host'],
-    adcCreateRequestProperties,
-    adcCreateRequestExample,
-  );
+  static pathParameter(name: string, desc: string): ParameterObject {
+    return buildParameterSchema(name, 'path', true, 'string', '', desc);
+  }
 
-  static adcUpdateRequest = buildRequestSchema(
-    'ADC resource properties that need to be updated',
-    [],
-    adcUpdateRequestProperties,
-    adcUpdateRequestExample,
-  );
+  static createRequest(entity: typeof Entity, desc: string): object {
+    let props = buildProperties(entity);
+    return buildRequestSchema(
+      desc,
+      props.required,
+      props.create,
+      props.createExample,
+    );
+  }
 
-  static adcResponse = buildResponseSchema(
-    adcResponseProperties,
-    adcResponseExample,
-  );
+  static updateRequest(entity: typeof Entity, desc: string): object {
+    let props = buildProperties(entity);
+    return buildRequestSchema(desc, [], props.update, props.updateExample);
+  }
 
-  static adcCollectionResponse = buildCollectionResponseSchema(
-    adcResponseProperties,
-    adcResponseExample,
-  );
+  static emptyResponse(desc: string): object {
+    return {
+      description: desc,
+    };
+  }
 
-  static BadRequest = ErrorResponseSchema.BadRequest().schema;
+  static response(entity: typeof Entity, desc: string): object {
+    let props = buildProperties(entity);
+    return {
+      description: desc,
+      content: {
+        'application/json': buildResponseSchema(
+          entity.modelName.toLowerCase(),
+          props.response,
+          props.responseExample,
+        ),
+      },
+    };
+  }
 
-  static NotFound = ErrorResponseSchema.NotFound().schema;
+  static collectionResponse(entity: typeof Entity, desc: string): object {
+    let props = buildProperties(entity);
+    return {
+      description: desc,
+      content: {
+        'application/json': buildCollectionResponseSchema(
+          entity.modelName.toLowerCase() + 's',
+          props.response,
+          props.responseExample,
+        ),
+      },
+    };
+  }
 
-  static UnprocessableEntity = ErrorResponseSchema.UnprocessableEntity().schema;
+  static badRequest(desc: string, example?: object): object {
+    return buildErrorResponseSchema(
+      desc,
+      Object.assign(
+        {
+          statusCode: 400,
+          name: 'BadRequestError',
+        },
+        example,
+      ),
+    );
+  }
+
+  static notFound(desc: string, example?: object): object {
+    return buildErrorResponseSchema(
+      desc,
+      Object.assign(
+        {
+          statusCode: 404,
+          name: 'Error',
+          code: 'ENTITY_NOT_FOUND',
+        },
+        example,
+      ),
+    );
+  }
+
+  static unprocessableEntity(desc: string, example?: object): object {
+    return buildErrorResponseSchema(
+      desc,
+      Object.assign(
+        {
+          statusCode: 422,
+          name: 'UnprocessableEntityError',
+          message:
+            'The request body is invalid. See error object `details` property for more info.',
+          code: 'VALIDATION_FAILED',
+        },
+        example,
+      ),
+    );
+  }
 }

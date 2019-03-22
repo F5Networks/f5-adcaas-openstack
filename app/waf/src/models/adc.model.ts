@@ -6,12 +6,24 @@ export class Adc extends CommonEntity {
   @property({
     type: 'string',
     required: true,
+    schema: {
+      create: true,
+      response: true,
+      required: true,
+      example: 'HW',
+    },
   })
   type: string;
 
   @property({
     type: 'string',
     required: true,
+    schema: {
+      create: true,
+      required: true,
+      response: true,
+      example: '192.168.0.1',
+    },
   })
   host: string;
 
@@ -19,6 +31,11 @@ export class Adc extends CommonEntity {
     type: 'number',
     required: false,
     default: 443,
+    schema: {
+      create: true,
+      response: true,
+      example: 8443,
+    },
   })
   port: number;
 
@@ -26,6 +43,11 @@ export class Adc extends CommonEntity {
     type: 'string',
     required: false,
     default: 'admin',
+    schema: {
+      create: true,
+      response: true,
+      example: 'admin',
+    },
   })
   username: string;
 
@@ -33,6 +55,11 @@ export class Adc extends CommonEntity {
     type: 'string',
     required: false,
     default: 'admin',
+    schema: {
+      create: true,
+      response: true,
+      example: 'admin',
+    },
   })
   passphrase: string;
 
