@@ -92,7 +92,7 @@ describe('ConditionController', () => {
   );
 
   it(
-    'put ' + prefix + '/rules/{rule_id}/conditions/{condition_id}',
+    'patch ' + prefix + '/rules/{rule_id}/conditions/{condition_id}',
     async () => {
       const rule = await givenRuleData(wafapp);
       const conditionInDb = await givenConditionData(wafapp, {

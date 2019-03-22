@@ -1,25 +1,11 @@
-import {Entity, model, property} from '@loopback/repository';
+import {model, hasMany} from '@loopback/repository';
+import {CommonEntity} from '.';
+import {Rule} from '../models';
 
 @model()
-export class Endpointpolicy extends Entity {
-  @property({
-    type: 'string',
-    id: true,
-  })
-  id: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  name: string;
-
-  @property({
-    type: 'array',
-    itemType: 'string',
-    required: true,
-  })
-  rules: string[];
+export class Endpointpolicy extends CommonEntity {
+  @hasMany(() => Rule, {keyTo: 'endpointpolicyId'})
+  rules?: Rule[];
 
   constructor(data?: Partial<Endpointpolicy>) {
     super(data);

@@ -5,6 +5,7 @@ import {
   givenEmptyDatabase,
   createRuleObject,
   givenRuleData,
+  givenEndpointpolicyData,
 } from '../helpers/database.helpers';
 import {Rule} from '../../src/models';
 import uuid = require('uuid');
@@ -30,6 +31,7 @@ describe('RuleController', () => {
     const rule = new Rule(
       createRuleObject({
         id: uuid(),
+        endpointpolicyId: uuid(),
       }),
     );
 
@@ -42,7 +44,7 @@ describe('RuleController', () => {
   });
 
   it('post ' + prefix + '/rules: with no id', async () => {
-    const rule = new Rule(createRuleObject());
+    const rule = new Rule(createRuleObject({endpointpolicyId: uuid()}));
 
     const response = await client
       .post(prefix + '/rules')
@@ -65,6 +67,7 @@ describe('RuleController', () => {
     const rule = new Rule(
       createRuleObject({
         id: uuid(),
+        endpointpolicyId: uuid(),
       }),
     );
 
@@ -77,12 +80,8 @@ describe('RuleController', () => {
   });
 
   it('get ' + prefix + '/rules: of all', async () => {
-    const rule = await givenRuleData(wafapp);
-
-    await client
-      .get(prefix + '/rules')
-      .expect(200, [toJSON(rule)])
-      .expect('Content-Type', /application\/json/);
+    await givenRuleData(wafapp);
+    await client.get(prefix + '/rules').expect(200);
   });
 
   it('get ' + prefix + '/rules: with filter string', async () => {
@@ -119,7 +118,7 @@ describe('RuleController', () => {
   });
 
   it('patch ' + prefix + '/rules/{id}: existing item', async () => {
-    const patched_name = {name: 'new rule name'};
+    const patched_name = {name: 'new rule name', endpointpolicyId: uuid()};
     const rule = await givenRuleData(wafapp);
 
     await client
@@ -129,7 +128,7 @@ describe('RuleController', () => {
   });
 
   it('patch ' + prefix + '/rules/{id}: non-existing item', async () => {
-    const patched_name = {name: 'new rule name'};
+    const patched_name = {name: 'new rule name', endpointpolicyId: uuid()};
     await client
       .patch(prefix + '/rules/' + uuid())
       .send(patched_name)
@@ -145,4 +144,97 @@ describe('RuleController', () => {
 
     await client.del(prefix + '/rules/' + rule.id).expect(204);
   });
+
+  it(
+    'delete ' +
+      prefix +
+      '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      const rule = await givenRuleData(wafapp, {
+        id: uuid(),
+        endpointpolicyId: epp.id,
+      });
+
+      await client
+        .del(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
+        .expect(204);
+
+      await client
+        .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
+        .expect(404);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      const rule = createRuleObject();
+
+      const response = await client
+        .post(prefix + `/endpointpolicies/${epp.id}/rules`)
+        .send(rule)
+        .expect(200);
+
+      expect(response.body.id)
+        .to.not.empty()
+        .and.type('string');
+    },
+  );
+
+  it(
+    'get ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      await givenRuleData(wafapp, {id: uuid(), endpointpolicyId: epp.id});
+      await givenRuleData(wafapp, {id: uuid(), endpointpolicyId: epp.id});
+
+      const response = await client
+        .get(prefix + `/endpointpolicies/${epp.id}/rules`)
+        .expect(200);
+
+      expect(response.body)
+        .be.instanceOf(Array)
+        .and.have.length(2);
+    },
+  );
+
+  it(
+    'get ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      const rule = await givenRuleData(wafapp, {
+        id: uuid(),
+        endpointpolicyId: epp.id,
+      });
+
+      const response = await client
+        .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
+        .expect(200);
+
+      expect(response.body.id)
+        .to.not.empty()
+        .and.type('string');
+    },
+  );
+
+  it(
+    'patch ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      const rule = await givenRuleData(wafapp, {
+        id: uuid(),
+        endpointpolicyId: epp.id,
+      });
+      const patched_name = {id: rule.id, name: 'test'};
+
+      const response = await client
+        .patch(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
+        .send(patched_name)
+        .expect(200);
+
+      expect(response.body.count).to.eql(1);
+    },
+  );
 });

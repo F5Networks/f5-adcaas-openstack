@@ -257,13 +257,11 @@ export class ApplicationController {
       );
 
       if (params.endpointpolicy) {
-        params.rules = await this.ruleRepository.find({
-          where: {
-            id: {
-              inq: (<Endpointpolicy>params.endpointpolicy).rules,
-            },
-          },
-        });
+        let eppolicy = <Endpointpolicy>params.endpointpolicy;
+        params.rules = await this.endpointpolicyRepository
+          .rules(eppolicy.id)
+          .find();
+
         let rules = <Rule[]>params.rules;
         for (let rule of rules) {
           rule.conditions = await this.ruleRepository
@@ -271,9 +269,10 @@ export class ApplicationController {
             .find();
           rule.actions = await this.ruleRepository.actions(rule.id).find();
         }
-        params.wafs = await this.wafpolicyRepository.find();
       }
     }
+
+    params.wafs = await this.wafpolicyRepository.find();
 
     let req = new AS3DeployRequest(params);
     return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);

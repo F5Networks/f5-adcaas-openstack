@@ -120,6 +120,7 @@ export class AS3Application extends AS3Object {
     if (service) {
       this.serviceMain = new AS3ServiceHTTP(params);
     }
+
     if (endpointpolicy) {
       this.endpointpolicyObj = new AS3EndpointPolicy(params);
     }
@@ -145,13 +146,14 @@ export class AS3Application extends AS3Object {
       }
     }
 
-    if (this.endpointpolicyObj) {
+    if (this.endpointpolicyObj.name) {
       obj[this.endpointpolicyObj.name] = this.endpointpolicyObj.toJSON();
     }
 
     for (let waf of this.wafs) {
       obj[waf.name] = waf.toJSON();
     }
+
     return obj;
   }
 }
@@ -174,7 +176,7 @@ export class AS3ServiceHTTP extends AS3Object {
       this.pool = new AS3Pool(params);
     }
 
-    if (endpointpolicy) {
+    if (endpointpolicy && endpointpolicy.name) {
       this.policyEndpoint = endpointpolicy.name;
     }
   }
@@ -285,7 +287,7 @@ export class AS3Rule extends AS3Object {
   }
 }
 export class AS3EndpointPolicy extends AS3Object {
-  name: string;
+  name?: string;
   rules: AS3Rule[];
   constructor(params: {[key: string]: Object}) {
     super();
@@ -293,6 +295,7 @@ export class AS3EndpointPolicy extends AS3Object {
     let rules = <Rule[]>params.rules;
     this.class = 'Endpoint_Policy';
     this.name = endpointpolicy.name;
+
     this.rules = [];
 
     for (let rule of rules) {

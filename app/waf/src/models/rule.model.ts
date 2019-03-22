@@ -21,6 +21,12 @@ export class Rule extends Entity {
   @hasMany(() => Action, {keyTo: 'ruleId'})
   actions?: Action[];
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  endpointpolicyId: string;
+
   constructor(data?: Partial<Rule>) {
     super(data);
   }
