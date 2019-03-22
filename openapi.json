@@ -60,28 +60,27 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "statusCode",
-                    "name",
-                    "message"
-                  ],
                   "properties": {
                     "statusCode": {
-                      "type": "integer",
-                      "example": 404
+                      "type": "integer"
                     },
                     "name": {
-                      "type": "string",
-                      "example": "Error"
+                      "type": "string"
                     },
                     "message": {
-                      "type": "string",
-                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                      "type": "string"
                     },
                     "code": {
-                      "type": "string",
-                      "example": "ENTITY_NOT_FOUND"
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
                   }
                 }
               }
@@ -101,7 +100,6 @@
           }
         ],
         "requestBody": {
-          "description": "ADC resource properties that need to be updated",
           "required": true,
           "content": {
             "application/json": {
@@ -114,7 +112,7 @@
                   }
                 },
                 "example": {
-                  "name": "My BIG-IP"
+                  "name": "My name"
                 }
               }
             }
@@ -131,7 +129,59 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully update ADC resource"
+            "description": "Successfully retrieve ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adc": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "number"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "passphrase": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HW",
+                        "host": "192.168.0.1",
+                        "port": 8443,
+                        "username": "admin",
+                        "passphrase": "admin"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Can not find ADC resource",
@@ -139,28 +189,27 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "statusCode",
-                    "name",
-                    "message"
-                  ],
                   "properties": {
                     "statusCode": {
-                      "type": "integer",
-                      "example": 404
+                      "type": "integer"
                     },
                     "name": {
-                      "type": "string",
-                      "example": "Error"
+                      "type": "string"
                     },
                     "message": {
-                      "type": "string",
-                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                      "type": "string"
                     },
                     "code": {
-                      "type": "string",
-                      "example": "ENTITY_NOT_FOUND"
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
                   }
                 }
               }
@@ -197,28 +246,27 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "statusCode",
-                    "name",
-                    "message"
-                  ],
                   "properties": {
                     "statusCode": {
-                      "type": "integer",
-                      "example": 404
+                      "type": "integer"
                     },
                     "name": {
-                      "type": "string",
-                      "example": "Error"
+                      "type": "string"
                     },
                     "message": {
-                      "type": "string",
-                      "example": "Entity not found: XXXX with id \"11111111-2222-3333-4444-555555555555\""
+                      "type": "string"
                     },
                     "code": {
-                      "type": "string",
-                      "example": "ENTITY_NOT_FOUND"
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
                   }
                 }
               }
@@ -255,44 +303,49 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "host": {
-                      "type": "string"
-                    },
-                    "port": {
-                      "type": "number"
-                    },
-                    "username": {
-                      "type": "string"
-                    },
-                    "passphrase": {
-                      "type": "string"
-                    },
-                    "createdAt": {
-                      "type": "date"
-                    },
-                    "updatedAt": {
-                      "type": "date"
+                    "adc": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "number"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "passphrase": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HW",
+                        "host": "192.168.0.1",
+                        "port": 8443,
+                        "username": "admin",
+                        "passphrase": "admin"
+                      }
                     }
-                  },
-                  "example": {
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "name": "My BIG-IP",
-                    "type": "HW",
-                    "host": "192.168.0.1",
-                    "port": 8443,
-                    "username": "admin",
-                    "passphrase": "admin",
-                    "createdAt": "2019-03-05T08:40:25.000Z",
-                    "updatedAt": "2019-03-05T08:40:25.100Z"
                   }
                 }
               }
@@ -304,24 +357,26 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "statusCode",
-                    "name",
-                    "message"
-                  ],
                   "properties": {
                     "statusCode": {
-                      "type": "integer",
-                      "example": 400
+                      "type": "integer"
                     },
                     "name": {
-                      "type": "string",
-                      "example": "BadRequestError"
+                      "type": "string"
                     },
                     "message": {
-                      "type": "string",
-                      "example": ""
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
                   }
                 }
               }
@@ -333,32 +388,28 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "statusCode",
-                    "name",
-                    "message"
-                  ],
                   "properties": {
                     "statusCode": {
-                      "type": "integer",
-                      "example": 422
+                      "type": "integer"
                     },
                     "name": {
-                      "type": "string",
-                      "example": "UnprocessableEntityError"
+                      "type": "string"
                     },
                     "message": {
-                      "type": "string",
-                      "example": "The request body is invalid. See error object `details` property for more info."
+                      "type": "string"
                     },
                     "code": {
-                      "type": "string",
-                      "example": "VALIDATION_FAILED"
+                      "type": "string"
                     },
                     "details": {
-                      "type": "array",
-                      "example": []
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
                   }
                 }
               }
@@ -366,7 +417,6 @@
           }
         },
         "requestBody": {
-          "description": "ADC resource that need to be created",
           "required": true,
           "content": {
             "application/json": {
@@ -377,9 +427,6 @@
                   "host"
                 ],
                 "properties": {
-                  "id": {
-                    "type": "string"
-                  },
                   "name": {
                     "type": "string"
                   },
@@ -400,7 +447,7 @@
                   }
                 },
                 "example": {
-                  "name": "My BIG-IP",
+                  "name": "My name",
                   "type": "HW",
                   "host": "192.168.0.1",
                   "port": 8443,
@@ -425,48 +472,53 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "host": {
-                        "type": "string"
-                      },
-                      "port": {
-                        "type": "number"
-                      },
-                      "username": {
-                        "type": "string"
-                      },
-                      "passphrase": {
-                        "type": "string"
-                      },
-                      "createdAt": {
-                        "type": "date"
-                      },
-                      "updatedAt": {
-                        "type": "date"
+                  "type": "object",
+                  "properties": {
+                    "adcs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "passphrase": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "type": "HW",
+                          "host": "192.168.0.1",
+                          "port": 8443,
+                          "username": "admin",
+                          "passphrase": "admin"
+                        }
                       }
-                    },
-                    "example": {
-                      "id": "11111111-2222-3333-4444-555555555555",
-                      "name": "My BIG-IP",
-                      "type": "HW",
-                      "host": "192.168.0.1",
-                      "port": 8443,
-                      "username": "admin",
-                      "passphrase": "admin",
-                      "createdAt": "2019-03-05T08:40:25.000Z",
-                      "updatedAt": "2019-03-05T08:40:25.100Z"
                     }
                   }
                 }
