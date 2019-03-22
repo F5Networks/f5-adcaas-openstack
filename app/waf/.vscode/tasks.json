@@ -37,21 +37,20 @@
       ]
     },
     {
-      "label": "Watch, Build and Debug",
-      "command": "tsc",
+      "label": "Single Build",
       "type": "shell",
+      "command": "npm",
       "args": [
-        "-p",
-        ".",
-        "-w"
+        "run",
+        "build"
       ],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "group": {
+        "kind": "test",
+        "isDefault": true
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": [
+        "$tsc"
+      ]
     }
   ]
 }

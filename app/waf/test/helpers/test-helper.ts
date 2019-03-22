@@ -4,7 +4,7 @@ import {
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
-import {testdb_config, testdb} from '../fixtures/datasources/testdb.datasource';
+import {testdb_config} from '../fixtures/datasources/testdb.datasource';
 import {stubLogging, restoreLogging} from './logging.helpers';
 
 export async function setupApplication(): Promise<AppWithClient> {
@@ -14,11 +14,12 @@ export async function setupApplication(): Promise<AppWithClient> {
       port: 3000,
     }),
   });
-  app.dataSource(testdb);
+
+  stubLogging();
+  // TODO: change all binding keys in code from string to BindingKey type.
+  app.bind('datasources.config.db').to(testdb_config);
 
   await app.boot();
-  app.bind('datasources.config.db').to(testdb_config);
-  stubLogging();
   await app.start();
 
   const client = createRestAppClient(app);
