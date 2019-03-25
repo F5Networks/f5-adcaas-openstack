@@ -1,7 +1,7 @@
 import {Entity} from '@loopback/repository';
 import {ParameterObject, ParameterLocation} from '@loopback/openapi-v3-types';
 import {MetadataInspector} from '@loopback/metadata';
-import {PropertyDefinition} from '@loopback/repository';
+import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
 
 class SchemaProperties {
   public create: {[key: string]: object} = {};
@@ -27,7 +27,7 @@ function buildProperties(entity: typeof Entity): SchemaProperties {
 
   let metadata =
     MetadataInspector.getAllPropertyMetadata<PropertyDefinition>(
-      'loopback:model-properties',
+      MODEL_PROPERTIES_KEY,
       entity.prototype,
     ) || {};
 
