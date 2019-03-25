@@ -12,6 +12,12 @@ import {
 } from '.';
 import {isNullOrUndefined} from 'util';
 
+// TODO: use json-schema-to-ts re-implement the following?
+// Or change to type definition?
+// as3-schema definition:
+//  https://github.com/F5Networks/f5-appsvcs-extension/blob/master/schema/latest/as3-schema-3.9.0-3.json
+// json-schema-to-typescript
+//  https://www.npmjs.com/package/json-schema-to-typescript
 export class AS3Object extends Object {
   class: string;
 
