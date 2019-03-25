@@ -109,10 +109,14 @@
                 "properties": {
                   "name": {
                     "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
                   }
                 },
                 "example": {
-                  "name": "My name"
+                  "name": "My name",
+                  "description": "My description"
                 }
               }
             }
@@ -144,6 +148,12 @@
                         "name": {
                           "type": "string"
                         },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "date"
                         },
@@ -169,6 +179,8 @@
                       "example": {
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HW",
@@ -312,6 +324,12 @@
                         "name": {
                           "type": "string"
                         },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "date"
                         },
@@ -337,6 +355,8 @@
                       "example": {
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HW",
@@ -430,6 +450,12 @@
                   "name": {
                     "type": "string"
                   },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
                   "type": {
                     "type": "string"
                   },
@@ -448,6 +474,8 @@
                 },
                 "example": {
                   "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "type": "HW",
                   "host": "192.168.0.1",
                   "port": 8443,
@@ -485,6 +513,12 @@
                           "name": {
                             "type": "string"
                           },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "date"
                           },
@@ -510,6 +544,8 @@
                         "example": {
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "HW",
@@ -544,6 +580,12 @@
                       "type": "boolean"
                     },
                     "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
                       "type": "boolean"
                     },
                     "createdAt": {
@@ -1593,6 +1635,12 @@
                       "type": "boolean"
                     },
                     "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
                       "type": "boolean"
                     },
                     "createdAt": {
@@ -3823,6 +3871,12 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -4047,6 +4101,12 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -4123,6 +4183,12 @@
             "type": "string"
           },
           "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
             "type": "string"
           },
           "createdAt": {
