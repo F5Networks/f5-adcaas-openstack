@@ -262,12 +262,15 @@ export async function givenServiceData(
   data?: Partial<Service>,
 ) {
   const appRepo = await wafapp.getRepository(ApplicationRepository);
-  return await appRepo.services(appId).create(createServiceObject(data));
+  const obj = createServiceObject(data);
+  return await appRepo.services(appId).create(new Service(obj));
 }
 
 export function createServiceObject(data?: Partial<Service>) {
   return Object.assign(
     {
+      id: uuid(),
+      type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
     },
     data,

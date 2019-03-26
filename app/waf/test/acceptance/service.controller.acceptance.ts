@@ -1,15 +1,9 @@
-// Copyright F5 Networks, Inc. 2018. All Rights Reserved.
-// Node module: @loopback/example-shopping
-// This file is licensed under the MIT License.
-// License text available at https://opensource.org/licenses/MIT
-
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenServiceData,
-  createServiceObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 
@@ -44,34 +38,38 @@ describe('ServiceController', () => {
   it('get' + prefix + '/services', async () => {
     const service = await givenServiceData(wafapp, uuid(), {id: uuid()});
 
-    await client.get(prefix + '/services').expect(200, [toJSON(service)]);
+    let response = await client.get(prefix + '/services').expect(200);
+    expect(response.body.services).to.containDeep([toJSON(service)]);
   });
 
   it('get' + prefix + '/services/{id}', async () => {
     const service = await givenServiceData(wafapp, uuid(), {id: uuid()});
 
-    await client
+    let response = await client
       .get(prefix + `/services/${service.id}`)
-      .expect(200, toJSON(service));
+      .expect(200);
+
+    expect(response.body.service).to.containDeep(toJSON(service));
   });
 
   it('post ' + prefix + '/services', async () => {
-    const service = createServiceObject({
+    const request = {
+      type: 'HTTPS',
       virtualAddresses: ['10.0.1.11', '10.0.2.11'],
       virtualPort: 443,
       pool: 'web_pool',
       applicationId: uuid(),
-    });
+    };
 
     const response = await client
       .post(prefix + '/services')
-      .send(service)
+      .send(request)
       .expect(200);
 
-    expect(response.body.id)
+    expect(response.body.service.id)
       .to.not.empty()
       .and.type('string');
-    expect(response.body).to.containDeep(service);
+    expect(response.body.service).to.containDeep(request);
   });
 
   it('delete' + prefix + '/services/{id}', async () => {
