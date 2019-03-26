@@ -2,13 +2,46 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Tests",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--colors",
+        "--no-timeouts",
+        "--debug-brk",
+        // TODO: remove .vscode
+        //"${workspaceFolder}/dist/test/<your specific file>.js",
+        //"${workspaceFolder}/dist/test/**/*.js",
+        "${workspaceFolder}/dist/test/acceptance/openstack.controller.acceptance.js"
+      ],
+      "runtimeExecutable": null,
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "stopOnEntry": false,
+      "preLaunchTask": "Single Build"
+    },
+    {
       "name": "Launch",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/index.js",
       "args": [],
       "cwd": "${workspaceFolder}",
-      "protocol": "inspector"
+      "protocol": "inspector",
+      "env": {
+        "TEST_OPENSTACK_INTEGRATION": "1"
+        // "PRODUCT_RELEASE": "1",
+        // "OS_AUTH_URL": "http://10.145.116.217:35357/v2.0",
+        // "OS_USERNAME": "wafaas",
+        // "OS_PASSWORD": "91153c85b8dd4147",
+        // "OS_TENANT_NAME": "services",
+        // "OS_DOMAIN_NAME": "Default"
+      },
+      "preLaunchTask": "Single Build"
     }
   ]
 }
