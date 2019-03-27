@@ -1,4 +1,5 @@
 
+export PRODUCT_RELEASE=1
 export WAF_APP_PORT=3000
 
 export DATABASE_USER=postgres
@@ -7,3 +8,14 @@ export DATABASE_DB=postgres
 
 export DATABASE_PORT=5432
 export DATABASE_DATA_DIRECTORY=
+
+export OS_AUTH_URL=http://10.145.116.217:35357/v2.0
+export OS_USERNAME=wafaas
+export OS_PASSWORD=91153c85b8dd4147
+export OS_TENANT_NAME=services
+# Required if identity version is v3
+export OS_DOMAIN_NAME=Default
+
+# Possible useful variable.
+#export OS_REGION_NAME=RegionOne
+#export OS_AVAILABLE_ZONE=nova

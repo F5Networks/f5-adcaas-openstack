@@ -16,6 +16,7 @@ array.forEach(element => {
   );
 });
 
+// TODO: refactor the factory to bind to application context.
 export const factory = LFService.createNamedLoggerFactory(
   'LoggerFactory',
   options,
