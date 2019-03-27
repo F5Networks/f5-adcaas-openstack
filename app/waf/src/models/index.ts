@@ -14,3 +14,4 @@ export * from './as3.model';
 export * from './condition.model';
 export * from './action.model';
 export * from './monitor.model';
+export * from './wafinst.model';

@@ -12,3 +12,4 @@ export * from './wafpolicy.repository';
 export * from './condition.repository';
 export * from './action.repository';
 export * from './monitor.repository';
+export * from './wafinst.repository';
