@@ -47,16 +47,13 @@ export class MySequence implements SequenceHandler {
       this.send(response, result);
     } catch (err) {
       this.reject(context, err);
-    }
-
-    // TODO: remove this workaround after fix response log issue.
-    if (context.request.url.startsWith('/adcaas')) {
+    } finally {
       await this.logResponse(logUuid, context, result);
     }
   }
 
   async logRequest(logUuid: string, context: RequestContext): Promise<void> {
-    const req = await context.get(RestBindings.Http.REQUEST);
+    const req = context.request;
     const logObj = {
       uuid: logUuid,
       method: req.method,
@@ -74,7 +71,7 @@ export class MySequence implements SequenceHandler {
     context: RequestContext,
     result: object,
   ): Promise<void> {
-    const res = await context.get(RestBindings.Http.RESPONSE);
+    const res = context.response;
 
     const logObj = {
       uuid: logUuid,
