@@ -21,8 +21,6 @@ sed -i 's/\/openapi.json/.\/openapi.json/g' index.html
 git config --global user.email "q.zhao@f5.com"
 git config --global user.name "Qin Zhao"
 git config --global credential.helper "$(pwd)/git-credential.sh"
-git commit -a -m "Travis CI $TRAVIS_BUILD_WEB_URL"
 
-if [ $? -eq 0 ] ; then
-  git push origin gh-pages
-fi
+git commit -a -m "Travis CI $TRAVIS_BUILD_WEB_URL" || true
+git push origin gh-pages
