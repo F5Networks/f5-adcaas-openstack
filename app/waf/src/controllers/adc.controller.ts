@@ -41,7 +41,7 @@ export class AdcController {
     reqBody: Partial<Adc>,
   ): Promise<AdcResponse> {
     try {
-      return new AdcResponse(await this.adcRepository.create(new Adc(reqBody)));
+      return new AdcResponse(await this.adcRepository.create(reqBody));
     } catch (error) {
       throw new HttpErrors.BadRequest(error.message);
     }

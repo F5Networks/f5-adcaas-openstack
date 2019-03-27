@@ -1,9 +1,9 @@
-import {DefaultCrudRepository} from '@loopback/repository';
+import {CommonRepository} from '.';
 import {Adc} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
-export class AdcRepository extends DefaultCrudRepository<
+export class AdcRepository extends CommonRepository<
   Adc,
   typeof Adc.prototype.id
 > {

@@ -1,3 +1,4 @@
+export * from './common';
 export * from './application.repository';
 export * from './tenantassoc.repository';
 export * from './adc.repository';
