@@ -3,7 +3,7 @@ import {
   setupRestAppAndClient,
   RestAppAndClient,
   teardownRestAppAndClient,
-  MockRestApplication,
+  TestingApplication,
   RestApplicationPort,
 } from '../helpers/rest.helpers';
 import {MockSelfTestController} from '../fixtures/controllers/mock.selftest.controller';
@@ -11,7 +11,7 @@ import {MockSelfTestController} from '../fixtures/controllers/mock.selftest.cont
 describe('openstack integration acceptance test', () => {
   let restAppAndClient: RestAppAndClient;
   let client: Client;
-  let restApp: MockRestApplication;
+  let restApp: TestingApplication;
 
   before('setup', async () => {
     restAppAndClient = await setupRestAppAndClient(
