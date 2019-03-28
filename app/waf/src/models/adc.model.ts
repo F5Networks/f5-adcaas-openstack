@@ -1,5 +1,5 @@
 import {model, property} from '@loopback/repository';
-import {CommonEntity, CommonResponse, CommonCollectionResponse} from '.';
+import {CommonEntity} from '.';
 
 @model()
 export class Adc extends CommonEntity {
@@ -65,17 +65,5 @@ export class Adc extends CommonEntity {
 
   constructor(data?: Partial<Adc>) {
     super(data);
-  }
-}
-
-export class AdcResponse extends CommonResponse {
-  constructor(data: Adc) {
-    super('adc', data);
-  }
-}
-
-export class AdcCollectionResponse extends CommonCollectionResponse {
-  constructor(data: Adc[]) {
-    super('adcs', data);
   }
 }
