@@ -1,25 +1,22 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Filter, repository} from '@loopback/repository';
 import {
   post,
   param,
   get,
   getFilterSchemaFor,
-  getWhereSchemaFor,
   patch,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Monitor} from '../models';
 import {MonitorRepository} from '../repositories';
-import uuid = require('uuid');
+import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
+const createDesc: string = 'Monitor resource that need to be created';
+const updateDesc: string =
+  'Monitor resource properties that need to be updated';
 
 export class MonitorController {
   constructor(
@@ -29,83 +26,79 @@ export class MonitorController {
 
   @post(prefix + '/monitors', {
     responses: {
-      '200': {
-        description: 'Monitor model instance',
-        content: {'application/json': {schema: {'x-ts-type': Monitor}}},
-      },
+      '200': Schema.response(Monitor, 'Successfully create Monitor resource'),
+      '400': Schema.badRequest('Invalid Monitor resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Monitor resource'),
     },
   })
-  async create(@requestBody() monitor: Partial<Monitor>): Promise<Monitor> {
-    monitor.id = uuid();
-    return await this.monitorRepository.create(monitor);
-  }
-
-  @get(prefix + '/monitors/count', {
-    responses: {
-      '200': {
-        description: 'Monitor model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(Monitor)) where?: Where,
-  ): Promise<Count> {
-    return await this.monitorRepository.count(where);
+  async create(
+    @requestBody(Schema.createRequest(Monitor, createDesc))
+    reqBody: Partial<Monitor>,
+  ): Promise<Response> {
+    try {
+      const data = await this.monitorRepository.create(reqBody);
+      return new Response(Monitor, data);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.message);
+    }
   }
 
   @get(prefix + '/monitors', {
     responses: {
-      '200': {
-        description: 'Array of Monitor model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Monitor}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Monitor,
+        'Successfully retrieve Monitor resources',
+      ),
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Monitor)) filter?: Filter,
-  ): Promise<Monitor[]> {
-    return await this.monitorRepository.find(filter);
+  ): Promise<CollectionResponse> {
+    const data = await this.monitorRepository.find(filter);
+    return new CollectionResponse(Monitor, data);
   }
 
-  @get(prefix + '/monitors/{id}', {
+  @get(prefix + '/monitors/{monitorId}', {
     responses: {
-      '200': {
-        description: 'Monitor model instance',
-        content: {'application/json': {schema: {'x-ts-type': Monitor}}},
+      responses: {
+        '200': Schema.response(Monitor, 'Successfully retrieve Pool resource'),
+        '404': Schema.notFound('Can not find Pool resource'),
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Monitor> {
-    return await this.monitorRepository.findById(id);
+  async findById(
+    @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
+    id: string,
+  ): Promise<Response> {
+    const data = await this.monitorRepository.findById(id);
+    return new Response(Monitor, data);
   }
 
-  @patch(prefix + '/monitors/{id}', {
+  @patch(prefix + '/monitors/{monitorId}', {
     responses: {
-      '204': {
-        description: 'Monitor PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully update Monitor resource'),
+      '404': Schema.notFound('Can not find Monitor resource'),
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() monitor: Monitor,
+    @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
+    id: string,
+    @requestBody(Schema.createRequest(Monitor, updateDesc))
+    monitor: Monitor,
   ): Promise<void> {
     await this.monitorRepository.updateById(id, monitor);
   }
 
-  @del(prefix + '/monitors/{id}', {
+  @del(prefix + '/monitors/{monitorId}', {
     responses: {
-      '204': {
-        description: 'Monitor DELETE success',
-      },
+      '204': Schema.emptyResponse('Successfully delete Monitor resource'),
+      '404': Schema.notFound('Can not find Monitor resource'),
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
+    id: string,
+  ): Promise<void> {
     await this.monitorRepository.deleteById(id);
   }
 }
