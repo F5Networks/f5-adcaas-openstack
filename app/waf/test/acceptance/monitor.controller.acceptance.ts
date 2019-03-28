@@ -99,9 +99,7 @@ describe('MointorController', () => {
 
   it('delete ' + prefix + '/monitors/{id}', async () => {
     const monitor = await givenMonitorData(wafapp, {id: uuid()});
-
     await client.del(prefix + `/monitors/${monitor.id}`).expect(204);
-
     await client.get(prefix + `/monitors/${monitor.id}`).expect(404);
   });
 });

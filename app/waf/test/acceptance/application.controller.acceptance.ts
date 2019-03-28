@@ -288,14 +288,18 @@ describe('ApplicationController', () => {
         id: uuid(),
         poolId: pool.id,
       });
-
-      let rule1 = await givenRuleData(wafapp, {
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+      await givenRuleData(wafapp, {
         id: '1234',
         name: 'rule1',
+        endpointpolicyId: epp.id,
       });
-      let rule2 = await givenRuleData(wafapp, {
+      await givenRuleData(wafapp, {
         id: '2345',
         name: 'rule2',
+        endpointpolicyId: epp.id,
       });
       await givenConditionData(wafapp, {
         ruleId: '1234',
@@ -317,10 +321,6 @@ describe('ApplicationController', () => {
         policy: {wafpolicy: '12345678'},
       });
 
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-        rules: [rule1.id, rule2.id],
-      });
       let application = await givenApplicationData(wafapp);
       await givenServiceData(wafapp, <string>application.id, {
         pool: pool.id,
@@ -356,6 +356,7 @@ describe('ApplicationController', () => {
       .post(prefix + '/applications/' + application.id + '/deploy')
       .expect(422);
   });
+
   it(
     'post ' + prefix + '/applications/{id}/deploy: no member in pool',
     async () => {
@@ -397,6 +398,7 @@ describe('ApplicationController', () => {
         .expect(422);
     },
   );
+
   it(
     'post ' + prefix + '/applications/{id}/deploy: deploy with wap config',
     async () => {
@@ -413,11 +415,17 @@ describe('ApplicationController', () => {
         poolId: pool.id,
       });
 
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+
       let rule1 = await givenRuleData(wafapp, {
         name: 'rule1',
+        endpointpolicyId: epp.id,
       });
       let rule2 = await givenRuleData(wafapp, {
         name: 'rule2',
+        endpointpolicyId: epp.id,
       });
 
       let waf = await givenWafpolicyData(wafapp, {
@@ -465,10 +473,6 @@ describe('ApplicationController', () => {
         ruleId: rule1.id,
         type: 'test',
         policy: {wafpolicy: '12345678'},
-      });
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-        rules: [rule1.id, rule2.id],
       });
 
       let application = await givenApplicationData(wafapp, {});
