@@ -1,9 +1,8 @@
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider, CoreBindings, Application} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
-import {bindingKeyAdminAuthedToken} from '../components';
-import {AuthedToken} from './identity.service';
 import {factory} from '../log4ts';
+import {WafBindingKeys} from '../keys';
 
 export interface NetworkService {
   v2CreatePort(
@@ -83,7 +82,7 @@ export class NetworkDriver {
     let endpoint: string | undefined;
     try {
       await this.application
-        .get<AuthedToken>(bindingKeyAdminAuthedToken)
+        .get(WafBindingKeys.KeyAdminAuthedToken)
         .then(adminToken => {
           endpoint = (() => {
             for (let c of adminToken.catalog) {

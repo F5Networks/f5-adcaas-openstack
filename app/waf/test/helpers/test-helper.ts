@@ -6,6 +6,7 @@ import {
 } from '@loopback/testlab';
 import {testdb_config} from '../fixtures/datasources/testdb.datasource';
 import {stubLogging, restoreLogging} from './logging.helpers';
+import {WafBindingKeys} from '../../src/keys';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
@@ -17,7 +18,7 @@ export async function setupApplication(): Promise<AppWithClient> {
 
   stubLogging();
   // TODO: change all binding keys in code from string to BindingKey type.
-  app.bind('datasources.config.db').to(testdb_config);
+  app.bind(WafBindingKeys.KeyDbConfig).to(testdb_config);
 
   await app.boot();
   await app.start();

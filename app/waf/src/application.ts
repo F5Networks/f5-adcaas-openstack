@@ -9,9 +9,8 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
-import {LOG_BINDING} from './keys';
+import {WafBindingKeys} from './keys';
 import {factory} from './log4ts';
-import {AuthWithOSIdentity} from './services';
 import {OpenStackComponent} from './components';
 
 import {OpenstackController} from '../test/fixtures/controllers/openstack.controller';
@@ -45,7 +44,7 @@ export class WafApplication extends BootMixin(
     this.component(RestExplorerComponent);
     this.component(OpenStackComponent);
 
-    this.bind(LOG_BINDING.LOGGER_GENERATOR).to(factory);
+    this.bind(WafBindingKeys.KeyLoggerGenerator).to(factory);
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -70,8 +69,8 @@ export class WafApplication extends BootMixin(
     let tried = 0;
     let durInMillSecs = 1000;
 
-    let authWithOSIdentity = await this.get<AuthWithOSIdentity>(
-      'services.openstack.AuthWithOSIdentity',
+    let authWithOSIdentity = await this.get(
+      WafBindingKeys.KeyAuthWithOSIdentity,
     );
 
     let delayFunc = async (ms: number) => {
