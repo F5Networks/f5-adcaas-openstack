@@ -1,5 +1,4 @@
 import {Entity, model, property} from '@loopback/repository';
-import uuid = require('uuid');
 
 @model()
 export abstract class CommonEntity extends Entity {
@@ -73,14 +72,6 @@ export abstract class CommonEntity extends Entity {
 
   constructor(data?: Partial<CommonEntity>) {
     super(data);
-
-    if (!this.id) {
-      this.id = uuid();
-    }
-
-    if (!this.createdAt) {
-      this.createdAt = new Date().toISOString();
-    }
   }
 }
 

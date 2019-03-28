@@ -31,17 +31,6 @@ describe('AdcController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('post ' + prefix + '/adcs: with id', async () => {
-    const adc = new Adc(createAdcObject({id: uuid()}));
-
-    const response = await client
-      .post(prefix + '/adcs')
-      .send(adc)
-      .expect(200);
-
-    expect(response.body.adc).to.containDeep(toJSON(adc));
-  });
-
   it('post ' + prefix + '/adcs: with no id', async () => {
     const adc = new Adc(createAdcObject());
 
@@ -51,15 +40,6 @@ describe('AdcController', () => {
       .expect(200);
 
     expect(response.body.adc).to.containDeep(toJSON(adc));
-  });
-
-  it('post ' + prefix + '/adcs: with duplicate id', async () => {
-    const adc = await givenAdcData(wafapp);
-
-    await client
-      .post(prefix + '/adcs')
-      .send(adc)
-      .expect(400);
   });
 
   it('get ' + prefix + '/adcs: of all', async () => {
