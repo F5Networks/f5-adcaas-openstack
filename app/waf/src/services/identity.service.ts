@@ -10,7 +10,7 @@ export interface IdentityService {
     url: string,
     osUsername: string,
     osPassword: string,
-    tenantName: string,
+    tenantId: string,
   ): Promise<object>;
 
   // TODO: v2AuthToken v2ValidateToken can be combined because their json definition are same.
@@ -56,8 +56,9 @@ export abstract class AuthWithOSIdentity {
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
+    adminToken: string,
     userToken: string,
-    tenantName?: string,
+    tenantId?: string,
   ): Promise<AuthedToken>;
 
   // async bindIdentityService() {
@@ -97,8 +98,9 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
   }
 
   async validateUserToken(
+    adminToken: string,
     userToken: string,
-    tenantName?: string,
+    tenantId?: string,
   ): Promise<AuthedToken> {
     let authedToken = new AuthedToken();
 
@@ -108,7 +110,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
       auth: {token: {id: userToken}},
     };
 
-    if (tenantName) reqBody.auth.tenantName = tenantName;
+    if (tenantId) reqBody.auth.tenantId = tenantId;
 
     try {
       await this.identityService
@@ -165,18 +167,16 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
   }
 
   async validateUserToken(
+    adminToken: string,
     userToken: string,
-    tenantName?: string,
+    tenantId?: string,
   ): Promise<AuthedToken> {
     // tenantName is useless in v3/auth/tokens
     let authedToken = new AuthedToken();
 
     try {
-      let adminToken = await this.application.get<AuthedToken>(
-        bindingKeyAdminAuthedToken,
-      );
       await this.identityService
-        .v3ValidateToken(this.authConfig.osAuthUrl, adminToken.token, userToken)
+        .v3ValidateToken(this.authConfig.osAuthUrl, adminToken, userToken)
         .then(response => {
           authedToken = this.parseAuthResponseNoException(response);
         });
@@ -208,7 +208,11 @@ export class AuthWithIdentityUnknown extends AuthWithOSIdentity {
   adminAuthToken(): Promise<AuthedToken> {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
-  validateUserToken(userToken: string): Promise<AuthedToken> {
+  validateUserToken(
+    adminToken: string,
+    userToken: string,
+    tenantId: string,
+  ): Promise<AuthedToken> {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
 }
@@ -305,7 +309,7 @@ class UserTokenRequestBody {
     token: {
       id: string;
     };
-    tenantName?: string;
+    tenantId?: string;
   };
 }
 

@@ -13,7 +13,10 @@ import {
 } from '@loopback/rest';
 import {factory} from './log4ts';
 import uuid = require('uuid');
-import {AuthWithOSIdentity} from './services';
+import {AuthWithOSIdentity, AuthedToken} from './services';
+import {CoreBindings} from '@loopback/core';
+import {WafApplication} from '.';
+import {bindingKeyAdminAuthedToken} from './components';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -28,6 +31,8 @@ export class MySequence implements SequenceHandler {
     private logger = factory.getLogger('api.call'),
     @inject('services.openstack.AuthWithOSIdentity')
     private authWithOSIdentity: AuthWithOSIdentity,
+    @inject(CoreBindings.APPLICATION_INSTANCE)
+    private application: WafApplication,
   ) {}
 
   async handle(context: RequestContext) {
@@ -96,15 +101,22 @@ export class MySequence implements SequenceHandler {
       );
     }
 
-    await this.authWithOSIdentity.validateUserToken(<string>userToken).then(
-      authedObj => {
-        // ...
-        this.logger.debug('Authenticated OK');
-        this.logger.debug(JSON.stringify(authedObj));
-      },
-      notAuthed => {
-        throw new HttpErrors.Unauthorized('Unauthorized: invalid user token.');
-      },
+    const authedToken = await this.application.get<AuthedToken>(
+      bindingKeyAdminAuthedToken,
     );
+    await this.authWithOSIdentity
+      .validateUserToken(authedToken.token, <string>userToken)
+      .then(
+        authedObj => {
+          // ...
+          this.logger.debug('Authenticated OK');
+          this.logger.debug(JSON.stringify(authedObj));
+        },
+        notAuthed => {
+          throw new HttpErrors.Unauthorized(
+            'Unauthorized: invalid user token.',
+          );
+        },
+      );
   }
 }
