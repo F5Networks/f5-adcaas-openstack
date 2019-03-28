@@ -1,49 +1,19 @@
-import {Service} from './service.model';
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {CommonEntity, Service} from '.';
+import {model, property, hasMany} from '@loopback/repository';
 
 @model()
-export class Application extends Entity {
+export class Application extends CommonEntity {
   @property({
     type: 'string',
-    id: true,
-  })
-  id: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  name: string;
-
-  @property({
-    type: 'string',
-    required: false,
-  })
-  description?: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  tenantId: string;
-
-  @hasMany(() => Service, {keyTo: 'applicationId'})
-  services?: Service[];
-
-  @property({
-    type: 'string',
+    schema: {
+      response: true,
+      example: 'TBD',
+    },
   })
   status?: string;
 
-  @property({
-    type: 'date',
-  })
-  createdAt?: string;
-
-  @property({
-    type: 'date',
-  })
-  updatedAt?: string;
+  @hasMany(() => Service, {keyTo: 'applicationId'})
+  services?: Service[];
 
   constructor(data?: Partial<Application>) {
     super(data);

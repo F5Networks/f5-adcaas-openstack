@@ -176,8 +176,6 @@ export function createApplicationObject(data?: Partial<Application>) {
       description: 'application test data',
       status: 'Done',
       tenantId: 'TBD',
-      createdAt: '2019-01-22T05:03:45.502Z',
-      updatedAt: '2019-01-23T05:03:45.502Z',
     },
     data,
   );

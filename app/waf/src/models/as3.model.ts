@@ -120,7 +120,7 @@ export class AS3Application extends AS3Object {
     let wafs = <Wafpolicy[]>params.wafs;
 
     this.class = 'Application';
-    this.name = app.name;
+    this.name = 'Application-' + app.id;
     this.template = 'http';
 
     if (service) {
