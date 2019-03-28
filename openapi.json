@@ -684,56 +684,57 @@
         ],
         "responses": {
           "204": {
-            "description": "Application deploy success"
+            "description": "Successfully deploy Application resource"
+          },
+          "404": {
+            "description": "Can not find Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
             "name": "id",
+            "description": "Application resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "ApplicationController.deployById"
       }
     },
     "/adcaas/v1/applications/{id}": {
-      "put": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "ApplicationController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Application PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
-        "operationId": "ApplicationController.replaceById"
-      },
       "patch": {
         "x-controller-name": "ApplicationController",
         "x-operation-name": "updateById",
@@ -742,24 +743,72 @@
         ],
         "responses": {
           "204": {
-            "description": "Application PATCH success"
+            "description": "Successfully update Application resource"
+          },
+          "404": {
+            "description": "Can not find Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
             "name": "id",
+            "description": "Application resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
               }
             }
           },
@@ -775,11 +824,80 @@
         ],
         "responses": {
           "200": {
-            "description": "Application model instance",
+            "description": "Successfully retrieve Application resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Application"
+                  "type": "object",
+                  "properties": {
+                    "application": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "status": "TBD"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -788,11 +906,13 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Application resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "ApplicationController.findById"
@@ -805,17 +925,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Application DELETE success"
+            "description": "Successfully delete Application resource"
+          },
+          "404": {
+            "description": "Can not find Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
             "name": "id",
+            "description": "Application resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "ApplicationController.deleteById"
@@ -830,71 +984,145 @@
         ],
         "responses": {
           "200": {
-            "description": "Application model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Application"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "operationId": "ApplicationController.create"
-      },
-      "patch": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "ApplicationController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Application PATCH success count",
+            "description": "Successfully create Application resource",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "number"
+                    "application": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "status": "TBD"
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
                   }
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                }
               }
             }
           }
         },
-        "operationId": "ApplicationController.updateAll"
+        "operationId": "ApplicationController.create"
       },
       "get": {
         "x-controller-name": "ApplicationController",
@@ -904,13 +1132,50 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Application model instances",
+            "description": "Successfully retrieve Application resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Application"
+                  "type": "object",
+                  "properties": {
+                    "applications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "status": "TBD"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -943,13 +1208,13 @@
                     "tenantId": {
                       "type": "boolean"
                     },
-                    "status": {
-                      "type": "boolean"
-                    },
                     "createdAt": {
                       "type": "boolean"
                     },
                     "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "status": {
                       "type": "boolean"
                     }
                   }
@@ -1058,21 +1323,147 @@
         "operationId": "EndpointpolicyController.count"
       }
     },
-    "/adcaas/v1/endpointpolicies/{id}": {
-      "put": {
+    "/adcaas/v1/endpointpolicies/{endpointpolicyId}/rules/{ruleId}": {
+      "patch": {
         "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "replaceById",
+        "x-operation-name": "updateRuleByID",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "ruleId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "EndpointpolicyController.updateRuleByID"
+      },
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "getRuleByID",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule model instance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "ruleId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "operationId": "EndpointpolicyController.getRuleByID"
+      },
+      "delete": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "deleteRuleByID",
         "tags": [
           "EndpointpolicyController"
         ],
         "responses": {
           "204": {
-            "description": "Endpointpolicy PUT success"
+            "description": "Rules DELETE success"
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "endpointpolicyId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "ruleId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "operationId": "EndpointpolicyController.deleteRuleByID"
+      }
+    },
+    "/adcaas/v1/endpointpolicies/{endpointpolicyId}/rules": {
+      "post": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "createEndpointpolicyRule",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rules add to rule success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
             "in": "path",
             "schema": {
               "type": "string"
@@ -1090,8 +1481,43 @@
           },
           "x-parameter-index": 1
         },
-        "operationId": "EndpointpolicyController.replaceById"
+        "operationId": "EndpointpolicyController.createEndpointpolicyRule"
       },
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "getRules",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of rule model instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rule"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "operationId": "EndpointpolicyController.getRules"
+      }
+    },
+    "/adcaas/v1/endpointpolicies/{id}": {
       "patch": {
         "x-controller-name": "EndpointpolicyController",
         "x-operation-name": "updateById",
@@ -1209,51 +1635,6 @@
         },
         "operationId": "EndpointpolicyController.create"
       },
-      "patch": {
-        "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "EndpointpolicyController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Endpointpolicy PATCH success count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "operationId": "EndpointpolicyController.updateAll"
-      },
       "get": {
         "x-controller-name": "EndpointpolicyController",
         "x-operation-name": "find",
@@ -1295,7 +1676,16 @@
                     "name": {
                       "type": "boolean"
                     },
-                    "rules": {
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
                       "type": "boolean"
                     }
                   }
@@ -1316,6 +1706,46 @@
                   "type": "array",
                   "items": {
                     "type": "string"
+                  }
+                },
+                "include": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "relation": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "properties": {
+                          "where": {
+                            "type": "object"
+                          },
+                          "fields": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "skip": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "order": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               },
@@ -2984,6 +3414,9 @@
                     },
                     "name": {
                       "type": "boolean"
+                    },
+                    "endpointpolicyId": {
+                      "type": "boolean"
                     }
                   }
                 },
@@ -3809,8 +4242,8 @@
   },
   "components": {
     "schemas": {
-      "Application": {
-        "title": "Application",
+      "Endpointpolicy": {
+        "title": "Endpointpolicy",
         "properties": {
           "id": {
             "type": "string"
@@ -3824,9 +4257,6 @@
           "tenantId": {
             "type": "string"
           },
-          "status": {
-            "type": "string"
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3837,12 +4267,11 @@
           }
         },
         "required": [
-          "name",
-          "tenantId"
+          "id"
         ]
       },
-      "Endpointpolicy": {
-        "title": "Endpointpolicy",
+      "Rule": {
+        "title": "Rule",
         "properties": {
           "id": {
             "type": "string"
@@ -3850,16 +4279,13 @@
           "name": {
             "type": "string"
           },
-          "rules": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "endpointpolicyId": {
+            "type": "string"
           }
         },
         "required": [
           "name",
-          "rules"
+          "endpointpolicyId"
         ]
       },
       "Monitor": {
@@ -4076,20 +4502,6 @@
           "address",
           "port",
           "poolId"
-        ]
-      },
-      "Rule": {
-        "title": "Rule",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
         ]
       },
       "Condition": {
