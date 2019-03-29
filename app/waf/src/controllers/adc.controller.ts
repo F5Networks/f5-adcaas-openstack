@@ -16,9 +16,9 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Adc, AdcResponse, AdcCollectionResponse} from '../models';
+import {Adc} from '../models';
 import {AdcRepository} from '../repositories';
-import {Schema} from '.';
+import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
 
@@ -39,9 +39,9 @@ export class AdcController {
   async create(
     @requestBody(Schema.createRequest(Adc, this.createDesc))
     reqBody: Partial<Adc>,
-  ): Promise<AdcResponse> {
+  ): Promise<Response> {
     try {
-      return new AdcResponse(await this.adcRepository.create(reqBody));
+      return new Response(Adc, await this.adcRepository.create(reqBody));
     } catch (error) {
       throw new HttpErrors.BadRequest(error.message);
     }
@@ -71,9 +71,9 @@ export class AdcController {
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Adc)) filter?: Filter,
-  ): Promise<AdcCollectionResponse> {
+  ): Promise<CollectionResponse> {
     let data = await this.adcRepository.find(filter);
-    return new AdcCollectionResponse(data);
+    return new CollectionResponse(Adc, data);
   }
 
   @get(prefix + '/adcs/{id}', {
@@ -84,9 +84,9 @@ export class AdcController {
   })
   async findById(
     @param(Schema.pathParameter('id', 'ADC resource ID')) id: string,
-  ): Promise<AdcResponse> {
+  ): Promise<Response> {
     let data = await this.adcRepository.findById(id);
-    return new AdcResponse(data);
+    return new Response(Adc, data);
   }
 
   readonly updateDesc = 'ADC resource properties that need to be updated';

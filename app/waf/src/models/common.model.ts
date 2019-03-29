@@ -74,23 +74,3 @@ export abstract class CommonEntity extends Entity {
     super(data);
   }
 }
-
-export abstract class CommonResponse extends Object {
-  [key: string]: Object;
-
-  constructor(resourceName: string, data: CommonEntity) {
-    super(data);
-
-    this[resourceName] = data;
-  }
-}
-
-export abstract class CommonCollectionResponse extends Object {
-  [key: string]: Object;
-
-  constructor(collectionName: string, data: CommonEntity[]) {
-    super(data);
-
-    this[collectionName] = data;
-  }
-}
