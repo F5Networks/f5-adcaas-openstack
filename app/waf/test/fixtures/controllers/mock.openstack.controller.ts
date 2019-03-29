@@ -1,7 +1,7 @@
-import {MockBaseController} from '../../helpers/rest.helpers';
-import {post, requestBody, param, get} from '@loopback/rest';
-import {RequestBody} from './openstack.controller';
-import {StubResponses} from '../datasources/testrest.datasource';
+import { MockBaseController } from '../../helpers/rest.helpers';
+import { post, requestBody, param, get } from '@loopback/rest';
+import { RequestBody } from './openstack.controller';
+import { StubResponses } from '../datasources/testrest.datasource';
 
 export class MockKeyStoneController extends MockBaseController {
   @post('/v2.0/tokens')
@@ -45,9 +45,9 @@ export class MockNeutronController extends MockBaseController {
   }
 }
 
-let ResponseWith: {[key: string]: Function} = {};
+let ResponseWith: { [key: string]: Function } = {};
 
-export function ShouldResponseWith(spec: {[key: string]: Function}) {
+export function ShouldResponseWith(spec: { [key: string]: Function }) {
   ResponseWith = {
     '/v2.0/tokens': StubResponses.v2AuthToken200,
     '/v3/auth/tokens': StubResponses.v3AuthToken200,

@@ -1,9 +1,9 @@
-import {getService} from '@loopback/service-proxy';
-import {inject, Provider} from '@loopback/core';
-import {OpenstackDataSource} from '../datasources';
-import {factory} from '../log4ts';
-import {RestApplication} from '@loopback/rest';
-import {bindingKeyAdminAuthedToken} from '../components';
+import { getService } from '@loopback/service-proxy';
+import { inject, Provider } from '@loopback/core';
+import { OpenstackDataSource } from '../datasources';
+import { factory } from '../log4ts';
+import { RestApplication } from '@loopback/rest';
+import { WafBindingKeys } from '../keys';
 
 export interface IdentityService {
   v2AuthToken(
@@ -36,7 +36,7 @@ export class IdentityServiceProvider implements Provider<IdentityService> {
     // openstack must match the name property in the datasource json file
     @inject('datasources.openstack')
     protected dataSource: OpenstackDataSource = new OpenstackDataSource(),
-  ) {}
+  ) { }
 
   value(): Promise<IdentityService> {
     return getService(this.dataSource);
@@ -52,7 +52,7 @@ export abstract class AuthWithOSIdentity {
     protected authConfig: AuthConfig,
     protected application: RestApplication,
     protected identityService: IdentityService,
-  ) {}
+  ) { }
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
@@ -90,7 +90,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           adminToken = this.parseAuthResponseNoException(response);
         });
 
-      this.application.bind(bindingKeyAdminAuthedToken).to(adminToken);
+      this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(adminToken);
       return Promise.resolve(adminToken);
     } catch (error) {
       throw new Error('Failed to request /v2.0/tokens: ' + error.message);
@@ -107,7 +107,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
     //let reqBody = new UserTokenRequestBody();
     //reqBody.auth.token.id = userToken;
     let reqBody: UserTokenRequestBody = {
-      auth: {token: {id: userToken}},
+      auth: { token: { id: userToken } },
     };
 
     if (tenantId) reqBody.auth.tenantId = tenantId;
@@ -130,7 +130,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
 
     let respJson = JSON.parse(JSON.stringify(response));
 
-    let access = respJson[0]['access'];
+    let access = respJson['body'][0]['access'];
     authedToken.issuedAt = new Date(access['token']['issued_at']);
     authedToken.expiredAt = new Date(access['token']['expires']);
     authedToken.token = access['token']['id'];
@@ -192,10 +192,10 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
 
     let respJson = JSON.parse(JSON.stringify(response));
 
-    let token = respJson[0]['token'];
+    let token = respJson['body'][0]['token'];
     authedToken.issuedAt = new Date(token['issued_at']);
     authedToken.expiredAt = new Date(token['expires_at']);
-    authedToken.token = ''; // TODO: find it from header.
+    authedToken.token = respJson['headers']['X-Subject-Token'];
 
     authedToken.userId = token['user']['id'];
     authedToken.catalog = token['catalog'];

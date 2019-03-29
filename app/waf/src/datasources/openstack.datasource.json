@@ -1,6 +1,6 @@
 {
   "name": "openstack",
-  "connector": "rest",
+  "connector": "rest-hdr",
   "baseURL": "",
   "crud": true,
   "options": {
@@ -54,6 +54,7 @@
         "method": "POST",
         "url": "{url}/auth/tokens",
         "responsePath": "$",
+        "responseHeaders": true,
         "body": {
           "auth": {
             "identity": {

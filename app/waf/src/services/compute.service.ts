@@ -3,8 +3,7 @@ import {inject, Provider, CoreBindings} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {RestApplication} from '@loopback/rest';
 import {factory} from '../log4ts';
-import {bindingKeyAdminAuthedToken} from '../components';
-import {AuthedToken} from './identity.service';
+import {WafBindingKeys} from '../keys';
 
 export interface ComputeService {
   v2CreateVirtualServer(
@@ -93,7 +92,7 @@ export class ComputeManagerV2 extends ComputeManager {
           );
         })
         .then(serversResponse => {
-          const obj = JSON.parse(JSON.stringify(serversResponse))[0];
+          const obj = JSON.parse(JSON.stringify(serversResponse))['body'][0];
           this.logger.debug('Created server: ' + JSON.stringify(obj));
           return Promise.resolve(obj['server']['id']);
         });
@@ -129,7 +128,9 @@ export class ComputeManagerV2 extends ComputeManager {
   }
 
   async parseDetailResponse(response: object): Promise<ServerDetail> {
-    const serverJson = JSON.parse(JSON.stringify(response))[0]['server'];
+    const serverJson = JSON.parse(JSON.stringify(response))['body'][0][
+      'server'
+    ];
 
     let serverDetail: ServerDetail = {
       addresses: serverJson['addresss'], // TODO: key not exists??
@@ -152,7 +153,7 @@ export class ComputeManagerV2 extends ComputeManager {
     let endpoint: string | undefined;
     try {
       await this.application
-        .get<AuthedToken>(bindingKeyAdminAuthedToken)
+        .get(WafBindingKeys.KeyAdminAuthedToken)
         .then(adminToken => {
           endpoint = (() => {
             for (let c of adminToken.catalog) {
