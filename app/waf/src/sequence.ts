@@ -16,7 +16,7 @@ import uuid = require('uuid');
 import {AuthWithOSIdentity, AuthedToken} from './services';
 import {CoreBindings} from '@loopback/core';
 import {WafApplication} from '.';
-import {bindingKeyAdminAuthedToken} from './components';
+import {WafBindingKeys} from './keys';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -102,7 +102,7 @@ export class MySequence implements SequenceHandler {
     }
 
     const authedToken = await this.application.get<AuthedToken>(
-      bindingKeyAdminAuthedToken,
+      WafBindingKeys.KeyAdminAuthedToken,
     );
     await this.authWithOSIdentity
       .validateUserToken(authedToken.token, <string>userToken)

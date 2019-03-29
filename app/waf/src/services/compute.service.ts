@@ -3,8 +3,7 @@ import {inject, Provider, CoreBindings} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {RestApplication} from '@loopback/rest';
 import {factory} from '../log4ts';
-import {bindingKeyAdminAuthedToken} from '../components';
-import {AuthedToken} from './identity.service';
+import {WafBindingKeys} from '../keys';
 
 export interface ComputeService {
   v2CreateVirtualServer(
@@ -152,7 +151,7 @@ export class ComputeManagerV2 extends ComputeManager {
     let endpoint: string | undefined;
     try {
       await this.application
-        .get<AuthedToken>(bindingKeyAdminAuthedToken)
+        .get(WafBindingKeys.KeyAdminAuthedToken)
         .then(adminToken => {
           endpoint = (() => {
             for (let c of adminToken.catalog) {
