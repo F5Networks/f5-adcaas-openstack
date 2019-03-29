@@ -782,7 +782,460 @@
         "operationId": "ApplicationController.count"
       }
     },
-    "/adcaas/v1/applications/{id}/deploy": {
+    "/adcaas/v1/applications/{applicationId}/declarations/{declarationId}": {
+      "patch": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "updateDeclarationByID",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update Declaration resource"
+          },
+          "404": {
+            "description": "Can not find Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "declarationId",
+            "description": "Declaration resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "ApplicationController.updateDeclarationByID"
+      },
+      "get": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "findDeclarationByID",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Declaration resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "declaration": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "object"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "content": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "declarationId",
+            "description": "Declaration resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ApplicationController.findDeclarationByID"
+      },
+      "delete": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "deleteDeclarationByID",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete Declaration resource"
+          },
+          "404": {
+            "description": "Can not find Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "declarationId",
+            "description": "Declaration resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ApplicationController.deleteDeclarationByID"
+      }
+    },
+    "/adcaas/v1/applications/{applicationId}/declarations": {
+      "post": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "createDeclaration",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "declaration": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "object"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "content": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "ApplicationController.createDeclaration"
+      },
+      "get": {
+        "x-controller-name": "ApplicationController",
+        "x-operation-name": "findDeclarations",
+        "tags": [
+          "ApplicationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Declaration resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "declarations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "applicationId": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "type": "object"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "applicationId": "11111111-2222-3333-4444-555555555555",
+                          "content": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ApplicationController.findDeclarations"
+      }
+    },
+    "/adcaas/v1/applications/{applicationId}/deploy": {
       "post": {
         "x-controller-name": "ApplicationController",
         "x-operation-name": "deployById",
@@ -828,7 +1281,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "applicationId",
             "description": "Application resource ID",
             "in": "path",
             "required": true,
@@ -841,7 +1294,7 @@
         "operationId": "ApplicationController.deployById"
       }
     },
-    "/adcaas/v1/applications/{id}": {
+    "/adcaas/v1/applications/{applicationId}": {
       "patch": {
         "x-controller-name": "ApplicationController",
         "x-operation-name": "updateById",
@@ -887,7 +1340,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "applicationId",
             "description": "Application resource ID",
             "in": "path",
             "required": true,
@@ -1012,7 +1465,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "applicationId",
             "description": "Application resource ID",
             "in": "path",
             "required": true,
@@ -1069,7 +1522,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "applicationId",
             "description": "Application resource ID",
             "in": "path",
             "required": true,
