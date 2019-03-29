@@ -1,21 +1,10 @@
 import {inject, CoreBindings} from '@loopback/core';
-import {
-  bindingKeyAuthWithOSIdentity,
-  bindingKeyComputeManager,
-  bindingKeyNetworkDriver,
-} from '../../../src/components';
-import {
-  AuthWithOSIdentity,
-  ServersParams,
-  ComputeManager,
-} from '../../../src/services';
-import {
-  NetworkDriver,
-  PortCreationParams,
-} from '../../../src/services/network.service';
+import {ServersParams} from '../../../src/services';
+import {PortCreationParams} from '../../../src/services/network.service';
 import {factory} from '../../../src/log4ts';
 import {get, requestBody, RestApplication} from '@loopback/rest';
 import {MockBaseController} from '../../helpers/rest.helpers';
+import {WafBindingKeys} from '../../../src/keys';
 
 class Environs {
   [key: string]: string | undefined;
@@ -74,8 +63,8 @@ export class OpenstackController extends MockBaseController {
   @get('/openstack/adminAuthToken')
   async adminAuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get<AuthWithOSIdentity>(
-        bindingKeyAuthWithOSIdentity,
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
       );
       return authWithOSIdentity.adminAuthToken();
     });
@@ -86,8 +75,8 @@ export class OpenstackController extends MockBaseController {
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get<AuthWithOSIdentity>(
-        bindingKeyAuthWithOSIdentity,
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
       return await authWithOSIdentity.adminAuthToken().then(async () => {
@@ -104,12 +93,12 @@ export class OpenstackController extends MockBaseController {
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get<AuthWithOSIdentity>(
-        bindingKeyAuthWithOSIdentity,
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      const computeMgr = await this.application.get<ComputeManager>(
-        bindingKeyComputeManager,
+      const computeMgr = await this.application.get(
+        WafBindingKeys.KeyComputeManager,
       );
 
       let serversParams: ServersParams = {
@@ -140,12 +129,12 @@ export class OpenstackController extends MockBaseController {
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get<AuthWithOSIdentity>(
-        bindingKeyAuthWithOSIdentity,
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      const computeMgr = await this.application.get<ComputeManager>(
-        bindingKeyComputeManager,
+      const computeMgr = await this.application.get(
+        WafBindingKeys.KeyComputeManager,
       );
 
       return authWithOSIdentity.adminAuthToken().then(() => {
@@ -162,11 +151,11 @@ export class OpenstackController extends MockBaseController {
   @get('/openstack/createPort')
   async createPort(@requestBody() reqBody: RequestBody): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const networkDriver = await this.application.get<NetworkDriver>(
-        bindingKeyNetworkDriver,
+      const networkDriver = await this.application.get(
+        WafBindingKeys.KeyNetworkDriver,
       );
-      const authWithOSIdentity = await this.application.get<AuthWithOSIdentity>(
-        bindingKeyAuthWithOSIdentity,
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
       await authWithOSIdentity.adminAuthToken();

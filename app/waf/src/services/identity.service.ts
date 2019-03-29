@@ -3,7 +3,7 @@ import {inject, Provider} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {factory} from '../log4ts';
 import {RestApplication} from '@loopback/rest';
-import {bindingKeyAdminAuthedToken} from '../components';
+import {WafBindingKeys} from '../keys';
 
 export interface IdentityService {
   v2AuthToken(
@@ -90,7 +90,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           adminToken = this.parseAuthResponseNoException(response);
         });
 
-      this.application.bind(bindingKeyAdminAuthedToken).to(adminToken);
+      this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(adminToken);
       return Promise.resolve(adminToken);
     } catch (error) {
       throw new Error('Failed to request /v2.0/tokens: ' + error.message);
