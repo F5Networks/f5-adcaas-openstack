@@ -13,8 +13,6 @@ import {WafBindingKeys} from './keys';
 import {factory} from './log4ts';
 import {OpenStackComponent} from './components';
 
-import {OpenstackController} from '../test/fixtures/controllers/openstack.controller';
-
 export class WafApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
@@ -56,9 +54,6 @@ export class WafApplication extends BootMixin(
         nested: true,
       },
     };
-
-    if (process.env.TEST_OPENSTACK_INTEGRATION)
-      this.controller(OpenstackController);
   }
 
   async keepAliveAdminToken() {

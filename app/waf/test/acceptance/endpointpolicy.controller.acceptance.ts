@@ -80,21 +80,19 @@ describe('EndpointpolicyController', () => {
   );
 
   it('get ' + prefix + '/endpointpolicies: of all', async () => {
-    const epp = await givenEndpointpolicyData(wafapp);
+    await givenEndpointpolicyData(wafapp);
 
-    await client
-      .get(prefix + '/endpointpolicies')
-      .expect(200, [toJSON(epp)])
-      .expect('Content-Type', /application\/json/);
+    await client.get(prefix + '/endpointpolicies').expect(200);
   });
 
   it('get ' + prefix + '/endpointpolicies: with filter string', async () => {
     const epp = await givenEndpointpolicyData(wafapp);
 
-    await client
+    const response = await client
       .get(prefix + '/endpointpolicies')
-      .query({filter: {where: {id: epp.id}}})
-      .expect(200, [toJSON(epp)]);
+      .query({where: {id: epp.getId()}})
+      .expect(200);
+    expect(response.body).be.instanceOf(Array);
   });
 
   it('get ' + prefix + '/endpointpolicies/count', async () => {
@@ -112,62 +110,11 @@ describe('EndpointpolicyController', () => {
     expect(response.body.count).to.eql(1);
   });
 
-  it('patch ' + prefix + '/endpointpolicies: all items', async () => {
-    await givenEndpointpolicyData(wafapp);
-    await givenEndpointpolicyData(wafapp);
-
-    const patched_name = {name: 'updated endpointpolicy name'};
-    let response = await client
-      .patch(prefix + '/endpointpolicies')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/endpointpolicies/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/endpointpolicies: selected items', async () => {
-    await givenEndpointpolicyData(wafapp);
-    await givenEndpointpolicyData(wafapp);
-
-    const patch_condition = {id: '1'};
-    const patched_name = {name: 'updated endpointpolicy name'};
-    await givenEndpointpolicyData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/endpointpolicies')
-      .query(patch_condition)
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(3);
-
-    response = await client
-      .get(prefix + '/endpointpolicies/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(3);
-
-    response = await client
-      .get(prefix + '/endpointpolicies/count')
-      .query({where: patch_condition})
-      .expect(200);
-
-    expect(response.body.count).to.eql(0);
-  });
-
   it('get ' + prefix + '/endpointpolicies/{id}: selected item', async () => {
     await givenEndpointpolicyData(wafapp);
     const epp = await givenEndpointpolicyData(wafapp);
 
-    await client
-      .get(prefix + '/endpointpolicies/' + epp.id)
-      .expect(200, toJSON(epp));
+    await client.get(prefix + '/endpointpolicies/' + epp.id).expect(200);
   });
 
   it('get ' + prefix + '/endpointpolicies/{id}: not found', async () => {
@@ -206,26 +153,6 @@ describe('EndpointpolicyController', () => {
     const epp = await givenEndpointpolicyData(wafapp);
 
     await client.del(prefix + '/endpointpolicies/' + epp.id).expect(204);
-  });
-
-  it('put' + prefix + '/endpointpolicies/{id}: existing item', async () => {
-    const epp = await givenEndpointpolicyData(wafapp);
-
-    const epp_new = new Endpointpolicy(
-      createEndpointpolicyObject({
-        name: 'new endpointpolicy name.',
-      }),
-    );
-    await client
-      .put(prefix + '/endpointpolicies/' + epp.id)
-      .send(epp_new)
-      .expect(204);
-
-    const response = await client
-      .get(prefix + '/endpointpolicies/' + epp.id)
-      .expect(200);
-
-    expect(response.body).to.containDeep({name: 'new endpointpolicy name.'});
   });
 
   it(

@@ -12,7 +12,6 @@ import {
   getFilterSchemaFor,
   getWhereSchemaFor,
   patch,
-  put,
   del,
   requestBody,
   HttpErrors,
@@ -31,7 +30,7 @@ import {
   RuleRepository,
 } from '../repositories';
 import {AS3Service} from '../services';
-import uuid = require('uuid');
+import {Schema} from '.';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
 const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
@@ -61,21 +60,21 @@ export class ApplicationController {
     @inject('services.AS3Service') public as3Service: AS3Service,
   ) {}
 
+  readonly createDesc = 'Application resource that need to be created';
   @post(prefix + '/applications', {
     responses: {
-      '200': {
-        description: 'Application model instance',
-        content: {'application/json': {schema: {'x-ts-type': Application}}},
-      },
+      '200': Schema.response(
+        Application,
+        'Successfully create Application resource',
+      ),
+      '400': Schema.badRequest('Invalid Application resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Application resource'),
     },
   })
   async create(
-    @requestBody() application: Partial<Application>,
+    @requestBody(Schema.createRequest(Application, this.createDesc))
+    application: Partial<Application>,
   ): Promise<Application> {
-    if (!application.id) {
-      application.id = uuid();
-    }
-
     try {
       return await this.applicationRepository.create(application);
     } catch (error) {
@@ -99,14 +98,10 @@ export class ApplicationController {
 
   @get(prefix + '/applications', {
     responses: {
-      '200': {
-        description: 'Array of Application model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Application}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Application,
+        'Successfully retrieve Application resources',
+      ),
     },
   })
   async find(
@@ -116,81 +111,58 @@ export class ApplicationController {
     return await this.applicationRepository.find(filter);
   }
 
-  @patch(prefix + '/applications', {
-    responses: {
-      '200': {
-        description: 'Application PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody() application: Partial<Application>,
-    @param.query.object('where', getWhereSchemaFor(Application)) where?: Where,
-  ): Promise<Count> {
-    return await this.applicationRepository.updateAll(application, where);
-  }
-
   @get(prefix + '/applications/{id}', {
     responses: {
-      '200': {
-        description: 'Application model instance',
-        content: {'application/json': {schema: {'x-ts-type': Application}}},
-      },
+      '200': Schema.response(
+        Application,
+        'Successfully retrieve Application resource',
+      ),
+      '404': Schema.notFound('Can not find Application resource'),
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Application> {
+  async findById(
+    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+  ): Promise<Application> {
     return await this.applicationRepository.findById(id);
   }
 
+  readonly updateDesc =
+    'Application resource properties that need to be updated';
   @patch(prefix + '/applications/{id}', {
     responses: {
-      '204': {
-        description: 'Application PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully update Application resource'),
+      '404': Schema.notFound('Can not find Application resource'),
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() application: Partial<Application>,
+    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+    @requestBody(Schema.updateRequest(Application, this.updateDesc))
+    application: Partial<Application>,
   ): Promise<void> {
     await this.applicationRepository.updateById(id, application);
   }
 
-  @put(prefix + '/applications/{id}', {
-    responses: {
-      '204': {
-        description: 'Application PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() application: Partial<Application>,
-  ): Promise<void> {
-    application.id = id;
-    await this.applicationRepository.replaceById(id, application);
-  }
-
   @del(prefix + '/applications/{id}', {
     responses: {
-      '204': {
-        description: 'Application DELETE success',
-      },
+      '204': Schema.emptyResponse('Successfully delete Application resource'),
+      '404': Schema.notFound('Can not find Application resource'),
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+  ): Promise<void> {
     await this.applicationRepository.deleteById(id);
   }
 
   @post(prefix + '/applications/{id}/deploy', {
     responses: {
-      '204': {
-        description: 'Application deploy success',
-      },
+      '204': Schema.emptyResponse('Successfully deploy Application resource'),
+      '404': Schema.notFound('Can not find Application resource'),
     },
   })
-  async deployById(@param.path.string('id') id: string): Promise<Object> {
+  async deployById(
+    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+  ): Promise<Object> {
     let application = await this.applicationRepository.findById(id);
 
     let services = await this.applicationRepository
@@ -257,13 +229,11 @@ export class ApplicationController {
       );
 
       if (params.endpointpolicy) {
-        params.rules = await this.ruleRepository.find({
-          where: {
-            id: {
-              inq: (<Endpointpolicy>params.endpointpolicy).rules,
-            },
-          },
-        });
+        let eppolicy = <Endpointpolicy>params.endpointpolicy;
+        params.rules = await this.endpointpolicyRepository
+          .rules(eppolicy.id)
+          .find();
+
         let rules = <Rule[]>params.rules;
         for (let rule of rules) {
           rule.conditions = await this.ruleRepository
@@ -271,9 +241,10 @@ export class ApplicationController {
             .find();
           rule.actions = await this.ruleRepository.actions(rule.id).find();
         }
-        params.wafs = await this.wafpolicyRepository.find();
       }
     }
+
+    params.wafs = await this.wafpolicyRepository.find();
 
     let req = new AS3DeployRequest(params);
     return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);

@@ -6,8 +6,13 @@ import {
   createRestAppClient,
   Client,
 } from '@loopback/testlab';
+import {RepositoryMixin} from '@loopback/repository';
+import {ServiceMixin} from '@loopback/service-proxy';
+import {join} from 'path';
 
-export class MockBaseController {}
+export class MockBaseController {
+  constructor(...args: object[]) {}
+}
 
 export enum RestApplicationPort {
   // in order, please.
@@ -19,12 +24,15 @@ export enum RestApplicationPort {
   IdentityAdmin = 35357,
 }
 
-export class MockRestApplication extends BootMixin(RestApplication) {
+export class TestingApplication extends BootMixin(
+  ServiceMixin(RepositoryMixin(RestApplication)),
+) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
     // TODO: investigate what projectRoot be used for.
-    this.projectRoot = __dirname;
+    //this.projectRoot = __dirname;
+    this.projectRoot = join(__dirname, '../../src');
   }
 }
 
@@ -32,7 +40,7 @@ export async function setupRestAppAndClient(
   port: number,
   controllerCtor: typeof MockBaseController,
 ): Promise<RestAppAndClient> {
-  const restApp = new MockRestApplication({
+  const restApp = new TestingApplication({
     rest: givenHttpServerConfig({
       port: port,
       host: 'localhost',
@@ -40,6 +48,18 @@ export async function setupRestAppAndClient(
   });
 
   restApp.controller(controllerCtor);
+
+  restApp.bootOptions = {
+    controllers: {
+      dirs: ['notexists'],
+    },
+    repositories: {
+      dirs: ['repositories'],
+      extensions: ['.repository.js'],
+      nested: true,
+    },
+  };
+
   await restApp.boot();
   await restApp.start();
 
@@ -47,11 +67,11 @@ export async function setupRestAppAndClient(
   return {restApp: restApp, client: client};
 }
 
-export function teardownRestAppAndClient(app: MockRestApplication) {
+export function teardownRestAppAndClient(app: TestingApplication) {
   app.stop();
 }
 
 export interface RestAppAndClient {
-  restApp: MockRestApplication;
+  restApp: TestingApplication;
   client: Client;
 }

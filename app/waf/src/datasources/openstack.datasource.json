@@ -20,7 +20,7 @@
               "username": "{osUsername}",
               "password": "{osPassword}"
             },
-            "tenantName": "{tenantName}"
+            "tenantId": "{tenantId}"
           }
         }
       },
@@ -29,7 +29,7 @@
           "url",
           "osUsername",
           "osPassword",
-          "tenantName"
+          "tenantId"
         ]
       }
     },

@@ -1,6 +1,5 @@
 import {
-  MockRestApplication,
-  RestAppAndClient,
+  TestingApplication,
   setupRestAppAndClient,
   RestApplicationPort,
   teardownRestAppAndClient,
@@ -13,50 +12,58 @@ import {
   MockNovaController,
   MockNeutronController,
 } from '../fixtures/controllers/mock.openstack.controller';
-import {WafApplication} from '../../src';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+import {OpenstackController} from '../fixtures/controllers/openstack.controller';
+import {OpenStackComponent} from '../../src/components';
 
 describe('openstack.identity.test', () => {
-  let mockKeystoneApp: MockRestApplication;
-  let mockNovaApp: MockRestApplication;
-  let mockNeutronApp: MockRestApplication;
+  let mockKeystoneApp: TestingApplication;
+  let mockNovaApp: TestingApplication;
+  let mockNeutronApp: TestingApplication;
 
-  let wafapp: WafApplication;
+  let testApp: TestingApplication;
   let client: Client;
 
   before('setup', async () => {
-    // TODO: combine RestAppAndClient and AppAndClient
-    let keyStoneAppAndClient: RestAppAndClient = await setupRestAppAndClient(
-      RestApplicationPort.IdentityAdmin,
-      MockKeyStoneController,
-    );
-    mockKeystoneApp = keyStoneAppAndClient.restApp;
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
 
-    let novaAppAndClient: RestAppAndClient = await setupRestAppAndClient(
-      RestApplicationPort.Nova,
-      MockNovaController,
-    );
-    mockNovaApp = novaAppAndClient.restApp;
+    mockNovaApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.Nova,
+        MockNovaController,
+      );
+      return restApp;
+    })();
 
-    let neutronAppAndClient: RestAppAndClient = await setupRestAppAndClient(
-      RestApplicationPort.Neutron,
-      MockNeutronController,
-    );
-    mockNeutronApp = neutronAppAndClient.restApp;
+    mockNeutronApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.Neutron,
+        MockNeutronController,
+      );
+      return restApp;
+    })();
 
-    process.env.TEST_OPENSTACK_INTEGRATION = '1';
-    let wafAppAndClient = await setupApplication();
-    wafapp = wafAppAndClient.wafapp;
-    client = wafAppAndClient.client;
+    let restAppAndClient = await setupRestAppAndClient(
+      RestApplicationPort.WafApp,
+      OpenstackController,
+    );
+    testApp = restAppAndClient.restApp;
+    testApp.component(OpenStackComponent);
+    client = restAppAndClient.client;
 
     stubLogger();
   });
 
   after('teardown', async () => {
     restoreLogger();
-    teardownApplication(wafapp);
+    teardownRestAppAndClient(testApp);
     teardownRestAppAndClient(mockKeystoneApp);
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);

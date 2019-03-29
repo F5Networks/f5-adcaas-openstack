@@ -7,16 +7,12 @@ import {
   AuthWithOSIdentity,
 } from './services';
 import {NetworkDriver} from './services/network.service';
-import {factory} from './log4ts';
 import {WafBindingKeys} from './keys';
 
 export class OpenStackComponent implements Component {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: RestApplication,
-    // @inject('services.IdentityService')
-    // private identityService: IdentityService,
-    private logger = factory.getLogger('components.openstack'),
   ) {}
 
   // TODO: make it work or find out the reason of not working.

@@ -1,5 +1,4 @@
 import {Entity, model, property} from '@loopback/repository';
-import uuid = require('uuid');
 
 @model()
 export abstract class CommonEntity extends Entity {
@@ -73,33 +72,5 @@ export abstract class CommonEntity extends Entity {
 
   constructor(data?: Partial<CommonEntity>) {
     super(data);
-
-    if (!this.id) {
-      this.id = uuid();
-    }
-
-    if (!this.createdAt) {
-      this.createdAt = new Date().toISOString();
-    }
-  }
-}
-
-export abstract class CommonResponse extends Object {
-  [key: string]: Object;
-
-  constructor(resourceName: string, data: CommonEntity) {
-    super(data);
-
-    this[resourceName] = data;
-  }
-}
-
-export abstract class CommonCollectionResponse extends Object {
-  [key: string]: Object;
-
-  constructor(collectionName: string, data: CommonEntity[]) {
-    super(data);
-
-    this[collectionName] = data;
   }
 }

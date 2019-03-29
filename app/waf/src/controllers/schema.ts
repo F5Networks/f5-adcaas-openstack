@@ -3,6 +3,8 @@ import {ParameterObject, ParameterLocation} from '@loopback/openapi-v3-types';
 import {MetadataInspector} from '@loopback/metadata';
 import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
 
+let plural = require('plural');
+
 class SchemaProperties {
   public create: {[key: string]: object} = {};
   public update: {[key: string]: object} = {};
@@ -232,7 +234,7 @@ export class Schema {
       description: desc,
       content: {
         'application/json': buildCollectionResponseSchema(
-          entity.modelName.toLowerCase() + 's',
+          plural(entity.modelName.toLowerCase()),
           props.response,
           props.responseExample,
         ),

@@ -24,7 +24,6 @@ import {
   createApplicationObject,
   givenWafpolicyData,
 } from '../helpers/database.helpers';
-import {Application} from '../../src/models';
 import uuid = require('uuid');
 
 describe('ApplicationController', () => {
@@ -56,23 +55,8 @@ describe('ApplicationController', () => {
     deployStub.restore();
   });
 
-  it('post ' + prefix + '/applications: with id', async () => {
-    const application = new Application(
-      createApplicationObject({
-        id: uuid(),
-      }),
-    );
-
-    const response = await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(application));
-  });
-
   it('post ' + prefix + '/applications: with no id', async () => {
-    const application = new Application(createApplicationObject());
+    const application = createApplicationObject();
 
     const response = await client
       .post(prefix + '/applications')
@@ -80,15 +64,6 @@ describe('ApplicationController', () => {
       .expect(200);
 
     expect(response.body).to.containDeep(toJSON(application));
-  });
-
-  it('post ' + prefix + '/applications: with duplicate id', async () => {
-    const application = await givenApplicationData(wafapp);
-
-    await client
-      .post(prefix + '/applications')
-      .send(application)
-      .expect(400);
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
@@ -119,55 +94,6 @@ describe('ApplicationController', () => {
       .get(prefix + '/applications/count')
       .query({where: {id: application.id}})
       .expect(200);
-    expect(response.body.count).to.eql(1);
-  });
-
-  it('patch ' + prefix + '/applications: all items', async () => {
-    await givenApplicationData(wafapp);
-    await givenApplicationData(wafapp);
-
-    const patched_name = {name: 'updated application name'};
-    let response = await client
-      .patch(prefix + '/applications')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/applications: selected items', async () => {
-    await givenApplicationData(wafapp);
-    await givenApplicationData(wafapp);
-
-    const patch_condition = {description: 'the only one to patch'};
-    const patched_name = {name: 'updated application name'};
-    await givenApplicationData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/applications')
-      .query({where: patch_condition})
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/applications/count')
-      .query({where: patch_condition})
-      .expect(200);
-
     expect(response.body.count).to.eql(1);
   });
 
@@ -210,38 +136,6 @@ describe('ApplicationController', () => {
     const application = await givenApplicationData(wafapp);
 
     await client.del(prefix + '/applications/' + application.id).expect(204);
-  });
-
-  it('put' + prefix + '/applications/{id}: existing item', async () => {
-    const application = await givenApplicationData(wafapp);
-
-    const wafpolicy_new = new Application(
-      createApplicationObject({
-        name: 'new application name.',
-      }),
-    );
-    await client
-      .put(prefix + '/applications/' + application.id)
-      .send(wafpolicy_new)
-      .expect(204);
-
-    const response = await client
-      .get(prefix + '/applications/' + application.id)
-      .expect(200);
-
-    expect(response.body).to.containDeep({name: 'new application name.'});
-  });
-
-  it('put ' + prefix + '/applications/{id}: non-existing item', async () => {
-    const application = new Application(
-      createApplicationObject({
-        name: 'new application name.',
-      }),
-    );
-    await client
-      .put(prefix + '/applications/' + application.id)
-      .send(application)
-      .expect(404);
   });
 
   it(
@@ -288,14 +182,18 @@ describe('ApplicationController', () => {
         id: uuid(),
         poolId: pool.id,
       });
-
-      let rule1 = await givenRuleData(wafapp, {
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+      await givenRuleData(wafapp, {
         id: '1234',
         name: 'rule1',
+        endpointpolicyId: epp.id,
       });
-      let rule2 = await givenRuleData(wafapp, {
+      await givenRuleData(wafapp, {
         id: '2345',
         name: 'rule2',
+        endpointpolicyId: epp.id,
       });
       await givenConditionData(wafapp, {
         ruleId: '1234',
@@ -317,10 +215,6 @@ describe('ApplicationController', () => {
         policy: {wafpolicy: '12345678'},
       });
 
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-        rules: [rule1.id, rule2.id],
-      });
       let application = await givenApplicationData(wafapp);
       await givenServiceData(wafapp, <string>application.id, {
         pool: pool.id,
@@ -356,6 +250,7 @@ describe('ApplicationController', () => {
       .post(prefix + '/applications/' + application.id + '/deploy')
       .expect(422);
   });
+
   it(
     'post ' + prefix + '/applications/{id}/deploy: no member in pool',
     async () => {
@@ -397,6 +292,7 @@ describe('ApplicationController', () => {
         .expect(422);
     },
   );
+
   it(
     'post ' + prefix + '/applications/{id}/deploy: deploy with wap config',
     async () => {
@@ -413,11 +309,17 @@ describe('ApplicationController', () => {
         poolId: pool.id,
       });
 
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+
       let rule1 = await givenRuleData(wafapp, {
         name: 'rule1',
+        endpointpolicyId: epp.id,
       });
       let rule2 = await givenRuleData(wafapp, {
         name: 'rule2',
+        endpointpolicyId: epp.id,
       });
 
       let waf = await givenWafpolicyData(wafapp, {
@@ -465,10 +367,6 @@ describe('ApplicationController', () => {
         ruleId: rule1.id,
         type: 'test',
         policy: {wafpolicy: '12345678'},
-      });
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-        rules: [rule1.id, rule2.id],
       });
 
       let application = await givenApplicationData(wafapp, {});
