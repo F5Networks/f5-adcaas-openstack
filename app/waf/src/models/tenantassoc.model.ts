@@ -1,7 +1,14 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class TenantAssociation extends Entity {
+export class AdcTenantAssociation extends Entity {
+  @property({
+    type: 'string',
+    id: true,
+    required: true,
+  })
+  adcId: string;
+
   @property({
     type: 'string',
     id: true,
@@ -9,23 +16,24 @@ export class TenantAssociation extends Entity {
   })
   tenantId: string;
 
+  constructor(data?: Partial<AdcTenantAssociation>) {
+    super(data);
+  }
+}
+
+export class Tenant extends Entity {
   @property({
     type: 'string',
+    id: true,
     required: true,
+    schema: {
+      response: true,
+      example: '11111111-2222-3333-4444-555555555555',
+    },
   })
-  adcId: string;
+  id: string;
 
-  @property({
-    type: 'date',
-  })
-  createdAt?: string;
-
-  @property({
-    type: 'date',
-  })
-  updatedAt?: string;
-
-  constructor(data?: Partial<TenantAssociation>) {
+  constructor(data?: Partial<Tenant>) {
     super(data);
   }
 }

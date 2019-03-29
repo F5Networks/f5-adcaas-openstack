@@ -21,7 +21,7 @@ import {Application, AS3DeployRequest, Endpointpolicy, Rule} from '../models';
 import {
   ApplicationRepository,
   AdcRepository,
-  TenantAssociationRepository,
+  AdcTenantAssociationRepository,
   ServiceRepository,
   PoolRepository,
   MemberRepository,
@@ -43,8 +43,8 @@ export class ApplicationController {
     public applicationRepository: ApplicationRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
-    @repository(TenantAssociationRepository)
-    public tenantAssociationRepository: TenantAssociationRepository,
+    @repository(AdcTenantAssociationRepository)
+    public tenantAssociationRepository: AdcTenantAssociationRepository,
     @repository(ServiceRepository)
     public serviceRepository: ServiceRepository,
     @repository(PoolRepository)

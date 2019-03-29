@@ -13,7 +13,7 @@ import {
   givenEmptyDatabase,
   givenApplicationData,
   givenAdcData,
-  givenTenantAssociationData,
+  givenAdcTenantAssociationData,
   givenServiceData,
   givenPoolData,
   givenMemberData,
@@ -156,7 +156,7 @@ describe('ApplicationController', () => {
     async () => {
       const application = await givenApplicationData(wafapp);
       const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
+      await givenAdcTenantAssociationData(wafapp, {
         tenantId: 'default',
         adcId: adc.id,
       });
@@ -171,7 +171,7 @@ describe('ApplicationController', () => {
     'post ' + prefix + '/applications/{id}/deploy: deploy without wap config',
     async () => {
       const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
+      await givenAdcTenantAssociationData(wafapp, {
         tenantId: 'default',
         adcId: adc.id,
       });
@@ -233,7 +233,7 @@ describe('ApplicationController', () => {
   );
 
   it('post ' + prefix + '/applications/{id}/deploy: no adcId', async () => {
-    await givenTenantAssociationData(wafapp, {
+    await givenAdcTenantAssociationData(wafapp, {
       tenantId: 'default',
     });
     let pool = await givenPoolData(wafapp, {
@@ -255,7 +255,7 @@ describe('ApplicationController', () => {
     'post ' + prefix + '/applications/{id}/deploy: no member in pool',
     async () => {
       const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
+      await givenAdcTenantAssociationData(wafapp, {
         tenantId: 'default',
         adcId: adc.id,
       });
@@ -278,7 +278,7 @@ describe('ApplicationController', () => {
     'post ' + prefix + '/applications/{id}/deploy: unprocessable declaration',
     async () => {
       const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
+      await givenAdcTenantAssociationData(wafapp, {
         tenantId: 'default',
         adcId: adc.id,
       });
@@ -297,7 +297,7 @@ describe('ApplicationController', () => {
     'post ' + prefix + '/applications/{id}/deploy: deploy with wap config',
     async () => {
       const adc = await givenAdcData(wafapp);
-      await givenTenantAssociationData(wafapp, {
+      await givenAdcTenantAssociationData(wafapp, {
         tenantId: 'default',
         adcId: adc.id,
       });

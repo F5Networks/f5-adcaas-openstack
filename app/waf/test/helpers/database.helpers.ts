@@ -1,7 +1,7 @@
 import {
   WafpolicyRepository,
   ApplicationRepository,
-  TenantAssociationRepository,
+  AdcTenantAssociationRepository,
   ServiceRepository,
   PoolRepository,
   MemberRepository,
@@ -15,7 +15,7 @@ import {
 import {
   Application,
   Wafpolicy,
-  TenantAssociation,
+  AdcTenantAssociation,
   Service,
   Pool,
   Member,
@@ -41,7 +41,7 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
   const adcrepo = await wafapp.getRepository(AdcRepository);
   await adcrepo.deleteAll();
 
-  const tenantRepo = await wafapp.getRepository(TenantAssociationRepository);
+  const tenantRepo = await wafapp.getRepository(AdcTenantAssociationRepository);
   await tenantRepo.deleteAll();
 
   const serviceRepo = await wafapp.getRepository(ServiceRepository);
@@ -214,23 +214,21 @@ export async function givenAdcData(
   return await adcpepo.create(new Adc(obj));
 }
 
-export async function givenTenantAssociationData(
+export async function givenAdcTenantAssociationData(
   wafapp: WafApplication,
-  data?: Partial<TenantAssociation>,
+  data?: Partial<AdcTenantAssociation>,
 ) {
-  const repo = await wafapp.getRepository(TenantAssociationRepository);
-  return await repo.create(createTenantAssociationObject(data));
+  const repo = await wafapp.getRepository(AdcTenantAssociationRepository);
+  return await repo.create(createAdcTenantAssociationObject(data));
 }
 
-export function createTenantAssociationObject(
-  data?: Partial<TenantAssociation>,
+export function createAdcTenantAssociationObject(
+  data?: Partial<AdcTenantAssociation>,
 ) {
   return Object.assign(
     {
       tenantId: uuid(),
       adcId: uuid(),
-      createdAt: '2019-01-22T05:03:45.502Z',
-      updatedAt: '2019-01-23T05:03:45.502Z',
     },
     data,
   );
