@@ -6,7 +6,6 @@ import {
 } from '../../../src/components';
 import {
   AuthWithOSIdentity,
-  IdentityService,
   ServersParams,
   ComputeManager,
 } from '../../../src/services';
@@ -61,12 +60,13 @@ export class RequestBody {
 }
 
 export class OpenstackController extends MockBaseController {
+  private logger = factory.getLogger('tests.openstack');
+
   constructor(
-    @inject('services.IdentityService')
-    private identityService: IdentityService,
+    // @inject('services.IdentityService')
+    // private identityService: IdentityService,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: RestApplication,
-    private logger = factory.getLogger('tests.openstack'),
   ) {
     super();
   }

@@ -12,7 +12,6 @@ import {
   IdentityServiceProvider,
 } from './services';
 import {NetworkDriver} from './services/network.service';
-import {factory} from './log4ts';
 
 export const bindingKeyAuthWithOSIdentity = BindingKey.create(
   'services.openstack.AuthWithOSIdentity',
@@ -34,9 +33,6 @@ export class OpenStackComponent implements Component {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: RestApplication,
-    // @inject('services.IdentityService')
-    // private identityService: IdentityService,
-    private logger = factory.getLogger('components.openstack'),
   ) {}
 
   // TODO: make it work or find out the reason of not working.
