@@ -43,7 +43,114 @@
         "operationId": "AdcController.count"
       }
     },
-    "/adcaas/v1/adcs/{id}": {
+    "/adcaas/v1/adcs/{adcId}/tenants/{tenantId}": {
+      "get": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "findTenant",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Tenant resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tenant": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "tenantId",
+            "description": "OpenStack project ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "AdcController.findTenant"
+      }
+    },
+    "/adcaas/v1/adcs/{adcId}/tenants": {
+      "get": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "findTenants",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Tenant resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tenants": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "AdcController.findTenants"
+      }
+    },
+    "/adcaas/v1/adcs/{adcId}": {
       "patch": {
         "x-controller-name": "AdcController",
         "x-operation-name": "updateById",
@@ -89,7 +196,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "adcId",
             "description": "ADC resource ID",
             "in": "path",
             "required": true,
@@ -230,7 +337,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "adcId",
             "description": "ADC resource ID",
             "in": "path",
             "required": true,
@@ -287,7 +394,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "adcId",
             "description": "ADC resource ID",
             "in": "path",
             "required": true,
@@ -3693,24 +3800,44 @@
         "operationId": "ServiceController.find"
       }
     },
-    "/adcaas/v1/tenantassocs/count": {
-      "get": {
+    "/adcaas/v1/tenants/{tenantId}/adcs/{adcId}": {
+      "post": {
         "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "count",
+        "x-operation-name": "associateAdc",
         "tags": [
           "TenantAssociationController"
         ],
         "responses": {
-          "200": {
-            "description": "TenantAssociation model count",
+          "204": {
+            "description": "Successfully associate ADC and Tenant"
+          },
+          "404": {
+            "description": "Cannot find ADC resource",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "number"
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
                     }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
                   }
                 }
               }
@@ -3719,65 +3846,126 @@
         },
         "parameters": [
           {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
+            "name": "tenantId",
+            "description": "OpenStack project ID",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "object"
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
             }
           }
         ],
-        "operationId": "TenantAssociationController.count"
-      }
-    },
-    "/adcaas/v1/tenantassocs/{tenantId}": {
-      "patch": {
+        "operationId": "TenantAssociationController.associateAdc"
+      },
+      "get": {
         "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "updateById",
+        "x-operation-name": "findAdc",
         "tags": [
           "TenantAssociationController"
         ],
         "responses": {
-          "204": {
-            "description": "TenantAssociation PATCH success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "tenantId",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
+          "200": {
+            "description": "Successfully retrieve ADC associated with Tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adc": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "number"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "passphrase": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HW",
+                        "host": "192.168.0.1",
+                        "port": 8443,
+                        "username": "admin",
+                        "passphrase": "admin"
+                      }
+                    }
+                  }
+                }
               }
             }
           },
-          "x-parameter-index": 1
-        },
-        "operationId": "TenantAssociationController.updateById"
-      },
-      "get": {
-        "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "findById",
-        "tags": [
-          "TenantAssociationController"
-        ],
-        "responses": {
-          "200": {
-            "description": "TenantAssociation model instance",
+          "404": {
+            "description": "Cannot find assoociation or ADC resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantAssociation"
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -3786,84 +3974,132 @@
         "parameters": [
           {
             "name": "tenantId",
+            "description": "Tenant resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
           }
         ],
-        "operationId": "TenantAssociationController.findById"
+        "operationId": "TenantAssociationController.findAdc"
       },
       "delete": {
         "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "deleteById",
+        "x-operation-name": "deassociateAdc",
         "tags": [
           "TenantAssociationController"
         ],
         "responses": {
           "204": {
-            "description": "TenantAssociation DELETE success"
+            "description": "Successfully deassociate ADC and Tenant"
           }
         },
         "parameters": [
           {
             "name": "tenantId",
+            "description": "OpenStack Project ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
           }
         ],
-        "operationId": "TenantAssociationController.deleteById"
+        "operationId": "TenantAssociationController.deassociateAdc"
       }
     },
-    "/adcaas/v1/tenantassocs": {
-      "post": {
-        "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "create",
-        "tags": [
-          "TenantAssociationController"
-        ],
-        "responses": {
-          "200": {
-            "description": "TenantAssociation model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TenantAssociation"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "operationId": "TenantAssociationController.create"
-      },
+    "/adcaas/v1/tenants/{tenantId}/adcs": {
       "get": {
         "x-controller-name": "TenantAssociationController",
-        "x-operation-name": "find",
+        "x-operation-name": "findAdcs",
         "tags": [
           "TenantAssociationController"
         ],
         "responses": {
           "200": {
-            "description": "Array of TenantAssociation model instances",
+            "description": "Successfully retrieve ADCs associated with Tenant",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TenantAssociation"
+                  "type": "object",
+                  "properties": {
+                    "adcs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "passphrase": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "type": "HW",
+                          "host": "192.168.0.1",
+                          "port": 8443,
+                          "username": "admin",
+                          "passphrase": "admin"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3872,56 +4108,17 @@
         },
         "parameters": [
           {
-            "name": "filter",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
+            "name": "tenantId",
+            "description": "OpenStack Project ID",
+            "in": "path",
+            "required": true,
             "schema": {
-              "properties": {
-                "where": {
-                  "type": "object"
-                },
-                "fields": {
-                  "type": "object",
-                  "properties": {
-                    "tenantId": {
-                      "type": "boolean"
-                    },
-                    "adcId": {
-                      "type": "boolean"
-                    },
-                    "createdAt": {
-                      "type": "boolean"
-                    },
-                    "updatedAt": {
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "offset": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "limit": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "skip": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "order": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "type": "object"
+              "type": "string",
+              "format": ""
             }
           }
         ],
-        "operationId": "TenantAssociationController.find"
+        "operationId": "TenantAssociationController.findAdcs"
       }
     },
     "/adcaas/v1/wafpolicies/count": {
@@ -4679,29 +4876,6 @@
         "required": [
           "virtualAddresses",
           "applicationId"
-        ]
-      },
-      "TenantAssociation": {
-        "title": "TenantAssociation",
-        "properties": {
-          "tenantId": {
-            "type": "string"
-          },
-          "adcId": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "tenantId",
-          "adcId"
         ]
       },
       "Wafpolicy": {
