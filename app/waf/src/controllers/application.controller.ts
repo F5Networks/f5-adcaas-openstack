@@ -17,7 +17,13 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {inject} from '@loopback/context';
-import {Application, AS3DeployRequest, Endpointpolicy, Rule} from '../models';
+import {
+  Application,
+  Declaration,
+  AS3DeployRequest,
+  Endpointpolicy,
+  Rule,
+} from '../models';
 import {
   ApplicationRepository,
   AdcRepository,
@@ -30,7 +36,7 @@ import {
   RuleRepository,
 } from '../repositories';
 import {AS3Service} from '../services';
-import {Schema} from '.';
+import {Schema, Response, CollectionResponse} from '.';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
 const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
@@ -111,7 +117,7 @@ export class ApplicationController {
     return await this.applicationRepository.find(filter);
   }
 
-  @get(prefix + '/applications/{id}', {
+  @get(prefix + '/applications/{applicationId}', {
     responses: {
       '200': Schema.response(
         Application,
@@ -121,47 +127,175 @@ export class ApplicationController {
     },
   })
   async findById(
-    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
   ): Promise<Application> {
     return await this.applicationRepository.findById(id);
   }
 
   readonly updateDesc =
     'Application resource properties that need to be updated';
-  @patch(prefix + '/applications/{id}', {
+  @patch(prefix + '/applications/{applicationId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully update Application resource'),
       '404': Schema.notFound('Can not find Application resource'),
     },
   })
   async updateById(
-    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
     @requestBody(Schema.updateRequest(Application, this.updateDesc))
     application: Partial<Application>,
   ): Promise<void> {
     await this.applicationRepository.updateById(id, application);
   }
 
-  @del(prefix + '/applications/{id}', {
+  @del(prefix + '/applications/{applicationId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully delete Application resource'),
       '404': Schema.notFound('Can not find Application resource'),
     },
   })
   async deleteById(
-    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
   ): Promise<void> {
     await this.applicationRepository.deleteById(id);
   }
 
-  @post(prefix + '/applications/{id}/deploy', {
+  readonly createDeclarationDesc =
+    'Declaration resource that need to be created';
+  @post(prefix + '/applications/{applicationId}/declarations', {
+    responses: {
+      '200': Schema.response(Declaration, this.createDeclarationDesc),
+    },
+  })
+  async createDeclaration(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
+    @requestBody(Schema.createRequest(Declaration, this.createDeclarationDesc))
+    reqBody: Partial<Declaration>,
+  ): Promise<Response> {
+    // Throws HTTP 404, if application does not exist
+    await this.applicationRepository.findById(id);
+    return new Response(
+      Declaration,
+      await this.applicationRepository
+        .declarations(id)
+        .create(new Declaration(reqBody)),
+    );
+  }
+
+  @get(prefix + '/applications/{applicationId}/declarations', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Declaration,
+        'Successfully retrieve Declaration resources',
+      ),
+    },
+  })
+  async findDeclarations(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
+  ): Promise<CollectionResponse> {
+    return new CollectionResponse(
+      Declaration,
+      await this.applicationRepository.declarations(id).find(),
+    );
+  }
+
+  @get(prefix + '/applications/{applicationId}/declarations/{declarationId}', {
+    responses: {
+      '200': Schema.response(
+        Declaration,
+        'Successfully retrieve Declaration resources',
+      ),
+      '404': Schema.notFound('Can not find Declaration resource'),
+    },
+  })
+  async findDeclarationByID(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    applicationId: string,
+    @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
+    declarationId: string,
+  ): Promise<Response> {
+    let declarations = await this.applicationRepository
+      .declarations(applicationId)
+      .find({
+        where: {
+          id: declarationId,
+        },
+      });
+
+    if (declarations.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find Declaration');
+    } else {
+      return new Response(Declaration, declarations[0]);
+    }
+  }
+
+  readonly updateDeclarationDesc =
+    'Declaration resource properties that need to be updated';
+  @patch(
+    prefix + '/applications/{applicationId}/declarations/{declarationId}',
+    {
+      responses: {
+        '204': Schema.emptyResponse('Successfully update Declaration resource'),
+        '404': Schema.notFound('Can not find Declaration resource'),
+      },
+    },
+  )
+  async updateDeclarationByID(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    applicationId: string,
+    @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
+    declarationId: string,
+    @requestBody(Schema.updateRequest(Application, this.updateDeclarationDesc))
+    declaration: Partial<Declaration>,
+  ): Promise<void> {
+    let declarations = await this.applicationRepository
+      .declarations(applicationId)
+      .find({
+        where: {
+          id: declarationId,
+        },
+      });
+
+    if (declarations.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find Declaration');
+    } else {
+      await this.applicationRepository
+        .declarations(applicationId)
+        .patch(declaration, {id: declarationId});
+    }
+  }
+
+  @del(prefix + '/applications/{applicationId}/declarations/{declarationId}', {
+    responses: {
+      '204': Schema.emptyResponse('Successfully delete Declaration resource'),
+      '404': Schema.notFound('Can not find Declaration resource'),
+    },
+  })
+  async deleteDeclarationByID(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    applicationId: string,
+    @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
+    declarationId: string,
+  ) {
+    await this.applicationRepository
+      .declarations(applicationId)
+      .delete({id: declarationId});
+  }
+
+  @post(prefix + '/applications/{applicationId}/deploy', {
     responses: {
       '204': Schema.emptyResponse('Successfully deploy Application resource'),
       '404': Schema.notFound('Can not find Application resource'),
     },
   })
   async deployById(
-    @param(Schema.pathParameter('id', 'Application resource ID')) id: string,
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    id: string,
   ): Promise<Object> {
     let application = await this.applicationRepository.findById(id);
 

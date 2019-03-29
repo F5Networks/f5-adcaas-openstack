@@ -1,7 +1,9 @@
 import {
+  AdcRepository,
   WafpolicyRepository,
   ApplicationRepository,
   AdcTenantAssociationRepository,
+  DeclarationRepository,
   ServiceRepository,
   PoolRepository,
   MemberRepository,
@@ -13,7 +15,9 @@ import {
 } from '../../src/repositories';
 
 import {
+  Adc,
   Application,
+  Declaration,
   Wafpolicy,
   AdcTenantAssociation,
   Service,
@@ -27,8 +31,6 @@ import {
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
-import {AdcRepository} from '../../src/repositories/adc.repository';
-import {Adc} from '../../src/models/adc.model';
 import {isNullOrUndefined} from 'util';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
@@ -200,6 +202,26 @@ export function createAdcObject(data?: Partial<Adc>) {
       port: 8443,
       username: 'admin',
       passphrase: 'admin',
+    },
+    data,
+  );
+}
+
+export async function givenDeclarationData(
+  wafapp: WafApplication,
+  data?: Partial<Declaration>,
+) {
+  const repo = await wafapp.getRepository(DeclarationRepository);
+  const obj = createDeclarationObject(data);
+  return await repo.create(obj);
+}
+
+export function createDeclarationObject(data?: Partial<Declaration>) {
+  return Object.assign(
+    {
+      id: uuid(),
+      name: 'delaration',
+      content: {},
     },
     data,
   );

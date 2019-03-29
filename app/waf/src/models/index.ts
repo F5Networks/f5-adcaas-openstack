@@ -2,6 +2,7 @@ export * from './common.model';
 export * from './application.model';
 export * from './tenantassoc.model';
 export * from './adc.model';
+export * from './declaration.model';
 export * from './service.model';
 export * from './pool.model';
 export * from './member.model';
