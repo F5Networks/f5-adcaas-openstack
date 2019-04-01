@@ -5,7 +5,6 @@ import {
   Client,
 } from '@loopback/testlab';
 import {testdb_config} from '../fixtures/datasources/testdb.datasource';
-import {stubLogging, restoreLogging} from './logging.helpers';
 import {WafBindingKeys} from '../../src/keys';
 import {BootMixin} from '@loopback/boot';
 import {ServiceMixin} from '@loopback/service-proxy';
@@ -24,6 +23,7 @@ export enum RestApplicationPort {
   Neutron = 9696,
   IdentityAdmin = 35357,
 }
+import {stubLogger, restoreLogger} from './logging.helpers';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
@@ -33,7 +33,7 @@ export async function setupApplication(): Promise<AppWithClient> {
     }),
   });
 
-  stubLogging();
+  stubLogger();
   app.bind(WafBindingKeys.KeyDbConfig).to(testdb_config);
 
   await app.boot();
@@ -47,7 +47,7 @@ export async function setupApplication(): Promise<AppWithClient> {
 export async function teardownApplication(
   wafapp: WafApplication,
 ): Promise<void> {
-  restoreLogging();
+  restoreLogger();
   return wafapp.stop();
 }
 
