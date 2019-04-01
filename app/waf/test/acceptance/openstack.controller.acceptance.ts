@@ -3,7 +3,7 @@ import {
   setupRestAppAndClient,
   RestApplicationPort,
   teardownRestAppAndClient,
-} from '../helpers/rest.helpers';
+} from '../helpers/test-helper';
 import {Client, expect} from '@loopback/testlab';
 import {
   MockKeyStoneController,
@@ -11,7 +11,7 @@ import {
   ShouldResponseWith,
   MockNovaController,
   MockNeutronController,
-} from '../fixtures/controllers/mock.openstack.controller';
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {OpenstackController} from '../fixtures/controllers/openstack.controller';

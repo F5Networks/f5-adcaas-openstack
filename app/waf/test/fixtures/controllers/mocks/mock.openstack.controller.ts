@@ -1,7 +1,7 @@
-import {MockBaseController} from '../../helpers/rest.helpers';
 import {post, requestBody, param, get} from '@loopback/rest';
-import {RequestBody} from './openstack.controller';
-import {StubResponses} from '../datasources/testrest.datasource';
+import {RequestBody} from '../openstack.controller';
+import {StubResponses} from '../../datasources/testrest.datasource';
+import {MockBaseController} from './mock.base.controller';
 
 export class MockKeyStoneController extends MockBaseController {
   @post('/v2.0/tokens')

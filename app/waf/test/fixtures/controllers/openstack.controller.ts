@@ -3,8 +3,8 @@ import {ServersParams} from '../../../src/services';
 import {PortCreationParams} from '../../../src/services/network.service';
 import {factory} from '../../../src/log4ts';
 import {get, requestBody, RestApplication} from '@loopback/rest';
-import {MockBaseController} from '../../helpers/rest.helpers';
 import {WafBindingKeys} from '../../../src/keys';
+import {MockBaseController} from './mocks/mock.base.controller';
 
 class Environs {
   [key: string]: string | undefined;
