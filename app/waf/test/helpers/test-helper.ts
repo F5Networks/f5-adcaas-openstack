@@ -7,17 +7,33 @@ import {
 import {testdb_config} from '../fixtures/datasources/testdb.datasource';
 import {stubLogging, restoreLogging} from './logging.helpers';
 import {WafBindingKeys} from '../../src/keys';
+import {BootMixin} from '@loopback/boot';
+import {ServiceMixin} from '@loopback/service-proxy';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
+import {ApplicationConfig} from '@loopback/core';
+import {join} from 'path';
+import {MockBaseController} from '../fixtures/controllers/mocks/mock.base.controller';
+
+export enum RestApplicationPort {
+  // in order, please.
+  RestSelfTest = 2000,
+  WafApp = 3000,
+  IdentityUser = 5000,
+  Nova = 8774,
+  Neutron = 9696,
+  IdentityAdmin = 35357,
+}
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
     rest: givenHttpServerConfig({
       host: 'localhost',
-      port: 3000,
+      port: RestApplicationPort.WafApp,
     }),
   });
 
   stubLogging();
-  // TODO: change all binding keys in code from string to BindingKey type.
   app.bind(WafBindingKeys.KeyDbConfig).to(testdb_config);
 
   await app.boot();
@@ -37,5 +53,54 @@ export async function teardownApplication(
 
 export interface AppWithClient {
   wafapp: WafApplication;
+  client: Client;
+}
+
+export class TestingApplication extends BootMixin(
+  ServiceMixin(RepositoryMixin(RestApplication)),
+) {
+  constructor(options: ApplicationConfig = {}) {
+    super(options);
+    this.projectRoot = join(__dirname, '../../src');
+  }
+}
+
+export async function setupRestAppAndClient(
+  port: number,
+  controllerCtor: typeof MockBaseController,
+): Promise<RestAppAndClient> {
+  const restApp = new TestingApplication({
+    rest: givenHttpServerConfig({
+      port: port,
+      host: 'localhost',
+    }),
+  });
+
+  restApp.controller(controllerCtor);
+
+  restApp.bootOptions = {
+    controllers: {
+      dirs: ['notexists'],
+    },
+    repositories: {
+      dirs: ['repositories'],
+      extensions: ['.repository.js'],
+      nested: true,
+    },
+  };
+
+  await restApp.boot();
+  await restApp.start();
+
+  const client = createRestAppClient(restApp);
+  return {restApp: restApp, client: client};
+}
+
+export function teardownRestAppAndClient(app: TestingApplication) {
+  app.stop();
+}
+
+export interface RestAppAndClient {
+  restApp: TestingApplication;
   client: Client;
 }
