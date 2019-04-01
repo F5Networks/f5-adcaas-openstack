@@ -207,6 +207,7 @@
           }
         ],
         "requestBody": {
+          "description": "ADC resource properties that need to be updated",
           "required": true,
           "content": {
             "application/json": {
@@ -544,6 +545,7 @@
           }
         },
         "requestBody": {
+          "description": "ADC resource that need to be created",
           "required": true,
           "content": {
             "application/json": {
@@ -849,6 +851,7 @@
           }
         ],
         "requestBody": {
+          "description": "Declaration resource properties that need to be updated",
           "required": true,
           "content": {
             "application/json": {
@@ -1066,6 +1069,7 @@
         ],
         "responses": {
           "200": {
+            "description": "Declaration resource that need to be created",
             "content": {
               "application/json": {
                 "schema": {
@@ -1129,6 +1133,7 @@
           }
         ],
         "requestBody": {
+          "description": "Declaration resource that need to be created",
           "required": true,
           "content": {
             "application/json": {
@@ -1351,6 +1356,7 @@
           }
         ],
         "requestBody": {
+          "description": "Application resource properties that need to be updated",
           "required": true,
           "content": {
             "application/json": {
@@ -1656,6 +1662,7 @@
           }
         },
         "requestBody": {
+          "description": "Application resource that need to be created",
           "required": true,
           "content": {
             "application/json": {
