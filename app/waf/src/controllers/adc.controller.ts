@@ -22,6 +22,9 @@ import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
 
+const createDesc = 'ADC resource that need to be created';
+const updateDesc = 'ADC resource properties that need to be updated';
+
 export class AdcController {
   constructor(
     @repository(AdcRepository)
@@ -30,7 +33,6 @@ export class AdcController {
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
   ) {}
 
-  readonly createDesc = 'ADC resource that need to be created';
   @post(prefix + '/adcs', {
     responses: {
       '200': Schema.response(Adc, 'Successfully create ADC resource'),
@@ -39,7 +41,7 @@ export class AdcController {
     },
   })
   async create(
-    @requestBody(Schema.createRequest(Adc, this.createDesc))
+    @requestBody(Schema.createRequest(Adc, createDesc))
     reqBody: Partial<Adc>,
   ): Promise<Response> {
     try {
@@ -91,7 +93,6 @@ export class AdcController {
     return new Response(Adc, data);
   }
 
-  readonly updateDesc = 'ADC resource properties that need to be updated';
   @patch(prefix + '/adcs/{adcId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully update ADC resource'),
@@ -100,7 +101,7 @@ export class AdcController {
   })
   async updateById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
-    @requestBody(Schema.updateRequest(Adc, this.updateDesc)) adc: Partial<Adc>,
+    @requestBody(Schema.updateRequest(Adc, updateDesc)) adc: Partial<Adc>,
   ): Promise<void> {
     await this.adcRepository.updateById(id, adc);
   }
