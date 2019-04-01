@@ -8,7 +8,6 @@ import {
   RestBindings,
   Send,
   SequenceHandler,
-  Request,
   HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
@@ -41,7 +40,7 @@ export class MySequence implements SequenceHandler {
     try {
       const {request, response} = context;
 
-      //await this.authRequest(request);
+      await this.authRequest(context);
 
       const route = this.findRoute(request);
       const args = await this.parseParams(request, route);
@@ -83,8 +82,11 @@ export class MySequence implements SequenceHandler {
     this.logger.info('Response: ' + JSON.stringify(logObj));
   }
 
-  async authRequest(request: Request) {
+  async authRequest(context: RequestContext) {
     if (!process.env.PRODUCT_RELEASE) return;
+
+    let {request} = context;
+    let authedToken = new AuthedToken();
 
     this.logger.debug('start to authenticate user');
 
@@ -95,16 +97,17 @@ export class MySequence implements SequenceHandler {
       );
     }
 
-    const authedToken = await this.application.get<AuthedToken>(
+    const adminToken = await this.application.get<AuthedToken>(
       WafBindingKeys.KeyAdminAuthedToken,
     );
     await this.authWithOSIdentity
-      .validateUserToken(authedToken.token, <string>userToken)
+      .validateUserToken(adminToken.token, <string>userToken)
       .then(
         authedObj => {
           // ...
           this.logger.debug('Authenticated OK');
           this.logger.debug(JSON.stringify(authedObj));
+          authedToken = authedObj;
         },
         notAuthed => {
           throw new HttpErrors.Unauthorized(
@@ -112,5 +115,14 @@ export class MySequence implements SequenceHandler {
           );
         },
       );
+
+    if (request.headers['tenant-id']) {
+      authedToken.tenantId = <string>request.headers['tenant-id'];
+    }
+    if (!authedToken.tenantId || authedToken.tenantId === '') {
+      throw new HttpErrors.BadRequest('BadRequest: tenant id is not provided');
+    }
+
+    context.bind(WafBindingKeys.Request.KeyTenantId).to(authedToken.tenantId);
   }
 }

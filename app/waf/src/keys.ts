@@ -31,4 +31,10 @@ export namespace WafBindingKeys {
   );
 
   export const KeyDbConfig = BindingKey.create<object>('datasources.config.db');
+
+  export namespace Request {
+    export const KeyTenantId = BindingKey.create<string>(
+      'context.request.tenantid',
+    );
+  }
 }

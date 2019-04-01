@@ -325,4 +325,5 @@ export class AuthedToken {
     type: string;
     name: string;
   }[];
+  tenantId: string;
 }
