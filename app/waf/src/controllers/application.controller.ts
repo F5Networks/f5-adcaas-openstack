@@ -43,6 +43,12 @@ const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
 
 const prefix = '/adcaas/v1';
 
+const createDesc = 'Application resource that need to be created';
+const updateDesc = 'Application resource properties that need to be updated';
+const createDeclarationDesc = 'Declaration resource that need to be created';
+const updateDeclarationDesc =
+  'Declaration resource properties that need to be updated';
+
 export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
@@ -66,7 +72,6 @@ export class ApplicationController {
     @inject('services.AS3Service') public as3Service: AS3Service,
   ) {}
 
-  readonly createDesc = 'Application resource that need to be created';
   @post(prefix + '/applications', {
     responses: {
       '200': Schema.response(
@@ -78,7 +83,7 @@ export class ApplicationController {
     },
   })
   async create(
-    @requestBody(Schema.createRequest(Application, this.createDesc))
+    @requestBody(Schema.createRequest(Application, createDesc))
     application: Partial<Application>,
   ): Promise<Application> {
     try {
@@ -133,8 +138,6 @@ export class ApplicationController {
     return await this.applicationRepository.findById(id);
   }
 
-  readonly updateDesc =
-    'Application resource properties that need to be updated';
   @patch(prefix + '/applications/{applicationId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully update Application resource'),
@@ -144,7 +147,7 @@ export class ApplicationController {
   async updateById(
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
-    @requestBody(Schema.updateRequest(Application, this.updateDesc))
+    @requestBody(Schema.updateRequest(Application, updateDesc))
     application: Partial<Application>,
   ): Promise<void> {
     await this.applicationRepository.updateById(id, application);
@@ -163,17 +166,15 @@ export class ApplicationController {
     await this.applicationRepository.deleteById(id);
   }
 
-  readonly createDeclarationDesc =
-    'Declaration resource that need to be created';
   @post(prefix + '/applications/{applicationId}/declarations', {
     responses: {
-      '200': Schema.response(Declaration, this.createDeclarationDesc),
+      '200': Schema.response(Declaration, createDeclarationDesc),
     },
   })
   async createDeclaration(
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
-    @requestBody(Schema.createRequest(Declaration, this.createDeclarationDesc))
+    @requestBody(Schema.createRequest(Declaration, createDeclarationDesc))
     reqBody: Partial<Declaration>,
   ): Promise<Response> {
     // Throws HTTP 404, if application does not exist
@@ -234,8 +235,6 @@ export class ApplicationController {
     }
   }
 
-  readonly updateDeclarationDesc =
-    'Declaration resource properties that need to be updated';
   @patch(
     prefix + '/applications/{applicationId}/declarations/{declarationId}',
     {
@@ -250,7 +249,7 @@ export class ApplicationController {
     applicationId: string,
     @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
     declarationId: string,
-    @requestBody(Schema.updateRequest(Application, this.updateDeclarationDesc))
+    @requestBody(Schema.updateRequest(Application, updateDeclarationDesc))
     declaration: Partial<Declaration>,
   ): Promise<void> {
     let declarations = await this.applicationRepository
