@@ -12,7 +12,6 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
-import uuid = require('uuid');
 import {AuthWithOSIdentity, AuthedToken} from './services';
 import {CoreBindings} from '@loopback/core';
 import {WafApplication} from '.';
@@ -36,8 +35,7 @@ export class MySequence implements SequenceHandler {
   ) {}
 
   async handle(context: RequestContext) {
-    let logUuid = uuid();
-    await this.logRequest(logUuid, context);
+    await this.logRequest(context);
 
     let result: object = {};
     try {
@@ -53,14 +51,14 @@ export class MySequence implements SequenceHandler {
     } catch (err) {
       this.reject(context, err);
     } finally {
-      await this.logResponse(logUuid, context, result);
+      await this.logResponse(context, result);
     }
   }
 
-  async logRequest(logUuid: string, context: RequestContext): Promise<void> {
+  async logRequest(context: RequestContext): Promise<void> {
     const req = context.request;
     const logObj = {
-      uuid: logUuid,
+      uuid: context.name,
       method: req.method,
       headers: req.headers,
       path: req.path,
@@ -71,15 +69,11 @@ export class MySequence implements SequenceHandler {
     };
     this.logger.info('Request: ' + JSON.stringify(logObj));
   }
-  async logResponse(
-    logUuid: string,
-    context: RequestContext,
-    result: object,
-  ): Promise<void> {
+  async logResponse(context: RequestContext, result: object): Promise<void> {
     const res = context.response;
 
     const logObj = {
-      uuid: logUuid,
+      uuid: context.name,
       statusCode: res.statusCode,
       statusMessage: res.statusMessage,
       headers: res.getHeaders(),
