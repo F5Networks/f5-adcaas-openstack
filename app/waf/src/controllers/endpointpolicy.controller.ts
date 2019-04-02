@@ -16,14 +16,25 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Endpointpolicy, Rule} from '../models';
-import {EndpointpolicyRepository} from '../repositories';
+import {Endpointpolicy, Rule, Service} from '../models';
+import {
+  EndpointpolicyRepository,
+  ServiceRepository,
+  ServiceEndpointpolicyAssociationRepository,
+} from '../repositories';
+import {Schema, Response, CollectionResponse} from '.';
 import uuid = require('uuid');
+
 const prefix = '/adcaas/v1';
+
 export class EndpointpolicyController {
   constructor(
     @repository(EndpointpolicyRepository)
     public endpointpolicyRepository: EndpointpolicyRepository,
+    @repository(ServiceRepository)
+    public serviceRepository: ServiceRepository,
+    @repository(ServiceEndpointpolicyAssociationRepository)
+    public serviceEndpointpolicyAssociationRepository: ServiceEndpointpolicyAssociationRepository,
   ) {}
 
   @post(prefix + '/endpointpolicies', {
@@ -208,5 +219,68 @@ export class EndpointpolicyController {
     return await this.endpointpolicyRepository
       .rules(endpointpolicyId)
       .patch(rule, {id: ruleId});
+  }
+
+  @get(prefix + '/endpointpolicies/{endpointpolicyId}/services', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Service,
+        'Successfully retrieve Service resources',
+      ),
+    },
+  })
+  async findServices(
+    @param(
+      Schema.pathParameter('endpointpolicyId', 'Endpoint Policy resource ID'),
+    )
+    id: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
+      where: {
+        endpointpolicyId: id,
+      },
+    });
+
+    let serviceIds = assocs.map(({serviceId}) => serviceId);
+    return new CollectionResponse(
+      Service,
+      await this.serviceRepository.find({
+        where: {
+          id: {
+            inq: serviceIds,
+          },
+        },
+      }),
+    );
+  }
+
+  @get(prefix + '/endpointpolicies/{endpointpolicyId}/services/{serviceId}', {
+    responses: {
+      '200': Schema.response(Service, 'Successfully retrieve Service resource'),
+    },
+  })
+  async findService(
+    @param(
+      Schema.pathParameter('endpointpolicyId', 'Endpoint Policy resource ID'),
+    )
+    endpointpolicyId: string,
+    @param(Schema.pathParameter('serviceId', 'Service resource ID'))
+    serviceId: string,
+  ): Promise<Response> {
+    let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
+      where: {
+        serviceId: serviceId,
+        endpointpolicyId: endpointpolicyId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      return new Response(
+        Service,
+        await this.serviceRepository.findById(assocs[0].serviceId),
+      );
+    }
   }
 }

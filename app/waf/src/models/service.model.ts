@@ -335,7 +335,6 @@ export class Service extends CommonEntity {
 
   //TODO: many-to-many relation to other objects
   // iRules
-  // policyEndpoint
   // allowVlans
   // rejectVlans
   // securityLogProfiles
