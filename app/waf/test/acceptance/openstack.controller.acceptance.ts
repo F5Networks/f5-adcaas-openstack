@@ -215,6 +215,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },
@@ -239,6 +240,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },
@@ -249,7 +251,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v3: 401', async () => {
-    ShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    ShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -263,6 +265,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },
