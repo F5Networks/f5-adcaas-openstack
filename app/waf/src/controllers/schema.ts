@@ -1,4 +1,4 @@
-import {Entity} from '@loopback/repository';
+import {Entity, AnyObject} from '@loopback/repository';
 import {ParameterObject, ParameterLocation} from '@loopback/openapi-v3-types';
 import {MetadataInspector} from '@loopback/metadata';
 import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
@@ -17,7 +17,7 @@ class SchemaProperties {
 
 let schemaMap: {[key: string]: SchemaProperties} = {};
 
-function buildProperties(entity: typeof Entity): SchemaProperties {
+export function buildProperties(entity: typeof Entity): SchemaProperties {
   let entityKey = entity.modelName;
   let props = schemaMap[entityKey];
 
@@ -130,6 +130,19 @@ function buildResponseSchema(
       properties: resp,
     },
   };
+}
+
+function buildResponse(t: typeof Entity, data: Entity) {
+  let props = buildProperties(t);
+  let resp = {};
+
+  for (let key in props.response) {
+    if (props.response[key]) {
+      Object.assign(resp, {[key]: (data as AnyObject)[key]});
+    }
+  }
+
+  return resp;
 }
 
 function buildCollectionResponseSchema(
@@ -283,5 +296,25 @@ export class Schema {
         example,
       ),
     );
+  }
+}
+
+export class Response {
+  [key: string]: object;
+
+  constructor(t: typeof Entity, data: Entity) {
+    this[t.modelName.toLowerCase()] = buildResponse(t, data);
+  }
+}
+
+export class CollectionResponse {
+  [key: string]: object[];
+
+  constructor(t: typeof Entity, data: Entity[]) {
+    let collection = [];
+    for (let elem of data) {
+      collection.push(buildResponse(t, elem));
+    }
+    this[plural(t.modelName.toLowerCase())] = collection;
   }
 }
