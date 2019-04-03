@@ -1,7 +1,7 @@
-import {WafApplication} from './application';
-import {ApplicationConfig} from '@loopback/core';
+import { WafApplication } from './application';
+import { ApplicationConfig } from '@loopback/core';
 
-export {WafApplication};
+export { WafApplication };
 
 const prefix = '/adcaas/v1';
 
