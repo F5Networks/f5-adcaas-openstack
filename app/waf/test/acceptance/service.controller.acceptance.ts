@@ -39,7 +39,7 @@ describe('ServiceController', () => {
     const service = await givenServiceData(wafapp, uuid(), {id: uuid()});
 
     let response = await client.get(prefix + '/services').expect(200);
-    expect(response.body.services).to.containDeep([toJSON(service)]);
+    expect(toJSON(service)).to.containDeep(response.body.services[0]);
   });
 
   it('get' + prefix + '/services/{id}', async () => {
@@ -49,7 +49,7 @@ describe('ServiceController', () => {
       .get(prefix + `/services/${service.id}`)
       .expect(200);
 
-    expect(response.body.service).to.containDeep(toJSON(service));
+    expect(toJSON(service)).to.containDeep(response.body.service);
   });
 
   it('post ' + prefix + '/services', async () => {
