@@ -11,14 +11,18 @@ import {
   get,
   getFilterSchemaFor,
   getWhereSchemaFor,
+  patch,
   del,
   requestBody,
 } from '@loopback/rest';
 import {Service} from '../models';
 import {ServiceRepository, ApplicationRepository} from '../repositories';
-import uuid = require('uuid');
+import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
+
+const createDesc = 'Service resource that need to be created';
+const updateDesc = 'Service resource properties that need to be updated';
 
 export class ServiceController {
   constructor(
@@ -44,61 +48,71 @@ export class ServiceController {
 
   @get(prefix + '/services', {
     responses: {
-      '200': {
-        description: 'Array of Service model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Service}},
-          },
-        },
-      },
+      '200': Schema.response(Service, 'Successfully retrieve Service resource'),
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Service)) filter?: Filter,
-  ): Promise<Service[]> {
-    return await this.serviceRepository.find(filter);
+  ): Promise<CollectionResponse> {
+    let data = await this.serviceRepository.find(filter);
+    return new CollectionResponse(Service, data);
   }
 
-  @get(prefix + '/services/{service_id}', {
+  @get(prefix + '/services/{serviceId}', {
     responses: {
-      '200': {
-        description: 'Service model instance',
-        content: {'application/json': {schema: {'x-ts-type': Service}}},
-      },
+      '200': Schema.response(Service, 'Successfully retrieve Service resource'),
+      '404': Schema.notFound('Can not find Service resource'),
     },
   })
   async findById(
-    @param.path.string('service_id') service_id: string,
-  ): Promise<Service> {
-    return await this.serviceRepository.findById(service_id);
+    @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
+  ): Promise<Response> {
+    let data = await this.serviceRepository.findById(id);
+    return new Response(Service, data);
   }
 
   @post(prefix + '/services', {
     responses: {
-      '200': {
-        description: 'Service model instance',
-        content: {'application/json': {schema: {'x-ts-type': Service}}},
-      },
+      '200': Schema.response(Service, 'Successfully create Service resource'),
+      '400': Schema.badRequest('Invalid Service resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Service resource'),
     },
   })
-  async create(@requestBody() service: Service): Promise<Service> {
-    service.id = uuid();
+  async create(
+    @requestBody(Schema.createRequest(Service, createDesc))
+    service: Service,
+  ): Promise<Response> {
     const appId = service.applicationId;
     delete service.applicationId;
-    return await this.applicationRepository.services(appId).create(service);
+    return new Response(
+      Service,
+      await this.applicationRepository.services(appId).create(service),
+    );
   }
 
-  @del(prefix + '/services/{service_id}', {
+  @patch(prefix + '/services/{serviceId}', {
     responses: {
-      '204': {
-        description: 'Service DELETE success',
-      },
+      '204': Schema.emptyResponse('Successfully update Service resource'),
+      '404': Schema.notFound('Can not find Service resource'),
+    },
+  })
+  async updateById(
+    @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
+    @requestBody(Schema.updateRequest(Service, updateDesc))
+    service: Partial<Service>,
+  ): Promise<void> {
+    await this.serviceRepository.updateById(id, service);
+  }
+
+  @del(prefix + '/services/{serviceId}', {
+    responses: {
+      '204': Schema.emptyResponse('Successfully delete Service resource'),
+      '404': Schema.notFound('Can not find Service resource'),
     },
   })
   async deleteById(
-    @param.path.string('service_id') service_id: string,
+    @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
   ): Promise<void> {
-    await this.serviceRepository.deleteById(service_id);
+    await this.serviceRepository.deleteById(id);
   }
 }
