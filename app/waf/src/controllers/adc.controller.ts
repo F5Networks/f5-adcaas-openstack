@@ -15,10 +15,15 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RestBindings,
+  RequestContext,
 } from '@loopback/rest';
 import {Adc, Tenant} from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {inject} from '@loopback/core';
+import {factory} from '../log4ts';
+import {WafBindingKeys} from '../keys';
 
 const prefix = '/adcaas/v1';
 
@@ -31,6 +36,9 @@ export class AdcController {
     public adcRepository: AdcRepository,
     @repository(AdcTenantAssociationRepository)
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
+    @inject(RestBindings.Http.CONTEXT)
+    private reqCxt: RequestContext,
+    private logger = factory.getLogger('controllers.adc'),
   ) {}
 
   @post(prefix + '/adcs', {
@@ -62,6 +70,16 @@ export class AdcController {
   async count(
     @param.query.object('where', getWhereSchemaFor(Adc)) where?: Where,
   ): Promise<Count> {
+    try {
+      // TODO: remove this reqCxt usage sample.
+      this.logger.debug(
+        'Checked tenant id: ' +
+          (await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId)),
+      );
+    } catch (error) {
+      // do nothing
+    }
+
     return await this.adcRepository.count(where);
   }
 
