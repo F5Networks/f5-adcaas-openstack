@@ -4091,7 +4091,103 @@
         "operationId": "ServiceController.count"
       }
     },
-    "/adcaas/v1/services/{service_id}": {
+    "/adcaas/v1/services/{serviceId}": {
+      "patch": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update Service resource"
+          },
+          "404": {
+            "description": "Can not find Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Service resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "pool": {
+                    "type": "string"
+                  },
+                  "virtualAddresses": {
+                    "type": "array"
+                  },
+                  "virtualPort": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "pool": "11111111-2222-3333-4444-555555555555",
+                  "virtualAddresses": [
+                    "10.100.0.1"
+                  ],
+                  "virtualPort": "80"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "ServiceController.updateById"
+      },
       "get": {
         "x-controller-name": "ServiceController",
         "x-operation-name": "findById",
@@ -4100,11 +4196,98 @@
         ],
         "responses": {
           "200": {
-            "description": "Service model instance",
+            "description": "Successfully retrieve Service resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Service"
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "pool": {
+                          "type": "string"
+                        },
+                        "virtualAddresses": {
+                          "type": "array"
+                        },
+                        "virtualPort": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HTTP",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "virtualAddresses": [
+                          "10.100.0.1"
+                        ],
+                        "virtualPort": "80"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -4112,12 +4295,14 @@
         },
         "parameters": [
           {
-            "name": "service_id",
+            "name": "serviceId",
+            "description": "Service resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "ServiceController.findById"
@@ -4130,17 +4315,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Service DELETE success"
+            "description": "Successfully delete Service resource"
+          },
+          "404": {
+            "description": "Can not find Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "service_id",
+            "name": "serviceId",
+            "description": "Service resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "ServiceController.deleteById"
@@ -4155,21 +4374,185 @@
         ],
         "responses": {
           "200": {
-            "description": "Service model instance",
+            "description": "Successfully create Service resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Service"
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "pool": {
+                          "type": "string"
+                        },
+                        "virtualAddresses": {
+                          "type": "array"
+                        },
+                        "virtualPort": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HTTP",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "virtualAddresses": [
+                          "10.100.0.1"
+                        ],
+                        "virtualPort": "80"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
           }
         },
         "requestBody": {
+          "description": "Service resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Service"
+                "type": "object",
+                "required": [
+                  "type",
+                  "applicationId",
+                  "virtualAddresses"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "applicationId": {
+                    "type": "string"
+                  },
+                  "pool": {
+                    "type": "string"
+                  },
+                  "virtualAddresses": {
+                    "type": "array"
+                  },
+                  "virtualPort": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "type": "HTTP",
+                  "applicationId": "11111111-2222-3333-4444-555555555555",
+                  "pool": "11111111-2222-3333-4444-555555555555",
+                  "virtualAddresses": [
+                    "10.100.0.1"
+                  ],
+                  "virtualPort": "80"
+                }
               }
             }
           }
@@ -4184,13 +4567,65 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Service model instances",
+            "description": "Successfully retrieve Service resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Service"
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "pool": {
+                          "type": "string"
+                        },
+                        "virtualAddresses": {
+                          "type": "array"
+                        },
+                        "virtualPort": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HTTP",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "virtualAddresses": [
+                          "10.100.0.1"
+                        ],
+                        "virtualPort": "80"
+                      }
+                    }
                   }
                 }
               }
@@ -4217,19 +4652,160 @@
                     "name": {
                       "type": "boolean"
                     },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "type": "boolean"
+                    },
+                    "applicationId": {
+                      "type": "boolean"
+                    },
+                    "addressStatus": {
+                      "type": "boolean"
+                    },
+                    "clientTLS": {
+                      "type": "boolean"
+                    },
+                    "clonePools": {
+                      "type": "boolean"
+                    },
+                    "enable": {
+                      "type": "boolean"
+                    },
+                    "fallbackPersistenceMethod": {
+                      "type": "boolean"
+                    },
+                    "lastHop": {
+                      "type": "boolean"
+                    },
+                    "layer4": {
+                      "type": "boolean"
+                    },
+                    "maxConnections": {
+                      "type": "boolean"
+                    },
+                    "metadata": {
+                      "type": "boolean"
+                    },
+                    "mirroring": {
+                      "type": "boolean"
+                    },
+                    "persistenceMethods": {
+                      "type": "boolean"
+                    },
+                    "policyFirewallEnforced": {
+                      "type": "boolean"
+                    },
+                    "policyFirewallStaged": {
+                      "type": "boolean"
+                    },
+                    "policyIAM": {
+                      "type": "boolean"
+                    },
+                    "policyNAT": {
+                      "type": "boolean"
+                    },
+                    "pool": {
+                      "type": "boolean"
+                    },
+                    "profileAnalytics": {
+                      "type": "boolean"
+                    },
+                    "profileClassification": {
+                      "type": "boolean"
+                    },
+                    "profileDiameterEndpoint": {
+                      "type": "boolean"
+                    },
+                    "profileDNS": {
+                      "type": "boolean"
+                    },
+                    "profileDOS": {
+                      "type": "boolean"
+                    },
+                    "profileEnforcement": {
+                      "type": "boolean"
+                    },
+                    "profileFIX": {
+                      "type": "boolean"
+                    },
+                    "profileFTP": {
+                      "type": "boolean"
+                    },
+                    "profileHTTP": {
+                      "type": "boolean"
+                    },
+                    "profileHTTPAcceleration": {
+                      "type": "boolean"
+                    },
+                    "profileHTTPCompression": {
+                      "type": "boolean"
+                    },
+                    "profileIPOther": {
+                      "type": "boolean"
+                    },
+                    "profileMultiplex": {
+                      "type": "boolean"
+                    },
+                    "profileL4": {
+                      "type": "boolean"
+                    },
+                    "profileRADIUS": {
+                      "type": "boolean"
+                    },
+                    "profileRewrite": {
+                      "type": "boolean"
+                    },
+                    "profileSIP": {
+                      "type": "boolean"
+                    },
+                    "profileSubscriberManagement": {
+                      "type": "boolean"
+                    },
+                    "profileTCP": {
+                      "type": "boolean"
+                    },
+                    "profileTrafficLog": {
+                      "type": "boolean"
+                    },
+                    "profileUDP": {
+                      "type": "boolean"
+                    },
+                    "redirect80": {
+                      "type": "boolean"
+                    },
+                    "serverTLS": {
+                      "type": "boolean"
+                    },
+                    "snat": {
+                      "type": "boolean"
+                    },
+                    "translateClientPort": {
+                      "type": "boolean"
+                    },
+                    "translateServerAddress": {
+                      "type": "boolean"
+                    },
+                    "translateServerPort": {
+                      "type": "boolean"
+                    },
                     "virtualAddresses": {
                       "type": "boolean"
                     },
                     "virtualPort": {
                       "type": "boolean"
                     },
-                    "pool": {
-                      "type": "boolean"
-                    },
                     "endpointpolicy": {
-                      "type": "boolean"
-                    },
-                    "applicationId": {
                       "type": "boolean"
                     }
                   }
@@ -5314,6 +5890,158 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string"
+          },
+          "applicationId": {
+            "type": "string"
+          },
+          "addressStatus": {
+            "type": "boolean"
+          },
+          "clientTLS": {
+            "type": "string"
+          },
+          "clonePools": {
+            "type": "object"
+          },
+          "enable": {
+            "type": "boolean"
+          },
+          "fallbackPersistenceMethod": {
+            "type": "string"
+          },
+          "lastHop": {
+            "type": "string"
+          },
+          "layer4": {
+            "type": "string"
+          },
+          "maxConnections": {
+            "type": "number"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "mirroring": {
+            "type": "string"
+          },
+          "persistenceMethods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "policyFirewallEnforced": {
+            "type": "string"
+          },
+          "policyFirewallStaged": {
+            "type": "string"
+          },
+          "policyIAM": {
+            "type": "string"
+          },
+          "policyNAT": {
+            "type": "string"
+          },
+          "pool": {
+            "type": "string"
+          },
+          "profileAnalytics": {
+            "type": "string"
+          },
+          "profileClassification": {
+            "type": "string"
+          },
+          "profileDiameterEndpoint": {
+            "type": "string"
+          },
+          "profileDNS": {
+            "type": "string"
+          },
+          "profileDOS": {
+            "type": "string"
+          },
+          "profileEnforcement": {
+            "type": "string"
+          },
+          "profileFIX": {
+            "type": "string"
+          },
+          "profileFTP": {
+            "type": "string"
+          },
+          "profileHTTP": {
+            "type": "string"
+          },
+          "profileHTTPAcceleration": {
+            "type": "string"
+          },
+          "profileHTTPCompression": {
+            "type": "string"
+          },
+          "profileIPOther": {
+            "type": "string"
+          },
+          "profileMultiplex": {
+            "type": "string"
+          },
+          "profileL4": {
+            "type": "string"
+          },
+          "profileRADIUS": {
+            "type": "string"
+          },
+          "profileRewrite": {
+            "type": "string"
+          },
+          "profileSIP": {
+            "type": "string"
+          },
+          "profileSubscriberManagement": {
+            "type": "string"
+          },
+          "profileTCP": {
+            "type": "object"
+          },
+          "profileTrafficLog": {
+            "type": "string"
+          },
+          "profileUDP": {
+            "type": "string"
+          },
+          "redirect80": {
+            "type": "boolean"
+          },
+          "serverTLS": {
+            "type": "string"
+          },
+          "snat": {
+            "type": "string"
+          },
+          "translateClientPort": {
+            "type": "boolean"
+          },
+          "translateServerAddress": {
+            "type": "boolean"
+          },
+          "translateServerPort": {
+            "type": "boolean"
+          },
           "virtualAddresses": {
             "type": "array",
             "items": {
@@ -5323,19 +6051,15 @@
           "virtualPort": {
             "type": "number"
           },
-          "pool": {
-            "type": "string"
-          },
           "endpointpolicy": {
-            "type": "string"
-          },
-          "applicationId": {
             "type": "string"
           }
         },
         "required": [
-          "virtualAddresses",
-          "applicationId"
+          "id",
+          "type",
+          "applicationId",
+          "virtualAddresses"
         ]
       },
       "Wafpolicy": {
