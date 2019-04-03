@@ -36,5 +36,8 @@ export namespace WafBindingKeys {
     export const KeyTenantId = BindingKey.create<string>(
       'context.request.tenantid',
     );
+    export const KeyUserToken = BindingKey.create<string>(
+      'context.request.usertoken',
+    );
   }
 }

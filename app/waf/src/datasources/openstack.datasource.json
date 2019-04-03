@@ -28,11 +28,15 @@
       "template": {
         "method": "GET",
         "url": "{url}",
+        "headers": {
+          "X-Auth-Token": "{adminToken}"
+        },
         "responsePath": "$"
       },
       "functions": {
         "v2ValidateToken": [
-          "url"
+          "url",
+          "adminToken"
         ]
       }
     },

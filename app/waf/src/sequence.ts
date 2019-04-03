@@ -113,5 +113,6 @@ export class MySequence implements SequenceHandler {
     }
 
     context.bind(WafBindingKeys.Request.KeyTenantId).to(userToken.tenantId);
+    context.bind(WafBindingKeys.Request.KeyUserToken).to(userToken.token);
   }
 }

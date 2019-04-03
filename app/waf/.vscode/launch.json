@@ -14,7 +14,7 @@
         // TODO: remove .vscode
         //"${workspaceFolder}/dist/test/<your specific file>.js",
         //"${workspaceFolder}/dist/test/**/*.js",
-        "${workspaceFolder}/dist/test/acceptance/openstack.controller.acceptance.js"
+        "${workspaceFolder}/dist/test/acceptance/adc.controller.acceptance.js"
       ],
       "runtimeExecutable": null,
       "internalConsoleOptions": "openOnSessionStart",
@@ -32,10 +32,10 @@
       "args": [],
       "env": {
         "PRODUCT_RELEASE": "1",
-        "OS_AUTH_URL": "http://10.145.116.217:35357/v3",
+        "OS_AUTH_URL": "http://10.250.13.51:5000/v3",
         "OS_USERNAME": "wafaas",
         "OS_PASSWORD": "91153c85b8dd4147",
-        "OS_TENANT_ID": "32b8bef6100e4cb0a984a7c1f9027802",
+        "OS_TENANT_ID": "5d873cbc8e194e20b0db211a82f3b472",
         "OS_DOMAIN_NAME": "Default"
       },
       "cwd": "${workspaceFolder}",
