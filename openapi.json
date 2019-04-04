@@ -2514,159 +2514,7 @@
         "operationId": "EndpointpolicyController.find"
       }
     },
-    "/adcaas/v1/members/count": {
-      "get": {
-        "x-controller-name": "PoolController",
-        "x-operation-name": "countMembers",
-        "tags": [
-          "PoolController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Member model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "PoolController.countMembers"
-      }
-    },
-    "/adcaas/v1/members": {
-      "get": {
-        "x-controller-name": "PoolController",
-        "x-operation-name": "findMembers",
-        "tags": [
-          "PoolController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of Member model instances",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Member"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "filter",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "properties": {
-                "where": {
-                  "type": "object"
-                },
-                "fields": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "boolean"
-                    },
-                    "address": {
-                      "type": "boolean"
-                    },
-                    "port": {
-                      "type": "boolean"
-                    },
-                    "poolId": {
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "offset": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "limit": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "skip": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "order": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "PoolController.findMembers"
-      }
-    },
-    "/adcaas/v1/monitors/count": {
-      "get": {
-        "x-controller-name": "MonitorController",
-        "x-operation-name": "count",
-        "tags": [
-          "MonitorController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Monitor model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "MonitorController.count"
-      }
-    },
-    "/adcaas/v1/monitors/{id}": {
+    "/adcaas/v1/monitors/{monitorId}": {
       "patch": {
         "x-controller-name": "MonitorController",
         "x-operation-name": "updateById",
@@ -2675,24 +2523,97 @@
         ],
         "responses": {
           "204": {
-            "description": "Monitor PATCH success"
+            "description": "Successfully update Monitor resource"
+          },
+          "404": {
+            "description": "Can not find Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "monitorId",
+            "description": "Monitor resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Monitor resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Monitor"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "interval": {
+                    "type": "number"
+                  },
+                  "timeout": {
+                    "type": "number"
+                  },
+                  "targetAddress": {
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "number"
+                  },
+                  "monitorType": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "interval": 5,
+                  "timeout": 16,
+                  "targetAddress": "192.168.10.123",
+                  "targetPort": 8080,
+                  "monitorType": "tcp"
+                }
               }
             }
           },
@@ -2707,12 +2628,99 @@
           "MonitorController"
         ],
         "responses": {
-          "200": {
-            "description": "Monitor model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Monitor"
+          "responses": {
+            "200": {
+              "description": "Successfully retrieve Pool resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "monitor": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "interval": {
+                            "type": "number"
+                          },
+                          "timeout": {
+                            "type": "number"
+                          },
+                          "targetAddress": {
+                            "type": "string"
+                          },
+                          "targetPort": {
+                            "type": "number"
+                          },
+                          "monitorType": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "interval": 5,
+                          "timeout": 16,
+                          "targetAddress": "192.168.10.123",
+                          "targetPort": 8080,
+                          "monitorType": "tcp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Can not find Pool resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "statusCode": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "details": {
+                        "type": "array"
+                      }
+                    },
+                    "example": {
+                      "statusCode": 404,
+                      "name": "Error",
+                      "code": "ENTITY_NOT_FOUND"
+                    }
+                  }
                 }
               }
             }
@@ -2720,12 +2728,14 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "monitorId",
+            "description": "Monitor resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "MonitorController.findById"
@@ -2738,17 +2748,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Monitor DELETE success"
+            "description": "Successfully delete Monitor resource"
+          },
+          "404": {
+            "description": "Can not find Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "monitorId",
+            "description": "Monitor resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "MonitorController.deleteById"
@@ -2763,21 +2807,177 @@
         ],
         "responses": {
           "200": {
-            "description": "Monitor model instance",
+            "description": "Successfully create Monitor resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Monitor"
+                  "type": "object",
+                  "properties": {
+                    "monitor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "interval": {
+                          "type": "number"
+                        },
+                        "timeout": {
+                          "type": "number"
+                        },
+                        "targetAddress": {
+                          "type": "string"
+                        },
+                        "targetPort": {
+                          "type": "number"
+                        },
+                        "monitorType": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "interval": 5,
+                        "timeout": 16,
+                        "targetAddress": "192.168.10.123",
+                        "targetPort": 8080,
+                        "monitorType": "tcp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
           }
         },
         "requestBody": {
+          "description": "Monitor resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "interval": {
+                    "type": "number"
+                  },
+                  "timeout": {
+                    "type": "number"
+                  },
+                  "targetAddress": {
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "number"
+                  },
+                  "monitorType": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "interval": 5,
+                  "timeout": 16,
+                  "targetAddress": "192.168.10.123",
+                  "targetPort": 8080,
+                  "monitorType": "tcp"
+                }
               }
             }
           }
@@ -2792,13 +2992,66 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Monitor model instances",
+            "description": "Successfully retrieve Monitor resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Monitor"
+                  "type": "object",
+                  "properties": {
+                    "monitors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "interval": {
+                            "type": "number"
+                          },
+                          "timeout": {
+                            "type": "number"
+                          },
+                          "targetAddress": {
+                            "type": "string"
+                          },
+                          "targetPort": {
+                            "type": "number"
+                          },
+                          "monitorType": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "interval": 5,
+                          "timeout": 16,
+                          "targetAddress": "192.168.10.123",
+                          "targetPort": 8080,
+                          "monitorType": "tcp"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3045,46 +3298,8 @@
         "operationId": "PingController.ping"
       }
     },
-    "/adcaas/v1/pools/count": {
-      "get": {
-        "x-controller-name": "PoolController",
-        "x-operation-name": "count",
-        "tags": [
-          "PoolController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Pool model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "PoolController.count"
-      }
-    },
-    "/adcaas/v1/pools/{pool_id}/members/{member_id}": {
-      "put": {
+    "/adcaas/v1/pools/{poolId}/members/{memberId}": {
+      "patch": {
         "x-controller-name": "PoolController",
         "x-operation-name": "updateMemberByID",
         "tags": [
@@ -3104,27 +3319,58 @@
         },
         "parameters": [
           {
-            "name": "pool_id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "member_id",
+            "name": "memberId",
+            "description": "Member resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Member resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "address": "192.168.1.12",
+                  "port": 80
+                }
               }
             }
           },
@@ -3140,11 +3386,59 @@
         ],
         "responses": {
           "200": {
-            "description": "Member model instance",
+            "description": "Successfully retrieve member resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Member"
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "address": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "poolId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "address": "192.168.1.12",
+                          "port": 80,
+                          "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -3152,20 +3446,24 @@
         },
         "parameters": [
           {
-            "name": "pool_id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "member_id",
+            "name": "memberId",
+            "description": "Member resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "PoolController.getMemberByID"
@@ -3183,26 +3481,30 @@
         },
         "parameters": [
           {
-            "name": "pool_id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "member_id",
+            "name": "memberId",
+            "description": "Member resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "PoolController.deleteMemberByID"
       }
     },
-    "/adcaas/v1/pools/{pool_id}/members": {
+    "/adcaas/v1/pools/{poolId}/members": {
       "post": {
         "x-controller-name": "PoolController",
         "x-operation-name": "createPoolMember",
@@ -3211,11 +3513,120 @@
         ],
         "responses": {
           "200": {
-            "description": "Member add to Pool success",
+            "description": "Successfully create Member resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Member"
+                  "type": "object",
+                  "properties": {
+                    "member": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "number"
+                        },
+                        "poolId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "address": "192.168.1.12",
+                        "port": 80,
+                        "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Member resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Member resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
@@ -3223,19 +3634,48 @@
         },
         "parameters": [
           {
-            "name": "pool_id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Member resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "address": "192.168.1.12",
+                  "port": 80
+                }
               }
             }
           },
@@ -3251,13 +3691,58 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Member model instances",
+            "description": "Successfully retrieve member resources by pool id",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Member"
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "address": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "poolId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "address": "192.168.1.12",
+                          "port": 80,
+                          "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3266,51 +3751,20 @@
         },
         "parameters": [
           {
-            "name": "pool_id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "PoolController.getMembers"
       }
     },
-    "/adcaas/v1/pools/{id}": {
-      "put": {
-        "x-controller-name": "PoolController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "PoolController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Pool PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pool"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
-        "operationId": "PoolController.replaceById"
-      },
+    "/adcaas/v1/pools/{poolId}": {
       "patch": {
         "x-controller-name": "PoolController",
         "x-operation-name": "updateById",
@@ -3319,24 +3773,104 @@
         ],
         "responses": {
           "204": {
-            "description": "Pool PATCH success"
+            "description": "Successfully update Pool resource"
+          },
+          "404": {
+            "description": "Can not find Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Pool resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pool"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "loadBalancingMode": {
+                    "type": "string"
+                  },
+                  "monitors": {
+                    "type": "array"
+                  },
+                  "minimumMembersActive": {
+                    "type": "number"
+                  },
+                  "minimumMonitors": {
+                    "type": "number"
+                  },
+                  "reselectTries": {
+                    "type": "number"
+                  },
+                  "serviceDownAction": {
+                    "type": "string"
+                  },
+                  "slowRampTime": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "loadBalancingMode": "round-robin",
+                  "monitors": [
+                    "23442d6a-4d82-40ee-8d08-243750dbc191",
+                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                  ],
+                  "minimumMembersActive": 1,
+                  "minimumMonitors": 1,
+                  "reselectTries": 0,
+                  "serviceDownAction": "drop",
+                  "slowRampTime": 10
+                }
               }
             }
           },
@@ -3352,11 +3886,107 @@
         ],
         "responses": {
           "200": {
-            "description": "Pool model instance",
+            "description": "Successfully retrieve Pool resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pool"
+                  "type": "object",
+                  "properties": {
+                    "pool": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "loadBalancingMode": {
+                          "type": "string"
+                        },
+                        "monitors": {
+                          "type": "array"
+                        },
+                        "minimumMembersActive": {
+                          "type": "number"
+                        },
+                        "minimumMonitors": {
+                          "type": "number"
+                        },
+                        "reselectTries": {
+                          "type": "number"
+                        },
+                        "serviceDownAction": {
+                          "type": "string"
+                        },
+                        "slowRampTime": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "loadBalancingMode": "round-robin",
+                        "monitors": [
+                          "23442d6a-4d82-40ee-8d08-243750dbc191",
+                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                        ],
+                        "minimumMembersActive": 1,
+                        "minimumMonitors": 1,
+                        "reselectTries": 0,
+                        "serviceDownAction": "drop",
+                        "slowRampTime": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -3364,12 +3994,14 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "PoolController.findById"
@@ -3382,17 +4014,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Pool DELETE success"
+            "description": "Successfully delete Pool resource"
+          },
+          "404": {
+            "description": "Can not find Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "poolId",
+            "description": "Pool resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "PoolController.deleteById"
@@ -3407,71 +4073,204 @@
         ],
         "responses": {
           "200": {
-            "description": "Pool model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pool"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pool"
-              }
-            }
-          }
-        },
-        "operationId": "PoolController.create"
-      },
-      "patch": {
-        "x-controller-name": "PoolController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "PoolController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Pool PATCH success count",
+            "description": "Successfully create Pool resource",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "number"
+                    "pool": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "loadBalancingMode": {
+                          "type": "string"
+                        },
+                        "monitors": {
+                          "type": "array"
+                        },
+                        "minimumMembersActive": {
+                          "type": "number"
+                        },
+                        "minimumMonitors": {
+                          "type": "number"
+                        },
+                        "reselectTries": {
+                          "type": "number"
+                        },
+                        "serviceDownAction": {
+                          "type": "string"
+                        },
+                        "slowRampTime": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "loadBalancingMode": "round-robin",
+                        "monitors": [
+                          "23442d6a-4d82-40ee-8d08-243750dbc191",
+                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                        ],
+                        "minimumMembersActive": 1,
+                        "minimumMonitors": 1,
+                        "reselectTries": 0,
+                        "serviceDownAction": "drop",
+                        "slowRampTime": 10
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
                   }
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
         "requestBody": {
+          "description": "Pool resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pool"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "loadBalancingMode": {
+                    "type": "string"
+                  },
+                  "monitors": {
+                    "type": "array"
+                  },
+                  "minimumMembersActive": {
+                    "type": "number"
+                  },
+                  "minimumMonitors": {
+                    "type": "number"
+                  },
+                  "reselectTries": {
+                    "type": "number"
+                  },
+                  "serviceDownAction": {
+                    "type": "string"
+                  },
+                  "slowRampTime": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "loadBalancingMode": "round-robin",
+                  "monitors": [
+                    "23442d6a-4d82-40ee-8d08-243750dbc191",
+                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                  ],
+                  "minimumMembersActive": 1,
+                  "minimumMonitors": 1,
+                  "reselectTries": 0,
+                  "serviceDownAction": "drop",
+                  "slowRampTime": 10
+                }
               }
             }
           }
         },
-        "operationId": "PoolController.updateAll"
+        "operationId": "PoolController.create"
       },
       "get": {
         "x-controller-name": "PoolController",
@@ -3481,13 +4280,77 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Pool model instances",
+            "description": "Successfully retrieve Pool resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Pool"
+                  "type": "object",
+                  "properties": {
+                    "pools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "loadBalancingMode": {
+                            "type": "string"
+                          },
+                          "monitors": {
+                            "type": "array"
+                          },
+                          "minimumMembersActive": {
+                            "type": "number"
+                          },
+                          "minimumMonitors": {
+                            "type": "number"
+                          },
+                          "reselectTries": {
+                            "type": "number"
+                          },
+                          "serviceDownAction": {
+                            "type": "string"
+                          },
+                          "slowRampTime": {
+                            "type": "number"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "loadBalancingMode": "round-robin",
+                          "monitors": [
+                            "23442d6a-4d82-40ee-8d08-243750dbc191",
+                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                          ],
+                          "minimumMembersActive": 1,
+                          "minimumMonitors": 1,
+                          "reselectTries": 0,
+                          "serviceDownAction": "drop",
+                          "slowRampTime": 10
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3514,10 +4377,37 @@
                     "name": {
                       "type": "boolean"
                     },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
                     "loadBalancingMode": {
                       "type": "boolean"
                     },
                     "monitors": {
+                      "type": "boolean"
+                    },
+                    "minimumMembersActive": {
+                      "type": "boolean"
+                    },
+                    "minimumMonitors": {
+                      "type": "boolean"
+                    },
+                    "reselectTries": {
+                      "type": "boolean"
+                    },
+                    "serviceDownAction": {
+                      "type": "boolean"
+                    },
+                    "slowRampTime": {
                       "type": "boolean"
                     }
                   }
@@ -6134,8 +7024,8 @@
           "monitorType"
         ]
       },
-      "Pool": {
-        "title": "Pool",
+      "Member": {
+        "title": "Member",
         "properties": {
           "id": {
             "type": "string"
@@ -6143,22 +7033,19 @@
           "name": {
             "type": "string"
           },
-          "loadBalancingMode": {
+          "description": {
             "type": "string"
           },
-          "monitors": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "Member": {
-        "title": "Member",
-        "properties": {
-          "id": {
+          "tenantId": {
             "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           },
           "address": {
             "type": "string"
