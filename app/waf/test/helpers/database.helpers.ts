@@ -13,6 +13,7 @@ import {
   ConditionRepository,
   ActionRepository,
   MonitorRepository,
+  PoolmonitorassocRepository,
 } from '../../src/repositories';
 
 import {
@@ -30,6 +31,7 @@ import {
   Condition,
   Action,
   Monitor,
+  PoolMonitorAssociation,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -67,6 +69,11 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const monitorRepo = await wafapp.getRepository(MonitorRepository);
   await monitorRepo.deleteAll();
+
+  const poolmonitorRepo = await wafapp.getRepository(
+    PoolmonitorassocRepository,
+  );
+  await poolmonitorRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -313,7 +320,6 @@ export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
-      monitors: ['http'],
     },
     data,
   );
@@ -354,4 +360,25 @@ export function createMonitorObject(data?: Partial<Monitor>) {
     },
     data,
   );
+}
+
+export function createPoolMonitorAssociationObject(
+  data?: Partial<PoolMonitorAssociation>,
+) {
+  return Object.assign(
+    {
+      poolId: uuid(),
+      monitorId: uuid(),
+    },
+    data,
+  );
+}
+
+export async function givePoolMonitorAssociationData(
+  wafapp: WafApplication,
+  data?: Partial<PoolMonitorAssociation>,
+) {
+  const repo = await wafapp.getRepository(PoolmonitorassocRepository);
+
+  return await repo.create(createPoolMonitorAssociationObject(data));
 }
