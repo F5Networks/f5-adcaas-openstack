@@ -2084,6 +2084,197 @@
         "operationId": "EndpointpolicyController.getRules"
       }
     },
+    "/adcaas/v1/endpointpolicies/{endpointpolicyId}/services/{serviceId}": {
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "findService",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Service resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "applicationId": {
+                          "type": "string"
+                        },
+                        "pool": {
+                          "type": "string"
+                        },
+                        "virtualAddresses": {
+                          "type": "array"
+                        },
+                        "virtualPort": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "type": "HTTP",
+                        "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "virtualAddresses": [
+                          "10.100.0.1"
+                        ],
+                        "virtualPort": "80"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
+            "description": "Endpoint Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "EndpointpolicyController.findService"
+      }
+    },
+    "/adcaas/v1/endpointpolicies/{endpointpolicyId}/services": {
+      "get": {
+        "x-controller-name": "EndpointpolicyController",
+        "x-operation-name": "findServices",
+        "tags": [
+          "EndpointpolicyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Service resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "applicationId": {
+                            "type": "string"
+                          },
+                          "pool": {
+                            "type": "string"
+                          },
+                          "virtualAddresses": {
+                            "type": "array"
+                          },
+                          "virtualPort": {
+                            "type": "number"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "type": "HTTP",
+                          "applicationId": "11111111-2222-3333-4444-555555555555",
+                          "pool": "11111111-2222-3333-4444-555555555555",
+                          "virtualAddresses": [
+                            "10.100.0.1"
+                          ],
+                          "virtualPort": "80"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "endpointpolicyId",
+            "description": "Endpoint Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "EndpointpolicyController.findServices"
+      }
+    },
     "/adcaas/v1/endpointpolicies/{id}": {
       "patch": {
         "x-controller-name": "EndpointpolicyController",
@@ -4089,6 +4280,255 @@
           }
         ],
         "operationId": "ServiceController.count"
+      }
+    },
+    "/adcaas/v1/services/{serviceId}/endpointpolicies/{endpointpolicyId}": {
+      "post": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "associatePolicy",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully associate Service and Endpoint Policy"
+          },
+          "404": {
+            "description": "Cannot find Service resource or Endpoint Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "endpointpolicyId",
+            "description": "Endpoint Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ServiceController.associatePolicy"
+      },
+      "get": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "findPolicy",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Endpoint Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "endpointpolicy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "endpointpolicyId",
+            "description": "Endpoint Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ServiceController.findPolicy"
+      },
+      "delete": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "deassociatePolicy",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deassociate Service and Endpoint Policy"
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "endpointpolicyId",
+            "description": "Endpoint Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ServiceController.deassociatePolicy"
+      }
+    },
+    "/adcaas/v1/services/{serviceId}/endpointpolicies": {
+      "get": {
+        "x-controller-name": "ServiceController",
+        "x-operation-name": "findPolicies",
+        "tags": [
+          "ServiceController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Endpoint Policy resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "endpointpolicies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "description": "Service resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ServiceController.findPolicies"
       }
     },
     "/adcaas/v1/services/{serviceId}": {
