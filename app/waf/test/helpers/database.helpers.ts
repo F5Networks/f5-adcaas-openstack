@@ -5,6 +5,7 @@ import {
   AdcTenantAssociationRepository,
   DeclarationRepository,
   ServiceRepository,
+  ServiceEndpointpolicyAssociationRepository,
   PoolRepository,
   MemberRepository,
   RuleRepository,
@@ -21,6 +22,7 @@ import {
   Wafpolicy,
   AdcTenantAssociation,
   Service,
+  ServiceEndpointpolicyAssociation,
   Pool,
   Member,
   Rule,
@@ -272,6 +274,28 @@ export function createServiceObject(data?: Partial<Service>) {
       id: uuid(),
       type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
+    },
+    data,
+  );
+}
+
+export async function givenServiceEndpointpolicyAssociationData(
+  wafapp: WafApplication,
+  data?: Partial<ServiceEndpointpolicyAssociation>,
+) {
+  const repo = await wafapp.getRepository(
+    ServiceEndpointpolicyAssociationRepository,
+  );
+  return await repo.create(createServiceEndpointpolicyAssociationObject(data));
+}
+
+export function createServiceEndpointpolicyAssociationObject(
+  data?: Partial<ServiceEndpointpolicyAssociation>,
+) {
+  return Object.assign(
+    {
+      serviceId: uuid(),
+      endpointpolicyId: uuid(),
     },
     data,
   );

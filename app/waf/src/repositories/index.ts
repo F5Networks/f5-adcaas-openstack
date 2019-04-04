@@ -8,6 +8,7 @@ export * from './pool.repository';
 export * from './member.repository';
 export * from './rule.repository';
 export * from './endpointpolicy.repository';
+export * from './endpointpolicyassoc.repository';
 export * from './wafpolicy.repository';
 export * from './condition.repository';
 export * from './action.repository';

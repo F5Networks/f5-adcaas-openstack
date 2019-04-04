@@ -14,9 +14,15 @@ import {
   patch,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
-import {Service} from '../models';
-import {ServiceRepository, ApplicationRepository} from '../repositories';
+import {Service, Endpointpolicy} from '../models';
+import {
+  ServiceRepository,
+  ApplicationRepository,
+  EndpointpolicyRepository,
+  ServiceEndpointpolicyAssociationRepository,
+} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
@@ -30,6 +36,10 @@ export class ServiceController {
     public serviceRepository: ServiceRepository,
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
+    @repository(EndpointpolicyRepository)
+    public endpointpolicyRepository: EndpointpolicyRepository,
+    @repository(ServiceEndpointpolicyAssociationRepository)
+    public serviceEndpointpolicyAssociationRepository: ServiceEndpointpolicyAssociationRepository,
   ) {}
 
   @get(prefix + '/services/count', {
@@ -114,5 +124,118 @@ export class ServiceController {
     @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
   ): Promise<void> {
     await this.serviceRepository.deleteById(id);
+  }
+
+  @post(prefix + '/services/{serviceId}/endpointpolicies/{endpointpolicyId}', {
+    responses: {
+      '204': Schema.emptyResponse(
+        'Successfully associate Service and Endpoint Policy',
+      ),
+      '404': Schema.notFound(
+        'Cannot find Service resource or Endpoint Policy resource',
+      ),
+    },
+  })
+  async associatePolicy(
+    @param(Schema.pathParameter('serviceId', 'Service resource ID'))
+    serviceId: string,
+    @param(
+      Schema.pathParameter('endpointpolicyId', 'Endpoint Policy resource ID'),
+    )
+    endpointpolicyId: string,
+  ): Promise<void> {
+    // Throws HTTP 404, if Service or Endpoint Policy not found.
+    await this.serviceRepository.findById(serviceId);
+    await this.endpointpolicyRepository.findById(endpointpolicyId);
+    await this.serviceEndpointpolicyAssociationRepository.create({
+      serviceId: serviceId,
+      endpointpolicyId: endpointpolicyId,
+    });
+  }
+
+  @get(prefix + '/services/{serviceId}/endpointpolicies', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Endpointpolicy,
+        'Successfully retrieve Endpoint Policy resources',
+      ),
+    },
+  })
+  async findPolicies(
+    @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
+      where: {
+        serviceId: id,
+      },
+    });
+
+    let policyIds = assocs.map(({endpointpolicyId}) => endpointpolicyId);
+    return new CollectionResponse(
+      Endpointpolicy,
+      await this.endpointpolicyRepository.find({
+        where: {
+          id: {
+            inq: policyIds,
+          },
+        },
+      }),
+    );
+  }
+
+  @get(prefix + '/services/{serviceId}/endpointpolicies/{endpointpolicyId}', {
+    responses: {
+      '200': Schema.response(
+        Endpointpolicy,
+        'Successfully retrieve Endpoint Policy resource',
+      ),
+    },
+  })
+  async findPolicy(
+    @param(Schema.pathParameter('serviceId', 'Service resource ID'))
+    serviceId: string,
+    @param(
+      Schema.pathParameter('endpointpolicyId', 'Endpoint Policy resource ID'),
+    )
+    endpointpolicyId: string,
+  ): Promise<Response> {
+    let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
+      where: {
+        serviceId: serviceId,
+        endpointpolicyId: endpointpolicyId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      return new Response(
+        Endpointpolicy,
+        await this.endpointpolicyRepository.findById(
+          assocs[0].endpointpolicyId,
+        ),
+      );
+    }
+  }
+
+  @del(prefix + '/services/{serviceId}/endpointpolicies/{endpointpolicyId}', {
+    responses: {
+      '204': Schema.emptyResponse(
+        'Successfully deassociate Service and Endpoint Policy',
+      ),
+    },
+  })
+  async deassociatePolicy(
+    @param(Schema.pathParameter('serviceId', 'Service resource ID'))
+    serviceId: string,
+    @param(
+      Schema.pathParameter('endpointpolicyId', 'Endpoint Policy resource ID'),
+    )
+    endpointpolicyId: string,
+  ): Promise<void> {
+    await this.serviceEndpointpolicyAssociationRepository.deleteAll({
+      serviceId: serviceId,
+      endpointpolicyId: endpointpolicyId,
+    });
   }
 }
