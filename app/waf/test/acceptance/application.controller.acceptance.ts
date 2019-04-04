@@ -176,6 +176,7 @@ describe('ApplicationController', () => {
         adcId: adc.id,
       });
       let pool = await givenPoolData(wafapp, {
+        id: uuid(),
         name: 'pool1',
       });
       await givenMemberData(wafapp, {
@@ -238,6 +239,7 @@ describe('ApplicationController', () => {
     });
     let pool = await givenPoolData(wafapp, {
       name: 'pool1',
+      id: uuid(),
     });
     let application = await givenApplicationData(wafapp);
     await givenServiceData(wafapp, <string>application.id, {
@@ -260,6 +262,7 @@ describe('ApplicationController', () => {
         adcId: adc.id,
       });
       let pool = await givenPoolData(wafapp, {
+        id: uuid(),
         name: 'pool1',
       });
       let application = await givenApplicationData(wafapp);
@@ -303,6 +306,7 @@ describe('ApplicationController', () => {
       });
       let pool = await givenPoolData(wafapp, {
         name: 'pool1',
+        id: uuid(),
       });
       await givenMemberData(wafapp, {
         id: uuid(),

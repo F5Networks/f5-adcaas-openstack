@@ -306,21 +306,10 @@ export async function givenPoolData(
   data?: Partial<Pool>,
 ) {
   const repo = await wafapp.getRepository(PoolRepository);
-  return await repo.create(createPoolObjectWithID(data));
+  return await repo.create(createPoolObject(data));
 }
 
-export function createPoolObjectWithID(data?: Partial<Pool>) {
-  return Object.assign(
-    {
-      id: uuid(),
-      loadBalancingMode: 'round-robin',
-      monitors: ['http'],
-    },
-    data,
-  );
-}
-
-export function createPoolObjectWithoutID(data?: Partial<Pool>) {
+export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
