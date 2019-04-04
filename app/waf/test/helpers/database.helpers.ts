@@ -14,6 +14,7 @@ import {
   ActionRepository,
   MonitorRepository,
   MemberMonitorAssociationRepository,
+  PoolMonitorAssocRepository,
 } from '../../src/repositories';
 
 import {
@@ -32,6 +33,7 @@ import {
   Action,
   Monitor,
   MemberMonitorAssociation,
+  PoolMonitorAssociation,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -74,6 +76,10 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
     MemberMonitorAssociationRepository,
   );
   await memberMonitorRepo.deleteAll();
+  const poolmonitorRepo = await wafapp.getRepository(
+    PoolMonitorAssocRepository,
+  );
+  await poolmonitorRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -320,7 +326,6 @@ export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
-      monitors: ['http'],
     },
     data,
   );
@@ -375,6 +380,18 @@ export function createMemberMonitorAssociationObject(
   );
 }
 
+export function createPoolMonitorAssociationObject(
+  data?: Partial<PoolMonitorAssociation>,
+) {
+  return Object.assign(
+    {
+      poolId: uuid(),
+      monitorId: uuid(),
+    },
+    data,
+  );
+}
+
 export async function giveMemberMonitorAssociationData(
   wafapp: WafApplication,
   data?: Partial<MemberMonitorAssociation>,
@@ -382,4 +399,13 @@ export async function giveMemberMonitorAssociationData(
   const repo = await wafapp.getRepository(MemberMonitorAssociationRepository);
 
   return await repo.create(createMemberMonitorAssociationObject(data));
+}
+
+export async function givePoolMonitorAssociationData(
+  wafapp: WafApplication,
+  data?: Partial<PoolMonitorAssociation>,
+) {
+  const repo = await wafapp.getRepository(PoolMonitorAssocRepository);
+
+  return await repo.create(createPoolMonitorAssociationObject(data));
 }
