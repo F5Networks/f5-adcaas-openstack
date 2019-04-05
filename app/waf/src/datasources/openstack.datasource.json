@@ -78,15 +78,15 @@
           "X-Auth-Token": "{userToken}",
           "content-type": "application/json"
         },
-        "url": "{url}/servers",
-        "body": "{createVSBody}",
+        "url": "{url}",
+        "body": "{body}",
         "responsePath": "$"
       },
       "functions": {
-        "v2CreateVirtualServer": [
+        "v2CreateServer": [
           "url",
           "userToken",
-          "createVSBody"
+          "body"
         ]
       }
     },
@@ -116,15 +116,33 @@
           "X-Auth-Token": "{userToken}",
           "content-type": "application/json"
         },
-        "url": "{url}/v2.0/ports",
-        "body": "{portCreationBody}",
+        "url": "{url}",
+        "body": "{body}",
         "responsePath": "$"
       },
       "functions": {
         "v2CreatePort": [
           "url",
           "userToken",
-          "portCreationBody"
+          "body"
+        ]
+      }
+    },
+    {
+      "description": "get a specific network's subnets.",
+      "template": {
+        "method": "GET",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2GetSubnets": [
+          "url",
+          "userToken"
         ]
       }
     }
