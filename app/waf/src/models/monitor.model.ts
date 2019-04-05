@@ -6,24 +6,48 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'number',
     default: 5,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 5,
+    },
   })
   interval: number;
 
   @property({
     type: 'number',
     default: 16,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 16,
+    },
   })
   timeout: number;
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: '192.168.10.123',
+    },
   })
   targetAddress: string;
 
   @property({
     type: 'number',
     default: 0,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 8080,
+    },
   })
   targetPort: number;
 
@@ -31,6 +55,12 @@ export class Monitor extends CommonEntity {
     type: 'string',
     required: true,
     default: 'tcp',
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 'tcp',
+    },
   })
   monitorType: string;
 

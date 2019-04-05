@@ -1,14 +1,11 @@
-import {
-  DefaultCrudRepository,
-  HasManyRepositoryFactory,
-  repository,
-} from '@loopback/repository';
+import {HasManyRepositoryFactory, repository} from '@loopback/repository';
 import {Pool, Member} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
 import {MemberRepository} from './member.repository';
+import {CommonRepository} from './common';
 
-export class PoolRepository extends DefaultCrudRepository<
+export class PoolRepository extends CommonRepository<
   Pool,
   typeof Pool.prototype.id
 > {

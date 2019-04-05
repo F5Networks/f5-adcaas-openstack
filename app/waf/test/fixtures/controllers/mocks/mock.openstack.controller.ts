@@ -1,20 +1,44 @@
-import { MockBaseController } from '../../helpers/rest.helpers';
-import { post, requestBody, param, get } from '@loopback/rest';
-import { RequestBody } from './openstack.controller';
-import { StubResponses } from '../datasources/testrest.datasource';
+import {
+  post,
+  requestBody,
+  param,
+  get,
+  RestBindings,
+  RequestContext,
+} from '@loopback/rest';
+import {RequestBody} from '../openstack.controller';
+import {StubResponses} from '../../datasources/testrest.datasource';
+import {MockBaseController} from './mock.base.controller';
+import {inject} from '@loopback/core';
 
 export class MockKeyStoneController extends MockBaseController {
+  constructor(
+    @inject(RestBindings.Http.CONTEXT)
+    private ctx: RequestContext,
+  ) {
+    super();
+  }
   @post('/v2.0/tokens')
-  async v2AuthTokenAndv2ValidateToken(
+  async v2AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    return ResponseWith['/v2.0/tokens']();
+  }
+  @get('/v2.0/tokens/{tokenId}')
+  async v2ValidateToken(
+    @param.path.string('tokenId') tokenId: string,
+    @param.query.string('belongsTo') belongsTo: string,
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return ResponseWith['/v2.0/tokens']();
   }
 
   @post('/v3/auth/tokens')
-  async v3AuthTokenAndv3ValidateToken(
-    @requestBody() reqBody: RequestBody,
-  ): Promise<object> {
+  async v3AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    this.ctx.response.setHeader('X-Subject-Token', ExpectedData.userToken);
+    return ResponseWith['/v3/auth/tokens']();
+  }
+
+  @get('/v3/auth/tokens')
+  async v3ValidateToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return ResponseWith['/v3/auth/tokens']();
   }
 }
@@ -45,9 +69,9 @@ export class MockNeutronController extends MockBaseController {
   }
 }
 
-let ResponseWith: { [key: string]: Function } = {};
+let ResponseWith: {[key: string]: Function} = {};
 
-export function ShouldResponseWith(spec: { [key: string]: Function }) {
+export function ShouldResponseWith(spec: {[key: string]: Function}) {
   ResponseWith = {
     '/v2.0/tokens': StubResponses.v2AuthToken200,
     '/v3/auth/tokens': StubResponses.v3AuthToken200,

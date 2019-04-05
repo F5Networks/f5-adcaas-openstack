@@ -1,9 +1,9 @@
-import {DefaultCrudRepository} from '@loopback/repository';
 import {Member} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
+import {CommonRepository} from './common';
 
-export class MemberRepository extends DefaultCrudRepository<
+export class MemberRepository extends CommonRepository<
   Member,
   typeof Member.prototype.id
 > {

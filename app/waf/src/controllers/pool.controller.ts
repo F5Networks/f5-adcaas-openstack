@@ -1,25 +1,24 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Count, Filter, repository} from '@loopback/repository';
 import {
   post,
   param,
   get,
   getFilterSchemaFor,
-  getWhereSchemaFor,
   patch,
-  put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Pool, Member} from '../models';
 import {PoolRepository, MemberRepository} from '../repositories';
+import {Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
+const createDesc: string = 'Pool resource that need to be created';
+const updateDesc: string = 'Pool resource properties that need to be updated';
+const createMemberDesc: string = 'Member resource that need to be created';
+const updateMemberDesc: string =
+  'Member resource properties that need to be updated';
 
 export class PoolController {
   constructor(
@@ -31,111 +30,77 @@ export class PoolController {
 
   @post(prefix + '/pools', {
     responses: {
-      '200': {
-        description: 'Pool model instance',
-        content: {'application/json': {schema: {'x-ts-type': Pool}}},
-      },
+      '200': Schema.response(Pool, 'Successfully create Pool resource'),
+      '400': Schema.badRequest('Invalid Pool resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Pool resource'),
     },
   })
-  async create(@requestBody() pool: Pool): Promise<Pool> {
-    return await this.poolRepository.create(pool);
-  }
-
-  @get(prefix + '/pools/count', {
-    responses: {
-      '200': {
-        description: 'Pool model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(Pool)) where?: Where,
-  ): Promise<Count> {
-    return await this.poolRepository.count(where);
+  async create(
+    @requestBody(Schema.createRequest(Pool, createDesc))
+    reqBody: Partial<Pool>,
+  ): Promise<Response> {
+    try {
+      const data = await this.poolRepository.create(reqBody);
+      return new Response(Pool, data);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.message);
+    }
   }
 
   @get(prefix + '/pools', {
     responses: {
-      '200': {
-        description: 'Array of Pool model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Pool}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Pool,
+        'Successfully retrieve Pool resources',
+      ),
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Pool)) filter?: Filter,
-  ): Promise<Pool[]> {
-    return await this.poolRepository.find(filter);
+  ): Promise<CollectionResponse> {
+    const data = await this.poolRepository.find(filter);
+    return new CollectionResponse(Pool, data);
   }
 
-  @patch(prefix + '/pools', {
+  @get(prefix + '/pools/{poolId}', {
     responses: {
-      '200': {
-        description: 'Pool PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
+      '200': Schema.response(Pool, 'Successfully retrieve Pool resource'),
+      '404': Schema.notFound('Can not find Pool resource'),
     },
   })
-  async updateAll(
-    @requestBody() pool: Pool,
-    @param.query.object('where', getWhereSchemaFor(Pool)) where?: Where,
-  ): Promise<Count> {
-    return await this.poolRepository.updateAll(pool, where);
+  async findById(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    id: string,
+  ): Promise<Response> {
+    const data = await this.poolRepository.findById(id);
+    return new Response(Pool, data);
   }
 
-  @get(prefix + '/pools/{id}', {
+  @patch(prefix + '/pools/{poolId}', {
     responses: {
-      '200': {
-        description: 'Pool model instance',
-        content: {'application/json': {schema: {'x-ts-type': Pool}}},
-      },
-    },
-  })
-  async findById(@param.path.string('id') id: string): Promise<Pool> {
-    return await this.poolRepository.findById(id);
-  }
-
-  @patch(prefix + '/pools/{id}', {
-    responses: {
-      '204': {
-        description: 'Pool PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully update Pool resource'),
+      '404': Schema.notFound('Can not find Pool resource'),
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() pool: Pool,
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    id: string,
+    @requestBody(Schema.updateRequest(Pool, updateDesc))
+    pool: Partial<Pool>,
   ): Promise<void> {
     await this.poolRepository.updateById(id, pool);
   }
 
-  @put(prefix + '/pools/{id}', {
+  @del(prefix + '/pools/{poolId}', {
     responses: {
-      '204': {
-        description: 'Pool PUT success',
-      },
+      '204': Schema.emptyResponse('Successfully delete Pool resource'),
+      '404': Schema.notFound('Can not find Pool resource'),
     },
   })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() pool: Pool,
+  async deleteById(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    id: string,
   ): Promise<void> {
-    await this.poolRepository.replaceById(id, pool);
-  }
-
-  @del(prefix + '/pools/{id}', {
-    responses: {
-      '204': {
-        description: 'Pool DELETE success',
-      },
-    },
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.poolRepository.deleteById(id);
   }
 
@@ -145,90 +110,60 @@ export class PoolController {
    * https://github.com/strongloop/loopback/issues/4142
    */
 
-  @get(prefix + '/members/count', {
+  @post(prefix + '/pools/{poolId}/members', {
     responses: {
-      '200': {
-        description: 'Member model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async countMembers(
-    @param.query.object('where', getWhereSchemaFor(Member)) where?: Where,
-  ): Promise<Count> {
-    return await this.memberRepository.count(where);
-  }
-
-  @get(prefix + '/members', {
-    responses: {
-      '200': {
-        description: 'Array of Member model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Member}},
-          },
-        },
-      },
-    },
-  })
-  async findMembers(
-    @param.query.object('filter', getFilterSchemaFor(Member)) filter?: Filter,
-  ): Promise<Member[]> {
-    return await this.memberRepository.find(filter);
-  }
-
-  @post(prefix + '/pools/{pool_id}/members', {
-    responses: {
-      '200': {
-        description: 'Member add to Pool success',
-        content: {'application/json': {schema: {'x-ts-type': Member}}},
-      },
+      '200': Schema.response(Member, 'Successfully create Member resource'),
+      '400': Schema.badRequest('Invalid Member resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Member resource'),
     },
   })
   async createPoolMember(
-    @param.path.string('pool_id') pool_id: string,
-    @requestBody() member: Partial<Member>,
-  ): Promise<Member> {
-    return await this.poolRepository.members(pool_id).create(member);
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    pool_id: string,
+    @requestBody(Schema.createRequest(Member, createMemberDesc))
+    member: Partial<Member>,
+  ): Promise<Response> {
+    const data = await this.poolRepository.members(pool_id).create(member);
+    return new Response(Member, data);
   }
 
-  @get(prefix + '/pools/{pool_id}/members/{member_id}', {
+  @get(prefix + '/pools/{poolId}/members/{memberId}', {
     responses: {
-      '200': {
-        description: 'Member model instance',
-        content: {'application/json': {schema: {'x-ts-type': Member}}},
-      },
+      '200': Schema.collectionResponse(
+        Member,
+        'Successfully retrieve member resources',
+      ),
     },
   })
   async getMemberByID(
-    @param.path.string('pool_id') pool_id: string,
-    @param.path.string('member_id') member_id: string,
-  ): Promise<Member> {
-    const result = await this.poolRepository
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    pool_id: string,
+    @param(Schema.pathParameter('memberId', 'Member resource ID'))
+    member_id: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.poolRepository
       .members(pool_id)
       .find({where: {id: member_id}});
-    return result[0];
+    return new CollectionResponse(Member, data);
   }
 
-  @get(prefix + '/pools/{pool_id}/members', {
+  @get(prefix + '/pools/{poolId}/members', {
     responses: {
-      '200': {
-        description: 'Array of Member model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Member}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Member,
+        'Successfully retrieve member resources by pool id',
+      ),
     },
   })
   async getMembers(
-    @param.path.string('pool_id') pool_id: string,
-  ): Promise<Member[]> {
-    return await this.poolRepository.members(pool_id).find();
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    pool_id: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.poolRepository.members(pool_id).find();
+    return new CollectionResponse(Member, data);
   }
 
-  @del(prefix + '/pools/{pool_id}/members/{member_id}', {
+  @del(prefix + '/pools/{poolId}/members/{memberId}', {
     responses: {
       '204': {
         description: 'Member DELETE success',
@@ -236,13 +171,15 @@ export class PoolController {
     },
   })
   async deleteMemberByID(
-    @param.path.string('pool_id') pool_id: string,
-    @param.path.string('member_id') member_id: string,
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    pool_id: string,
+    @param(Schema.pathParameter('memberId', 'Member resource ID'))
+    member_id: string,
   ) {
     await this.poolRepository.members(pool_id).delete({id: member_id});
   }
 
-  @put(prefix + '/pools/{pool_id}/members/{member_id}', {
+  @patch(prefix + '/pools/{poolId}/members/{memberId}', {
     responses: {
       '200': {
         description: 'Member model instance',
@@ -251,9 +188,12 @@ export class PoolController {
     },
   })
   async updateMemberByID(
-    @param.path.string('pool_id') pool_id: string,
-    @param.path.string('member_id') member_id: string,
-    @requestBody() member: Partial<Member>,
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    pool_id: string,
+    @param(Schema.pathParameter('memberId', 'Member resource ID'))
+    member_id: string,
+    @requestBody(Schema.createRequest(Member, updateMemberDesc))
+    member: Partial<Member>,
   ): Promise<Count> {
     return await this.poolRepository
       .members(pool_id)

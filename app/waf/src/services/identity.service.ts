@@ -1,29 +1,14 @@
-import { getService } from '@loopback/service-proxy';
-import { inject, Provider } from '@loopback/core';
-import { OpenstackDataSource } from '../datasources';
-import { factory } from '../log4ts';
-import { RestApplication } from '@loopback/rest';
-import { WafBindingKeys } from '../keys';
+import {getService} from '@loopback/service-proxy';
+import {inject, Provider} from '@loopback/core';
+import {OpenstackDataSource} from '../datasources';
+import {factory} from '../log4ts';
+import {RestApplication} from '@loopback/rest';
+import {WafBindingKeys} from '../keys';
 
 export interface IdentityService {
-  v2AuthToken(
-    url: string,
-    osUsername: string,
-    osPassword: string,
-    tenantId: string,
-  ): Promise<object>;
-
-  // TODO: v2AuthToken v2ValidateToken can be combined because their json definition are same.
-  v2ValidateToken(url: string, userTokenRequestBody: object): Promise<object>;
-
-  v3AuthToken(
-    url: string,
-    osUsername: string,
-    osPassword: string,
-    tenantName: string,
-    domainName: string,
-  ): Promise<object>;
-
+  v2AuthToken(url: string, body: object): Promise<object>;
+  v2ValidateToken(url: string): Promise<object>;
+  v3AuthToken(url: string, body: object): Promise<object>;
   v3ValidateToken(
     url: string,
     adminToken: string,
@@ -36,7 +21,7 @@ export class IdentityServiceProvider implements Provider<IdentityService> {
     // openstack must match the name property in the datasource json file
     @inject('datasources.openstack')
     protected dataSource: OpenstackDataSource = new OpenstackDataSource(),
-  ) { }
+  ) {}
 
   value(): Promise<IdentityService> {
     return getService(this.dataSource);
@@ -52,7 +37,7 @@ export abstract class AuthWithOSIdentity {
     protected authConfig: AuthConfig,
     protected application: RestApplication,
     protected identityService: IdentityService,
-  ) { }
+  ) {}
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
@@ -74,22 +59,27 @@ export abstract class AuthWithOSIdentity {
 
 class AuthWithIdentityV2 extends AuthWithOSIdentity {
   async adminAuthToken(): Promise<AuthedToken> {
-    try {
-      let adminToken = new AuthedToken();
+    let url = this.authConfig.osAuthUrl + '/tokens';
+    let reqBody = {
+      auth: {
+        passwordCredentials: {
+          username: this.authConfig.osUsername,
+          password: this.authConfig.osPassword,
+        },
+        tenantName: this.authConfig.osTenantName,
+      },
+    };
 
-      await this.identityService
-        .v2AuthToken(
-          this.authConfig.osAuthUrl,
-          this.authConfig.osUsername,
-          this.authConfig.osPassword,
-          this.authConfig.osTenantName,
-        )
+    try {
+      let adminToken = await this.identityService
+        .v2AuthToken(url, reqBody)
         .then(response => {
           this.logger.debug('adminAuthToken done.');
           //this.logger.debug(JSON.stringify(response));
-          adminToken = this.parseAuthResponseNoException(response);
+          return this.parseAuthResponseNoException(response);
         });
 
+      // TODO: don't bind values in services, move it to top level invocation.
       this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(adminToken);
       return Promise.resolve(adminToken);
     } catch (error) {
@@ -102,24 +92,13 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken> {
-    let authedToken = new AuthedToken();
-
-    //let reqBody = new UserTokenRequestBody();
-    //reqBody.auth.token.id = userToken;
-    let reqBody: UserTokenRequestBody = {
-      auth: { token: { id: userToken } },
-    };
-
-    if (tenantId) reqBody.auth.tenantId = tenantId;
+    let url = this.authConfig.osAuthUrl + '/tokens/' + userToken;
+    if (tenantId) url = url + '?belongsTo=' + tenantId;
 
     try {
-      await this.identityService
-        .v2ValidateToken(this.authConfig.osAuthUrl, reqBody)
-        .then(response => {
-          authedToken = this.parseAuthResponseNoException(response);
-        });
-
-      return Promise.resolve(authedToken);
+      return await this.identityService.v2ValidateToken(url).then(response => {
+        return this.parseAuthResponseNoException(response);
+      });
     } catch (error) {
       throw new Error('Failed to request identity service: ' + error);
     }
@@ -144,20 +123,33 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
 
 class AuthWithIdentityV3 extends AuthWithOSIdentity {
   async adminAuthToken(): Promise<AuthedToken> {
-    let adminToken = new AuthedToken();
+    let url = this.authConfig.osAuthUrl + '/auth/tokens';
+    let reqBody = {
+      auth: {
+        identity: {
+          methods: ['password'],
+          password: {
+            user: {
+              name: this.authConfig.osUsername,
+              password: this.authConfig.osPassword,
+              domain: {name: <string>this.authConfig.osDomainName},
+            },
+          },
+        },
+        scope: {
+          project: {
+            domain: {name: <string>this.authConfig.osDomainName},
+            id: this.authConfig.osTenantName, // TODO: id <-> name
+          },
+        },
+      },
+    };
 
     try {
-      await this.identityService
-        .v3AuthToken(
-          this.authConfig.osAuthUrl,
-          this.authConfig.osUsername,
-          this.authConfig.osPassword,
-          this.authConfig.osTenantName,
-          <string>this.authConfig.osDomainName,
-        )
-        .then(response => {
-          adminToken = this.parseAuthResponseNoException(response);
-        });
+      let adminToken = new AuthedToken();
+      await this.identityService.v3AuthToken(url, reqBody).then(response => {
+        adminToken = this.parseAuthResponseNoException(response);
+      });
       // TODO: return the promise returned by v3AuthToken. so do all 'Promise.resolve'.
 
       return Promise.resolve(adminToken);
@@ -171,12 +163,13 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken> {
-    // tenantName is useless in v3/auth/tokens
-    let authedToken = new AuthedToken();
-
+    // tenantId is useless in v3/auth/tokens
+    // since tenant info can be retrieved from token validation.
+    let url = this.authConfig.osAuthUrl + '/auth/tokens';
     try {
+      let authedToken = new AuthedToken();
       await this.identityService
-        .v3ValidateToken(this.authConfig.osAuthUrl, adminToken, userToken)
+        .v3ValidateToken(url, adminToken, userToken)
         .then(response => {
           authedToken = this.parseAuthResponseNoException(response);
         });
@@ -195,7 +188,7 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
     let token = respJson['body'][0]['token'];
     authedToken.issuedAt = new Date(token['issued_at']);
     authedToken.expiredAt = new Date(token['expires_at']);
-    authedToken.token = respJson['headers']['X-Subject-Token'];
+    authedToken.token = respJson['headers']['x-subject-token']; //key in lower case
 
     authedToken.userId = token['user']['id'];
     authedToken.catalog = token['catalog'];
@@ -290,7 +283,7 @@ export class AuthManager {
         );
         break;
     }
-    //await authWithOSIdentity.bindIdentityService();
+
     return authWithOSIdentity;
   }
 }
@@ -302,15 +295,6 @@ class AuthConfig {
   osPassword: string;
   osTenantName: string;
   osDomainName?: string;
-}
-
-class UserTokenRequestBody {
-  auth: {
-    token: {
-      id: string;
-    };
-    tenantId?: string;
-  };
 }
 
 export class AuthedToken {
@@ -325,4 +309,5 @@ export class AuthedToken {
     type: string;
     name: string;
   }[];
+  tenantId: string;
 }

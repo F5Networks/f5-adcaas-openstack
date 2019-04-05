@@ -3,7 +3,7 @@ import {
   setupRestAppAndClient,
   RestApplicationPort,
   teardownRestAppAndClient,
-} from '../helpers/rest.helpers';
+} from '../helpers/test-helper';
 import {Client, expect} from '@loopback/testlab';
 import {
   MockKeyStoneController,
@@ -11,7 +11,7 @@ import {
   ShouldResponseWith,
   MockNovaController,
   MockNeutronController,
-} from '../fixtures/controllers/mock.openstack.controller';
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {OpenstackController} from '../fixtures/controllers/openstack.controller';
@@ -153,7 +153,7 @@ describe('openstack.identity.test', () => {
       .expect(200);
 
     expect(response.body.userId).eql(ExpectedData.userId);
-    expect(response.body.token).eql('');
+    expect(response.body.token).eql(ExpectedData.userToken);
   });
 
   it('identity v3 auth admin token: 401', async () => {
@@ -215,6 +215,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },
@@ -239,6 +240,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },
@@ -249,7 +251,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v3: 401', async () => {
-    ShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    ShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -263,6 +265,7 @@ describe('openstack.identity.test', () => {
           OS_AVAILABLE_ZONE: 'nova',
         },
         param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
           userToken: '149bfc5ac96c442db50ced09cf075479',
           tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
         },

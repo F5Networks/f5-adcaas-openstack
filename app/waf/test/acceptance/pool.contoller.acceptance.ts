@@ -1,15 +1,10 @@
-// Copyright F5 Networks, Inc. 2018. All Rights Reserved.
-// Node module: @loopback/example-shopping
-// This file is licensed under the MIT License.
-// License text available at https://opensource.org/licenses/MIT
-
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenPoolData,
-  createPoolObjectWithoutID,
+  createPoolObject,
 } from '../helpers/database.helpers';
 
 describe('PoolController', () => {
@@ -30,102 +25,44 @@ describe('PoolController', () => {
   });
 
   it('post ' + prefix + '/pools', async () => {
-    const pool = createPoolObjectWithoutID();
+    const pool = createPoolObject();
 
     const response = await client
       .post(prefix + '/pools')
       .send(pool)
       .expect(200);
-
-    expect(response.body.id)
+    expect(response.body.pool.id)
       .to.not.empty()
       .and.type('string');
-    expect(response.body).to.containDeep(pool);
-  });
-
-  it('get ' + prefix + '/pools/count', async () => {
-    const pool = await givenPoolData(wafapp);
-
-    const response = await client
-      .get(prefix + '/pools/count')
-      .query({where: {id: pool.id}})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
+    expect(response.body.pool).to.containDeep(toJSON(pool));
   });
 
   it('get ' + prefix + '/pools', async () => {
     const pool = await givenPoolData(wafapp);
 
-    await client.get(prefix + '/pools').expect(200, [toJSON(pool)]);
-  });
-
-  it('get ' + prefix + '/pools', async () => {
-    const pool = await givenPoolData(wafapp);
-
-    await client.get(prefix + '/pools').expect(200, [toJSON(pool)]);
-  });
-
-  it('patch ' + prefix + '/pools', async () => {
-    const poolObject = createPoolObjectWithoutID();
-
-    const pool = await givenPoolData(wafapp);
-
-    // pzhang(NOTE): return a count
-    const response = await client
-      .patch(prefix + `/pools`)
-      .send(poolObject)
-      .expect(200);
-
-    expect(response.body.count).to.equal(1);
-
-    // pzhang(NOTE): id will not change in generic patch with id method.
-    poolObject.id = pool.id;
-
-    await client
-      .get(prefix + `/pools/${pool.id}`)
-      .expect(200, toJSON(poolObject));
+    const response = await client.get(prefix + '/pools').expect(200);
+    expect(toJSON(pool)).to.containDeep(response.body.pools[0]);
   });
 
   it('get ' + prefix + '/pools/{id}', async () => {
     const pool = await givenPoolData(wafapp);
 
-    await client.get(prefix + `/pools/${pool.id}`).expect(200, toJSON(pool));
+    const response = await client.get(prefix + `/pools/${pool.id}`).expect(200);
+
+    expect(response.body.pool.id).equal(pool.id);
   });
 
   it('patch ' + prefix + '/pools/{id}', async () => {
-    const poolObject = createPoolObjectWithoutID();
-
     const pool = await givenPoolData(wafapp);
     // pzhang(NOTE): return no content
+    pool.name = 'test';
+
     await client
       .patch(prefix + `/pools/${pool.id}`)
-      .send(poolObject)
+      .send(pool)
       .expect(204);
 
-    // pzhang(NOTE): id will not change in generic patch with id method.
-    poolObject.id = pool.id;
-
-    await client
-      .get(prefix + `/pools/${pool.id}`)
-      .expect(200, toJSON(poolObject));
-  });
-
-  it('put ' + prefix + '/pools/{id}', async () => {
-    const pool = await givenPoolData(wafapp);
-
-    const poolObject = createPoolObjectWithoutID();
-
-    await client
-      .put(prefix + `/pools/${pool.id}`)
-      .send(poolObject)
-      .expect(204);
-
-    poolObject.id = pool.id;
-
-    await client
-      .get(prefix + `/pools/${pool.id}`)
-      .expect(200, toJSON(poolObject));
+    await client.get(prefix + `/pools/${pool.id}`).expect(200);
   });
 
   it('delete ' + prefix + '/pools/{id}', async () => {

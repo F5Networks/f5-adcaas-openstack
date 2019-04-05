@@ -12,39 +12,27 @@
       "description": "identity v2 get auth token with user/password",
       "template": {
         "method": "POST",
-        "url": "{url}/tokens",
+        "url": "{url}",
         "responsePath": "$",
-        "body": {
-          "auth": {
-            "passwordCredentials": {
-              "username": "{osUsername}",
-              "password": "{osPassword}"
-            },
-            "tenantId": "{tenantId}"
-          }
-        }
+        "body": "{body}"
       },
       "functions": {
         "v2AuthToken": [
           "url",
-          "osUsername",
-          "osPassword",
-          "tenantId"
+          "body"
         ]
       }
     },
     {
       "description": "identity v2 validate user's token.",
       "template": {
-        "method": "POST",
-        "url": "{url}/tokens",
-        "responsePath": "$",
-        "body": "{userTokenRequestBody}"
+        "method": "GET",
+        "url": "{url}",
+        "responsePath": "$"
       },
       "functions": {
         "v2ValidateToken": [
-          "url",
-          "userTokenRequestBody"
+          "url"
         ]
       }
     },
@@ -52,43 +40,15 @@
       "description": "identity v3 get auth token with user/password",
       "template": {
         "method": "POST",
-        "url": "{url}/auth/tokens",
+        "url": "{url}",
         "responsePath": "$",
-        "responseHeaders": true,
-        "body": {
-          "auth": {
-            "identity": {
-              "methods": [
-                "password"
-              ],
-              "password": {
-                "user": {
-                  "name": "{osUsername}",
-                  "password": "{osPassword}",
-                  "domain": {
-                    "name": "{domainName}"
-                  }
-                }
-              }
-            },
-            "scope": {
-              "project": {
-                "domain": {
-                  "name": "{domainName}"
-                },
-                "name": "{tenantName}"
-              }
-            }
-          }
-        }
+        "body": "{body}",
+        "responseHeaders": true
       },
       "functions": {
         "v3AuthToken": [
           "url",
-          "osUsername",
-          "osPassword",
-          "tenantName",
-          "domainName"
+          "body"
         ]
       }
     },
@@ -100,7 +60,7 @@
           "X-Auth-Token": "{adminToken}",
           "X-Subject-Token": "{userToken}"
         },
-        "url": "{url}/auth/tokens",
+        "url": "{url}",
         "responsePath": "$"
       },
       "functions": {

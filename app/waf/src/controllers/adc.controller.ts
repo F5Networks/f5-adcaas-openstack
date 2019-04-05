@@ -15,12 +15,20 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RestBindings,
+  RequestContext,
 } from '@loopback/rest';
 import {Adc, Tenant} from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {inject} from '@loopback/core';
+import {factory} from '../log4ts';
+import {WafBindingKeys} from '../keys';
 
 const prefix = '/adcaas/v1';
+
+const createDesc = 'ADC resource that need to be created';
+const updateDesc = 'ADC resource properties that need to be updated';
 
 export class AdcController {
   constructor(
@@ -28,9 +36,11 @@ export class AdcController {
     public adcRepository: AdcRepository,
     @repository(AdcTenantAssociationRepository)
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
+    @inject(RestBindings.Http.CONTEXT)
+    private reqCxt: RequestContext,
+    private logger = factory.getLogger('controllers.adc'),
   ) {}
 
-  readonly createDesc = 'ADC resource that need to be created';
   @post(prefix + '/adcs', {
     responses: {
       '200': Schema.response(Adc, 'Successfully create ADC resource'),
@@ -39,7 +49,7 @@ export class AdcController {
     },
   })
   async create(
-    @requestBody(Schema.createRequest(Adc, this.createDesc))
+    @requestBody(Schema.createRequest(Adc, createDesc))
     reqBody: Partial<Adc>,
   ): Promise<Response> {
     try {
@@ -60,6 +70,16 @@ export class AdcController {
   async count(
     @param.query.object('where', getWhereSchemaFor(Adc)) where?: Where,
   ): Promise<Count> {
+    try {
+      // TODO: remove this reqCxt usage sample.
+      this.logger.debug(
+        'Checked tenant id: ' +
+          (await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId)),
+      );
+    } catch (error) {
+      // do nothing
+    }
+
     return await this.adcRepository.count(where);
   }
 
@@ -91,7 +111,6 @@ export class AdcController {
     return new Response(Adc, data);
   }
 
-  readonly updateDesc = 'ADC resource properties that need to be updated';
   @patch(prefix + '/adcs/{adcId}', {
     responses: {
       '204': Schema.emptyResponse('Successfully update ADC resource'),
@@ -100,7 +119,7 @@ export class AdcController {
   })
   async updateById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
-    @requestBody(Schema.updateRequest(Adc, this.updateDesc)) adc: Partial<Adc>,
+    @requestBody(Schema.updateRequest(Adc, updateDesc)) adc: Partial<Adc>,
   ): Promise<void> {
     await this.adcRepository.updateById(id, adc);
   }

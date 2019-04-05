@@ -1,5 +1,5 @@
 import {HttpErrors} from '@loopback/rest';
-import {ExpectedData} from '../controllers/mock.openstack.controller';
+import {ExpectedData} from '../controllers/mocks/mock.openstack.controller';
 
 export const StubResponses = {
   response400: () => {

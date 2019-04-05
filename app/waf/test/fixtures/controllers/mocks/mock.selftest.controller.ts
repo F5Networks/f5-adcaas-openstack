@@ -1,5 +1,5 @@
-import {MockBaseController} from '../../helpers/rest.helpers';
 import {get} from '@loopback/rest';
+import {MockBaseController} from './mock.base.controller';
 
 export class MockSelfTestController extends MockBaseController {
   // TODO: regulate the url session from openstack.datasource.json

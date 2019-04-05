@@ -5,6 +5,7 @@ import {
   AdcTenantAssociationRepository,
   DeclarationRepository,
   ServiceRepository,
+  ServiceEndpointpolicyAssociationRepository,
   PoolRepository,
   MemberRepository,
   RuleRepository,
@@ -21,6 +22,7 @@ import {
   Wafpolicy,
   AdcTenantAssociation,
   Service,
+  ServiceEndpointpolicyAssociation,
   Pool,
   Member,
   Rule,
@@ -262,13 +264,38 @@ export async function givenServiceData(
   data?: Partial<Service>,
 ) {
   const appRepo = await wafapp.getRepository(ApplicationRepository);
-  return await appRepo.services(appId).create(createServiceObject(data));
+  const obj = createServiceObject(data);
+  return await appRepo.services(appId).create(new Service(obj));
 }
 
 export function createServiceObject(data?: Partial<Service>) {
   return Object.assign(
     {
+      id: uuid(),
+      type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
+    },
+    data,
+  );
+}
+
+export async function givenServiceEndpointpolicyAssociationData(
+  wafapp: WafApplication,
+  data?: Partial<ServiceEndpointpolicyAssociation>,
+) {
+  const repo = await wafapp.getRepository(
+    ServiceEndpointpolicyAssociationRepository,
+  );
+  return await repo.create(createServiceEndpointpolicyAssociationObject(data));
+}
+
+export function createServiceEndpointpolicyAssociationObject(
+  data?: Partial<ServiceEndpointpolicyAssociation>,
+) {
+  return Object.assign(
+    {
+      serviceId: uuid(),
+      endpointpolicyId: uuid(),
     },
     data,
   );
@@ -279,21 +306,10 @@ export async function givenPoolData(
   data?: Partial<Pool>,
 ) {
   const repo = await wafapp.getRepository(PoolRepository);
-  return await repo.create(createPoolObjectWithID(data));
+  return await repo.create(createPoolObject(data));
 }
 
-export function createPoolObjectWithID(data?: Partial<Pool>) {
-  return Object.assign(
-    {
-      id: uuid(),
-      loadBalancingMode: 'round-robin',
-      monitors: ['http'],
-    },
-    data,
-  );
-}
-
-export function createPoolObjectWithoutID(data?: Partial<Pool>) {
+export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',

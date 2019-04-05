@@ -1,25 +1,8 @@
 import {sinon} from '@loopback/testlab';
-import {MySequence} from '../../src/sequence';
 import {AbstractLogger} from 'typescript-logging';
 
-let logRequest: sinon.SinonStub;
-let logResponse: sinon.SinonStub;
 let consoleLog: sinon.SinonStub;
-
 let loggerFuncs: {[key: string]: sinon.SinonStub} = {};
-
-export function stubLogging(): void {
-  logRequest = sinon.stub(MySequence.prototype, 'logRequest');
-  logRequest.callsFake(() => {});
-
-  logResponse = sinon.stub(MySequence.prototype, 'logResponse');
-  logResponse.callsFake(() => {});
-}
-
-export function restoreLogging(): void {
-  logRequest.restore();
-  logResponse.restore();
-}
 
 export function stubConsoleLog(): void {
   consoleLog = sinon.stub(console, 'log');
@@ -30,7 +13,6 @@ export function restoreConsoleLog(): void {
   consoleLog.restore();
 }
 
-// TODO: combine the above logging stubs.
 export function stubLogger() {
   let fakeFunc = () => {};
 
