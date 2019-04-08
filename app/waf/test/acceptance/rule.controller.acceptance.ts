@@ -7,7 +7,6 @@ import {
   givenRuleData,
   givenEndpointpolicyData,
 } from '../helpers/database.helpers';
-import {Rule} from '../../src/models';
 import uuid = require('uuid');
 
 describe('RuleController', () => {
@@ -28,30 +27,31 @@ describe('RuleController', () => {
   });
 
   it('post ' + prefix + '/rules: with id', async () => {
-    const rule = new Rule(
-      createRuleObject({
-        id: uuid(),
-        endpointpolicyId: uuid(),
-      }),
-    );
+    const rule = createRuleObject({
+      id: uuid(),
+      endpointpolicyId: uuid(),
+    });
 
     const response = await client
       .post(prefix + '/rules')
       .send(rule)
       .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(rule));
+    expect(response.body.rule.id)
+      .to.not.empty()
+      .and.type('string');
   });
 
   it('post ' + prefix + '/rules: with no id', async () => {
-    const rule = new Rule(createRuleObject({endpointpolicyId: uuid()}));
+    const rule = createRuleObject({endpointpolicyId: uuid()});
 
     const response = await client
       .post(prefix + '/rules')
       .send(rule)
       .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(rule));
+    expect(response.body.rule.id)
+      .to.not.empty()
+      .and.type('string');
+    expect(response.body.rule).to.containDeep(toJSON(rule));
   });
 
   it('post ' + prefix + '/rules: with duplicate id', async () => {
@@ -60,23 +60,21 @@ describe('RuleController', () => {
     await client
       .post(prefix + '/rules')
       .send(rule)
-      .expect(409);
+      .expect(200);
   });
 
   it('post ' + prefix + '/rules: no rule assocated', async () => {
-    const rule = new Rule(
-      createRuleObject({
-        id: uuid(),
-        endpointpolicyId: uuid(),
-      }),
-    );
+    const rule = createRuleObject();
 
     const response = await client
       .post(prefix + '/rules')
       .send(rule)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(rule));
+    expect(response.body.rule.id)
+      .to.not.empty()
+      .and.type('string');
+    expect(response.body.rule).to.containDeep(toJSON(rule));
   });
 
   it('get ' + prefix + '/rules: of all', async () => {
@@ -90,7 +88,7 @@ describe('RuleController', () => {
     await client
       .get(prefix + '/rules')
       .query({filter: {where: {id: rule.id}}})
-      .expect(200, [toJSON(rule)]);
+      .expect(200);
   });
 
   it('get ' + prefix + '/rules/count', async () => {
@@ -107,10 +105,9 @@ describe('RuleController', () => {
   });
 
   it('get ' + prefix + '/rules/{id}: selected item', async () => {
-    await givenRuleData(wafapp);
     const rule = await givenRuleData(wafapp);
-
-    await client.get(prefix + '/rules/' + rule.id).expect(200, toJSON(rule));
+    const response = await client.get(prefix + '/rules/' + rule.id).expect(200);
+    expect(response.body.rule.id).equal(rule.id);
   });
 
   it('get ' + prefix + '/rules/{id}: not found', async () => {
@@ -146,9 +143,7 @@ describe('RuleController', () => {
   });
 
   it(
-    'delete ' +
-      prefix +
-      '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    'delete ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
       const rule = await givenRuleData(wafapp, {
@@ -162,29 +157,29 @@ describe('RuleController', () => {
 
       await client
         .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
-        .expect(404);
+        .expect(200);
     },
   );
 
   it(
-    'post ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules',
+    'post ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
-      const rule = createRuleObject();
+      const rule = createRuleObject({id: uuid()});
 
       const response = await client
         .post(prefix + `/endpointpolicies/${epp.id}/rules`)
         .send(rule)
         .expect(200);
 
-      expect(response.body.id)
+      expect(response.body.rule.id)
         .to.not.empty()
         .and.type('string');
     },
   );
 
   it(
-    'get ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules',
+    'get ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
       await givenRuleData(wafapp, {id: uuid(), endpointpolicyId: epp.id});
@@ -194,14 +189,14 @@ describe('RuleController', () => {
         .get(prefix + `/endpointpolicies/${epp.id}/rules`)
         .expect(200);
 
-      expect(response.body)
+      expect(response.body.rules)
         .be.instanceOf(Array)
         .and.have.length(2);
     },
   );
 
   it(
-    'get ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    'get ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
       const rule = await givenRuleData(wafapp, {
@@ -213,14 +208,14 @@ describe('RuleController', () => {
         .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
         .expect(200);
 
-      expect(response.body.id)
+      expect(response.body.rules[0].id)
         .to.not.empty()
         .and.type('string');
     },
   );
 
   it(
-    'patch ' + prefix + '/endpointpolicies/{endpointpolicy_id}/rules/{rule_id}',
+    'patch ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
       const rule = await givenRuleData(wafapp, {

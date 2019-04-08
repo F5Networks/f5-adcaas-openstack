@@ -1,15 +1,11 @@
-import {
-  DefaultCrudRepository,
-  HasManyRepositoryFactory,
-  repository,
-} from '@loopback/repository';
+import {HasManyRepositoryFactory, repository} from '@loopback/repository';
 import {Rule, Condition, Action} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
 import {ConditionRepository} from './condition.repository';
 import {ActionRepository} from './action.repository';
-
-export class RuleRepository extends DefaultCrudRepository<
+import {CommonRepository} from './common';
+export class RuleRepository extends CommonRepository<
   Rule,
   typeof Rule.prototype.id
 > {

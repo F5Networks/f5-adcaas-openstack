@@ -26,7 +26,7 @@ describe('ConditionController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('post ' + prefix + '/rules/{rule_id}/conditions', async () => {
+  it('post ' + prefix + '/rules/{ruleId}/conditions', async () => {
     const rule = await givenRuleData(wafapp);
     const condition = createConditionObject({id: uuid()});
 
@@ -35,31 +35,28 @@ describe('ConditionController', () => {
       .send(condition)
       .expect(200);
 
-    expect(response.body.id)
+    expect(response.body.condition.id)
       .to.not.empty()
       .and.type('string');
   });
 
-  it(
-    'get ' + prefix + '/rules/{rule_id}/conditions/{condition_id}',
-    async () => {
-      const rule = await givenRuleData(wafapp);
-      const condition = await givenConditionData(wafapp, {
-        id: uuid(),
-        ruleId: rule.id,
-      });
+  it('get ' + prefix + '/rules/{ruleId}/conditions/{conditionId}', async () => {
+    const rule = await givenRuleData(wafapp);
+    const condition = await givenConditionData(wafapp, {
+      id: uuid(),
+      ruleId: rule.id,
+    });
 
-      const response = await client
-        .get(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
-        .expect(200);
+    const response = await client
+      .get(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
+      .expect(200);
 
-      expect(response.body.id)
-        .to.not.empty()
-        .and.type('string');
-    },
-  );
+    expect(response.body.conditions[0].id)
+      .to.not.empty()
+      .and.type('string');
+  });
 
-  it('get ' + prefix + '/rules/{rule_id}/conditions', async () => {
+  it('get ' + prefix + '/rules/{ruleId}/conditions', async () => {
     const rule = await givenRuleData(wafapp);
     await givenConditionData(wafapp, {id: uuid(), ruleId: rule.id});
     await givenConditionData(wafapp, {id: uuid(), ruleId: rule.id});
@@ -68,13 +65,13 @@ describe('ConditionController', () => {
       .get(prefix + `/rules/${rule.id}/conditions`)
       .expect(200);
 
-    expect(response.body)
+    expect(response.body.conditions)
       .be.instanceOf(Array)
       .and.have.length(2);
   });
 
   it(
-    'delete ' + prefix + '/rules/{rule_id}/conditions/{condition_id}',
+    'delete ' + prefix + '/rules/{ruleId}/conditions/{conditionId}',
     async () => {
       const rule = await givenRuleData(wafapp);
       const condition = await givenConditionData(wafapp, {
@@ -87,12 +84,12 @@ describe('ConditionController', () => {
 
       await client
         .get(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
-        .expect(404);
+        .expect(200);
     },
   );
 
   it(
-    'patch ' + prefix + '/rules/{rule_id}/conditions/{condition_id}',
+    'patch ' + prefix + '/rules/{ruleId}/conditions/{conditionId}',
     async () => {
       const rule = await givenRuleData(wafapp);
       const conditionInDb = await givenConditionData(wafapp, {
@@ -102,7 +99,7 @@ describe('ConditionController', () => {
 
       const condition = createConditionObject({
         id: conditionInDb.id,
-        type: 'test',
+        type: 'request',
       });
       const response = await client
         .patch(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
