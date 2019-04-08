@@ -13,6 +13,7 @@ import {
   ConditionRepository,
   ActionRepository,
   MonitorRepository,
+  MemberMonitorAssociationRepository,
 } from '../../src/repositories';
 
 import {
@@ -30,6 +31,7 @@ import {
   Condition,
   Action,
   Monitor,
+  MemberMonitorAssociation,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -67,6 +69,11 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
 
   const monitorRepo = await wafapp.getRepository(MonitorRepository);
   await monitorRepo.deleteAll();
+
+  const memberMonitorRepo = await wafapp.getRepository(
+    MemberMonitorAssociationRepository,
+  );
+  await memberMonitorRepo.deleteAll();
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
@@ -354,4 +361,25 @@ export function createMonitorObject(data?: Partial<Monitor>) {
     },
     data,
   );
+}
+
+export function createMemberMonitorAssociationObject(
+  data?: Partial<MemberMonitorAssociation>,
+) {
+  return Object.assign(
+    {
+      memberId: uuid(),
+      monitorId: uuid(),
+    },
+    data,
+  );
+}
+
+export async function giveMemberMonitorAssociationData(
+  wafapp: WafApplication,
+  data?: Partial<MemberMonitorAssociation>,
+) {
+  const repo = await wafapp.getRepository(MemberMonitorAssociationRepository);
+
+  return await repo.create(createMemberMonitorAssociationObject(data));
 }
