@@ -90,10 +90,9 @@ describe('MemberController', () => {
       port: 4789,
     });
 
-    const response = await client
+    await client
       .patch(prefix + `/pools/${pool.id}/members/${member.id}`)
       .send(member)
-      .expect(200);
-    expect(response.body.count).to.eql(1);
+      .expect(204);
   });
 });

@@ -85,9 +85,12 @@ export class ApplicationController {
   async create(
     @requestBody(Schema.createRequest(Application, createDesc))
     application: Partial<Application>,
-  ): Promise<Application> {
+  ): Promise<Response> {
     try {
-      return await this.applicationRepository.create(application);
+      return new Response(
+        Application,
+        await this.applicationRepository.create(application),
+      );
     } catch (error) {
       throw new HttpErrors.BadRequest(error.detail);
     }
@@ -118,8 +121,11 @@ export class ApplicationController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Application))
     filter?: Filter,
-  ): Promise<Application[]> {
-    return await this.applicationRepository.find(filter);
+  ): Promise<CollectionResponse> {
+    return new CollectionResponse(
+      Application,
+      await this.applicationRepository.find(filter),
+    );
   }
 
   @get(prefix + '/applications/{applicationId}', {
@@ -134,8 +140,11 @@ export class ApplicationController {
   async findById(
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
-  ): Promise<Application> {
-    return await this.applicationRepository.findById(id);
+  ): Promise<Response> {
+    return new Response(
+      Application,
+      await this.applicationRepository.findById(id),
+    );
   }
 
   @patch(prefix + '/applications/{applicationId}', {

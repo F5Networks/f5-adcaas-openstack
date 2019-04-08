@@ -1,4 +1,4 @@
-import {Count, Filter, repository} from '@loopback/repository';
+import {Filter, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -175,7 +175,7 @@ export class PoolController {
     pool_id: string,
     @param(Schema.pathParameter('memberId', 'Member resource ID'))
     member_id: string,
-  ) {
+  ): Promise<void> {
     await this.poolRepository.members(pool_id).delete({id: member_id});
   }
 
@@ -194,9 +194,7 @@ export class PoolController {
     member_id: string,
     @requestBody(Schema.createRequest(Member, updateMemberDesc))
     member: Partial<Member>,
-  ): Promise<Count> {
-    return await this.poolRepository
-      .members(pool_id)
-      .patch(member, {id: member_id});
+  ): Promise<void> {
+    await this.poolRepository.members(pool_id).patch(member, {id: member_id});
   }
 }
