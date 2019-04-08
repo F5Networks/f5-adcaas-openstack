@@ -89,7 +89,7 @@ export class ComputeManagerV2 extends ComputeManager {
           return this.computeService.v2CreateServer(url, userToken, reqBody);
         })
         .then(serversResponse => {
-          const obj = JSON.parse(JSON.stringify(serversResponse))[0];
+          const obj = JSON.parse(JSON.stringify(serversResponse))['body'][0];
           this.logger.debug('Created server: ' + JSON.stringify(obj));
           return Promise.resolve(obj['server']['id']);
         });
@@ -125,7 +125,9 @@ export class ComputeManagerV2 extends ComputeManager {
   }
 
   async parseDetailResponse(response: object): Promise<ServerDetail> {
-    const serverJson = JSON.parse(JSON.stringify(response))[0]['server'];
+    const serverJson = JSON.parse(JSON.stringify(response))['body'][0][
+      'server'
+    ];
 
     let serverDetail: ServerDetail = {
       addresses: serverJson['addresses'], // TODO: key not exists??

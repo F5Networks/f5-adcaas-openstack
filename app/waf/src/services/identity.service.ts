@@ -109,7 +109,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
 
     let respJson = JSON.parse(JSON.stringify(response));
 
-    let access = respJson[0]['access'];
+    let access = respJson['body'][0]['access'];
     authedToken.issuedAt = new Date(access['token']['issued_at']);
     authedToken.expiredAt = new Date(access['token']['expires']);
     authedToken.token = access['token']['id'];
@@ -139,7 +139,7 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
         scope: {
           project: {
             domain: {name: <string>this.authConfig.osDomainName},
-            name: this.authConfig.osTenantName,
+            id: this.authConfig.osTenantName, // TODO: id <-> name
           },
         },
       },
@@ -185,10 +185,10 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
 
     let respJson = JSON.parse(JSON.stringify(response));
 
-    let token = respJson[0]['token'];
+    let token = respJson['body'][0]['token'];
     authedToken.issuedAt = new Date(token['issued_at']);
     authedToken.expiredAt = new Date(token['expires_at']);
-    authedToken.token = ''; // TODO: find it from header.
+    authedToken.token = respJson['headers']['x-subject-token']; //key in lower case
 
     authedToken.userId = token['user']['id'];
     authedToken.catalog = token['catalog'];

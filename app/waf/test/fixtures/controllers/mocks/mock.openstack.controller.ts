@@ -1,9 +1,23 @@
-import {post, requestBody, param, get} from '@loopback/rest';
+import {
+  post,
+  requestBody,
+  param,
+  get,
+  RestBindings,
+  RequestContext,
+} from '@loopback/rest';
 import {RequestBody} from '../openstack.controller';
 import {StubResponses} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
+import {inject} from '@loopback/core';
 
 export class MockKeyStoneController extends MockBaseController {
+  constructor(
+    @inject(RestBindings.Http.CONTEXT)
+    private ctx: RequestContext,
+  ) {
+    super();
+  }
   @post('/v2.0/tokens')
   async v2AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return ResponseWith['/v2.0/tokens']();
@@ -19,6 +33,7 @@ export class MockKeyStoneController extends MockBaseController {
 
   @post('/v3/auth/tokens')
   async v3AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    this.ctx.response.setHeader('X-Subject-Token', ExpectedData.userToken);
     return ResponseWith['/v3/auth/tokens']();
   }
 

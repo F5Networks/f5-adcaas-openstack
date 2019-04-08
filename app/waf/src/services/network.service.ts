@@ -75,7 +75,7 @@ export class NetworkDriver {
           return this.networkService.v2CreatePort(url, userToken, body);
         })
         .then(response => {
-          const respJson = JSON.parse(JSON.stringify(response))[0];
+          const respJson = JSON.parse(JSON.stringify(response))['body'][0];
           return respJson['port']['id'];
         });
     } catch (error) {

@@ -153,7 +153,7 @@ describe('openstack.identity.test', () => {
       .expect(200);
 
     expect(response.body.userId).eql(ExpectedData.userId);
-    expect(response.body.token).eql('');
+    expect(response.body.token).eql(ExpectedData.userToken);
   });
 
   it('identity v3 auth admin token: 401', async () => {
