@@ -8,8 +8,9 @@ export interface NetworkService {
   v2CreatePort(
     url: string,
     userToken: string,
-    portCreationBody: PortCreationRequestBody,
+    body: PortsRequest,
   ): Promise<object>;
+  v2GetSubnets(url: string, userToken: string): Promise<object>;
 }
 
 export class NetworkServiceProvider implements Provider<NetworkService> {
@@ -51,23 +52,27 @@ export class NetworkDriver {
   }
 
   async createPort(
-    url: string,
     userToken: string,
     portParams: PortCreationParams,
   ): Promise<string> {
     try {
       // TODO: exception check.
       return await this.networkEndpoint(portParams.regionName)
-        .then(networkUrl => {
-          let portCreationBody: PortCreationRequestBody = {
-            port: {network_id: portParams.networkId},
+        .then(async networkUrl => {
+          let url = networkUrl + '/v2.0/ports';
+          let body: PortsRequest = {
+            port: {
+              network_id: portParams.networkId,
+            },
           };
 
-          return this.networkService.v2CreatePort(
-            networkUrl,
-            userToken,
-            portCreationBody,
-          );
+          if (portParams.fixedIp) {
+            body.port.fixed_ips = [{ip_address: portParams.fixedIp}];
+          }
+
+          body.port.name = 'f5-' + portParams.name;
+
+          return this.networkService.v2CreatePort(url, userToken, body);
         })
         .then(response => {
           const respJson = JSON.parse(JSON.stringify(response))[0];
@@ -107,21 +112,37 @@ export class NetworkDriver {
     if (!endpoint) throw new Error('Not found compute url.');
     return Promise.resolve(endpoint);
   }
+
+  async getSubnetIds(userToken: string, networkId: string): Promise<[string]> {
+    let url =
+      (await this.networkEndpoint()) + '/v2.0/subnets?network_id=' + networkId;
+    return await this.networkService
+      .v2GetSubnets(url, userToken)
+      .then(response => {
+        this.logger.debug(
+          'access ' + url + ' response: ' + JSON.stringify(response),
+        );
+        let resp = JSON.parse(JSON.stringify(response))['subnets'];
+        return resp.map((v: {[key: string]: string}) => {
+          return v.id;
+        });
+      });
+  }
+
+  //async createFloatingIp() { }
 }
 
-export class PortCreationRequestBody {
+type PortsRequest = {
   port: {
     network_id: string;
     name?: string;
     admin_state_up?: boolean;
     tenent_id?: string;
     mac_address?: string;
-    fixed_ips?: [
-      {
-        ip_address?: string;
-        subnet_id?: string;
-      }
-    ];
+    fixed_ips?: {
+      ip_address?: string;
+      subnet_id?: string;
+    }[];
     'binding:vnic_type'?:
       | 'normal'
       | 'macvtap'
@@ -132,9 +153,11 @@ export class PortCreationRequestBody {
       | 'smart-nic';
     allowed_address_pairs?: object[]; // TODO: investigate it for what it does do.
   };
-}
+};
 
 export class PortCreationParams {
   networkId: string;
-  regionName: string = 'RegionOne';
+  regionName?: string = 'RegionOne';
+  fixedIp?: string;
+  name: string;
 }

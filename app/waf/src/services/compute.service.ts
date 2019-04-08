@@ -6,7 +6,7 @@ import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 
 export interface ComputeService {
-  v2CreateVirtualServer(
+  v2CreateServer(
     url: string,
     userToken: string,
     serversRequestBody: object,
@@ -41,12 +41,12 @@ export abstract class ComputeManager {
     protected application: RestApplication,
   ) {}
 
-  abstract createVirtualServer(
+  abstract createServer(
     userToken: string,
     serversParams: ServersParams,
   ): Promise<string>;
 
-  abstract virtualServerDetail(
+  abstract getServerDetail(
     userToken: string,
     serverId: string,
     tenantId?: string,
@@ -72,7 +72,7 @@ export abstract class ComputeManager {
 }
 
 export class ComputeManagerV2 extends ComputeManager {
-  async createVirtualServer(
+  async createServer(
     userToken: string,
     serversParams: ServersParams,
   ): Promise<string> {
@@ -84,12 +84,9 @@ export class ComputeManagerV2 extends ComputeManager {
         ),
         this.assembleRequestBody(serversParams),
       ])
-        .then(([computeUrl, serversRequestBody]) => {
-          return this.computeService.v2CreateVirtualServer(
-            computeUrl,
-            userToken,
-            serversRequestBody,
-          );
+        .then(([computeUrl, reqBody]) => {
+          let url = computeUrl + '/servers';
+          return this.computeService.v2CreateServer(url, userToken, reqBody);
         })
         .then(serversResponse => {
           const obj = JSON.parse(JSON.stringify(serversResponse))[0];
@@ -104,7 +101,7 @@ export class ComputeManagerV2 extends ComputeManager {
     }
   }
 
-  async virtualServerDetail(
+  async getServerDetail(
     userToken: string,
     serverId: string,
     tenantId?: string,
@@ -131,7 +128,7 @@ export class ComputeManagerV2 extends ComputeManager {
     const serverJson = JSON.parse(JSON.stringify(response))[0]['server'];
 
     let serverDetail: ServerDetail = {
-      addresses: serverJson['addresss'], // TODO: key not exists??
+      addresses: serverJson['addresses'], // TODO: key not exists??
       createdAt: serverJson['created'],
       id: serverJson['id'],
       name: serverJson['name'],

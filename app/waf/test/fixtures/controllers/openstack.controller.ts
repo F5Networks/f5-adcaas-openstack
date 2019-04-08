@@ -117,7 +117,7 @@ export class OpenstackController extends MockBaseController {
       // Need to generate admin token to retrieve catalog.
       return authWithOSIdentity.adminAuthToken().then(async () => {
         return {
-          id: await computeMgr.createVirtualServer(
+          id: await computeMgr.createServer(
             reqBody.param.userToken,
             serversParams,
           ),
@@ -140,7 +140,7 @@ export class OpenstackController extends MockBaseController {
       );
 
       return authWithOSIdentity.adminAuthToken().then(() => {
-        return computeMgr.virtualServerDetail(
+        return computeMgr.getServerDetail(
           reqBody.param.userToken,
           reqBody.param.serverId,
           reqBody.param.tenantId,
@@ -161,15 +161,13 @@ export class OpenstackController extends MockBaseController {
       );
 
       await authWithOSIdentity.adminAuthToken();
-      let networkUrl = await networkDriver.networkEndpoint(
-        reqBody.param.regionName,
-      );
+
       let portsParams: PortCreationParams = {
         networkId: reqBody.param.networkId,
         regionName: reqBody.param.regionName,
+        name: 'adcId-',
       };
       let portId = await networkDriver.createPort(
-        networkUrl,
         reqBody.param.userToken,
         portsParams,
       );
