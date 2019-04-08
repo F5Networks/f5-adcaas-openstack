@@ -2514,6 +2514,538 @@
         "operationId": "EndpointpolicyController.find"
       }
     },
+    "/adcaas/v1/members/{memberId}/monitors/{monitorId}": {
+      "post": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "associateMemberMonitor",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully associate Member and Monitor"
+          },
+          "404": {
+            "description": "Cannot find Member or Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.associateMemberMonitor"
+      },
+      "get": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "findMonitor",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve  Monitor resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "interval": {
+                          "type": "number"
+                        },
+                        "timeout": {
+                          "type": "number"
+                        },
+                        "targetAddress": {
+                          "type": "string"
+                        },
+                        "targetPort": {
+                          "type": "number"
+                        },
+                        "monitorType": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "interval": 5,
+                        "timeout": 16,
+                        "targetAddress": "192.168.10.123",
+                        "targetPort": 8080,
+                        "monitorType": "tcp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cannot find assoociation or Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.findMonitor"
+      },
+      "delete": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "deassociateMemberMonitor",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deassociate Member and Monitor"
+          }
+        },
+        "parameters": [
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.deassociateMemberMonitor"
+      }
+    },
+    "/adcaas/v1/members/{memberId}/monitors": {
+      "get": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "findMonitors",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Monitor resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "interval": {
+                            "type": "number"
+                          },
+                          "timeout": {
+                            "type": "number"
+                          },
+                          "targetAddress": {
+                            "type": "string"
+                          },
+                          "targetPort": {
+                            "type": "number"
+                          },
+                          "monitorType": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "interval": 5,
+                          "timeout": 16,
+                          "targetAddress": "192.168.10.123",
+                          "targetPort": 8080,
+                          "monitorType": "tcp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.findMonitors"
+      }
+    },
+    "/adcaas/v1/monitors/{monitorId}/members/{memberId}": {
+      "get": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "findMember",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve  Member resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "interval": {
+                          "type": "number"
+                        },
+                        "timeout": {
+                          "type": "number"
+                        },
+                        "targetAddress": {
+                          "type": "string"
+                        },
+                        "targetPort": {
+                          "type": "number"
+                        },
+                        "monitorType": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "interval": 5,
+                        "timeout": 16,
+                        "targetAddress": "192.168.10.123",
+                        "targetPort": 8080,
+                        "monitorType": "tcp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cannot find assoociation or Member resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.findMember"
+      }
+    },
+    "/adcaas/v1/monitors/{monitorId}/members": {
+      "get": {
+        "x-controller-name": "MemberMonitorAssociationController",
+        "x-operation-name": "findMembers",
+        "tags": [
+          "MemberMonitorAssociationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Member resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "address": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "poolId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "address": "192.168.1.12",
+                          "port": 80,
+                          "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MemberMonitorAssociationController.findMembers"
+      }
+    },
     "/adcaas/v1/monitors/{monitorId}": {
       "patch": {
         "x-controller-name": "MonitorController",
