@@ -13,7 +13,13 @@ export class Action extends CommonEntity {
   @property({
     type: 'string',
     required: false,
-    default: 'request',
+    schema: {
+      create: true,
+      response: true,
+      required: true,
+      example: 'request',
+    },
+   
   })
   event: string;
 
@@ -26,6 +32,12 @@ export class Action extends CommonEntity {
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: true,
+      response: true,
+      required: true,
+      example: 'http://1.2.3.4/index.html',
+    },
   })
   location: string;
 
@@ -56,12 +68,22 @@ export class Action extends CommonEntity {
   @property({
     type: 'string',
     required: true,
+    schema: {
+      create: true,
+      response: true,
+      required: true,
+      example: 'httpUri',
+    },
   })
   type: string;
 
   @property({
     type: 'string',
     required: true,
+    schema: {
+      response: true,
+      example: '2d3h896a-4d82-40ee-8d08-55550dbc191',
+    },
   })
   ruleId: string;
 

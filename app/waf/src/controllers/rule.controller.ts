@@ -1,10 +1,4 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Filter, repository,CountSchema,Count,Where} from '@loopback/repository';
 import {
   post,
   param,
@@ -22,8 +16,20 @@ import {
   ConditionRepository,
   ActionRepository,
 } from '../repositories';
-import uuid = require('uuid');
+import {Schema, Response, CollectionResponse} from '.';
 const prefix = '/adcaas/v1';
+
+const createDesc: string = 'Rule resource that need to be created';
+const updateDesc: string =
+  'Rule resource properties that need to be updated';
+const createConditionDesc: string = 'Condition resource that need to be created';
+const updateConditionDesc: string =
+  'Condition resource properties that need to be updated';
+
+const createActionDesc: string = 'Action resource that need to be created';
+const updateActionDesc: string =
+  'Action resource properties that need to be updated';
+
 
 export class RuleController {
   constructor(
@@ -37,59 +43,64 @@ export class RuleController {
 
   @post(prefix + '/rules', {
     responses: {
-      '200': {
-        description: 'Rule model instance',
-        content: {'application/json': {schema: {'x-ts-type': Rule}}},
-      },
+    '200': Schema.response(Rule, 'Successfully create Rule resource'),
+    '400': Schema.badRequest('Invalid Rule resource'),
+    '422': Schema.unprocessableEntity('Unprocessable Rule resource'),
     },
   })
-  async create(@requestBody() rule: Partial<Rule>): Promise<Rule> {
-    if (!rule.id) {
-      rule.id = uuid();
+  async create(
+    @requestBody(Schema.createRequest(Rule,createDesc))
+    reqBody: Partial <Rule>,
+  ): Promise<Response>{
+    try {
+      const data = await this.ruleRepository.create(reqBody);
+      return new Response(Rule, data);
+    } catch (error) {
+      throw new HttpErrors.BadRequest(error.message);
     }
-    return await this.ruleRepository.create(rule);
   }
+    
 
   @get(prefix + '/rules', {
     responses: {
-      '200': {
-        description: 'Array of Rule model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Rule}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Rule,
+        'Successfully retrieve Rule resources',
+      ),
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Rule)) filter?: Filter,
-  ): Promise<Rule[]> {
-    return await this.ruleRepository.find(filter);
+  ): Promise<CollectionResponse> {
+    const data = await this.ruleRepository.find(filter);
+    return new CollectionResponse(Rule, data);
   }
 
-  @patch(prefix + '/rules/{id}', {
+  @patch(prefix + '/rules/{ruleId}', {
     responses: {
-      '204': {
-        description: 'Rule PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully update Rule resource'),
+      '404': Schema.notFound('Can not find Rule resource'),
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() rule: Rule,
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    id: string,
+    @requestBody(Schema.createRequest(Rule, updateDesc))
+    rule: Rule,
   ): Promise<void> {
     await this.ruleRepository.updateById(id, rule);
   }
 
-  @del(prefix + '/rules/{id}', {
+  @del(prefix + '/rules/{ruleId}', {
     responses: {
-      '204': {
-        description: 'Rule DELETE success',
-      },
+      '204': Schema.emptyResponse('Successfully delete Rule resource'),
+      '404': Schema.notFound('Can not find Rule resource'),
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    id: string,
+  ): Promise<void> {
     await this.ruleRepository.deleteById(id);
   }
 
@@ -107,34 +118,90 @@ export class RuleController {
     return await this.ruleRepository.count(where);
   }
 
-  @get(prefix + '/rules/{id}', {
+  @get(prefix + '/rules/{ruleId}', {
     responses: {
-      '200': {
-        description: 'Rule model instance',
-        content: {'application/json': {schema: {'x-ts-type': Rule}}},
-      },
+      '200': Schema.response(Rule, 'Successfully retrieve Rule resource'),
+      '404': Schema.notFound('Can not find Rule resource'),
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Rule> {
-    return await this.ruleRepository.findById(id);
+  async findById(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    id: string,
+  ): Promise<Response> {
+    const data = await this.ruleRepository.findById(id);
+    return new Response(Rule, data);
   }
 
-  @post(prefix + '/rules/{rule_id}/conditions', {
+  @post(prefix + '/rules/{ruleId}/conditions', {
     responses: {
-      '200': {
-        description: 'Conditions add to rule success',
-        content: {'application/json': {schema: {'x-ts-type': Condition}}},
-      },
+      '200': Schema.response(Rule, 'Successfully create Rule resource'),
+      '400': Schema.badRequest('Invalid Rule resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Rule resource'),
     },
   })
   async createRuleCondition(
-    @param.path.string('rule_id') ruleId: string,
-    @requestBody() condition: Partial<Condition>,
-  ): Promise<Condition> {
-    return await this.ruleRepository.conditions(ruleId).create(condition);
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @requestBody(Schema.createRequest(Rule, createConditionDesc))
+    condition: Partial<Condition>,
+  ): Promise<Response> {
+    const data = await this.ruleRepository.conditions(ruleId).create(condition);
+    return new Response(Condition, data);
   }
 
-  @get(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
+  @get(prefix + '/rules/{ruleId}/conditions/{conditionId}', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Condition,
+        'Successfully retrieve condition resources',
+      ),
+    },
+  })
+  async getConditionByID(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
+    conditionId: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.ruleRepository
+      .conditions(ruleId)
+      .find({where: {id: conditionId}});
+    return new CollectionResponse(Condition, data);
+  }
+  
+  @get(prefix + '/rules/{ruleId}/conditions', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Condition,
+        'Successfully retrieve condition resources by pool id',
+      ),
+    },
+  })
+  async getConditions(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.ruleRepository.conditions(ruleId).find();
+    return new CollectionResponse(Condition, data);
+  }
+
+  @del(prefix + '/rules/{ruleId}/conditions/{conditionId}', {
+    responses: {
+      '204': {
+        description: 'condition DELETE success',
+      },
+    },
+  })
+  async deleteConditionByID(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
+    conditionId: string,
+  ) {
+    await this.ruleRepository.conditions(ruleId).delete({id: conditionId});
+  }
+  
+  @patch(prefix + '/rules/{ruleId}/conditions/{conditionId}', {
     responses: {
       '200': {
         description: 'Condition model instance',
@@ -142,133 +209,74 @@ export class RuleController {
       },
     },
   })
-  async getConditionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('condition_id') conditionId: string,
-  ): Promise<Condition> {
-    const result = await this.ruleRepository
-      .conditions(ruleId)
-      .find({where: {id: conditionId}});
-    if (result.length !== 0) {
-      return result[0];
-    } else {
-      throw new HttpErrors.NotFound(
-        'Condition ' + conditionId + ' for ruleId ' + ruleId + ' not found.',
-      );
-    }
-  }
-
-  @get(prefix + '/rules/{rule_id}/conditions', {
-    responses: {
-      '200': {
-        description: 'Array of conditon model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Condition}},
-          },
-        },
-      },
-    },
-  })
-  async getConditions(
-    @param.path.string('rule_id') ruleId: string,
-  ): Promise<Condition[]> {
-    return await this.ruleRepository.conditions(ruleId).find();
-  }
-
-  @del(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
-    responses: {
-      '204': {
-        description: 'Condition DELETE success',
-      },
-    },
-  })
-  async deleteConditionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('condition_id') conditionId: string,
-  ) {
-    await this.ruleRepository.conditions(ruleId).delete({id: conditionId});
-  }
-
-  @patch(prefix + '/rules/{rule_id}/conditions/{condition_id}', {
-    responses: {
-      '200': {
-        description: 'Conditon model instance',
-        content: {'application/json': {schema: {'x-ts-type': Condition}}},
-      },
-    },
-  })
-  async updateCondtionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('condition_id') conditionId: string,
-    @requestBody() condition: Partial<Condition>,
+  async updateConditionByID(
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
+    conditionId: string,
+    @requestBody(Schema.createRequest(Condition, updateConditionDesc))
+    condition: Partial<Condition>,
   ): Promise<Count> {
     return await this.ruleRepository
       .conditions(ruleId)
       .patch(condition, {id: conditionId});
   }
 
-  @post(prefix + '/rules/{rule_id}/actions', {
+  @post(prefix + '/rules/{ruleId}/actions', {
     responses: {
-      '200': {
-        description: 'Actions add to rule success',
-        content: {'application/json': {schema: {'x-ts-type': Action}}},
-      },
+      '200': Schema.response(Action, 'Successfully create Action resource'),
+      '400': Schema.badRequest('Invalid Action resource'),
+      '422': Schema.unprocessableEntity('Unprocessable Action resource'),
     },
   })
   async createRuleAction(
-    @param.path.string('rule_id') ruleId: string,
-    @requestBody() action: Partial<Action>,
-  ): Promise<Action> {
-    if (!action.id) {
-      action.id = uuid();
-    }
-    return await this.ruleRepository.actions(ruleId).create(action);
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @requestBody(Schema.createRequest(Action, createActionDesc))
+    action: Partial<Action>,
+  ): Promise<Response> {
+    const data = await this.ruleRepository.actions(ruleId).create(action);
+    return new Response(Action, data);
   }
 
-  @get(prefix + '/rules/{rule_id}/actions/{action_id}', {
+
+  @get(prefix + '/rules/{ruleId}/actions/{actionId}', {
     responses: {
-      '200': {
-        description: 'Action model instance',
-        content: {'application/json': {schema: {'x-ts-type': Action}}},
-      },
+      '200': Schema.collectionResponse(
+        Action,
+        'Successfully retrieve action resources',
+      ),
     },
   })
   async getActionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('action_id') actionId: string,
-  ): Promise<Action> {
-    const result = await this.ruleRepository
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('actionId', 'Action resource ID'))
+    actionId: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.ruleRepository
       .actions(ruleId)
       .find({where: {id: actionId}});
-    if (result.length !== 0) {
-      return result[0];
-    } else {
-      throw new HttpErrors.NotFound(
-        'action ' + actionId + ' for ruleId ' + ruleId + ' not found.',
-      );
-    }
+    return new CollectionResponse(Action, data);
   }
 
-  @get(prefix + '/rules/{rule_id}/actions', {
+  @get(prefix + '/rules/{ruleId}/actions', {
     responses: {
-      '200': {
-        description: 'Array of action model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Action}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Action,
+        'Successfully retrieve action resources by pool id',
+      ),
     },
   })
   async getActions(
-    @param.path.string('rule_id') ruleId: string,
-  ): Promise<Action[]> {
-    return await this.ruleRepository.actions(ruleId).find();
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+  ): Promise<CollectionResponse> {
+    const data = await this.ruleRepository.actions(ruleId).find();
+    return new CollectionResponse(Action, data);
   }
 
-  @del(prefix + '/rules/{rule_id}/actions/{action_id}', {
+  @del(prefix + '/rules/{ruleId}/actions/{actionId}', {
     responses: {
       '204': {
         description: 'Action DELETE success',
@@ -276,13 +284,16 @@ export class RuleController {
     },
   })
   async deleteActionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('action_id') actionId: string,
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('actionId', 'Action resource ID'))
+    actionId: string,
   ) {
     await this.ruleRepository.actions(ruleId).delete({id: actionId});
   }
 
-  @patch(prefix + '/rules/{rule_id}/actions/{action_id}', {
+
+  @patch(prefix + '/rules/{ruleId}/actions/{actionId}', {
     responses: {
       '200': {
         description: 'Action model instance',
@@ -291,12 +302,16 @@ export class RuleController {
     },
   })
   async updateActionByID(
-    @param.path.string('rule_id') ruleId: string,
-    @param.path.string('action_id') actionId: string,
-    @requestBody() action: Partial<Action>,
+    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
+    ruleId: string,
+    @param(Schema.pathParameter('actionId', 'Action resource ID'))
+    actionId: string,
+    @requestBody(Schema.createRequest(Action, updateActionDesc))
+    action: Partial<Action>,
   ): Promise<Count> {
     return await this.ruleRepository
       .actions(ruleId)
       .patch(action, {id: actionId});
   }
+
 }
