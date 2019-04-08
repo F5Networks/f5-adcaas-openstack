@@ -63,25 +63,28 @@ describe('ApplicationController', () => {
       .send(application)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(application));
+    expect(response.body.application).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
     const application = await givenApplicationData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/applications')
-      .expect(200, [toJSON(application)])
       .expect('Content-Type', /application\/json/);
+
+    expect(response.body.applications[0]).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications: with filter string', async () => {
     const application = await givenApplicationData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/applications')
       .query({filter: {where: {id: application.id}}})
-      .expect(200, [toJSON(application)]);
+      .expect(200);
+
+    expect(response.body.applications[0]).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications/count', async () => {
@@ -101,9 +104,11 @@ describe('ApplicationController', () => {
     await givenApplicationData(wafapp);
     const application = await givenApplicationData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/applications/' + application.id)
-      .expect(200, toJSON(application));
+      .expect(200);
+
+    expect(response.body.application).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications/{id}: not found', async () => {
