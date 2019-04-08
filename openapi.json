@@ -3046,6 +3046,201 @@
         "operationId": "MemberMonitorAssociationController.findMembers"
       }
     },
+    "/adcaas/v1/monitors/{monitorId}/pools/{poolId}": {
+      "get": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "findPool",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Pool resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pool": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "loadBalancingMode": {
+                          "type": "string"
+                        },
+                        "minimumMembersActive": {
+                          "type": "number"
+                        },
+                        "minimumMonitors": {
+                          "type": "number"
+                        },
+                        "reselectTries": {
+                          "type": "number"
+                        },
+                        "serviceDownAction": {
+                          "type": "string"
+                        },
+                        "slowRampTime": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "loadBalancingMode": "round-robin",
+                        "minimumMembersActive": 1,
+                        "minimumMonitors": 1,
+                        "reselectTries": 0,
+                        "serviceDownAction": "drop",
+                        "slowRampTime": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.findPool"
+      }
+    },
+    "/adcaas/v1/monitors/{monitorId}/pools": {
+      "get": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "findPools",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Pool resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "loadBalancingMode": {
+                            "type": "string"
+                          },
+                          "minimumMembersActive": {
+                            "type": "number"
+                          },
+                          "minimumMonitors": {
+                            "type": "number"
+                          },
+                          "reselectTries": {
+                            "type": "number"
+                          },
+                          "serviceDownAction": {
+                            "type": "string"
+                          },
+                          "slowRampTime": {
+                            "type": "number"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "loadBalancingMode": "round-robin",
+                          "minimumMembersActive": 1,
+                          "minimumMonitors": 1,
+                          "reselectTries": 0,
+                          "serviceDownAction": "drop",
+                          "slowRampTime": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.findPools"
+      }
+    },
     "/adcaas/v1/monitors/{monitorId}": {
       "patch": {
         "x-controller-name": "MonitorController",
@@ -4296,6 +4491,295 @@
         "operationId": "PoolController.getMembers"
       }
     },
+    "/adcaas/v1/pools/{poolId}/monitors/{monitorId}": {
+      "post": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "create",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully associate Pool and Monitor"
+          },
+          "404": {
+            "description": "Cannot find Pool resource or Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.create"
+      },
+      "get": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "findMointor",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "interval": {
+                          "type": "number"
+                        },
+                        "timeout": {
+                          "type": "number"
+                        },
+                        "targetAddress": {
+                          "type": "string"
+                        },
+                        "targetPort": {
+                          "type": "number"
+                        },
+                        "monitorType": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "interval": 5,
+                        "timeout": 16,
+                        "targetAddress": "192.168.10.123",
+                        "targetPort": 8080,
+                        "monitorType": "tcp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.findMointor"
+      },
+      "delete": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deassociate Pool and Monitor "
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.deleteById"
+      }
+    },
+    "/adcaas/v1/pools/{poolId}/monitors": {
+      "get": {
+        "x-controller-name": "PoolMonitorAssocationController",
+        "x-operation-name": "findMonitors",
+        "tags": [
+          "PoolMonitorAssocationController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Monitor resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "interval": {
+                            "type": "number"
+                          },
+                          "timeout": {
+                            "type": "number"
+                          },
+                          "targetAddress": {
+                            "type": "string"
+                          },
+                          "targetPort": {
+                            "type": "number"
+                          },
+                          "monitorType": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "interval": 5,
+                          "timeout": 16,
+                          "targetAddress": "192.168.10.123",
+                          "targetPort": 8080,
+                          "monitorType": "tcp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolMonitorAssocationController.findMonitors"
+      }
+    },
     "/adcaas/v1/pools/{poolId}": {
       "patch": {
         "x-controller-name": "PoolController",
@@ -4370,9 +4854,6 @@
                   "loadBalancingMode": {
                     "type": "string"
                   },
-                  "monitors": {
-                    "type": "array"
-                  },
                   "minimumMembersActive": {
                     "type": "number"
                   },
@@ -4393,10 +4874,6 @@
                   "name": "My name",
                   "description": "My description",
                   "loadBalancingMode": "round-robin",
-                  "monitors": [
-                    "23442d6a-4d82-40ee-8d08-243750dbc191",
-                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                  ],
                   "minimumMembersActive": 1,
                   "minimumMonitors": 1,
                   "reselectTries": 0,
@@ -4448,9 +4925,6 @@
                         "loadBalancingMode": {
                           "type": "string"
                         },
-                        "monitors": {
-                          "type": "array"
-                        },
                         "minimumMembersActive": {
                           "type": "number"
                         },
@@ -4475,10 +4949,6 @@
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "loadBalancingMode": "round-robin",
-                        "monitors": [
-                          "23442d6a-4d82-40ee-8d08-243750dbc191",
-                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                        ],
                         "minimumMembersActive": 1,
                         "minimumMonitors": 1,
                         "reselectTries": 0,
@@ -4635,9 +5105,6 @@
                         "loadBalancingMode": {
                           "type": "string"
                         },
-                        "monitors": {
-                          "type": "array"
-                        },
                         "minimumMembersActive": {
                           "type": "number"
                         },
@@ -4662,10 +5129,6 @@
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "loadBalancingMode": "round-robin",
-                        "monitors": [
-                          "23442d6a-4d82-40ee-8d08-243750dbc191",
-                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                        ],
                         "minimumMembersActive": 1,
                         "minimumMonitors": 1,
                         "reselectTries": 0,
@@ -4764,9 +5227,6 @@
                   "loadBalancingMode": {
                     "type": "string"
                   },
-                  "monitors": {
-                    "type": "array"
-                  },
                   "minimumMembersActive": {
                     "type": "number"
                   },
@@ -4788,10 +5248,6 @@
                   "description": "My description",
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "loadBalancingMode": "round-robin",
-                  "monitors": [
-                    "23442d6a-4d82-40ee-8d08-243750dbc191",
-                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                  ],
                   "minimumMembersActive": 1,
                   "minimumMonitors": 1,
                   "reselectTries": 0,
@@ -4844,9 +5300,6 @@
                           "loadBalancingMode": {
                             "type": "string"
                           },
-                          "monitors": {
-                            "type": "array"
-                          },
                           "minimumMembersActive": {
                             "type": "number"
                           },
@@ -4871,10 +5324,6 @@
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "loadBalancingMode": "round-robin",
-                          "monitors": [
-                            "23442d6a-4d82-40ee-8d08-243750dbc191",
-                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                          ],
                           "minimumMembersActive": 1,
                           "minimumMonitors": 1,
                           "reselectTries": 0,
@@ -4922,9 +5371,6 @@
                       "type": "boolean"
                     },
                     "loadBalancingMode": {
-                      "type": "boolean"
-                    },
-                    "monitors": {
                       "type": "boolean"
                     },
                     "minimumMembersActive": {
