@@ -54,7 +54,7 @@ export class NetworkDriver {
   async createPort(
     userToken: string,
     portParams: PortCreationParams,
-  ): Promise<string> {
+  ): Promise<PortResponse> {
     try {
       // TODO: exception check.
       return await this.networkEndpoint(portParams.regionName)
@@ -76,7 +76,11 @@ export class NetworkDriver {
         })
         .then(response => {
           const respJson = JSON.parse(JSON.stringify(response))['body'][0];
-          return respJson['port']['id'];
+          const portResp: PortResponse = {
+            id: respJson['port']['id'],
+            fixedIp: respJson['port']['fixed_ips'][0]['ip_address'],
+          };
+          return portResp;
         });
     } catch (error) {
       throw new Error('Failed to create port: ' + error);
@@ -161,3 +165,8 @@ export class PortCreationParams {
   fixedIp?: string;
   name: string;
 }
+
+export type PortResponse = {
+  id: string;
+  fixedIp: string;
+};

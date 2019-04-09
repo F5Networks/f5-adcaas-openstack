@@ -478,7 +478,7 @@ describe('openstack.identity.test', () => {
       })
       .expect(200);
 
-    expect(response.body).eql({id: ExpectedData.portId});
+    expect(response.body).containDeep({id: ExpectedData.portId});
   });
 
   it('create a port: 400', async () => {
