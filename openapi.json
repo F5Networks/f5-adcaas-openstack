@@ -2229,19 +2229,12 @@
                   },
                   "tenantId": {
                     "type": "string"
-                  },
-                  "rules": {
-                    "type": "array"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-                  "rules": [
-                    "23442d6a-4d82-40ee-8d08-243750dbc191",
-                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                  ]
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
                 }
               }
             }
@@ -2587,19 +2580,12 @@
                   },
                   "tenantId": {
                     "type": "string"
-                  },
-                  "rules": {
-                    "type": "array"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-                  "rules": [
-                    "23442d6a-4d82-40ee-8d08-243750dbc191",
-                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                  ]
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
                 }
               }
             }
@@ -2642,9 +2628,6 @@
                         },
                         "updatedAt": {
                           "type": "date"
-                        },
-                        "rules": {
-                          "type": "array"
                         }
                       },
                       "example": {
@@ -2653,11 +2636,7 @@
                         "description": "My description",
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "rules": [
-                          "23442d6a-4d82-40ee-8d08-243750dbc191",
-                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                        ]
+                        "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
                     }
                   }
@@ -2805,9 +2784,6 @@
                         },
                         "updatedAt": {
                           "type": "date"
-                        },
-                        "rules": {
-                          "type": "array"
                         }
                       },
                       "example": {
@@ -2816,11 +2792,7 @@
                         "description": "My description",
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "rules": [
-                          "23442d6a-4d82-40ee-8d08-243750dbc191",
-                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                        ]
+                        "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
                     }
                   }
@@ -2910,19 +2882,12 @@
                   },
                   "tenantId": {
                     "type": "string"
-                  },
-                  "rules": {
-                    "type": "array"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-                  "rules": [
-                    "23442d6a-4d82-40ee-8d08-243750dbc191",
-                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                  ]
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
                 }
               }
             }
@@ -2966,9 +2931,6 @@
                           },
                           "updatedAt": {
                             "type": "date"
-                          },
-                          "rules": {
-                            "type": "array"
                           }
                         },
                         "example": {
@@ -2977,11 +2939,7 @@
                           "description": "My description",
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
-                          "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "rules": [
-                            "23442d6a-4d82-40ee-8d08-243750dbc191",
-                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                          ]
+                          "updatedAt": "2019-03-05T08:40:25.100Z"
                         }
                       }
                     }
@@ -3021,9 +2979,6 @@
                       "type": "boolean"
                     },
                     "updatedAt": {
-                      "type": "boolean"
-                    },
-                    "rules": {
                       "type": "boolean"
                     }
                   }
@@ -6122,9 +6077,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "type"
-                ],
+                "required": [],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -6441,9 +6394,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "type"
-                ],
+                "required": [],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -7743,9 +7694,6 @@
                         },
                         "updatedAt": {
                           "type": "date"
-                        },
-                        "rules": {
-                          "type": "array"
                         }
                       },
                       "example": {
@@ -7754,11 +7702,7 @@
                         "description": "My description",
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "rules": [
-                          "23442d6a-4d82-40ee-8d08-243750dbc191",
-                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                        ]
+                        "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
                     }
                   }
@@ -7864,9 +7808,6 @@
                           },
                           "updatedAt": {
                             "type": "date"
-                          },
-                          "rules": {
-                            "type": "array"
                           }
                         },
                         "example": {
@@ -7875,11 +7816,7 @@
                           "description": "My description",
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
-                          "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "rules": [
-                            "23442d6a-4d82-40ee-8d08-243750dbc191",
-                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
-                          ]
+                          "updatedAt": "2019-03-05T08:40:25.100Z"
                         }
                       }
                     }
@@ -9310,12 +9247,6 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
-          },
-          "rules": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         },
         "required": [
@@ -9350,7 +9281,8 @@
           }
         },
         "required": [
-          "id"
+          "id",
+          "endpointpolicyId"
         ]
       },
       "Monitor": {
@@ -9704,7 +9636,8 @@
           }
         },
         "required": [
-          "id"
+          "id",
+          "ruleId"
         ]
       },
       "Service": {
