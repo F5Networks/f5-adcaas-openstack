@@ -189,7 +189,7 @@ export class OpenstackController extends MockBaseController {
       'OS_AUTH_URL',
       'OS_USERNAME',
       'OS_PASSWORD',
-      'OS_TENANT_NAME',
+      'OS_TENANT_ID',
       'OS_DOMAIN_NAME',
       'OS_AVAILABLE_ZONE',
     ];

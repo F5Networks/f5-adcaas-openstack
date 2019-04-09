@@ -66,7 +66,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           username: this.authConfig.osUsername,
           password: this.authConfig.osPassword,
         },
-        tenantName: this.authConfig.osTenantName,
+        tenantId: this.authConfig.osTenantId,
       },
     };
 
@@ -139,7 +139,7 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
         scope: {
           project: {
             domain: {name: <string>this.authConfig.osDomainName},
-            id: this.authConfig.osTenantName, // TODO: id <-> name
+            id: this.authConfig.osTenantId,
           },
         },
       },
@@ -228,13 +228,13 @@ export class AuthManager {
 
     if (process.env.OS_AUTH_URL.endsWith('/v2.0')) {
       this.authConfig.version = 'v2.0';
-      authProps = ['OS_USERNAME', 'OS_PASSWORD', 'OS_TENANT_NAME'];
+      authProps = ['OS_USERNAME', 'OS_PASSWORD', 'OS_TENANT_ID'];
     } else if (process.env.OS_AUTH_URL.endsWith('v3')) {
       this.authConfig.version = 'v3';
       authProps = [
         'OS_USERNAME',
         'OS_PASSWORD',
-        'OS_TENANT_NAME',
+        'OS_TENANT_ID',
         'OS_DOMAIN_NAME',
       ];
     } else {
@@ -251,7 +251,7 @@ export class AuthManager {
 
     this.authConfig.osUsername = <string>process.env.OS_USERNAME;
     this.authConfig.osPassword = <string>process.env.OS_PASSWORD;
-    this.authConfig.osTenantName = <string>process.env.OS_TENANT_NAME;
+    this.authConfig.osTenantId = <string>process.env.OS_TENANT_ID;
     this.authConfig.osDomainName = process.env.OS_DOMAIN_NAME;
 
     return this;
@@ -293,7 +293,7 @@ class AuthConfig {
   osAuthUrl: string;
   osUsername: string;
   osPassword: string;
-  osTenantName: string;
+  osTenantId: string;
   osDomainName?: string;
 }
 
