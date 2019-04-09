@@ -1912,26 +1912,49 @@
         "parameters": [
           {
             "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
             "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Rule resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                }
               }
             }
           },
@@ -1947,11 +1970,51 @@
         ],
         "responses": {
           "200": {
-            "description": "Rule model instance",
+            "description": "Successfully retrieve rule resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "endpointpolicyId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1960,19 +2023,23 @@
         "parameters": [
           {
             "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
             "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "EndpointpolicyController.getRuleByID"
@@ -1991,19 +2058,23 @@
         "parameters": [
           {
             "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
             "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "EndpointpolicyController.deleteRuleByID"
@@ -2018,11 +2089,112 @@
         ],
         "responses": {
           "200": {
-            "description": "Rules add to rule success",
+            "description": "Successfully create rule resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "endpointpolicyId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
@@ -2031,18 +2203,46 @@
         "parameters": [
           {
             "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Rule resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "rules": {
+                    "type": "array"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "rules": [
+                    "23442d6a-4d82-40ee-8d08-243750dbc191",
+                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                  ]
+                }
               }
             }
           },
@@ -2058,13 +2258,50 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of rule model instances",
+            "description": "Successfully retrieve rule resources by endpointpolicy id",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "endpointpolicyId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -2074,11 +2311,13 @@
         "parameters": [
           {
             "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "EndpointpolicyController.getRules"
@@ -2275,7 +2514,7 @@
         "operationId": "EndpointpolicyController.findServices"
       }
     },
-    "/adcaas/v1/endpointpolicies/{id}": {
+    "/adcaas/v1/endpointpolicies/{endpointpolicyId}": {
       "patch": {
         "x-controller-name": "EndpointpolicyController",
         "x-operation-name": "updateById",
@@ -2284,24 +2523,84 @@
         ],
         "responses": {
           "204": {
-            "description": "Endpointpolicy PATCH success"
+            "description": "Successfully update Endpointpolicy resource"
+          },
+          "404": {
+            "description": "Can not find Endpointpolicy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Endpointpolicy resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "rules": {
+                    "type": "array"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "rules": [
+                    "23442d6a-4d82-40ee-8d08-243750dbc191",
+                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                  ]
+                }
               }
             }
           },
@@ -2317,11 +2616,83 @@
         ],
         "responses": {
           "200": {
-            "description": "Endpointpolicy model instance",
+            "description": "Successfully retrieve Endpointpolicy resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Endpointpolicy"
+                  "type": "object",
+                  "properties": {
+                    "endpointpolicy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "rules": {
+                          "type": "array"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "rules": [
+                          "23442d6a-4d82-40ee-8d08-243750dbc191",
+                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Endpointpolicy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -2329,12 +2700,14 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "endpointpolicyId",
+            "description": "Endponitpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "EndpointpolicyController.findById"
@@ -2347,17 +2720,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Endpointpolicy DELETE success"
+            "description": "Successfully delete Endpointpolicy resource"
+          },
+          "404": {
+            "description": "Can not find Endpointpolicy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "endpointpolicyId",
+            "description": "Endpointpolicy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "EndpointpolicyController.deleteById"
@@ -2372,21 +2779,151 @@
         ],
         "responses": {
           "200": {
-            "description": "Endpointpolicy model instance",
+            "description": "Successfully create Endpointpolicy resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Endpointpolicy"
+                  "type": "object",
+                  "properties": {
+                    "endpointpolicy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "rules": {
+                          "type": "array"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "rules": [
+                          "23442d6a-4d82-40ee-8d08-243750dbc191",
+                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Endpointpolicy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Endpointpolicy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
           }
         },
         "requestBody": {
+          "description": "Endpointpolicy resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "rules": {
+                    "type": "array"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "rules": [
+                    "23442d6a-4d82-40ee-8d08-243750dbc191",
+                    "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                  ]
+                }
               }
             }
           }
@@ -2401,13 +2938,53 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Endpointpolicy model instances",
+            "description": "Successfully retrieve Endpointpolicy resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Endpointpolicy"
+                  "type": "object",
+                  "properties": {
+                    "endpointpolicies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "rules": {
+                            "type": "array"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "rules": [
+                            "23442d6a-4d82-40ee-8d08-243750dbc191",
+                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                          ]
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -2444,6 +3021,9 @@
                       "type": "boolean"
                     },
                     "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "rules": {
                       "type": "boolean"
                     }
                   }
@@ -5494,7 +6074,7 @@
         "operationId": "RuleController.count"
       }
     },
-    "/adcaas/v1/rules/{rule_id}/actions/{action_id}": {
+    "/adcaas/v1/rules/{ruleId}/actions/{actionId}": {
       "patch": {
         "x-controller-name": "RuleController",
         "x-operation-name": "updateActionByID",
@@ -5515,27 +6095,64 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "action_id",
+            "name": "actionId",
+            "description": "Action resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Action resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "event": "request",
+                  "location": "http://1.2.3.4/index.html",
+                  "type": "httpUri"
+                }
               }
             }
           },
@@ -5551,11 +6168,63 @@
         ],
         "responses": {
           "200": {
-            "description": "Action model instance",
+            "description": "Successfully retrieve action resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Action"
+                  "type": "object",
+                  "properties": {
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "event": {
+                            "type": "string"
+                          },
+                          "location": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "ruleId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "event": "request",
+                          "location": "http://1.2.3.4/index.html",
+                          "type": "httpUri",
+                          "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -5563,20 +6232,24 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "action_id",
+            "name": "actionId",
+            "description": "Action resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.getActionByID"
@@ -5594,26 +6267,30 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "action_id",
+            "name": "actionId",
+            "description": "Action resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.deleteActionByID"
       }
     },
-    "/adcaas/v1/rules/{rule_id}/actions": {
+    "/adcaas/v1/rules/{ruleId}/actions": {
       "post": {
         "x-controller-name": "RuleController",
         "x-operation-name": "createRuleAction",
@@ -5622,11 +6299,124 @@
         ],
         "responses": {
           "200": {
-            "description": "Actions add to rule success",
+            "description": "Successfully create Action resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Action"
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "event": {
+                          "type": "string"
+                        },
+                        "location": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "ruleId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "event": "request",
+                        "location": "http://1.2.3.4/index.html",
+                        "type": "httpUri",
+                        "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Action resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Action resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
@@ -5634,19 +6424,54 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Action resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "event": "request",
+                  "location": "http://1.2.3.4/index.html",
+                  "type": "httpUri"
+                }
               }
             }
           },
@@ -5662,13 +6487,62 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of action model instances",
+            "description": "Successfully retrieve action resources by pool id",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Action"
+                  "type": "object",
+                  "properties": {
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "event": {
+                            "type": "string"
+                          },
+                          "location": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "ruleId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "event": "request",
+                          "location": "http://1.2.3.4/index.html",
+                          "type": "httpUri",
+                          "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -5677,69 +6551,23 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.getActions"
       }
     },
-    "/adcaas/v1/rules/{rule_id}/conditions/{condition_id}": {
+    "/adcaas/v1/rules/{ruleId}/conditions/{conditionId}": {
       "patch": {
         "x-controller-name": "RuleController",
-        "x-operation-name": "updateCondtionByID",
-        "tags": [
-          "RuleController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Conditon model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Condition"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "rule_id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "name": "condition_id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          },
-          "x-parameter-index": 2
-        },
-        "operationId": "RuleController.updateCondtionByID"
-      },
-      "get": {
-        "x-controller-name": "RuleController",
-        "x-operation-name": "getConditionByID",
+        "x-operation-name": "updateConditionByID",
         "tags": [
           "RuleController"
         ],
@@ -5757,20 +6585,159 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "condition_id",
+            "name": "conditionId",
+            "description": "Condition resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Condition resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "index": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "event": "request",
+                  "index": 1,
+                  "type": "httpUri"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "RuleController.updateConditionByID"
+      },
+      "get": {
+        "x-controller-name": "RuleController",
+        "x-operation-name": "getConditionByID",
+        "tags": [
+          "RuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve condition resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "event": {
+                            "type": "string"
+                          },
+                          "index": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "ruleId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "event": "request",
+                          "index": 1,
+                          "type": "httpUri",
+                          "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ruleId",
+            "description": "Rule resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "conditionId",
+            "description": "Condition resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.getConditionByID"
@@ -5783,31 +6750,35 @@
         ],
         "responses": {
           "204": {
-            "description": "Condition DELETE success"
+            "description": "condition DELETE success"
           }
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           },
           {
-            "name": "condition_id",
+            "name": "conditionId",
+            "description": "Condition resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.deleteConditionByID"
       }
     },
-    "/adcaas/v1/rules/{rule_id}/conditions": {
+    "/adcaas/v1/rules/{ruleId}/conditions": {
       "post": {
         "x-controller-name": "RuleController",
         "x-operation-name": "createRuleCondition",
@@ -5816,11 +6787,124 @@
         ],
         "responses": {
           "200": {
-            "description": "Conditions add to rule success",
+            "description": "Successfully create Condition resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Condition"
+                  "type": "object",
+                  "properties": {
+                    "condition": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "event": {
+                          "type": "string"
+                        },
+                        "index": {
+                          "type": "number"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "ruleId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "event": "request",
+                        "index": 1,
+                        "type": "httpUri",
+                        "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Condition resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Condition resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
@@ -5828,19 +6912,52 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Condition resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "index": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "event": "request",
+                  "index": 1,
+                  "type": "httpUri"
+                }
               }
             }
           },
@@ -5856,13 +6973,62 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of conditon model instances",
+            "description": "Successfully retrieve condition resources by pool id",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Condition"
+                  "type": "object",
+                  "properties": {
+                    "conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "event": {
+                            "type": "string"
+                          },
+                          "index": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "ruleId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "event": "request",
+                          "index": 1,
+                          "type": "httpUri",
+                          "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -5871,18 +7037,20 @@
         },
         "parameters": [
           {
-            "name": "rule_id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.getConditions"
       }
     },
-    "/adcaas/v1/rules/{id}": {
+    "/adcaas/v1/rules/{ruleId}": {
       "patch": {
         "x-controller-name": "RuleController",
         "x-operation-name": "updateById",
@@ -5891,24 +7059,73 @@
         ],
         "responses": {
           "204": {
-            "description": "Rule PATCH success"
+            "description": "Successfully update Rule resource"
+          },
+          "404": {
+            "description": "Can not find Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "Rule resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Rule"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
               }
             }
           },
@@ -5924,11 +7141,80 @@
         ],
         "responses": {
           "200": {
-            "description": "Rule model instance",
+            "description": "Successfully retrieve Rule resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "endpointpolicyId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -5936,12 +7222,14 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.findById"
@@ -5954,17 +7242,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Rule DELETE success"
+            "description": "Successfully delete Rule resource"
+          },
+          "404": {
+            "description": "Can not find Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "ruleId",
+            "description": "Rule resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "RuleController.deleteById"
@@ -5979,21 +7301,141 @@
         ],
         "responses": {
           "200": {
-            "description": "Rule model instance",
+            "description": "Successfully create Rule resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "endpointpolicyId": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Rule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
                 }
               }
             }
           }
         },
         "requestBody": {
+          "description": "Rule resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                }
               }
             }
           }
@@ -6008,13 +7450,50 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Rule model instances",
+            "description": "Successfully retrieve Rule resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Rule"
+                  "type": "object",
+                  "properties": {
+                    "rules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "endpointpolicyId": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -6039,6 +7518,18 @@
                       "type": "boolean"
                     },
                     "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
                       "type": "boolean"
                     },
                     "endpointpolicyId": {
@@ -6252,6 +7743,9 @@
                         },
                         "updatedAt": {
                           "type": "date"
+                        },
+                        "rules": {
+                          "type": "array"
                         }
                       },
                       "example": {
@@ -6260,7 +7754,11 @@
                         "description": "My description",
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z"
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "rules": [
+                          "23442d6a-4d82-40ee-8d08-243750dbc191",
+                          "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                        ]
                       }
                     }
                   }
@@ -6366,6 +7864,9 @@
                           },
                           "updatedAt": {
                             "type": "date"
+                          },
+                          "rules": {
+                            "type": "array"
                           }
                         },
                         "example": {
@@ -6374,7 +7875,11 @@
                           "description": "My description",
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
-                          "updatedAt": "2019-03-05T08:40:25.100Z"
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "rules": [
+                            "23442d6a-4d82-40ee-8d08-243750dbc191",
+                            "aaaabbda-4d82-40ee-8d08-243750dbc192"
+                          ]
                         }
                       }
                     }
@@ -7805,6 +9310,12 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -7820,13 +9331,26 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "endpointpolicyId": {
             "type": "string"
           }
         },
         "required": [
-          "name",
-          "endpointpolicyId"
+          "id"
         ]
       },
       "Monitor": {
@@ -8122,7 +9646,6 @@
         },
         "required": [
           "id",
-          "type",
           "ruleId"
         ]
       },
@@ -8181,9 +9704,7 @@
           }
         },
         "required": [
-          "id",
-          "type",
-          "ruleId"
+          "id"
         ]
       },
       "Service": {
