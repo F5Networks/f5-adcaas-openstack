@@ -198,15 +198,16 @@ export class ComputeManagerV2 extends ComputeManager {
         serversParams.availableZoneName;
     if (serversParams.userData)
       serversRequestBody.server.userData = serversParams.userData;
-    if (serversParams.networkId) {
-      // TODO: support multiple networks/ports.
-      serversRequestBody.server.networks[0].uuid = serversParams.networkId;
-    } else if (serversParams.portId) {
-      delete serversRequestBody.server.networks[0].uuid;
-      serversRequestBody.server.networks[0].port = <string>serversParams.portId;
-      // if (serversParams.fixedIp) // TODO: support fixed ip.
-    }
 
+    serversRequestBody.server.networks.shift();
+    if (serversParams.networkId) {
+      // TODO: remove network uuid support?
+      serversRequestBody.server.networks.push({uuid: serversParams.networkId});
+    } else if (serversParams.ports) {
+      for (let p of serversParams.ports) {
+        serversRequestBody.server.networks.push({port: p});
+      }
+    } else throw new Error('Either network uuid or port id should be');
     return Promise.resolve(serversRequestBody);
   }
 }
@@ -216,7 +217,7 @@ export class ComputeManagerV2 extends ComputeManager {
 
 class ServersRequestBody {
   server: {
-    networks: [{uuid?: string; port?: string; fixed_ip?: string}];
+    networks: {uuid?: string; port?: string; fixed_ip?: string}[];
     name: string;
 
     imageRef: string;
@@ -234,7 +235,8 @@ class ServersRequestBody {
 
 export class ServersParams {
   userTenantId: string;
-  networkId: string;
+  networkId?: string;
+  ports?: string[];
   vmName: string;
 
   imageRef: string;
@@ -244,7 +246,6 @@ export class ServersParams {
   regionName: string;
   availableZoneName?: string;
   metadata?: {[key: string]: string};
-  portId?: string;
   fixedIp?: string;
 }
 

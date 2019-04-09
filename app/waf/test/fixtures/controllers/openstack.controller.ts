@@ -111,7 +111,7 @@ export class OpenstackController extends MockBaseController {
         securityGroupName: reqBody.param.securityGroupName,
         regionName: reqBody.param.regionName,
         vmName: reqBody.param.vmName,
-        portId: reqBody.param.portId,
+        ports: [reqBody.param.portId],
       };
 
       // Need to generate admin token to retrieve catalog.
@@ -167,11 +167,11 @@ export class OpenstackController extends MockBaseController {
         regionName: reqBody.param.regionName,
         name: 'adcId-',
       };
-      let portId = await networkDriver.createPort(
+      let port = await networkDriver.createPort(
         reqBody.param.userToken,
         portsParams,
       );
-      return Promise.resolve({id: portId});
+      return Promise.resolve(port);
     });
   }
 
