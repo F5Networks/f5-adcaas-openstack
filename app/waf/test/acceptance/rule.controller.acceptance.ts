@@ -64,7 +64,8 @@ describe('RuleController', () => {
   });
 
   it('post ' + prefix + '/rules: no rule assocated', async () => {
-    const rule = createRuleObject();
+
+    const rule = createRuleObject({endpointpolicyId: uuid()});
 
     const response = await client
       .post(prefix + '/rules')
