@@ -1,15 +1,12 @@
-import {
-  DefaultCrudRepository,
-  HasManyRepositoryFactory,
-  repository,
-} from '@loopback/repository';
+import {HasManyRepositoryFactory, repository} from '@loopback/repository';
 import {Endpointpolicy} from '../models';
 import {DbDataSource} from '../datasources';
 import {Rule} from '../models';
 import {inject, Getter} from '@loopback/core';
 import {RuleRepository} from './rule.repository';
+import {CommonRepository} from './common';
 
-export class EndpointpolicyRepository extends DefaultCrudRepository<
+export class EndpointpolicyRepository extends CommonRepository<
   Endpointpolicy,
   typeof Endpointpolicy.prototype.id
 > {

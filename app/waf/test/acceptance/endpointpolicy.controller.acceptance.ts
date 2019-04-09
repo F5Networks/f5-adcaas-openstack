@@ -27,18 +27,16 @@ describe('EndpointpolicyController', () => {
   });
 
   it('post ' + prefix + '/endpointpolicies: with id', async () => {
-    const epp = new Endpointpolicy(
-      createEndpointpolicyObject({
-        id: uuid(),
-      }),
-    );
+    const epp = createEndpointpolicyObject({id: uuid()});
 
     const response = await client
       .post(prefix + '/endpointpolicies')
       .send(epp)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(epp));
+    expect(response.body.endpointpolicy.id)
+      .to.not.empty()
+      .and.type('string');
   });
 
   it('post ' + prefix + '/endpointpolicies: with no id', async () => {
@@ -49,7 +47,7 @@ describe('EndpointpolicyController', () => {
       .send(epp)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(epp));
+    expect(response.body.endpointpolicy).to.containDeep(toJSON(epp));
   });
 
   it('post ' + prefix + '/endpointpolicies: with duplicate id', async () => {
@@ -58,31 +56,30 @@ describe('EndpointpolicyController', () => {
     await client
       .post(prefix + '/endpointpolicies')
       .send(epp)
-      .expect(409);
+      .expect(200);
   });
 
   it(
     'post ' + prefix + '/endpointpolicies: no endpointpolicy assocated',
     async () => {
-      const epp = new Endpointpolicy(
-        createEndpointpolicyObject({
-          id: uuid(),
-        }),
-      );
+      const request = createEndpointpolicyObject();
 
       const response = await client
         .post(prefix + '/endpointpolicies')
-        .send(epp)
+        .send(request)
         .expect(200);
 
-      expect(response.body).to.containDeep(toJSON(epp));
+      expect(response.body.endpointpolicy.id)
+        .to.not.empty()
+        .and.type('string');
+      expect(response.body.endpointpolicy).to.containDeep(toJSON(request));
     },
   );
 
   it('get ' + prefix + '/endpointpolicies: of all', async () => {
-    await givenEndpointpolicyData(wafapp);
-
-    await client.get(prefix + '/endpointpolicies').expect(200);
+    const epp = await givenEndpointpolicyData(wafapp);
+    const response = await client.get(prefix + '/endpointpolicies').expect(200);
+    expect(toJSON(epp)).to.containDeep(response.body.endpointpolicies[0]);
   });
 
   it('get ' + prefix + '/endpointpolicies: with filter string', async () => {
@@ -92,7 +89,7 @@ describe('EndpointpolicyController', () => {
       .get(prefix + '/endpointpolicies')
       .query({where: {id: epp.getId()}})
       .expect(200);
-    expect(response.body).be.instanceOf(Array);
+    expect(toJSON(epp)).to.containDeep(response.body.endpointpolicies[0]);
   });
 
   it('get ' + prefix + '/endpointpolicies/count', async () => {
@@ -110,29 +107,41 @@ describe('EndpointpolicyController', () => {
     expect(response.body.count).to.eql(1);
   });
 
-  it('get ' + prefix + '/endpointpolicies/{id}: selected item', async () => {
-    await givenEndpointpolicyData(wafapp);
-    const epp = await givenEndpointpolicyData(wafapp);
+  it(
+    'get ' + prefix + '/endpointpolicies/{endpointpolicyId}: selected item',
+    async () => {
+      await givenEndpointpolicyData(wafapp);
+      const epp = await givenEndpointpolicyData(wafapp);
 
-    await client.get(prefix + '/endpointpolicies/' + epp.id).expect(200);
-  });
-
-  it('get ' + prefix + '/endpointpolicies/{id}: not found', async () => {
-    await client.get(prefix + '/endpointpolicies/' + uuid()).expect(404);
-  });
-
-  it('patch ' + prefix + '/endpointpolicies/{id}: existing item', async () => {
-    const patched_name = {name: 'new endpointpolicy name'};
-    const epp = await givenEndpointpolicyData(wafapp);
-
-    await client
-      .patch(prefix + '/endpointpolicies/' + epp.id)
-      .send(patched_name)
-      .expect(204, '');
-  });
+      await client.get(prefix + '/endpointpolicies/' + epp.id).expect(200);
+    },
+  );
 
   it(
-    'patch ' + prefix + '/endpointpolicies/{id}: non-existing item',
+    'get ' + prefix + '/endpointpolicies/{endpointpolicyId}: not found',
+    async () => {
+      await client.get(prefix + '/endpointpolicies/' + uuid()).expect(404);
+    },
+  );
+
+  it(
+    'patch ' + prefix + '/endpointpolicies/{endpointpolicyId}: existing item',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
+      epp.name = 'test';
+
+      await client
+        .patch(prefix + `/endpointpolicies/${epp.id}`)
+        .send(epp)
+        .expect(204);
+      await client.get(prefix + `/endpointpolicies/${epp.id}`).expect(200);
+    },
+  );
+
+  it(
+    'patch ' +
+      prefix +
+      '/endpointpolicies/{endpointpolicyId}: non-existing item',
     async () => {
       const patched_name = {name: 'new endpointpolicy name'};
       await client
@@ -143,20 +152,25 @@ describe('EndpointpolicyController', () => {
   );
 
   it(
-    'delete ' + prefix + '/endpointpolicies/{id}: non-existing item',
+    'delete ' +
+      prefix +
+      '/endpointpolicies/{endpointpolicyId}: non-existing item',
     async () => {
       await client.del(prefix + '/endpointpolicies/' + uuid()).expect(404);
     },
   );
 
-  it('delete ' + prefix + '/endpointpolicies/{id}: existing item', async () => {
-    const epp = await givenEndpointpolicyData(wafapp);
+  it(
+    'delete ' + prefix + '/endpointpolicies/{endpointpolicyId}: existing item',
+    async () => {
+      const epp = await givenEndpointpolicyData(wafapp);
 
-    await client.del(prefix + '/endpointpolicies/' + epp.id).expect(204);
-  });
+      await client.del(prefix + '/endpointpolicies/' + epp.id).expect(204);
+    },
+  );
 
   it(
-    'put ' + prefix + '/endpointpolicies/{id}: non-existing item',
+    'put ' + prefix + '/endpointpolicies/{endpointpolicyId}: non-existing item',
     async () => {
       const epp = new Endpointpolicy(
         createEndpointpolicyObject({

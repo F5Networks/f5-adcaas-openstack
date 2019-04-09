@@ -276,13 +276,16 @@ export class AS3Rule extends AS3Object {
 
   constructor(rule: Rule, params: {[key: string]: Object}) {
     super();
-    this.name = rule.name;
+
     this.conditions = [];
     this.actions = [];
 
     let conditions = <Condition[]>rule.conditions;
     let actions = <Action[]>rule.actions;
 
+    if (rule.name) {
+      this.name = rule.name;
+    }
     for (let condition of conditions) {
       this.conditions.push(new AS3Condition(condition));
     }

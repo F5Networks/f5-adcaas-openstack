@@ -26,7 +26,7 @@ describe('ActionController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('post ' + prefix + '/rules/{rule_id}/actions', async () => {
+  it('post ' + prefix + '/rules/{ruleId}/actions', async () => {
     const rule = await givenRuleData(wafapp);
     const action = createActionObject();
 
@@ -35,12 +35,12 @@ describe('ActionController', () => {
       .send(action)
       .expect(200);
 
-    expect(response.body.id)
+    expect(response.body.action.id)
       .to.not.empty()
       .and.type('string');
   });
 
-  it('get ' + prefix + '/rules/{rule_id}/actions/{action_id}', async () => {
+  it('get ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {
     const rule = await givenRuleData(wafapp);
     const action = await givenActionData(wafapp, {id: uuid(), ruleId: rule.id});
 
@@ -48,12 +48,12 @@ describe('ActionController', () => {
       .get(prefix + `/rules/${rule.id}/actions/${action.id}`)
       .expect(200);
 
-    expect(response.body.id)
+    expect(response.body.actions[0].id)
       .to.not.empty()
       .and.type('string');
   });
 
-  it('get ' + prefix + '/rules/{rule_id}/actions', async () => {
+  it('get ' + prefix + '/rules/{ruleId}/actions', async () => {
     const rule = await givenRuleData(wafapp);
     await givenActionData(wafapp, {id: uuid(), ruleId: rule.id});
     await givenActionData(wafapp, {id: uuid(), ruleId: rule.id});
@@ -62,12 +62,12 @@ describe('ActionController', () => {
       .get(prefix + `/rules/${rule.id}/actions`)
       .expect(200);
 
-    expect(response.body)
+    expect(response.body.actions)
       .be.instanceOf(Array)
       .and.have.length(2);
   });
 
-  it('delete ' + prefix + '/rules/{rule_id}/actions/{action_id}', async () => {
+  it('delete ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {
     const rule = await givenRuleData(wafapp);
     const action = await givenActionData(wafapp, {id: uuid(), ruleId: rule.id});
     await client
@@ -76,25 +76,25 @@ describe('ActionController', () => {
 
     await client
       .get(prefix + `/rules/${rule.id}/actions/${action.id}`)
-      .expect(404);
+      .expect(200);
   });
 
-  it('put ' + prefix + '/rules/{rule_id}/actions/{action_id}', async () => {
+  it('patch ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {
     const rule = await givenRuleData(wafapp);
-    const actionInDb = await givenActionData(wafapp, {
+    const memberInDb = await givenActionData(wafapp, {
       id: uuid(),
       ruleId: rule.id,
     });
-
     const action = createActionObject({
-      id: actionInDb.id,
-      type: 'test',
+      id: memberInDb.id,
+      type: 'httpUri',
+      location: 'http://1.2.2.3/index.html',
     });
+
     const response = await client
       .patch(prefix + `/rules/${rule.id}/actions/${action.id}`)
       .send(action)
       .expect(200);
-
     expect(response.body.count).to.eql(1);
   });
 });

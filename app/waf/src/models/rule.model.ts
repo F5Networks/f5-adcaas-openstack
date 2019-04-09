@@ -1,31 +1,24 @@
 import {Condition, Action} from '../models';
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {model, property, hasMany} from '@loopback/repository';
+import {CommonEntity} from '.';
 
 @model()
-export class Rule extends Entity {
+export class Rule extends CommonEntity {
   @property({
     type: 'string',
-    id: true,
+    required: false,
+    schema: {
+      response: true,
+      example: '2d3h896a-4d82-40ee-8d08-55550db1234',
+    },
   })
-  id: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  name: string;
+  endpointpolicyId: string;
 
   @hasMany(() => Condition, {keyTo: 'ruleId'})
   conditions?: Condition[];
 
   @hasMany(() => Action, {keyTo: 'ruleId'})
   actions?: Action[];
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  endpointpolicyId: string;
 
   constructor(data?: Partial<Rule>) {
     super(data);
