@@ -37,6 +37,7 @@ import {
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
+import {isNullOrUndefined} from 'util';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
@@ -148,6 +149,10 @@ export async function givenRuleData(
   const rulerepo = await wafapp.getRepository(RuleRepository);
   const obj = createRuleObject(data);
   obj.id = uuid();
+
+  if (isNullOrUndefined(obj.endpointpolicyId)) {
+    obj.endpointpolicyId = uuid();
+  }
 
   return await rulerepo.create(obj);
 }

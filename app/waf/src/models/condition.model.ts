@@ -21,7 +21,6 @@ export class Condition extends CommonEntity {
     schema: {
       create: true,
       response: true,
-      required: false,
       example: 'request',
     },
   })
@@ -112,7 +111,6 @@ export class Condition extends CommonEntity {
     schema: {
       create: true,
       response: true,
-      required: false,
       example: 'httpUri',
     },
   })

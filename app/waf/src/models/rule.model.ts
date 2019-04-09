@@ -6,7 +6,7 @@ import {CommonEntity} from '.';
 export class Rule extends CommonEntity {
   @property({
     type: 'string',
-    required: false,
+    required: true,
     schema: {
       response: true,
       example: '2d3h896a-4d82-40ee-8d08-55550db1234',
