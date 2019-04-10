@@ -80,7 +80,7 @@ export class OpenstackController extends MockBaseController {
         WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      return await authWithOSIdentity.adminAuthToken().then(async () => {
+      return await authWithOSIdentity.solveAdminToken().then(async () => {
         return await authWithOSIdentity.validateUserToken(
           reqBody.param.adminToken,
           reqBody.param.userToken,
@@ -115,7 +115,7 @@ export class OpenstackController extends MockBaseController {
       };
 
       // Need to generate admin token to retrieve catalog.
-      return authWithOSIdentity.adminAuthToken().then(async () => {
+      return authWithOSIdentity.solveAdminToken().then(async () => {
         return {
           id: await computeMgr.createServer(
             reqBody.param.userToken,
@@ -139,7 +139,7 @@ export class OpenstackController extends MockBaseController {
         WafBindingKeys.KeyComputeManager,
       );
 
-      return authWithOSIdentity.adminAuthToken().then(() => {
+      return authWithOSIdentity.solveAdminToken().then(() => {
         return computeMgr.getServerDetail(
           reqBody.param.userToken,
           reqBody.param.serverId,
@@ -160,7 +160,7 @@ export class OpenstackController extends MockBaseController {
         WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      await authWithOSIdentity.adminAuthToken();
+      await authWithOSIdentity.solveAdminToken();
 
       let portsParams: PortCreationParams = {
         networkId: reqBody.param.networkId,
