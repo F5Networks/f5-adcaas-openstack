@@ -35,7 +35,7 @@
         "OS_AUTH_URL": "http://10.145.116.217:35357/v3",
         "OS_USERNAME": "wafaas",
         "OS_PASSWORD": "91153c85b8dd4147",
-        "OS_TENANT_NAME": "32b8bef6100e4cb0a984a7c1f9027802",
+        "OS_TENANT_ID": "32b8bef6100e4cb0a984a7c1f9027802",
         "OS_DOMAIN_NAME": "Default"
       },
       "cwd": "${workspaceFolder}",
