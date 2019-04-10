@@ -45,10 +45,10 @@ export class AS3DeployRequest extends AS3Object {
 
     this.class = 'AS3';
     this.action = 'deploy';
-    this.targetHost = adc.host;
-    this.targetPort = adc.port;
-    this.targetUsername = adc.username;
-    this.targetPassphrase = adc.passphrase;
+    this.targetHost = adc.management.ipAddress;
+    this.targetPort = adc.management.tcpPort;
+    this.targetUsername = 'admin'; // TODO: generate the password.
+    this.targetPassphrase = 'admin';
     this.declaration = new AS3Declaration(params);
   }
 }

@@ -1,67 +1,154 @@
 import {model, property} from '@loopback/repository';
 import {CommonEntity} from '.';
 
+export type ActionsBody = CreateBody & DeleteBody & SetupBody;
+
+type CreateBody = {
+  create: {
+    id: string;
+  };
+};
+
+type DeleteBody = {
+  delete: {
+    id: string;
+  };
+};
+
+type SetupBody = {
+  setup: {
+    id: string;
+  };
+};
+
+export type ConfigTypes = {
+  type: string;
+  //platformType: 'OpenStack';
+  networks: {
+    name?: string;
+    type: 'mgmt' | 'ext' | 'int' | 'ha';
+    networkId: string;
+    fixedIp?: string;
+    //floatingIp?: string;
+    portId?: string; // cannot be appointed.
+    ready?: boolean; // cannot be appointed.
+    //vips?: [string]; // cannot be appointed.
+  }[];
+  compute: {
+    imageRef: string;
+    flavorRef: string;
+    userData?: string;
+    vmId?: string; // cannot be appointed.
+  };
+  //floatingNetworkId?: string;
+  securityGroup?: [string];
+  management: {
+    // cannot be appointed.
+    ipAddress: string; // mostly floatingIp.
+    tcpPort: number;
+    // no username passphrase, use admin/admin for 1st phase.
+  };
+  status: 'NONE' | 'POWERON' | 'POWEROFF' | 'BUILDING' | 'ACTIVE' | 'ERROR'; // cannot be appointed.
+};
+
+// TODO: To be extended.
+// onBoarding: {
+//   declaration: {
+//     dsc: {
+//       trusts: [];
+//       sync: {};
+//       failover: {};
+//       group: {};
+//     };
+//     system: {
+//       licenses: {};
+//       provisions: {};
+//       dns: {};
+//       ntp: {};
+//       users: {};
+//       // ...
+//     };
+//     network: {
+//       selfips: [];
+//       vlans: [];
+//       routes: [];
+//     };
+//   };
+// };
+
 @model()
 export class Adc extends CommonEntity {
   @property({
     type: 'string',
     required: true,
+    default: 'VE',
     schema: {
       create: true,
       response: true,
       required: true,
-      example: 'HW',
+      example: 'VE',
     },
   })
   type: string;
 
   @property({
-    type: 'string',
+    type: 'array',
+    required: true,
+    itemType: 'object',
+    schema: {
+      response: true,
+    },
+  })
+  networks: ConfigTypes['networks'];
+
+  @property({
+    type: 'object',
     required: true,
     schema: {
-      create: true,
-      required: true,
       response: true,
-      example: '192.168.0.1',
     },
   })
-  host: string;
+  compute: ConfigTypes['compute'];
+
+  // @property({
+  //   type: 'string',
+  //   required: true,
+  // })
+  // floatingNetworkId: string;
+
+  // @property({
+  //   type: 'array',
+  //   itemType: 'string',
+  //   schema: {
+  //     response: true,
+  //   },
+  // })
+  // securityGroup?: [string];
 
   @property({
-    type: 'number',
-    required: false,
-    default: 443,
+    type: 'object',
+    required: true,
     schema: {
-      create: true,
       response: true,
-      example: 8443,
     },
   })
-  port: number;
-
-  @property({
-    type: 'string',
-    required: false,
-    default: 'admin',
-    schema: {
-      create: true,
-      response: true,
-      example: 'admin',
-    },
-  })
-  username: string;
+  management: ConfigTypes['management'];
 
   @property({
     type: 'string',
-    required: false,
-    default: 'admin',
+    required: true,
+    default: 'NONE',
     schema: {
-      create: true,
       response: true,
-      example: 'admin',
     },
   })
-  passphrase: string;
+  status: ConfigTypes['status'];
+
+  // @property({
+  //   type: 'object',
+  //   required: true,
+  // })
+  // onBoarding: ConfigBody['onBoarding'];
 
   constructor(data?: Partial<Adc>) {
     super(data);

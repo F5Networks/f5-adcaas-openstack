@@ -213,10 +213,19 @@ export function createAdcObject(data?: Partial<Adc>) {
     {
       name: 'adc target',
       type: 'HW',
-      host: '1.2.3.4',
-      port: 8443,
-      username: 'admin',
-      passphrase: 'admin',
+      //platformType: 'OpenStack',
+      networks: [{networkId: '0dfc2e39eb83466a805983426f8d8e9b'}],
+      compute: {
+        imageRef: '10b7f45b-2837-4f90-a8d8-eae33f48d1cd',
+        flavorRef: 'fde45211da0a44ecbf38cb0b644ab30d',
+      },
+      //floatingNetworkId: 'ee1eca47dc88f4879d8a229cc70a07c6',
+      management: {
+        ipAddress: '172.16.10.11',
+        tcpPort: 8080,
+        //username: 'admin',
+      },
+      //onBoarding: {...}
     },
     data,
   );
