@@ -271,16 +271,16 @@
                         "type": {
                           "type": "string"
                         },
-                        "host": {
-                          "type": "string"
+                        "networks": {
+                          "type": "array"
                         },
-                        "port": {
-                          "type": "number"
+                        "compute": {
+                          "type": "object"
                         },
-                        "username": {
-                          "type": "string"
+                        "management": {
+                          "type": "object"
                         },
-                        "passphrase": {
+                        "status": {
                           "type": "string"
                         }
                       },
@@ -291,11 +291,7 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "HW",
-                        "host": "192.168.0.1",
-                        "port": 8443,
-                        "username": "admin",
-                        "passphrase": "admin"
+                        "type": "VE"
                       }
                     }
                   }
@@ -447,16 +443,16 @@
                         "type": {
                           "type": "string"
                         },
-                        "host": {
-                          "type": "string"
+                        "networks": {
+                          "type": "array"
                         },
-                        "port": {
-                          "type": "number"
+                        "compute": {
+                          "type": "object"
                         },
-                        "username": {
-                          "type": "string"
+                        "management": {
+                          "type": "object"
                         },
-                        "passphrase": {
+                        "status": {
                           "type": "string"
                         }
                       },
@@ -467,11 +463,7 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "HW",
-                        "host": "192.168.0.1",
-                        "port": 8443,
-                        "username": "admin",
-                        "passphrase": "admin"
+                        "type": "VE"
                       }
                     }
                   }
@@ -552,8 +544,7 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "type",
-                  "host"
+                  "type"
                 ],
                 "properties": {
                   "name": {
@@ -567,29 +558,13 @@
                   },
                   "type": {
                     "type": "string"
-                  },
-                  "host": {
-                    "type": "string"
-                  },
-                  "port": {
-                    "type": "number"
-                  },
-                  "username": {
-                    "type": "string"
-                  },
-                  "passphrase": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-                  "type": "HW",
-                  "host": "192.168.0.1",
-                  "port": 8443,
-                  "username": "admin",
-                  "passphrase": "admin"
+                  "type": "VE"
                 }
               }
             }
@@ -637,16 +612,16 @@
                           "type": {
                             "type": "string"
                           },
-                          "host": {
-                            "type": "string"
+                          "networks": {
+                            "type": "array"
                           },
-                          "port": {
-                            "type": "number"
+                          "compute": {
+                            "type": "object"
                           },
-                          "username": {
-                            "type": "string"
+                          "management": {
+                            "type": "object"
                           },
-                          "passphrase": {
+                          "status": {
                             "type": "string"
                           }
                         },
@@ -657,11 +632,7 @@
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "type": "HW",
-                          "host": "192.168.0.1",
-                          "port": 8443,
-                          "username": "admin",
-                          "passphrase": "admin"
+                          "type": "VE"
                         }
                       }
                     }
@@ -706,16 +677,16 @@
                     "type": {
                       "type": "boolean"
                     },
-                    "host": {
+                    "networks": {
                       "type": "boolean"
                     },
-                    "port": {
+                    "compute": {
                       "type": "boolean"
                     },
-                    "username": {
+                    "management": {
                       "type": "boolean"
                     },
-                    "passphrase": {
+                    "status": {
                       "type": "boolean"
                     }
                   }
@@ -8692,16 +8663,16 @@
                         "type": {
                           "type": "string"
                         },
-                        "host": {
-                          "type": "string"
+                        "networks": {
+                          "type": "array"
                         },
-                        "port": {
-                          "type": "number"
+                        "compute": {
+                          "type": "object"
                         },
-                        "username": {
-                          "type": "string"
+                        "management": {
+                          "type": "object"
                         },
-                        "passphrase": {
+                        "status": {
                           "type": "string"
                         }
                       },
@@ -8712,11 +8683,7 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "HW",
-                        "host": "192.168.0.1",
-                        "port": 8443,
-                        "username": "admin",
-                        "passphrase": "admin"
+                        "type": "VE"
                       }
                     }
                   }
@@ -8858,16 +8825,16 @@
                           "type": {
                             "type": "string"
                           },
-                          "host": {
-                            "type": "string"
+                          "networks": {
+                            "type": "array"
                           },
-                          "port": {
-                            "type": "number"
+                          "compute": {
+                            "type": "object"
                           },
-                          "username": {
-                            "type": "string"
+                          "management": {
+                            "type": "object"
                           },
-                          "passphrase": {
+                          "status": {
                             "type": "string"
                           }
                         },
@@ -8878,11 +8845,7 @@
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "type": "HW",
-                          "host": "192.168.0.1",
-                          "port": 8443,
-                          "username": "admin",
-                          "passphrase": "admin"
+                          "type": "VE"
                         }
                       }
                     }
