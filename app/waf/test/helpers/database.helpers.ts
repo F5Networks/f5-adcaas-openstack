@@ -86,10 +86,7 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
   return Object.assign(
     {
       name: 'test waf policy',
-      shared: false,
-      tenant: ['adminz'],
       url: 'http://unknown',
-      createdAt: '2019-01-21T05:03:45.502Z',
     },
     data,
   );
@@ -181,8 +178,6 @@ export async function givenWafpolicyData(
 ) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
   const obj = createWafpolicyObject(data);
-  obj.id = uuid();
-
   return await wafpolicyrepo.create(obj);
 }
 

@@ -1,9 +1,9 @@
-import {DefaultCrudRepository} from '@loopback/repository';
+import {CommonRepository} from '.';
 import {Wafpolicy} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
-export class WafpolicyRepository extends DefaultCrudRepository<
+export class WafpolicyRepository extends CommonRepository<
   Wafpolicy,
   typeof Wafpolicy.prototype.id
 > {

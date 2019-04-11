@@ -249,7 +249,7 @@ export class AS3Action extends AS3Object {
       if (!isNullOrUndefined(this.wafpolicy)) {
         let wafid = <classwafpolicy>this.wafpolicy;
         for (let onewaf of this.wafs) {
-          if (onewaf.id === wafid.wafpolicy) {
+          if (onewaf.id === wafid.wafpolicy && onewaf.name) {
             this.wafpolicy = <AS3USEPolicy>new AS3USEPolicy(onewaf.name);
             break;
           }
@@ -372,7 +372,9 @@ export class AS3WAFPolicy extends AS3Object {
     super();
 
     this.class = 'WAF_Policy';
-    this.name = policy.name;
+    if (policy.name) {
+      this.name = policy.name;
+    }
     this.url = policy.url;
   }
   toJSON(): Object {
