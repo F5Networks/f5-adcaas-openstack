@@ -150,7 +150,10 @@ export class ComputeManagerV2 extends ComputeManager {
     let endpoint: string | undefined;
     try {
       await this.application
-        .get(WafBindingKeys.KeyAdminAuthedToken)
+        .get(WafBindingKeys.KeyAuthWithOSIdentity)
+        .then(async authHelper => {
+          return authHelper.solveAdminToken();
+        })
         .then(adminToken => {
           endpoint = (() => {
             for (let c of adminToken.catalog) {

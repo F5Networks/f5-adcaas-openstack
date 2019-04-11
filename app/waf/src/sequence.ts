@@ -97,9 +97,7 @@ export class MySequence implements SequenceHandler {
       );
     }
 
-    const adminToken = await this.application.get<AuthedToken>(
-      WafBindingKeys.KeyAdminAuthedToken,
-    );
+    const adminToken = await this.authWithOSIdentity.solveAdminToken();
     await this.authWithOSIdentity
       .validateUserToken(adminToken.token, <string>userToken)
       .then(
