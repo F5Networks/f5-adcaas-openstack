@@ -55,6 +55,21 @@ export abstract class AuthWithOSIdentity {
   //     this.identityService = idenServ;
   //   });
   // }
+
+  async solveAdminToken(): Promise<AuthedToken> {
+    try {
+      let authedToken = await this.application.get(
+        WafBindingKeys.KeyAdminAuthedToken,
+      );
+      if (authedToken.expiredAt.getTime() - new Date().getTime() >= 0)
+        return authedToken;
+      else throw new Error('admin token expires, re-authorizing.');
+    } catch (error) {
+      let authedToken = await this.adminAuthToken();
+      this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(authedToken);
+      return authedToken;
+    }
+  }
 }
 
 class AuthWithIdentityV2 extends AuthWithOSIdentity {
@@ -78,9 +93,6 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           //this.logger.debug(JSON.stringify(response));
           return this.parseAuthResponseNoException(response);
         });
-
-      // TODO: don't bind values in services, move it to top level invocation.
-      this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(adminToken);
       return Promise.resolve(adminToken);
     } catch (error) {
       throw new Error('Failed to request /v2.0/tokens: ' + error.message);
