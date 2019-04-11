@@ -12,13 +12,13 @@ import {
   getFilterSchemaFor,
   getWhereSchemaFor,
   patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
 import {Wafpolicy} from '../models';
 import {WafpolicyRepository} from '../repositories';
-import uuid = require('uuid');
+import {Schema, Response, CollectionResponse} from '.';
+
 const prefix = '/adcaas/v1';
 
 export class WafpolicyController {
@@ -29,19 +29,27 @@ export class WafpolicyController {
 
   @post(prefix + '/wafpolicies', {
     responses: {
-      '200': {
-        description: 'Wafpolicy model instance',
-        content: {'application/json': {schema: {'x-ts-type': Wafpolicy}}},
-      },
+      '200': Schema.response(
+        Wafpolicy,
+        'Successfully create WAF Policy resource',
+      ),
+      '400': Schema.badRequest('Invalid WAF Policy resource'),
+      '422': Schema.unprocessableEntity('Unprocessable WAF Policy resource'),
     },
   })
   async create(
-    @requestBody() wafpolicy: Partial<Wafpolicy>,
-  ): Promise<Wafpolicy> {
-    if (!wafpolicy.id) {
-      wafpolicy.id = uuid();
-    }
-    return await this.wafpolicyRepository.create(wafpolicy);
+    @requestBody(
+      Schema.createRequest(
+        Wafpolicy,
+        'WAF Policy resource that need to be created',
+      ),
+    )
+    wafpolicy: Partial<Wafpolicy>,
+  ): Promise<Response> {
+    return new Response(
+      Wafpolicy,
+      await this.wafpolicyRepository.create(wafpolicy),
+    );
   }
 
   @get(prefix + '/wafpolicies/count', {
@@ -60,86 +68,65 @@ export class WafpolicyController {
 
   @get(prefix + '/wafpolicies', {
     responses: {
-      '200': {
-        description: 'Array of Wafpolicy model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Wafpolicy}},
-          },
-        },
-      },
+      '200': Schema.collectionResponse(
+        Wafpolicy,
+        'Successfully retrieve WAF Policy resources',
+      ),
     },
   })
   async find(
     @param.query.object('filter', getFilterSchemaFor(Wafpolicy))
     filter?: Filter,
-  ): Promise<Wafpolicy[]> {
-    return await this.wafpolicyRepository.find(filter);
-  }
-
-  @patch(prefix + '/wafpolicies', {
-    responses: {
-      '200': {
-        description: 'Wafpolicy PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody() wafpolicy: Partial<Wafpolicy>,
-    @param.query.object('where', getWhereSchemaFor(Wafpolicy)) where?: Where,
-  ): Promise<Count> {
-    return await this.wafpolicyRepository.updateAll(wafpolicy, where);
+  ): Promise<CollectionResponse> {
+    return new CollectionResponse(
+      Wafpolicy,
+      await this.wafpolicyRepository.find(filter),
+    );
   }
 
   @get(prefix + '/wafpolicies/{id}', {
     responses: {
-      '200': {
-        description: 'Wafpolicy model instance',
-        content: {'application/json': {schema: {'x-ts-type': Wafpolicy}}},
-      },
+      '200': Schema.response(
+        Wafpolicy,
+        'Successfully retrieve WAF Policy resource',
+      ),
+      '404': Schema.notFound('Can not find WAF Policy resource'),
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Wafpolicy> {
-    return await this.wafpolicyRepository.findById(id);
+  async findById(
+    @param(Schema.pathParameter('id', 'WAF Policy resource ID')) id: string,
+  ): Promise<Response> {
+    return new Response(Wafpolicy, await this.wafpolicyRepository.findById(id));
   }
 
   @patch(prefix + '/wafpolicies/{id}', {
     responses: {
-      '204': {
-        description: 'Wafpolicy PATCH success',
-      },
+      '204': Schema.emptyResponse('Successfully update WAF Policy resource'),
+      '404': Schema.notFound('Can not find ADC resource'),
     },
   })
   async updateById(
-    @param.path.string('id') id: string,
-    @requestBody() wafpolicy: Partial<Wafpolicy>,
+    @param(Schema.pathParameter('id', 'WAF Policy resource ID')) id: string,
+    @requestBody(
+      Schema.updateRequest(
+        Wafpolicy,
+        'WAF Policy resource properties that need to be updated',
+      ),
+    )
+    wafpolicy: Partial<Wafpolicy>,
   ): Promise<void> {
     await this.wafpolicyRepository.updateById(id, wafpolicy);
   }
 
-  @put(prefix + '/wafpolicies/{id}', {
-    responses: {
-      '204': {
-        description: 'Wafpolicy PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() wafpolicy: Partial<Wafpolicy>,
-  ): Promise<void> {
-    await this.wafpolicyRepository.replaceById(id, wafpolicy);
-  }
-
   @del(prefix + '/wafpolicies/{id}', {
     responses: {
-      '204': {
-        description: 'Wafpolicy DELETE success',
-      },
+      '204': Schema.emptyResponse('Successfully delete WAF Policy resource'),
+      '404': Schema.notFound('Can not find WAF Policy resource'),
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @param(Schema.pathParameter('id', 'WAF Policy resource ID')) id: string,
+  ): Promise<void> {
     await this.wafpolicyRepository.deleteById(id);
   }
 }

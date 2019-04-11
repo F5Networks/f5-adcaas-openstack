@@ -1,42 +1,37 @@
-import {Entity, model, property} from '@loopback/repository';
+import {CommonEntity} from '.';
+import {model, property} from '@loopback/repository';
 
 @model()
-export class Wafpolicy extends Entity {
+export class Wafpolicy extends CommonEntity {
   @property({
     type: 'string',
-    id: true,
     required: false,
+    schema: {
+      response: true,
+      example: '/Common/my_waf',
+    },
   })
-  id: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  name: string;
+  file?: string;
 
   @property({
     type: 'boolean',
-    required: true,
+    required: false,
+    default: false,
   })
-  shared: boolean;
+  ignoreChanges: boolean;
 
   @property({
     type: 'string',
     required: true,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      required: true,
+      example: 'https://raw.githubusercontent.com/wafrepo/master/my_waf.xml',
+    },
   })
   url: string;
-
-  @property({
-    type: 'array',
-    itemType: 'string',
-  })
-  tenant?: string[];
-
-  @property({
-    type: 'date',
-  })
-  createdAt?: string;
 
   constructor(data?: Partial<Wafpolicy>) {
     super(data);

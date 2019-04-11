@@ -11,7 +11,6 @@ import {
   givenWafpolicyData,
   createWafpolicyObject,
 } from '../helpers/database.helpers';
-import {Wafpolicy} from '../../src/models';
 import uuid = require('uuid');
 
 describe('WafpolicyController', () => {
@@ -31,53 +30,37 @@ describe('WafpolicyController', () => {
     await teardownApplication(wafapp);
   });
 
-  it('post ' + prefix + '/wafpolicies: with id', async () => {
-    const wafpolicy = new Wafpolicy(createWafpolicyObject({id: uuid()}));
-
-    const response = await client
-      .post(prefix + '/wafpolicies')
-      .send(wafpolicy)
-      .expect(200);
-
-    expect(response.body).to.containDeep(toJSON(wafpolicy));
-  });
-
   it('post ' + prefix + '/wafpolicies: with no id', async () => {
-    const wafpolicy = new Wafpolicy(createWafpolicyObject());
+    const wafpolicy = createWafpolicyObject();
 
     const response = await client
       .post(prefix + '/wafpolicies')
       .send(wafpolicy)
       .expect(200);
 
-    expect(response.body).to.containDeep(toJSON(wafpolicy));
-  });
-
-  it('post ' + prefix + '/wafpolicies: with duplicate id', async () => {
-    const wafpolicy = await givenWafpolicyData(wafapp);
-
-    await client
-      .post(prefix + '/wafpolicies')
-      .send(wafpolicy)
-      .expect(409);
+    expect(response.body.wafpolicy).to.containDeep(toJSON(wafpolicy));
   });
 
   it('get ' + prefix + '/wafpolicies: of all', async () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/wafpolicies')
-      .expect(200, [toJSON(wafpolicy)])
+      .expect(200)
       .expect('Content-Type', /application\/json/);
+
+    expect(toJSON(wafpolicy)).to.containDeep(response.body.wafpolicies[0]);
   });
 
   it('get ' + prefix + '/wafpolicies: with filter string', async () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/wafpolicies')
       .query({filter: {where: {id: wafpolicy.id}}})
-      .expect(200, [toJSON(wafpolicy)]);
+      .expect(200);
+
+    expect(toJSON(wafpolicy)).to.containDeep(response.body.wafpolicies[0]);
   });
 
   it('get ' + prefix + '/wafpolicies/count', async () => {
@@ -93,63 +76,15 @@ describe('WafpolicyController', () => {
     expect(response.body.count).to.eql(1);
   });
 
-  it('patch ' + prefix + '/wafpolicies: all items', async () => {
-    await givenWafpolicyData(wafapp);
-    await givenWafpolicyData(wafapp);
-
-    const patched_name = {name: 'updated waf policy name'};
-    let response = await client
-      .patch(prefix + '/wafpolicies')
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(2);
-
-    response = await client
-      .get(prefix + '/wafpolicies/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(2);
-  });
-
-  it('patch ' + prefix + '/wafpolicies: selected items', async () => {
-    await givenWafpolicyData(wafapp);
-    await givenWafpolicyData(wafapp);
-
-    const patch_condition = {url: 'the only one to patch'};
-    const patched_name = {name: 'updated waf policy name'};
-
-    await givenWafpolicyData(wafapp, patch_condition);
-
-    let response = await client
-      .patch(prefix + '/wafpolicies')
-      .query({where: patch_condition})
-      .send(patched_name)
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/wafpolicies/count')
-      .query({where: patched_name})
-      .expect(200);
-    expect(response.body.count).to.eql(1);
-
-    response = await client
-      .get(prefix + '/wafpolicies/count')
-      .query({where: patch_condition})
-      .expect(200);
-
-    expect(response.body.count).to.eql(1);
-  });
-
   it('get ' + prefix + '/wafpolicies/{id}: selected item', async () => {
     await givenWafpolicyData(wafapp);
     const wafpolicy = await givenWafpolicyData(wafapp);
 
-    await client
+    let response = await client
       .get(prefix + '/wafpolicies/' + wafpolicy.id)
-      .expect(200, toJSON(wafpolicy));
+      .expect(200);
+
+    expect(toJSON(wafpolicy)).to.containDeep(response.body.wafpolicy);
   });
 
   it('get ' + prefix + '/wafpolicies/{id}: not found', async () => {
@@ -182,37 +117,5 @@ describe('WafpolicyController', () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
 
     await client.del(prefix + '/wafpolicies/' + wafpolicy.id).expect(204);
-  });
-
-  it('put' + prefix + '/wafpolicies/{id}: existing item', async () => {
-    const wafpolicy = await givenWafpolicyData(wafapp);
-
-    const wafpolicy_new = new Wafpolicy(
-      createWafpolicyObject({
-        name: 'new waf policy name.',
-      }),
-    );
-    await client
-      .put(prefix + '/wafpolicies/' + wafpolicy.id)
-      .send(wafpolicy_new)
-      .expect(204);
-
-    const response = await client
-      .get(prefix + '/wafpolicies/' + wafpolicy.id)
-      .expect(200);
-
-    expect(response.body).to.containDeep({name: 'new waf policy name.'});
-  });
-
-  it('put ' + prefix + '/wafpolicies/{id}: non-existing item', async () => {
-    const wafpolicy = new Wafpolicy(
-      createWafpolicyObject({
-        name: 'new waf policy name.',
-      }),
-    );
-    await client
-      .put(prefix + '/wafpolicies/' + wafpolicy.id)
-      .send(wafpolicy)
-      .expect(404);
   });
 });
