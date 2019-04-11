@@ -8909,39 +8909,6 @@
       }
     },
     "/adcaas/v1/wafpolicies/{id}": {
-      "put": {
-        "x-controller-name": "WafpolicyController",
-        "x-operation-name": "replaceById",
-        "tags": [
-          "WafpolicyController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Wafpolicy PUT success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
-        "operationId": "WafpolicyController.replaceById"
-      },
       "patch": {
         "x-controller-name": "WafpolicyController",
         "x-operation-name": "updateById",
@@ -8950,24 +8917,77 @@
         ],
         "responses": {
           "204": {
-            "description": "Wafpolicy PATCH success"
+            "description": "Successfully update WAF Policy resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
             "name": "id",
+            "description": "WAF Policy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "requestBody": {
+          "description": "WAF Policy resource properties that need to be updated",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                }
               }
             }
           },
@@ -8983,11 +9003,84 @@
         ],
         "responses": {
           "200": {
-            "description": "Wafpolicy model instance",
+            "description": "Successfully retrieve WAF Policy resource",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Wafpolicy"
+                  "type": "object",
+                  "properties": {
+                    "wafpolicy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "file": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "file": "/Common/my_waf",
+                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find WAF Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
                 }
               }
             }
@@ -8996,11 +9089,13 @@
         "parameters": [
           {
             "name": "id",
+            "description": "WAF Policy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "WafpolicyController.findById"
@@ -9013,17 +9108,51 @@
         ],
         "responses": {
           "204": {
-            "description": "Wafpolicy DELETE success"
+            "description": "Successfully delete WAF Policy resource"
+          },
+          "404": {
+            "description": "Can not find WAF Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
           {
             "name": "id",
+            "description": "WAF Policy resource ID",
             "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "required": true
+              "type": "string",
+              "format": ""
+            }
           }
         ],
         "operationId": "WafpolicyController.deleteById"
@@ -9038,71 +9167,156 @@
         ],
         "responses": {
           "200": {
-            "description": "Wafpolicy model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Wafpolicy"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "operationId": "WafpolicyController.create"
-      },
-      "patch": {
-        "x-controller-name": "WafpolicyController",
-        "x-operation-name": "updateAll",
-        "tags": [
-          "WafpolicyController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Wafpolicy PATCH success count",
+            "description": "Successfully create WAF Policy resource",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "number"
+                    "wafpolicy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "file": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "file": "/Common/my_waf",
+                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid WAF Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable WAF Policy resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
                   }
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
         "requestBody": {
+          "description": "WAF Policy resource that need to be created",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                }
               }
             }
           }
         },
-        "operationId": "WafpolicyController.updateAll"
+        "operationId": "WafpolicyController.create"
       },
       "get": {
         "x-controller-name": "WafpolicyController",
@@ -9112,13 +9326,54 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of Wafpolicy model instances",
+            "description": "Successfully retrieve WAF Policy resources",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Wafpolicy"
+                  "type": "object",
+                  "properties": {
+                    "wafpolicies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "file": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "file": "/Common/my_waf",
+                          "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -9145,16 +9400,25 @@
                     "name": {
                       "type": "boolean"
                     },
-                    "shared": {
+                    "description": {
                       "type": "boolean"
                     },
-                    "url": {
-                      "type": "boolean"
-                    },
-                    "tenant": {
+                    "tenantId": {
                       "type": "boolean"
                     },
                     "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "file": {
+                      "type": "boolean"
+                    },
+                    "ignoreChanges": {
+                      "type": "boolean"
+                    },
+                    "url": {
                       "type": "boolean"
                     }
                   }
@@ -9782,38 +10046,6 @@
           "type",
           "applicationId",
           "virtualAddresses"
-        ]
-      },
-      "Wafpolicy": {
-        "title": "Wafpolicy",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "shared": {
-            "type": "boolean"
-          },
-          "url": {
-            "type": "string"
-          },
-          "tenant": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "name",
-          "shared",
-          "url"
         ]
       }
     }
