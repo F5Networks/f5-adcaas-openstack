@@ -61,7 +61,8 @@
           "X-Subject-Token": "{userToken}"
         },
         "url": "{url}",
-        "responsePath": "$"
+        "responsePath": "$",
+        "responseHeaders": true
       },
       "functions": {
         "v3ValidateToken": [

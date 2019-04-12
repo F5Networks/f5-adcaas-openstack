@@ -11,7 +11,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
-import {AuthWithOSIdentity, AuthedToken} from './services';
+import {AuthWithOSIdentity} from './services';
 import {CoreBindings} from '@loopback/core';
 import {WafApplication} from '.';
 import {WafBindingKeys} from './keys';
@@ -86,41 +86,32 @@ export class MySequence implements SequenceHandler {
     if (!process.env.PRODUCT_RELEASE) return;
 
     let {request} = context;
-    let authedToken = new AuthedToken();
 
     this.logger.debug('start to authenticate user');
 
-    let userToken = request.header('X-Auth-Token');
-    if (typeof userToken !== typeof '') {
+    let hdrToken = request.header('X-Auth-Token');
+    if (typeof hdrToken !== typeof '') {
       throw new HttpErrors.Unauthorized(
         'Unauthorized: invalid X-Auth-Token header.',
       );
     }
 
     const adminToken = await this.authWithOSIdentity.solveAdminToken();
-    await this.authWithOSIdentity
-      .validateUserToken(adminToken.token, <string>userToken)
-      .then(
-        authedObj => {
-          // ...
-          this.logger.debug('Authenticated OK');
-          this.logger.debug(JSON.stringify(authedObj));
-          authedToken = authedObj;
-        },
-        notAuthed => {
-          throw new HttpErrors.Unauthorized(
-            'Unauthorized: invalid user token.',
-          );
-        },
-      );
+    let userToken = await this.authWithOSIdentity
+      .validateUserToken(adminToken.token, <string>hdrToken)
+      .then(authedObj => {
+        this.logger.debug('Authenticated OK');
+        this.logger.debug(JSON.stringify(authedObj));
+        return authedObj;
+      });
 
     if (request.headers['tenant-id']) {
-      authedToken.tenantId = <string>request.headers['tenant-id'];
+      userToken.tenantId = <string>request.headers['tenant-id'];
     }
-    if (!authedToken.tenantId || authedToken.tenantId === '') {
+    if (!userToken.tenantId || userToken.tenantId === '') {
       throw new HttpErrors.BadRequest('BadRequest: tenant id is not provided');
     }
 
-    context.bind(WafBindingKeys.Request.KeyTenantId).to(authedToken.tenantId);
+    context.bind(WafBindingKeys.Request.KeyTenantId).to(userToken.tenantId);
   }
 }

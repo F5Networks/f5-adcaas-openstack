@@ -77,15 +77,17 @@ export class ComputeManagerV2 extends ComputeManager {
     serversParams: ServersParams,
   ): Promise<string> {
     try {
+      let adminToken = await this.application
+        .get(WafBindingKeys.KeyAuthWithOSIdentity)
+        .then(authHelper => {
+          return authHelper.solveAdminToken();
+        });
+
       return await Promise.all([
-        this.serversEndpoint(
-          serversParams.userTenantId,
-          serversParams.regionName,
-        ),
+        adminToken.epServers(serversParams.userTenantId),
         this.assembleRequestBody(serversParams),
       ])
-        .then(([computeUrl, reqBody]) => {
-          let url = computeUrl + '/servers';
+        .then(([url, reqBody]) => {
           return this.computeService.v2CreateServer(url, userToken, reqBody);
         })
         .then(serversResponse => {
@@ -110,18 +112,19 @@ export class ComputeManagerV2 extends ComputeManager {
     if (!tenantId || !regionName)
       throw new Error('tenantId and regionName are required for compute v2.');
 
-    try {
-      return await this.serversEndpoint(tenantId, regionName)
-        .then(computeUrl => {
-          let fullUrl = computeUrl + '/servers/' + serverId;
-          return this.computeService.v2VirtualServerDetail(fullUrl, userToken);
-        })
-        .then(response => {
-          return this.parseDetailResponse(response);
-        });
-    } catch (error) {
-      throw new Error('Failed to get virtual server detail.' + error);
-    }
+    let adminToken = await this.application
+      .get(WafBindingKeys.KeyAuthWithOSIdentity)
+      .then(authHelper => {
+        return authHelper.solveAdminToken();
+      });
+
+    let url = adminToken.epServers(tenantId) + '/' + serverId;
+
+    return await this.computeService
+      .v2VirtualServerDetail(url, userToken)
+      .then(response => {
+        return this.parseDetailResponse(response);
+      });
   }
 
   async parseDetailResponse(response: object): Promise<ServerDetail> {
@@ -141,46 +144,6 @@ export class ComputeManagerV2 extends ComputeManager {
     };
 
     return Promise.resolve(serverDetail);
-  }
-
-  async serversEndpoint(
-    userTenantId: string,
-    regionName: string,
-  ): Promise<string> {
-    let endpoint: string | undefined;
-    try {
-      await this.application
-        .get(WafBindingKeys.KeyAuthWithOSIdentity)
-        .then(async authHelper => {
-          return authHelper.solveAdminToken();
-        })
-        .then(adminToken => {
-          endpoint = (() => {
-            for (let c of adminToken.catalog) {
-              if (c.type !== 'compute') continue;
-
-              for (let e of c.endpoints) {
-                let eJson = JSON.parse(JSON.stringify(e));
-                if (eJson['region'] !== regionName) continue;
-                let url = <string>eJson['internalURL'];
-                return url.slice(0, url.lastIndexOf('/')) + '/' + userTenantId;
-              }
-            }
-
-            throw new Error('Not found the endpoint.');
-          })();
-        });
-    } catch (error) {
-      let newErr = new Error(
-        'Failed to get compute endpoint from admin token.',
-      );
-      newErr.message += '\n' + error.message;
-      newErr.stack += '\n' + error.stack;
-      throw newErr;
-    }
-
-    if (!endpoint) throw new Error('Not found compute url.');
-    return Promise.resolve(endpoint);
   }
 
   async assembleRequestBody(
