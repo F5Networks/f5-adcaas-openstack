@@ -27,7 +27,7 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.REJECT) public reject: Reject,
     @inject('logger', {optional: true})
     private logger = factory.getLogger('api.call'),
-    @inject('services.openstack.AuthWithOSIdentity')
+    @inject(WafBindingKeys.KeyAuthWithOSIdentity)
     private authWithOSIdentity: AuthWithOSIdentity,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: WafApplication,

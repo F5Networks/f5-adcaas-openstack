@@ -14,6 +14,8 @@
         // TODO: remove .vscode
         //"${workspaceFolder}/dist/test/<your specific file>.js",
         //"${workspaceFolder}/dist/test/**/*.js",
+        //"${workspaceFolder}/dist/test/acceptance/sequence.acceptance.js"
+        //"${workspaceFolder}/dist/test/acceptance/openstack.controller.acceptance.js"
         "${workspaceFolder}/dist/test/acceptance/adc.controller.acceptance.js"
       ],
       "runtimeExecutable": null,
