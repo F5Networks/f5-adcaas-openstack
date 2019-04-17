@@ -59,6 +59,8 @@ export class OpenstackController extends MockBaseController {
     private application: RestApplication,
   ) {
     super();
+    // need to unbind it for re-auth admin token from start.
+    this.application.unbind(WafBindingKeys.KeyAdminAuthedToken);
   }
 
   @get('/openstack/adminAuthToken')
@@ -67,7 +69,7 @@ export class OpenstackController extends MockBaseController {
       const authWithOSIdentity = await this.application.get(
         WafBindingKeys.KeyAuthWithOSIdentity,
       );
-      return authWithOSIdentity.adminAuthToken();
+      return authWithOSIdentity.solveAdminToken();
     });
   }
 

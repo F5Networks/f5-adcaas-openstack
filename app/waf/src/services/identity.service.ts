@@ -61,8 +61,7 @@ export abstract class AuthWithOSIdentity {
       let authedToken = await this.application.get(
         WafBindingKeys.KeyAdminAuthedToken,
       );
-      if (authedToken.expiredAt.getTime() - new Date().getTime() >= 0)
-        return authedToken;
+      if (!authedToken.expired()) return authedToken;
       else throw new Error('admin token expires, re-authorizing.');
     } catch (error) {
       let authedToken = await this.adminAuthToken();
@@ -86,14 +85,11 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
     };
 
     try {
-      let adminToken = await this.identityService
-        .v2AuthToken(url, reqBody)
-        .then(response => {
-          this.logger.debug('adminAuthToken done.');
-          //this.logger.debug(JSON.stringify(response));
-          return this.parseAuthResponseNoException(response);
-        });
-      return Promise.resolve(adminToken);
+      return this.identityService.v2AuthToken(url, reqBody).then(response => {
+        this.logger.debug('adminAuthToken done.');
+        this.logger.debug(JSON.stringify(response));
+        return AuthedToken.buildWith(response);
+      });
     } catch (error) {
       throw new Error('Failed to request /v2.0/tokens: ' + error.message);
     }
@@ -109,27 +105,11 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
 
     try {
       return await this.identityService.v2ValidateToken(url).then(response => {
-        return this.parseAuthResponseNoException(response);
+        return AuthedToken.buildWith(response);
       });
     } catch (error) {
       throw new Error('Failed to request identity service: ' + error);
     }
-  }
-
-  private parseAuthResponseNoException(response: object): AuthedToken {
-    let authedToken = new AuthedToken();
-
-    let respJson = JSON.parse(JSON.stringify(response));
-
-    let access = respJson['body'][0]['access'];
-    authedToken.issuedAt = new Date(access['token']['issued_at']);
-    authedToken.expiredAt = new Date(access['token']['expires']);
-    authedToken.token = access['token']['id'];
-
-    authedToken.userId = access['user']['id'];
-    authedToken.catalog = access['serviceCatalog'];
-
-    return authedToken;
   }
 }
 
@@ -158,13 +138,11 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
     };
 
     try {
-      let adminToken = new AuthedToken();
-      await this.identityService.v3AuthToken(url, reqBody).then(response => {
-        adminToken = this.parseAuthResponseNoException(response);
-      });
-      // TODO: return the promise returned by v3AuthToken. so do all 'Promise.resolve'.
-
-      return Promise.resolve(adminToken);
+      return await this.identityService
+        .v3AuthToken(url, reqBody)
+        .then(response => {
+          return AuthedToken.buildWith(response);
+        });
     } catch (e) {
       throw new Error('Failed to request from identity service: ' + e);
     }
@@ -179,33 +157,14 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
     // since tenant info can be retrieved from token validation.
     let url = this.authConfig.osAuthUrl + '/auth/tokens';
     try {
-      let authedToken = new AuthedToken();
-      await this.identityService
+      return await this.identityService
         .v3ValidateToken(url, adminToken, userToken)
         .then(response => {
-          authedToken = this.parseAuthResponseNoException(response);
+          return AuthedToken.buildWith(response);
         });
-
-      return Promise.resolve(authedToken);
     } catch (error) {
       throw new Error('Failed to request from identity service: ' + error);
     }
-  }
-
-  private parseAuthResponseNoException(response: object): AuthedToken {
-    let authedToken = new AuthedToken();
-
-    let respJson = JSON.parse(JSON.stringify(response));
-
-    let token = respJson['body'][0]['token'];
-    authedToken.issuedAt = new Date(token['issued_at']);
-    authedToken.expiredAt = new Date(token['expires_at']);
-    authedToken.token = respJson['headers']['x-subject-token']; //key in lower case
-
-    authedToken.userId = token['user']['id'];
-    authedToken.catalog = token['catalog'];
-
-    return authedToken;
   }
 }
 
@@ -250,9 +209,7 @@ export class AuthManager {
         'OS_DOMAIN_NAME',
       ];
     } else {
-      throw new Error(
-        `Not authorized, invalide identity url: ${process.env.OS_AUTH_URL}`,
-      );
+      authProps = [];
     }
 
     authProps.forEach(prop => {
@@ -310,16 +267,172 @@ class AuthConfig {
 }
 
 export class AuthedToken {
-  token: string;
-  userId: string;
-  issuedAt: Date;
-  expiredAt: Date;
-  // TODO: extends endpoints sub session of catalog to make it compatible
-  // for v2.0 and v3.
-  catalog: {
+  public token: string;
+  public userId: string;
+  public issuedAt: Date;
+  public expiredAt: Date;
+  public catalog: {
     endpoints: object[];
     type: string;
     name: string;
   }[];
-  tenantId: string;
+  public tenantId: string;
+
+  private version: 'v2.0' | 'v3';
+
+  private constructor() {}
+
+  public static buildWith(response: object): AuthedToken {
+    let v = AuthedToken.versionOf(response);
+    let authedToken = new AuthedToken();
+    switch (v) {
+      case 'v2.0':
+        return authedToken.buildV2_0(response);
+
+      case 'v3':
+        return authedToken.buildV3(response);
+
+      default:
+        throw new Error('Not recognized version: ' + v);
+    }
+  }
+
+  private buildV2_0(response: object): AuthedToken {
+    let respJson = JSON.parse(JSON.stringify(response));
+
+    let access = respJson['body'][0]['access'];
+    this.version = 'v2.0';
+    this.issuedAt = new Date(access['token']['issued_at']);
+    this.expiredAt = new Date(access['token']['expires']);
+    this.token = access['token']['id'];
+    this.userId = access['user']['id'];
+    this.catalog = access['serviceCatalog'];
+    this.tenantId = access['token']['tenant']
+      ? access['token']['tenant']['id']
+      : undefined;
+
+    return this;
+  }
+
+  private buildV3(response: object): AuthedToken {
+    let respJson = JSON.parse(JSON.stringify(response));
+
+    let token = respJson['body'][0]['token'];
+    this.version = 'v3';
+    this.issuedAt = new Date(token['issued_at']);
+    this.expiredAt = new Date(token['expires_at']);
+    this.token = respJson['headers']['x-subject-token']; //key in lower case
+    this.userId = token['user']['id'];
+    this.catalog = token['catalog'];
+    this.tenantId = token['project'] ? token['project']['id'] : undefined;
+
+    return this;
+  }
+
+  private static versionOf(response: object): 'v2.0' | 'v3' | undefined {
+    try {
+      let resp = JSON.parse(JSON.stringify(response));
+      if (!resp['body']) throw new Error('no "body"');
+
+      // May be more points to check when more versions are added.
+      if (resp['body'][0]['access']) return 'v2.0';
+      else if (resp['body'][0]['token']) return 'v3';
+    } catch (error) {
+      throw new Error(
+        'Invalid authed object, unable to parse: ' + error.message,
+      );
+    }
+  }
+
+  expired(): boolean {
+    return this.expiredAt.getTime() - new Date().getTime() <= 0;
+  }
+
+  private endpointOf(
+    inf: 'admin' | 'public' | 'internal',
+    region: string,
+    type: string,
+  ): string {
+    if (!this.catalog) throw new Error('catalog of authed token is empty.');
+
+    switch (this.version) {
+      case 'v2.0':
+        return this.v2_0EndpointOf(inf, region, type);
+      case 'v3':
+        return this.v3EndpointOf(inf, region, type);
+    }
+  }
+
+  private v2_0EndpointOf(
+    inf: 'admin' | 'public' | 'internal',
+    region: string,
+    type: string,
+  ): string {
+    for (let ct of this.catalog) {
+      if (ct.type !== type) continue;
+
+      for (let ep of ct.endpoints) {
+        let eJson = JSON.parse(JSON.stringify(ep));
+        if (eJson['region'] !== region) continue;
+
+        return eJson[inf + 'URL'];
+      }
+    }
+
+    throw new Error(
+      inf +
+        ' endpoint for ' +
+        type +
+        ' in region: ' +
+        region +
+        ': not found in v2.0 authed token.',
+    );
+  }
+
+  private v3EndpointOf(
+    inf: 'admin' | 'public' | 'internal',
+    region: string,
+    type: string,
+  ): string {
+    for (let ct of this.catalog) {
+      if (ct.type !== type) continue;
+
+      for (let ep of ct.endpoints) {
+        let eJson = JSON.parse(JSON.stringify(ep));
+        if (eJson['region'] !== region) continue;
+        if (eJson['interface'] !== inf) continue;
+
+        return eJson['url'];
+      }
+    }
+
+    throw new Error(
+      inf +
+        ' endpoint for ' +
+        type +
+        ' in region: ' +
+        region +
+        ': not found in v3 authed token.',
+    );
+  }
+
+  private epNetwork(): string {
+    return this.endpointOf('internal', 'RegionOne', 'network');
+  }
+  private epCompute(): string {
+    return this.endpointOf('internal', 'RegionOne', 'compute');
+  }
+
+  public epPorts(): string {
+    return this.epNetwork() + '/v2.0/ports';
+  }
+
+  // public epSubnets(): string {
+  //   return this.epNetwork() + '/v2.0/subnets';
+  // }
+
+  public epServers(tenantId: string) {
+    let url = this.epCompute();
+    return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
+  }
 }

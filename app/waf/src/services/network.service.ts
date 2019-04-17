@@ -55,86 +55,57 @@ export class NetworkDriver {
     userToken: string,
     portParams: PortCreationParams,
   ): Promise<PortResponse> {
-    try {
-      // TODO: exception check.
-      return await this.networkEndpoint(portParams.regionName)
-        .then(async networkUrl => {
-          let url = networkUrl + '/v2.0/ports';
-          let body: PortsRequest = {
-            port: {
-              network_id: portParams.networkId,
-            },
-          };
+    let adminToken = await this.application
+      .get(WafBindingKeys.KeyAuthWithOSIdentity)
+      .then(authHelper => {
+        return authHelper.solveAdminToken();
+      });
 
-          if (portParams.fixedIp) {
-            body.port.fixed_ips = [{ip_address: portParams.fixedIp}];
-          }
+    let url = adminToken.epPorts();
 
-          body.port.name = 'f5-' + portParams.name;
-
-          return this.networkService.v2CreatePort(url, userToken, body);
-        })
-        .then(response => {
-          const respJson = JSON.parse(JSON.stringify(response))['body'][0];
-          const portResp: PortResponse = {
-            id: respJson['port']['id'],
-            fixedIp: respJson['port']['fixed_ips'][0]['ip_address'],
-          };
-          return portResp;
-        });
-    } catch (error) {
-      throw new Error('Failed to create port: ' + error);
-    }
-  }
-
-  async networkEndpoint(regionName: string = 'RegionOne'): Promise<string> {
-    let endpoint: string | undefined;
-    try {
-      await this.application
-        .get(WafBindingKeys.KeyAuthWithOSIdentity)
-        .then(async authHelper => {
-          return authHelper.solveAdminToken();
-        })
-        .then(adminToken => {
-          endpoint = (() => {
-            for (let c of adminToken.catalog) {
-              if (c.type !== 'network') continue;
-
-              for (let e of c.endpoints) {
-                let eJson = JSON.parse(JSON.stringify(e));
-                if (eJson['region'] !== regionName) continue;
-
-                return <string>eJson['internalURL'];
-              }
-            }
-            throw new Error('Not found the endpoint.');
-          })();
-        });
-    } catch (error) {
-      throw new Error(
-        'Failed to get compute endpoint from admin token.' + error,
-      );
+    let body: PortsRequest = {
+      port: {
+        network_id: portParams.networkId,
+      },
+    };
+    if (portParams.fixedIp) {
+      body.port.fixed_ips = [{ip_address: portParams.fixedIp}];
     }
 
-    if (!endpoint) throw new Error('Not found compute url.');
-    return Promise.resolve(endpoint);
-  }
+    body.port.name = 'f5-' + portParams.name;
 
-  async getSubnetIds(userToken: string, networkId: string): Promise<[string]> {
-    let url =
-      (await this.networkEndpoint()) + '/v2.0/subnets?network_id=' + networkId;
     return await this.networkService
-      .v2GetSubnets(url, userToken)
+      .v2CreatePort(url, userToken, body)
       .then(response => {
-        this.logger.debug(
-          'access ' + url + ' response: ' + JSON.stringify(response),
-        );
-        let resp = JSON.parse(JSON.stringify(response))['subnets'];
-        return resp.map((v: {[key: string]: string}) => {
-          return v.id;
-        });
+        const respJson = JSON.parse(JSON.stringify(response))['body'][0];
+        const portResp: PortResponse = {
+          id: respJson['port']['id'],
+          fixedIp: respJson['port']['fixed_ips'][0]['ip_address'],
+        };
+        return portResp;
       });
   }
+
+  // async getSubnetIds(userToken: string, networkId: string): Promise<[string]> {
+  //   let adminToken = await this.application
+  //     .get(WafBindingKeys.KeyAuthWithOSIdentity)
+  //     .then(authHelper => {
+  //       return authHelper.solveAdminToken();
+  //     });
+
+  //   let url = adminToken.epSubnets() + '/v2.0/subnets?network_id=' + networkId;
+  //   return await this.networkService
+  //     .v2GetSubnets(url, userToken)
+  //     .then(response => {
+  //       this.logger.debug(
+  //         'access ' + url + ' response: ' + JSON.stringify(response),
+  //       );
+  //       let resp = JSON.parse(JSON.stringify(response))['subnets'];
+  //       return resp.map((v: {[key: string]: string}) => {
+  //         return v.id;
+  //       });
+  //     });
+  // }
 
   //async createFloatingIp() { }
 }

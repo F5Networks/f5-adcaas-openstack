@@ -22,6 +22,7 @@ export class MockKeyStoneController extends MockBaseController {
   async v2AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return ResponseWith['/v2.0/tokens']();
   }
+
   @get('/v2.0/tokens/{tokenId}')
   async v2ValidateToken(
     @param.path.string('tokenId') tokenId: string,
@@ -39,6 +40,7 @@ export class MockKeyStoneController extends MockBaseController {
 
   @get('/v3/auth/tokens')
   async v3ValidateToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    this.ctx.response.setHeader('X-Subject-Token', ExpectedData.userToken);
     return ResponseWith['/v3/auth/tokens']();
   }
 }
