@@ -135,7 +135,6 @@ type PortsRequest = {
 
 export class PortCreationParams {
   networkId: string;
-  regionName?: string = 'RegionOne';
   fixedIp?: string;
   name: string;
 }

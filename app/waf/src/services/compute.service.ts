@@ -50,7 +50,6 @@ export abstract class ComputeManager {
     userToken: string,
     serverId: string,
     tenantId?: string,
-    regionName?: string,
   ): Promise<ServerDetail>;
 
   async bindComputeService(): Promise<ComputeManager> {
@@ -107,10 +106,8 @@ export class ComputeManagerV2 extends ComputeManager {
     userToken: string,
     serverId: string,
     tenantId?: string,
-    regionName?: string,
   ): Promise<ServerDetail> {
-    if (!tenantId || !regionName)
-      throw new Error('tenantId and regionName are required for compute v2.');
+    if (!tenantId) throw new Error('tenantId is required for compute v2.');
 
     let adminToken = await this.application
       .get(WafBindingKeys.KeyAuthWithOSIdentity)
@@ -209,7 +206,6 @@ export class ServersParams {
   flavorRef: string;
   securityGroupName: string;
   userData?: string;
-  regionName: string;
   availableZoneName?: string;
   metadata?: {[key: string]: string};
   fixedIp?: string;

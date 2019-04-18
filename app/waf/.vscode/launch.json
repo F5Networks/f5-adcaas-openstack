@@ -38,7 +38,8 @@
         "OS_USERNAME": "wafaas",
         "OS_PASSWORD": "91153c85b8dd4147",
         "OS_TENANT_ID": "5d873cbc8e194e20b0db211a82f3b472",
-        "OS_DOMAIN_NAME": "Default"
+        "OS_DOMAIN_NAME": "Default",
+        "ENABLED_REGION": ""
       },
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",
