@@ -286,6 +286,8 @@ export class AuthedToken {
     name: string;
   }[];
   public tenantId: string;
+  private region: string = process.env.OS_REGION_NAME || 'RegionOne';
+  private interface: string = process.env.OS_INTERFACE || 'internal';
 
   private version: 'v2.0' | 'v3';
 
@@ -357,32 +359,24 @@ export class AuthedToken {
     return this.expiredAt.getTime() - new Date().getTime() <= 0;
   }
 
-  private endpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    region: string,
-    type: string,
-  ): string {
+  private endpointOf(inf: string, type: string): string {
     if (!this.catalog) throw new Error('catalog of authed token is empty.');
 
     switch (this.version) {
       case 'v2.0':
-        return this.v2_0EndpointOf(inf, region, type);
+        return this.v2_0EndpointOf(inf, type);
       case 'v3':
-        return this.v3EndpointOf(inf, region, type);
+        return this.v3EndpointOf(inf, type);
     }
   }
 
-  private v2_0EndpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    region: string,
-    type: string,
-  ): string {
+  private v2_0EndpointOf(inf: string, type: string): string {
     for (let ct of this.catalog) {
       if (ct.type !== type) continue;
 
       for (let ep of ct.endpoints) {
         let eJson = JSON.parse(JSON.stringify(ep));
-        if (eJson['region'] !== region) continue;
+        if (eJson['region'] !== this.region) continue;
 
         return eJson[inf + 'URL'];
       }
@@ -393,22 +387,18 @@ export class AuthedToken {
         ' endpoint for ' +
         type +
         ' in region: ' +
-        region +
+        this.region +
         ': not found in v2.0 authed token.',
     );
   }
 
-  private v3EndpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    region: string,
-    type: string,
-  ): string {
+  private v3EndpointOf(inf: string, type: string): string {
     for (let ct of this.catalog) {
       if (ct.type !== type) continue;
 
       for (let ep of ct.endpoints) {
         let eJson = JSON.parse(JSON.stringify(ep));
-        if (eJson['region'] !== region) continue;
+        if (eJson['region'] !== this.region) continue;
         if (eJson['interface'] !== inf) continue;
 
         return eJson['url'];
@@ -420,16 +410,16 @@ export class AuthedToken {
         ' endpoint for ' +
         type +
         ' in region: ' +
-        region +
+        this.region +
         ': not found in v3 authed token.',
     );
   }
 
   private epNetwork(): string {
-    return this.endpointOf('internal', 'RegionOne', 'network');
+    return this.endpointOf(this.interface, 'network');
   }
   private epCompute(): string {
-    return this.endpointOf('internal', 'RegionOne', 'compute');
+    return this.endpointOf(this.interface, 'compute');
   }
 
   public epPorts(): string {
@@ -442,6 +432,10 @@ export class AuthedToken {
 
   public epServers(tenantId: string) {
     let url = this.epCompute();
-    return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
+    //TODO: remove if else?
+    if (url.endsWith('v2.0'))
+      return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
+    // starts from v2.1, tenantId is not included in the url path.
+    else return url + '/servers';
   }
 }

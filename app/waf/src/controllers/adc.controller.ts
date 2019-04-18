@@ -287,7 +287,6 @@ export class AdcController {
         imageRef: adc.compute.imageRef,
         flavorRef: adc.compute.flavorRef,
         securityGroupName: 'default', //TODO: remove the hardcode in the future.
-        regionName: 'RegionOne',
         ports: (() => {
           let ports = [];
           for (let n of Object.keys(adc.networks)) {
@@ -329,7 +328,6 @@ export class AdcController {
 
         let portParams: PortCreationParams = {
           networkId: net.networkId,
-          regionName: 'RegionOne',
           name: <string>(adc.id + '-' + net.type + '-' + k),
         };
         if (net.fixedIp) portParams.fixedIp = net.fixedIp;
