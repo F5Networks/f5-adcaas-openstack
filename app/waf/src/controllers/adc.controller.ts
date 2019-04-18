@@ -31,12 +31,23 @@ import {inject, CoreBindings} from '@loopback/core';
 import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
+import {
+  TrustedDeviceRequest,
+  TrustedDevice,
+  TrustedDeviceService,
+} from '../services';
 import {PortCreationParams, ServersParams, BigIpManager} from '../services';
 
 const prefix = '/adcaas/v1';
 
-const createDesc = 'ADC resource that need to be created';
-const updateDesc = 'ADC resource properties that need to be updated';
+const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
+const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
+
+async function sleep(time: number): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    setTimeout(resolve, time);
+  });
+}
 
 export class AdcController {
   constructor(
@@ -44,7 +55,10 @@ export class AdcController {
     public adcRepository: AdcRepository,
     @repository(AdcTenantAssociationRepository)
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
-    @inject(RestBindings.Http.CONTEXT)
+    @inject('services.TrustedDeviceService')
+    public trustedDeviceService: TrustedDeviceService,
+    //Suppress get injection binding exeption by using {optional: true}
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
     private reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private wafapp: WafApplication,
@@ -59,13 +73,124 @@ export class AdcController {
     },
   })
   async create(
-    @requestBody(Schema.createRequest(Adc, createDesc))
+    @requestBody(
+      Schema.createRequest(Adc, 'ADC resource that need to be created'),
+    )
     reqBody: Partial<Adc>,
   ): Promise<Response> {
+    //TODO: Reject create ADC HW request with duplicated mgmt IP address
+    if (reqBody.type === 'HW') {
+      await this.trustAdc(reqBody);
+    }
+
     try {
       return new Response(Adc, await this.adcRepository.create(reqBody));
-    } catch (error) {
-      throw new HttpErrors.BadRequest(error.message);
+    } catch (e) {
+      throw new HttpErrors.UnprocessableEntity(e.message);
+    }
+  }
+
+  async trustAdc(adc: Partial<Adc>): Promise<void> {
+    if (!adc.management || !adc.management.ipAddress) {
+      throw new HttpErrors.BadRequest(
+        'IP address and admin passphrase are required to trust ADC hardware',
+      );
+    }
+
+    let body: TrustedDeviceRequest = {
+      devices: [
+        {
+          targetHost: adc.management.ipAddress,
+          targetPort: adc.management.tcpPort || 443,
+          //TODO: Need away to input admin password of BIG-IP HW
+          targetUsername: 'admin',
+          targetPassphrase: 'admin',
+        },
+      ],
+    };
+
+    let devices: TrustedDevice[];
+
+    try {
+      devices = (await this.trustedDeviceService.trust(
+        ASG_HOST,
+        ASG_PORT,
+        body,
+      )).devices;
+    } catch (e) {
+      //TODO: Request TrustedDevices to hide admin passphrase in error message
+      throw new HttpErrors.UnprocessableEntity(e.message);
+    }
+
+    //Wait until trusted state become ACTIVE
+    let retries = 0;
+    while (retries < 15) {
+      if (devices.length !== 1) {
+        throw new HttpErrors.UnprocessableEntity(
+          'Trusting device fails: Response size is ' + devices.length,
+        );
+      } else {
+        adc.trustedDeviceId = devices[0].targetUUID;
+        if (devices[0].state === 'ACTIVE') {
+          break;
+        } else if (
+          devices[0].state === 'ERROR' ||
+          devices[0].state === 'UNDISCOVERED'
+        ) {
+          throw new HttpErrors.UnprocessableEntity(
+            'Trusting device fails: Device state is ' + devices[0].state,
+          );
+        }
+      }
+
+      await sleep(1000);
+      retries++;
+
+      try {
+        devices = (await this.trustedDeviceService.query(
+          ASG_HOST,
+          ASG_PORT,
+          adc.trustedDeviceId,
+        )).devices;
+      } catch (e) {
+        throw new HttpErrors.UnprocessableEntity(e.message);
+      }
+    }
+
+    if (retries >= 15) {
+      throw new HttpErrors.UnprocessableEntity(
+        'Trusting ADC' + adc.id + ' timeout',
+      );
+    }
+  }
+
+  async untrustAdc(adc: Adc): Promise<void> {
+    if (!adc.trustedDeviceId) {
+      return;
+    }
+
+    let devices: TrustedDevice[];
+
+    try {
+      devices = (await this.trustedDeviceService.untrust(
+        ASG_HOST,
+        ASG_PORT,
+        adc.trustedDeviceId,
+      )).devices;
+    } catch (e) {
+      throw new HttpErrors.UnprocessableEntity(e.message);
+    }
+
+    if (devices.length !== 1) {
+      throw new HttpErrors.UnprocessableEntity(
+        'Untrusting device fails: Response size is ' + devices.length,
+      );
+    }
+
+    if (devices[0].state !== 'DELETING') {
+      throw new HttpErrors.UnprocessableEntity(
+        'Untrusting device fails: Device state is ' + devices[0].state,
+      );
     }
   }
 
@@ -129,7 +254,13 @@ export class AdcController {
   })
   async updateById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
-    @requestBody(Schema.updateRequest(Adc, updateDesc)) adc: Partial<Adc>,
+    @requestBody(
+      Schema.updateRequest(
+        Adc,
+        'ADC resource properties that need to be updated',
+      ),
+    )
+    adc: Partial<Adc>,
   ): Promise<void> {
     // TODO: create the unified way in schema to check request body.
     if (adc.status || adc.createdAt || adc.updatedAt || adc.management)
@@ -147,6 +278,12 @@ export class AdcController {
   async deleteById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<void> {
+    let adc = await this.adcRepository.findById(id);
+
+    if (adc.type === 'HW') {
+      await this.untrustAdc(adc);
+    }
+
     await this.adcRepository.deleteById(id);
   }
 
