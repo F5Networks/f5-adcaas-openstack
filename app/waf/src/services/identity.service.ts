@@ -7,7 +7,7 @@ import {WafBindingKeys} from '../keys';
 
 export interface IdentityService {
   v2AuthToken(url: string, body: object): Promise<object>;
-  v2ValidateToken(url: string): Promise<object>;
+  v2ValidateToken(url: string, adminToken: string): Promise<object>;
   v3AuthToken(url: string, body: object): Promise<object>;
   v3ValidateToken(
     url: string,
@@ -64,9 +64,16 @@ export abstract class AuthWithOSIdentity {
       if (!authedToken.expired()) return authedToken;
       else throw new Error('admin token expires, re-authorizing.');
     } catch (error) {
-      let authedToken = await this.adminAuthToken();
-      this.application.bind(WafBindingKeys.KeyAdminAuthedToken).to(authedToken);
-      return authedToken;
+      try {
+        let authedToken = await this.adminAuthToken();
+        this.application
+          .bind(WafBindingKeys.KeyAdminAuthedToken)
+          .to(authedToken);
+        return authedToken;
+      } catch (error) {
+        this.logger.debug('solveAdminToken failed: ' + error.message);
+        throw error;
+      }
     }
   }
 }
@@ -104,9 +111,11 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
     if (tenantId) url = url + '?belongsTo=' + tenantId;
 
     try {
-      return await this.identityService.v2ValidateToken(url).then(response => {
-        return AuthedToken.buildWith(response);
-      });
+      return await this.identityService
+        .v2ValidateToken(url, adminToken)
+        .then(response => {
+          return AuthedToken.buildWith(response);
+        });
     } catch (error) {
       throw new Error('Failed to request identity service: ' + error);
     }

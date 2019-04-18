@@ -208,19 +208,33 @@ export function createAdcObject(data?: Partial<Adc>) {
     {
       name: 'adc target',
       type: 'HW',
-      //platformType: 'OpenStack',
-      networks: [{networkId: '0dfc2e39eb83466a805983426f8d8e9b'}],
+      networks: {
+        mgmt1: {
+          type: 'mgmt',
+          networkId: 'e51c1d5f-7f30-490a-8eab-efb02155096f',
+          fixedIp: '10.250.40.109',
+        },
+        failover1: {
+          type: 'ha',
+          networkId: 'd7e8635f-2d3a-42aa-a40e-8fbb177464bf',
+        },
+        internal1: {
+          type: 'int',
+          networkId: '6acb25ec-dc68-4e07-ba45-e1a11567f9ca',
+        },
+        external2: {
+          type: 'ext',
+          networkId: '1c19251d-7e97-411a-8816-6f7a72403707',
+        },
+      },
       compute: {
         imageRef: '10b7f45b-2837-4f90-a8d8-eae33f48d1cd',
         flavorRef: 'fde45211da0a44ecbf38cb0b644ab30d',
       },
-      //floatingNetworkId: 'ee1eca47dc88f4879d8a229cc70a07c6',
       management: {
-        ipAddress: '172.16.10.11',
-        tcpPort: 8080,
-        //username: 'admin',
+        ipAddress: '10.250.40.109',
+        tcpPort: 443,
       },
-      //onBoarding: {...}
     },
     data,
   );

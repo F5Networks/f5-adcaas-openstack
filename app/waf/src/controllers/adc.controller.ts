@@ -18,12 +18,20 @@ import {
   RestBindings,
   RequestContext,
 } from '@loopback/rest';
-import {Adc, Tenant} from '../models';
+import {
+  Adc,
+  Tenant,
+  ActionsBody,
+  ActionsResponse,
+  ActionsRequest,
+} from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
-import {inject} from '@loopback/core';
+import {inject, CoreBindings} from '@loopback/core';
 import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
+import {WafApplication} from '../application';
+import {PortCreationParams, ServersParams} from '../services';
 
 const prefix = '/adcaas/v1';
 
@@ -38,6 +46,8 @@ export class AdcController {
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
     @inject(RestBindings.Http.CONTEXT)
     private reqCxt: RequestContext,
+    @inject(CoreBindings.APPLICATION_INSTANCE)
+    private wafapp: WafApplication,
     private logger = factory.getLogger('controllers.adc'),
   ) {}
 
@@ -121,6 +131,10 @@ export class AdcController {
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
     @requestBody(Schema.updateRequest(Adc, updateDesc)) adc: Partial<Adc>,
   ): Promise<void> {
+    // TODO: create the unified way in schema to check request body.
+    if (adc.status || adc.createdAt || adc.updatedAt || adc.management)
+      throw new HttpErrors.BadRequest('Not changable properties.');
+
     await this.adcRepository.updateById(id, adc);
   }
 
@@ -192,5 +206,144 @@ export class AdcController {
         }),
       );
     }
+  }
+
+  // TODO: schema.response not work well here.
+  // It shows the below in Example Value:
+  // {
+  //   "actionsresponse": {
+  //     "id": "11111111-2222-3333-4444-555555555555"
+  //   }
+  // }
+  @post(prefix + '/adcs/{adcId}/action', {
+    responses: {
+      '200': Schema.response(ActionsResponse, 'Adc Id for the actions.'),
+    },
+  })
+  async provision(
+    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
+    @requestBody(Schema.createRequest(ActionsRequest, 'actions request'))
+    actionBody: ActionsBody,
+  ): Promise<object | undefined> {
+    let adc = await this.adcRepository.findById(id);
+
+    switch (Object.keys(actionBody)[0]) {
+      case 'create':
+        try {
+          if (adc.status !== 'NONE' && adc.status !== 'ERROR')
+            throw new HttpErrors.BadRequest(
+              'Adc status is ' +
+                adc.status +
+                ". Cannot repeat 'create' on the same ADC.",
+            );
+
+          // TODO: Create VM in async way.
+          return await this.createOn(adc).then(async () => {
+            return {id: adc.id};
+          });
+        } catch (error) {
+          throw new HttpErrors.BadRequest(error.message);
+        }
+
+      case 'delete':
+        break;
+
+      case 'setup':
+        break;
+
+      default:
+        throw new HttpErrors.BadRequest(
+          'Not supported: ' + Object.keys(actionBody)[0],
+        );
+    }
+  }
+
+  private async serialize(adc: Adc, data?: object) {
+    if (data) Object.assign(adc, data);
+    await this.adcRepository.update(adc);
+  }
+
+  private async createOn(adc: Adc): Promise<void> {
+    try {
+      await this.serialize(adc, {status: 'BUILDING'})
+        .then(async () => await this.cNet(adc))
+        .then(async () => await this.cSvr(adc));
+      await this.serialize(adc, {status: 'POWERON'});
+    } catch (error) {
+      await this.serialize(adc, {status: 'ERROR'});
+      throw error;
+    }
+  }
+
+  private async cSvr(adc: Adc): Promise<void> {
+    await Promise.all([
+      this.wafapp.get(WafBindingKeys.KeyComputeManager),
+      this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+      this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+    ]).then(async ([computeHelper, userToken, tenantId]) => {
+      let serverParams: ServersParams = {
+        userTenantId: tenantId,
+        vmName: adc.id,
+        imageRef: adc.compute.imageRef,
+        flavorRef: adc.compute.flavorRef,
+        securityGroupName: 'default', //TODO: remove the hardcode in the future.
+        regionName: 'RegionOne',
+        ports: (() => {
+          let ports = [];
+          for (let n of Object.keys(adc.networks)) {
+            ports.push(<string>adc.networks[n].portId);
+          }
+          return ports;
+        })(),
+      };
+
+      await computeHelper
+        .createServer(userToken, serverParams)
+        .then(response => {
+          adc.compute.vmId = response;
+          adc.management = {
+            tcpPort: 443, // TODO: remove the hard-code.
+            ipAddress: <string>(() => {
+              let ip: string | undefined;
+              Object.keys(adc.networks).forEach(v => {
+                if (adc.networks[v].type === 'mgmt')
+                  return adc.networks[v].fixedIp;
+              });
+              return ip;
+            })(),
+          };
+        });
+    });
+  }
+
+  private async cNet(adc: Adc): Promise<void> {
+    await Promise.all([
+      this.wafapp.get(WafBindingKeys.KeyNetworkDriver),
+      this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+    ]).then(async ([networkHelper, userToken]) => {
+      for (let k of Object.keys(adc.networks)) {
+        let net = adc.networks[k];
+        if (net.portId && net.ready) continue;
+
+        net.ready = false;
+
+        let portParams: PortCreationParams = {
+          networkId: net.networkId,
+          regionName: 'RegionOne',
+          name: <string>(adc.id + '-' + net.type + '-' + k),
+        };
+        if (net.fixedIp) portParams.fixedIp = net.fixedIp;
+
+        await networkHelper
+          .createPort(userToken, portParams)
+          .then(async port => {
+            net.fixedIp = port.fixedIp;
+            net.portId = port.id;
+            net.ready = true;
+
+            await this.serialize(adc);
+          });
+      }
+    });
   }
 }
