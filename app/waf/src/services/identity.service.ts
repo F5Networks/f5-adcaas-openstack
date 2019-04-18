@@ -286,7 +286,8 @@ export class AuthedToken {
     name: string;
   }[];
   public tenantId: string;
-  private region: string | undefined = process.env.ENABLED_REGION;
+  private region: string = process.env.OS_REGION_NAME || 'RegionOne';
+  private interface: string = process.env.OS_INTERFACE || 'internal';
 
   private version: 'v2.0' | 'v3';
 
@@ -358,10 +359,7 @@ export class AuthedToken {
     return this.expiredAt.getTime() - new Date().getTime() <= 0;
   }
 
-  private endpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    type: string,
-  ): string {
+  private endpointOf(inf: string, type: string): string {
     if (!this.catalog) throw new Error('catalog of authed token is empty.');
 
     switch (this.version) {
@@ -372,16 +370,13 @@ export class AuthedToken {
     }
   }
 
-  private v2_0EndpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    type: string,
-  ): string {
+  private v2_0EndpointOf(inf: string, type: string): string {
     for (let ct of this.catalog) {
       if (ct.type !== type) continue;
 
       for (let ep of ct.endpoints) {
         let eJson = JSON.parse(JSON.stringify(ep));
-        if (this.region && eJson['region'] !== this.region) continue;
+        if (eJson['region'] !== this.region) continue;
 
         return eJson[inf + 'URL'];
       }
@@ -397,16 +392,13 @@ export class AuthedToken {
     );
   }
 
-  private v3EndpointOf(
-    inf: 'admin' | 'public' | 'internal',
-    type: string,
-  ): string {
+  private v3EndpointOf(inf: string, type: string): string {
     for (let ct of this.catalog) {
       if (ct.type !== type) continue;
 
       for (let ep of ct.endpoints) {
         let eJson = JSON.parse(JSON.stringify(ep));
-        if (this.region && eJson['region'] !== this.region) continue;
+        if (eJson['region'] !== this.region) continue;
         if (eJson['interface'] !== inf) continue;
 
         return eJson['url'];
@@ -424,10 +416,10 @@ export class AuthedToken {
   }
 
   private epNetwork(): string {
-    return this.endpointOf('internal', 'network');
+    return this.endpointOf(this.interface, 'network');
   }
   private epCompute(): string {
-    return this.endpointOf('internal', 'compute');
+    return this.endpointOf(this.interface, 'compute');
   }
 
   public epPorts(): string {
