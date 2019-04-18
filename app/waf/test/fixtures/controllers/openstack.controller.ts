@@ -26,7 +26,6 @@ class Parameters {
   imageRef: string;
   flavorRef: string;
   securityGroupName: string;
-  regionName: string;
   vmName: string;
 
   // for createVirtual Server with port
@@ -35,13 +34,11 @@ class Parameters {
   // imageRef: string;
   // flavorRef: string;
   // securityGroupName: string;
-  // regionName: string;
   // vmName: string;
 
   // for virtualServerDetail
   serverId: string;
   // userToken
-  // regionName
 }
 
 export class RequestBody {
@@ -111,7 +108,6 @@ export class OpenstackController extends MockBaseController {
         imageRef: reqBody.param.imageRef,
         flavorRef: reqBody.param.flavorRef,
         securityGroupName: reqBody.param.securityGroupName,
-        regionName: reqBody.param.regionName,
         vmName: reqBody.param.vmName,
         ports: [reqBody.param.portId],
       };
@@ -146,7 +142,6 @@ export class OpenstackController extends MockBaseController {
           reqBody.param.userToken,
           reqBody.param.serverId,
           reqBody.param.tenantId,
-          reqBody.param.regionName,
         );
       });
     });
@@ -166,7 +161,6 @@ export class OpenstackController extends MockBaseController {
 
       let portsParams: PortCreationParams = {
         networkId: reqBody.param.networkId,
-        regionName: reqBody.param.regionName,
         name: 'adcId-',
       };
       let port = await networkDriver.createPort(
