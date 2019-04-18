@@ -16,6 +16,9 @@ export OS_TENANT_NAME=services
 # Required if identity version is v3
 export OS_DOMAIN_NAME=Default
 
+# Optional
+#export OS_REGION_NAME==RegionOne
+#export OS_INTERFACE=public
+
 # Possible useful variable.
-#export OS_REGION_NAME=RegionOne
 #export OS_AVAILABLE_ZONE=nova
