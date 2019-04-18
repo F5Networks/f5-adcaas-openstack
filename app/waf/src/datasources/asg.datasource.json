@@ -47,6 +47,25 @@
           "deviceId"
         ]
       }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}"
+      },
+      "functions": {
+        "queryExtensions": ["host","port","deviceId"]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}",
+        "body": "{body}"
+      },
+      "functions": {
+        "install": ["host","port","deviceId","body"]
+      }
     }
   ]
 }
