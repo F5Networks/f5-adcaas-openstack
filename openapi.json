@@ -43,6 +43,74 @@
         "operationId": "AdcController.count"
       }
     },
+    "/adcaas/v1/adcs/{adcId}/action": {
+      "post": {
+        "x-controller-name": "AdcController",
+        "x-operation-name": "provision",
+        "tags": [
+          "AdcController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Adc Id for the actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actionsresponse": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "actions request",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "action": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "action": "null"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "AdcController.provision"
+      }
+    },
     "/adcaas/v1/adcs/{adcId}/tenants/{tenantId}": {
       "get": {
         "x-controller-name": "AdcController",
@@ -272,7 +340,7 @@
                           "type": "string"
                         },
                         "networks": {
-                          "type": "array"
+                          "type": "object"
                         },
                         "compute": {
                           "type": "object"
@@ -291,7 +359,31 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "VE"
+                        "type": "VE",
+                        "networks": {
+                          "management": {
+                            "type": "mgmt",
+                            "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                            "fixedIp": "172.16.11.100"
+                          },
+                          "failover1": {
+                            "type": "ha",
+                            "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "internal1": {
+                            "type": "int",
+                            "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "external2": {
+                            "type": "ext",
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                          }
+                        },
+                        "compute": {
+                          "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                          "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                          "userData": "#!/bin/bash \necho userData is optional \n"
+                        }
                       }
                     }
                   }
@@ -444,7 +536,7 @@
                           "type": "string"
                         },
                         "networks": {
-                          "type": "array"
+                          "type": "object"
                         },
                         "compute": {
                           "type": "object"
@@ -463,7 +555,31 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "VE"
+                        "type": "VE",
+                        "networks": {
+                          "management": {
+                            "type": "mgmt",
+                            "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                            "fixedIp": "172.16.11.100"
+                          },
+                          "failover1": {
+                            "type": "ha",
+                            "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "internal1": {
+                            "type": "int",
+                            "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "external2": {
+                            "type": "ext",
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                          }
+                        },
+                        "compute": {
+                          "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                          "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                          "userData": "#!/bin/bash \necho userData is optional \n"
+                        }
                       }
                     }
                   }
@@ -544,7 +660,8 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "type"
+                  "type",
+                  "compute"
                 ],
                 "properties": {
                   "name": {
@@ -558,13 +675,21 @@
                   },
                   "type": {
                     "type": "string"
+                  },
+                  "compute": {
+                    "type": "object"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-                  "type": "VE"
+                  "type": "VE",
+                  "compute": {
+                    "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                    "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                    "userData": "#!/bin/bash \necho userData is optional \n"
+                  }
                 }
               }
             }
@@ -613,7 +738,7 @@
                             "type": "string"
                           },
                           "networks": {
-                            "type": "array"
+                            "type": "object"
                           },
                           "compute": {
                             "type": "object"
@@ -632,7 +757,31 @@
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "type": "VE"
+                          "type": "VE",
+                          "networks": {
+                            "management": {
+                              "type": "mgmt",
+                              "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                              "fixedIp": "172.16.11.100"
+                            },
+                            "failover1": {
+                              "type": "ha",
+                              "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                            },
+                            "internal1": {
+                              "type": "int",
+                              "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                            },
+                            "external2": {
+                              "type": "ext",
+                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                            }
+                          },
+                          "compute": {
+                            "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                            "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                            "userData": "#!/bin/bash \necho userData is optional \n"
+                          }
                         }
                       }
                     }
@@ -8664,7 +8813,7 @@
                           "type": "string"
                         },
                         "networks": {
-                          "type": "array"
+                          "type": "object"
                         },
                         "compute": {
                           "type": "object"
@@ -8683,7 +8832,31 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "type": "VE"
+                        "type": "VE",
+                        "networks": {
+                          "management": {
+                            "type": "mgmt",
+                            "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                            "fixedIp": "172.16.11.100"
+                          },
+                          "failover1": {
+                            "type": "ha",
+                            "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "internal1": {
+                            "type": "int",
+                            "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                          },
+                          "external2": {
+                            "type": "ext",
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                          }
+                        },
+                        "compute": {
+                          "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                          "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                          "userData": "#!/bin/bash \necho userData is optional \n"
+                        }
                       }
                     }
                   }
@@ -8826,7 +8999,7 @@
                             "type": "string"
                           },
                           "networks": {
-                            "type": "array"
+                            "type": "object"
                           },
                           "compute": {
                             "type": "object"
@@ -8845,7 +9018,31 @@
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "type": "VE"
+                          "type": "VE",
+                          "networks": {
+                            "management": {
+                              "type": "mgmt",
+                              "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                              "fixedIp": "172.16.11.100"
+                            },
+                            "failover1": {
+                              "type": "ha",
+                              "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                            },
+                            "internal1": {
+                              "type": "int",
+                              "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                            },
+                            "external2": {
+                              "type": "ext",
+                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                            }
+                          },
+                          "compute": {
+                            "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
+                            "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
+                            "userData": "#!/bin/bash \necho userData is optional \n"
+                          }
                         }
                       }
                     }
