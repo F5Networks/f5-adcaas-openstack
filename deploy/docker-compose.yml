@@ -1,8 +1,8 @@
 version: "3"
 services:
-  waf:
+  wafaas:
     image: f5devcentral/f5-wafaas-openstack:latest
-    container_name: f5-wafaas-openstack-server
+    container_name: WAFAAS
     env_file:
       - ./appcluster.rc
 
@@ -11,13 +11,17 @@ services:
     depends_on:
       - postgres
       - AS3
+      - ASG
+      - DO
+
     links:
       - postgres:postgres-server
-      - AS3:as3-server
+      - ASG:asg-server
+      - DO:do-server
 
   postgres:
     image: postgres:11.1
-    container_name: postgres-server
+    container_name: POSTGRES
     environment:
       - POSTGRES_USER=${DATABASE_USER:-postgres}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
@@ -28,11 +32,27 @@ services:
       - ${DATABASE_DATA_DIRECTORY:?err}:/var/lib/postgresql/data
 
   AS3:
-    image: f5devcentral/f5-as3-container:3.7.0
-    container_name: as3-server
+    image: f5devcentral/f5-as3-container:3.10.0
+    container_name: AS3
+    ports:
+      - 7443:443
+      - 8079:80
+
+  ASG:
+    image: f5devcentral/f5-api-services-gateway:latest
+    container_name: ASG
     ports:
       - 8443:443
       - 8080:80
+    volumes:
+      - /var/tmp/ASGExtensions:/root/lx
+
+  DO:
+    image: f5devcentral/f5-do-container:latest
+    container_name: DO
+    ports:
+      - 9443:443
+      - 8081:80
 
 # networks:
 #   app_net:
