@@ -281,12 +281,15 @@ export class AdcController {
       this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     ]).then(async ([computeHelper, userToken, tenantId]) => {
+      let userdata: string = await this.cUserdata();
+
       let serverParams: ServersParams = {
         userTenantId: tenantId,
         vmName: adc.id,
         imageRef: adc.compute.imageRef,
         flavorRef: adc.compute.flavorRef,
         securityGroupName: 'default', //TODO: remove the hardcode in the future.
+        userData: userdata,
         ports: (() => {
           let ports = [];
           for (let n of Object.keys(adc.networks)) {
@@ -343,5 +346,25 @@ export class AdcController {
           });
       }
     });
+  }
+
+  private async cUserdata(): Promise<string> {
+    let root_password: string = Math.random()
+      .toString(36)
+      .slice(-8);
+    let admin_password: string = Math.random()
+      .toString(36)
+      .slice(-8);
+
+    const user_data_unencoded: string = `#cloud-config
+    runcmd:
+     - "echo \\"root:${root_password}\\" | chpasswd"
+     - "echo \\"admin:${admin_password}\\" | chpasswd"`;
+
+    const user_data_base64_encode = Buffer.from(user_data_unencoded).toString(
+      'base64',
+    );
+
+    return user_data_base64_encode;
   }
 }
