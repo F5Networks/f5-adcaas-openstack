@@ -1,0 +1,25 @@
+{
+  "name": "do",
+  "connector": "rest",
+  "baseURL": "",
+  "crud": true,
+  "operations": [
+    {
+      "template": {
+        "method": "{method}",
+        "url": "{url}",
+        "headers": "{headers}",
+        "body": "{body}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "doRest": [
+          "method",
+          "url",
+          "headers",
+          "body"
+        ]
+      }
+    }
+  ]
+}
