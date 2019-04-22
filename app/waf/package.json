@@ -72,6 +72,7 @@
     "@loopback/testlab": "^1.0.1",
     "@types/node": "^10.11.2",
     "coveralls": "^3.0.0",
+    "nyc": "^13.0.0",
     "typescript": "^3.3.1"
   }
 }
