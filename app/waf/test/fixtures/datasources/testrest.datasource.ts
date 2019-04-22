@@ -520,4 +520,30 @@ export const StubResponses = {
       },
     };
   },
+
+  bigipMgmtSys200: () => {
+    return {
+      items: [
+        {
+          reference: {
+            link: 'https://localhost/mgmt/tm/sys/application?ver=13.1.1',
+          },
+        },
+        //...
+        {
+          reference: {
+            link: 'https://localhost/mgmt/tm/sys/ucs?ver=13.1.1',
+          },
+        },
+      ],
+      kind: 'tm:sys:syscollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/sys?ver=13.1.1',
+    };
+  },
+
+  bigipMgmtSysTimeout: async () => {
+    //await new Promise(resolve => setTimeout(resolve, 20 * 1000));
+    //return {};
+    throw new HttpErrors.RequestTimeout('timeout');
+  },
 };

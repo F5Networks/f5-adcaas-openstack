@@ -40,7 +40,7 @@
         "OS_TENANT_ID": "5d873cbc8e194e20b0db211a82f3b472",
         "OS_DOMAIN_NAME": "Default",
         "OS_INTERFACE": "public",
-        "OS_REGION_NAME": ""
+        "OS_REGION_NAME": "regionOne"
       },
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",
