@@ -434,9 +434,9 @@ export class AuthedToken {
     return this.epNetwork() + '/v2.0/ports';
   }
 
-  // public epSubnets(): string {
-  //   return this.epNetwork() + '/v2.0/subnets';
-  // }
+  public epSubnets(): string {
+    return this.epNetwork() + '/v2.0/subnets';
+  }
 
   public epServers(tenantId: string) {
     let url = this.epCompute();

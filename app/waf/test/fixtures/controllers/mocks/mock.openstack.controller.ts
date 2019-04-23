@@ -69,6 +69,11 @@ export class MockNeutronController extends MockBaseController {
   async v2CreatePort(@requestBody() reqBody: RequestBody): Promise<object> {
     return ResponseWith['/v2.0/ports']();
   }
+
+  @get('/v2.0/subnets')
+  async v2GetSubnets(): Promise<object> {
+    return ResponseWith['/v2.0/subnets']();
+  }
 }
 
 let ResponseWith: {[key: string]: Function} = {};
@@ -78,6 +83,7 @@ export function ShouldResponseWith(spec: {[key: string]: Function}) {
     '/v2.0/tokens': StubResponses.v2AuthToken200,
     '/v3/auth/tokens': StubResponses.v3AuthToken200,
     '/v2.0/ports': StubResponses.neutronCreatePort200,
+    '/v2.0/subnets': StubResponses.neutronGetSubnets200,
     '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,
     '/v2/{tenantId}/servers/{serverId}': StubResponses.novaGetVMDetail200,
   };
@@ -90,4 +96,11 @@ export const ExpectedData = {
   serverId: 'fef1e40c-ed9d-4e10-b10c-d60d3af70623',
   portId: 'fcc768fd-1439-48f2-b2df-6d7e867c86a7',
   tenantId: 'fdac59f5b20046829ea58720702a74af',
+  bigipMgmt: {
+    hostname: 'test-asm.example1234.openstack.com',
+    macAddr: 'fa:16:3e:a2:25:bc',
+    ipAddr: '10.1.1.245',
+    ipPoolCIDR: '10.1.1.0/24',
+    networkId: '0e51e68c-08f7-4e32-af54-328d29b93467',
+  },
 };

@@ -501,7 +501,7 @@ export const StubResponses = {
         fixed_ips: [
           {
             subnet_id: '86f9f11b-0895-4af7-b3cf-71acda85f1db',
-            ip_address: '10.1.1.15',
+            ip_address: '10.0.0.1',
           },
         ],
         id: ExpectedData.portId,
@@ -514,10 +514,329 @@ export const StubResponses = {
         'binding:vif_details': {},
         'binding:vnic_type': 'normal',
         'binding:vif_type': 'unbound',
-        mac_address: 'fa:16:3e:c5:dd:ae',
+        mac_address: ExpectedData.bigipMgmt.macAddr,
         project_id: 'ef9fd3e3df664e558f043bd24c1fca21',
         created_at: '2019-03-14T03:16:34Z',
       },
+    };
+  },
+
+  neutronGetSubnets200: () => {
+    return {
+      subnets: [
+        {
+          description: '',
+          enable_dhcp: true,
+          network_id: '68d40e08-c825-4a56-8321-f1c171303b9d',
+          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
+          created_at: '2018-08-30T06:05:41',
+          dns_nameservers: [],
+          updated_at: '2018-10-22T08:09:32',
+          gateway_ip: '10.0.0.1',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '10.0.0.2',
+              end: '10.0.0.254',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: '10.0.0.0/24',
+          id: '1f02e13a-1c1e-497c-acb4-6bcb733341b7',
+          subnetpool_id: null,
+          name: 'f5_test_subnet',
+        },
+        {
+          description: '',
+          enable_dhcp: true,
+          network_id: ExpectedData.bigipMgmt.networkId,
+          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
+          created_at: '2019-03-08T16:54:37',
+          dns_nameservers: [],
+          updated_at: '2019-03-08T16:54:37',
+          gateway_ip: '10.1.1.1',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '10.1.1.2',
+              end: '10.1.1.254',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: ExpectedData.bigipMgmt.ipPoolCIDR,
+          id: '7d3b71b8-932c-4c23-9635-17316e2b29aa',
+          subnetpool_id: null,
+          name: 'another',
+        },
+        {
+          description: '',
+          enable_dhcp: false,
+          network_id: '7088474a-9fa2-48d9-a97f-a967dc1f7487',
+          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
+          created_at: '2018-08-29T08:38:18',
+          dns_nameservers: [],
+          updated_at: '2018-08-29T08:38:18',
+          gateway_ip: '172.24.4.225',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '172.24.4.226',
+              end: '172.24.4.238',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: '172.24.4.224/28',
+          id: '3db5044f-4a5d-44b1-a7c5-00095b06e6c4',
+          subnetpool_id: null,
+          name: 'public_subnet',
+        },
+        {
+          description: '',
+          enable_dhcp: true,
+          network_id: '0e51e68c-08f7-4e32-af54-328d29b93467',
+          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
+          created_at: '2019-03-04T06:17:29',
+          dns_nameservers: [],
+          updated_at: '2019-03-04T06:17:29',
+          gateway_ip: '192.168.3.1',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '192.168.3.2',
+              end: '192.168.3.254',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: '192.168.3.0/24',
+          id: 'e45b1350-bfa3-41b4-a14f-cadd8a059277',
+          subnetpool_id: null,
+          name: 'test-subnet',
+        },
+        {
+          description: '',
+          enable_dhcp: true,
+          network_id: '3eb161f5-4d60-4a9d-8908-46c05f1f93ca',
+          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
+          created_at: '2019-04-09T09:26:59',
+          dns_nameservers: [],
+          updated_at: '2019-04-09T09:26:59',
+          gateway_ip: '172.16.11.1',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '172.16.11.2',
+              end: '172.16.11.254',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: '172.16.11.0/24',
+          id: '664b189f-4d74-4b2c-9b27-fab8d3ecd1ce',
+          subnetpool_id: null,
+          name: 'f5_test_mgmt_sub',
+        },
+        {
+          description: '',
+          enable_dhcp: true,
+          network_id: 'bb3d76a8-d24b-487e-b4b5-a82b03ddd446',
+          tenant_id: '0dfc2e39eb83466a805983426f8d8e9b',
+          created_at: '2018-08-29T08:38:29',
+          dns_nameservers: [],
+          updated_at: '2018-08-29T08:38:29',
+          gateway_ip: '10.0.0.1',
+          ipv6_ra_mode: null,
+          allocation_pools: [
+            {
+              start: '10.0.0.2',
+              end: '10.0.0.254',
+            },
+          ],
+          host_routes: [],
+          ip_version: 4,
+          ipv6_address_mode: null,
+          cidr: '10.0.0.0/24',
+          id: '76084ccf-a3a7-4b69-aad6-fd881e5d3715',
+          subnetpool_id: null,
+          name: 'private_subnet',
+        },
+      ],
+    };
+  },
+  bigipGlobalSettings200: () => {
+    return {
+      awsApiMaxConcurrency: 1,
+      consoleInactivityTimeout: 0,
+      customAddr: 'none',
+      failsafeAction: 'go-offline-restart-tm',
+      fileBlacklistPathPrefix:
+        '{/shared/3dns/} {/shared/bin/} {/shared/core/} {/appdata/core/} {/shared/datasync/} {/shared/em/} {/shared/GeoIP/} {/shared/images/} {/shared/lib/} {/shared/lib64/} {/shared/log/} {/shared/lost+found/} {/shared/mgmt/} {/shared/nfb/} {/shared/ssh/} {/shared/statsd/} {/shared/tmstat/} {/shared/vadc/} {/config/aaa/} {/config/big3d/} {/config/bigip/} {/config/filestore/} {/config/gtm/} {/config/httpd/} {/config/ntp.conf} {/config/rndc.key} {/config/ssh/} {/config/ssl/}',
+      fileBlacklistReadOnlyPathPrefix: '{/etc/shadow}',
+      fileLocalPathPrefix: '{/shared/} {/tmp/}',
+      fileWhitelistPathPrefix:
+        '{/var/local/scf} {/tmp/} {/shared/} {/config/} {/usr/share/aws/}',
+      guiSecurityBanner: 'enabled',
+      guiSecurityBannerText:
+        'Welcome to the BIG-IP Configuration Utility.\n\nLog in with your username and password using the fields on the left.',
+      guiSetup: 'disabled',
+      hostAddrMode: 'management',
+      hostname: ExpectedData.bigipMgmt.hostname,
+      kind: 'tm:sys:global-settings:global-settingsstate',
+      lcdDisplay: 'enabled',
+      ledLocator: 'disabled',
+      mgmtDhcp: 'enabled',
+      netReboot: 'disabled',
+      passwordPrompt: 'Password',
+      quietBoot: 'enabled',
+      selfLink: 'https://localhost/mgmt/tm/sys/global-settings?ver=13.1.1',
+      usernamePrompt: 'Username',
+    };
+  },
+  bigipNetInterfaces200: () => {
+    return {
+      items: [
+        {
+          bundle: 'not-supported',
+          bundleSpeed: 'not-supported',
+          enabled: true,
+          flowControl: 'tx-rx',
+          forceGigabitFiber: 'disabled',
+          forwardErrorCorrection: 'not-supported',
+          fullPath: '1.1',
+          generation: 29,
+          ifIndex: 48,
+          kind: 'tm:net:interface:interfacestate',
+          lldpAdmin: 'txonly',
+          lldpTlvmap: 130943,
+          macAddress: 'fa:16:3e:fd:0f:ce',
+          mediaActive: 'none',
+          mediaFixed: '10000T-FD',
+          mediaMax: 'auto',
+          mediaSfp: 'auto',
+          mtu: 9198,
+          name: '1.1',
+          portFwdMode: 'l3',
+          preferPort: 'sfp',
+          qinqEthertype: '0x8100',
+          selfLink: 'https://localhost/mgmt/tm/net/interface/1.1?ver=13.1.1',
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+          },
+          stp: 'enabled',
+          stpAutoEdgePort: 'enabled',
+          stpEdgePort: 'true',
+          stpLinkType: 'auto',
+        },
+        {
+          bundle: 'not-supported',
+          bundleSpeed: 'not-supported',
+          enabled: true,
+          flowControl: 'tx-rx',
+          forceGigabitFiber: 'disabled',
+          forwardErrorCorrection: 'not-supported',
+          fullPath: '1.2',
+          generation: 24,
+          ifIndex: 64,
+          kind: 'tm:net:interface:interfacestate',
+          lldpAdmin: 'txonly',
+          lldpTlvmap: 130943,
+          macAddress: 'fa:16:3e:f3:1a:b2',
+          mediaActive: 'none',
+          mediaFixed: '10000T-FD',
+          mediaMax: 'auto',
+          mediaSfp: 'auto',
+          mtu: 9198,
+          name: '1.2',
+          portFwdMode: 'l3',
+          preferPort: 'sfp',
+          qinqEthertype: '0x8100',
+          selfLink: 'https://localhost/mgmt/tm/net/interface/1.2?ver=13.1.1',
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+          },
+          stp: 'enabled',
+          stpAutoEdgePort: 'enabled',
+          stpEdgePort: 'true',
+          stpLinkType: 'auto',
+        },
+        {
+          bundle: 'not-supported',
+          bundleSpeed: 'not-supported',
+          enabled: true,
+          flowControl: 'tx-rx',
+          forceGigabitFiber: 'disabled',
+          forwardErrorCorrection: 'not-supported',
+          fullPath: '1.3',
+          generation: 20,
+          ifIndex: 80,
+          kind: 'tm:net:interface:interfacestate',
+          lldpAdmin: 'txonly',
+          lldpTlvmap: 130943,
+          macAddress: 'fa:16:3e:35:da:15',
+          mediaActive: 'none',
+          mediaFixed: '10000T-FD',
+          mediaMax: 'auto',
+          mediaSfp: 'auto',
+          mtu: 9198,
+          name: '1.3',
+          portFwdMode: 'l3',
+          preferPort: 'sfp',
+          qinqEthertype: '0x8100',
+          selfLink: 'https://localhost/mgmt/tm/net/interface/1.3?ver=13.1.1',
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+          },
+          stp: 'enabled',
+          stpAutoEdgePort: 'enabled',
+          stpEdgePort: 'true',
+          stpLinkType: 'auto',
+        },
+        {
+          bundle: 'not-supported',
+          bundleSpeed: 'not-supported',
+          enabled: true,
+          flowControl: 'tx-rx',
+          forceGigabitFiber: 'disabled',
+          forwardErrorCorrection: 'not-supported',
+          fullPath: 'mgmt',
+          generation: 202,
+          ifIndex: 32,
+          kind: 'tm:net:interface:interfacestate',
+          lldpAdmin: 'txonly',
+          lldpTlvmap: 130943,
+          macAddress: 'fa:16:3e:94:60:40',
+          mediaActive: '100TX-FD',
+          mediaFixed: 'auto',
+          mediaSfp: 'auto',
+          mtu: 1500,
+          name: 'mgmt',
+          portFwdMode: 'l3',
+          preferPort: 'sfp',
+          qinqEthertype: '0x8100',
+          selfLink: 'https://localhost/mgmt/tm/net/interface/mgmt?ver=13.1.1',
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+          },
+          stp: 'enabled',
+          stpAutoEdgePort: 'enabled',
+          stpEdgePort: 'true',
+          stpLinkType: 'auto',
+        },
+      ],
+      kind: 'tm:net:interface:interfacecollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/net/interface?ver=13.1.1',
     };
   },
 
@@ -541,9 +860,90 @@ export const StubResponses = {
     };
   },
 
+  // not used.
   bigipMgmtSysTimeout: async () => {
     //await new Promise(resolve => setTimeout(resolve, 20 * 1000));
     //return {};
     throw new HttpErrors.RequestTimeout('timeout');
+  },
+
+  onboardingProxyError502: () => {
+    return new HttpErrors.BadGateway(`
+    <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+    <head>
+        <title>502 Proxy Error</title>
+    </head>
+    <body>
+        <h1>Proxy Error</h1>
+        <p>The proxy server received an invalid
+response from an upstream server.
+            <br />
+The proxy server could not handle the request
+            <em>
+                <a href="/mgmt/shared/declarative-onboarding">POST&nbsp;/mgmt/shared/declarative-onboarding</a>
+            </em>.
+            <p>
+Reason:
+                <strong>Error reading from remote server</strong>
+            </p>
+        </p>
+    </body>
+</html>
+`);
+  },
+
+  onboardingServerError500: () => {
+    return {
+      code: 500,
+      status: 'ERROR',
+      message: 'invalid config - rolled back',
+      errors: [
+        "No offerings found for regkey pool license 'mykeypool-all' and the given search criteria (none)",
+      ],
+      declaration: {
+        schemaVersion: '1.3.0',
+        class: 'Device',
+        label: 'Basic onboarding',
+        async: false,
+        Common: {
+          class: 'Tenant',
+          hostname: ExpectedData.bigipMgmt.hostname,
+          myLicense: {
+            class: 'License',
+            licenseType: 'licensePool',
+            bigIqHost: '10.250.15.119',
+            bigIqUsername: 'admin',
+            licensePool: 'mykeypool-all',
+            reachable: true,
+            bigIpUsername: 'admin',
+            unitOfMeasure: 'monthly',
+            overwrite: false,
+          },
+        },
+      },
+    };
+  },
+
+  onboardingSucceed200: () => {
+    return {
+      result: {
+        class: 'Result',
+        code: 200,
+        status: 'OK',
+        message: 'success',
+        errors: [],
+      },
+      declaration: {
+        schemaVersion: '1.3.0',
+        class: 'Device',
+        label: 'Basic onboarding',
+        async: false,
+        Common: {
+          class: 'Tenant',
+          hostname: ExpectedData.bigipMgmt.hostname,
+        },
+      },
+    };
   },
 };

@@ -32,6 +32,10 @@ import {
   MockBigipController,
   BigipShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.bigip.controller';
+import {
+  MockDOController,
+  DOShouldResponseWith,
+} from '../fixtures/controllers/mocks/mock.do.controller';
 
 describe('AdcController', () => {
   let wafapp: WafApplication;
@@ -45,6 +49,7 @@ describe('AdcController', () => {
   let mockNovaApp: TestingApplication;
   let mockNeutronApp: TestingApplication;
   let mockBigip: TestingApplication;
+  let mockDO: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
@@ -56,6 +61,11 @@ describe('AdcController', () => {
     OS_DOMAIN_NAME: 'Default',
     OS_REGION_NAME: 'RegionOne',
     OS_AVAILABLE_ZONE: 'nova',
+    DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
+    DO_BIGIQ_HOST: '10.250.15.105',
+    DO_BIGIQ_USERNAME: 'admin',
+    DO_BIGIQ_PASSWORD: 'admin',
+    DO_BIGIQ_POOL: 'mykeypool',
   };
 
   before('setupApplication', async () => {
@@ -88,6 +98,14 @@ describe('AdcController', () => {
         RestApplicationPort.SSLDefault,
         MockBigipController,
         'https',
+      );
+      return restApp;
+    })();
+
+    mockDO = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.Onboarding,
+        MockDOController,
       );
       return restApp;
     })();
@@ -128,6 +146,7 @@ describe('AdcController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockDO);
     teardownRestAppAndClient(mockBigip);
     teardownRestAppAndClient(mockKeystoneApp);
     teardownRestAppAndClient(mockNovaApp);
@@ -144,6 +163,9 @@ describe('AdcController', () => {
       management: {
         ipAddress: '1.2.3.4',
         tcpPort: 100,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
       },
     });
 
@@ -229,6 +251,9 @@ describe('AdcController', () => {
         management: {
           ipAddress: '1.2.3.4',
           tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
         },
       });
 
@@ -257,6 +282,9 @@ describe('AdcController', () => {
         management: {
           ipAddress: '1.2.3.4',
           tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
         },
       });
 
@@ -502,7 +530,9 @@ describe('AdcController', () => {
     'post ' + prefix + '/adcs/{adcId}/action: setup: bigip accessible',
     async () => {
       BigipShouldResponseWith({});
+      DOShouldResponseWith({});
       let adc = await givenAdcData(wafapp);
+      ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
       await setupEnvs()
         .then(async () => {
