@@ -64,3 +64,5 @@ api-docs/
 /dist*
 
 data
+
+.vscode/

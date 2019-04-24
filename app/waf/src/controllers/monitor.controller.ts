@@ -8,10 +8,14 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RestBindings,
+  RequestContext,
 } from '@loopback/rest';
 import {Monitor} from '../models';
 import {MonitorRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {inject} from '@loopback/core';
+import {WafBindingKeys} from '../keys';
 
 const prefix = '/adcaas/v1';
 const createDesc: string = 'Monitor resource that need to be created';
@@ -22,6 +26,8 @@ export class MonitorController {
   constructor(
     @repository(MonitorRepository)
     public monitorRepository: MonitorRepository,
+    @inject(RestBindings.Http.CONTEXT)
+    private reqCxt: RequestContext,
   ) {}
 
   @post(prefix + '/monitors', {
@@ -54,7 +60,10 @@ export class MonitorController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Monitor)) filter?: Filter,
   ): Promise<CollectionResponse> {
-    const data = await this.monitorRepository.find(filter);
+    let tenantId = await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId);
+    let data = await this.monitorRepository.find(filter, {
+      tenantId: tenantId,
+    });
     return new CollectionResponse(Monitor, data);
   }
 
@@ -70,7 +79,11 @@ export class MonitorController {
     @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
     id: string,
   ): Promise<Response> {
-    const data = await this.monitorRepository.findById(id);
+    let tenantId = await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId);
+
+    const data = await this.monitorRepository.findById(id, undefined, {
+      tenantId: tenantId,
+    });
     return new Response(Monitor, data);
   }
 
@@ -86,7 +99,8 @@ export class MonitorController {
     @requestBody(Schema.createRequest(Monitor, updateDesc))
     monitor: Monitor,
   ): Promise<void> {
-    await this.monitorRepository.updateById(id, monitor);
+    let tenantId = await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId);
+    await this.monitorRepository.updateById(id, monitor, {tenantId: tenantId});
   }
 
   @del(prefix + '/monitors/{monitorId}', {
@@ -99,6 +113,7 @@ export class MonitorController {
     @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
     id: string,
   ): Promise<void> {
-    await this.monitorRepository.deleteById(id);
+    let tenantId = await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId);
+    await this.monitorRepository.deleteById(id, {tenantId: tenantId});
   }
 }

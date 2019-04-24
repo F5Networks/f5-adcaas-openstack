@@ -381,6 +381,7 @@ export function createMonitorObject(data?: Partial<Monitor>) {
       targetAddress: '192.0.1.23',
       targetPort: 80,
       monitorType: 'http',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
