@@ -6,8 +6,8 @@ if (require.main === module) {
   // Run the application
   const config = {
     rest: {
-      port: +process.env.PORT || 3000,
-      host: process.env.HOST || '0.0.0.0',
+      port: +process.env.WAF_APP_PORT || 3000,
+      host: process.env.WAF_APP_HOST || '0.0.0.0',
       openApiSpec: {
         // useful when used with OASGraph to locate your application
         setServersFromRequest: true,
