@@ -286,12 +286,20 @@ export class AuthedToken {
     name: string;
   }[];
   public tenantId: string;
-  private region: string = process.env.OS_REGION_NAME || 'RegionOne';
-  private interface: string = process.env.OS_INTERFACE || 'internal';
+  private region: string;
+  private interface: string;
 
   private version: 'v2.0' | 'v3';
 
-  private constructor() {}
+  private constructor() {
+    if (process.env.OS_REGION_NAME && process.env.OS_REGION_NAME !== '')
+      this.region = process.env.OS_REGION_NAME;
+    else this.region = 'RegionOne';
+
+    if (process.env.OS_INTERFACE && process.env.OS_INTERFACE !== '')
+      this.interface = process.env.OS_INTERFACE;
+    else this.interface = 'internal';
+  }
 
   public static buildWith(response: object): AuthedToken {
     let v = AuthedToken.versionOf(response);

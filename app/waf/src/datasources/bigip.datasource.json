@@ -1,0 +1,30 @@
+{
+  "connector": "rest-hdr",
+  "options": {
+    "headers": {
+      "accept": "application/json",
+      "content-type": "application/json"
+    },
+    "strictSSL": false
+  },
+  "operations": [
+    {
+      "template": {
+        "method": "GET",
+        "timout": 2000,
+        "url": "{url}",
+        "headers": {
+          "Authorization": "{cred64en}"
+        },
+        "responsePath": "$",
+        "responseHeaders": true
+      },
+      "functions": {
+        "getSysInfo": [
+          "url",
+          "cred64en"
+        ]
+      }
+    }
+  ]
+}

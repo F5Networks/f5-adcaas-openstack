@@ -19,6 +19,7 @@ export enum RestApplicationPort {
   RestSelfTest = 2000,
   WafApp = 3000,
   IdentityUser = 5000,
+  SSLDefault = 8443,
   Nova = 8774,
   Neutron = 9696,
   IdentityAdmin = 35357,
@@ -68,11 +69,13 @@ export class TestingApplication extends BootMixin(
 export async function setupRestAppAndClient(
   port: number,
   controllerCtor: typeof MockBaseController,
+  proto?: string,
 ): Promise<RestAppAndClient> {
   const restApp = new TestingApplication({
     rest: givenHttpServerConfig({
       port: port,
       host: 'localhost',
+      protocol: proto ? proto : 'http',
     }),
   });
 

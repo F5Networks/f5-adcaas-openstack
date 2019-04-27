@@ -31,7 +31,7 @@ import {inject, CoreBindings} from '@loopback/core';
 import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
-import {PortCreationParams, ServersParams} from '../services';
+import {PortCreationParams, ServersParams, BigIpManager} from '../services';
 
 const prefix = '/adcaas/v1';
 
@@ -249,7 +249,23 @@ export class AdcController {
         break;
 
       case 'setup':
-        break;
+        let mgr = await BigIpManager.instanlize({
+          username: 'admin',
+          password: 'admin',
+          ipAddr: 'localhost', //adc.management.ipAddress,
+          port: 8443, //adc.management.tcpPort,
+        });
+        let ready = await mgr.checkAndWaitBigipReady(5 * 1000);
+        if (ready) {
+          this.logger.debug('start to do onbarding here.');
+          // DO here.
+          return {id: adc.id};
+        } else {
+          let errmsg =
+            'bigip is not ready after waiting timeout. Cannot go forwards';
+          this.logger.error(errmsg);
+          throw new HttpErrors.RequestTimeout(errmsg);
+        }
 
       default:
         throw new HttpErrors.BadRequest(
@@ -349,22 +365,21 @@ export class AdcController {
   }
 
   private async cUserdata(): Promise<string> {
-    let root_password: string = Math.random()
+    let rootPassword: string = Math.random()
       .toString(36)
       .slice(-8);
-    let admin_password: string = Math.random()
+    let adminPassword: string = Math.random()
       .toString(36)
       .slice(-8);
 
-    const user_data_unencoded: string = `#cloud-config
+    const userData: string = `#cloud-config
     runcmd:
-     - "echo \\"root:${root_password}\\" | chpasswd"
-     - "echo \\"admin:${admin_password}\\" | chpasswd"`;
+     - "echo \\"root:${rootPassword}\\" | chpasswd"
+     - "echo \\"admin:${adminPassword}\\" | chpasswd"`;
 
-    const user_data_base64_encode = Buffer.from(user_data_unencoded).toString(
-      'base64',
-    );
+    this.logger.debug('userdata for create vm: ' + userData);
+    const userDataB64Encoded = Buffer.from(userData).toString('base64');
 
-    return user_data_base64_encode;
+    return userDataB64Encoded;
   }
 }

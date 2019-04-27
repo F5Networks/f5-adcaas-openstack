@@ -28,6 +28,10 @@ import {
   ExpectedData,
   ShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {
+  MockBigipController,
+  BigipShouldResponseWith,
+} from '../fixtures/controllers/mocks/mock.bigip.controller';
 
 describe('AdcController', () => {
   let wafapp: WafApplication;
@@ -36,6 +40,7 @@ describe('AdcController', () => {
   let mockKeystoneApp: TestingApplication;
   let mockNovaApp: TestingApplication;
   let mockNeutronApp: TestingApplication;
+  let mockBigip: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
@@ -74,6 +79,15 @@ describe('AdcController', () => {
       return restApp;
     })();
 
+    mockBigip = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.SSLDefault,
+        MockBigipController,
+        'https',
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
     ShouldResponseWith({});
   });
@@ -98,6 +112,7 @@ describe('AdcController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockBigip);
     teardownRestAppAndClient(mockKeystoneApp);
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);
@@ -254,7 +269,7 @@ describe('AdcController', () => {
     },
   );
 
-  it('post ' + prefix + '/adcs/{adcId}/action: ', async () => {
+  it('post ' + prefix + '/adcs/{adcId}/action: create', async () => {
     let adc = await givenAdcData(wafapp);
 
     await setupEnvs()
@@ -269,4 +284,47 @@ describe('AdcController', () => {
       })
       .finally(teardownEnvs);
   });
+
+  it(
+    'post ' + prefix + '/adcs/{adcId}/action: setup: bigip accessible',
+    async () => {
+      BigipShouldResponseWith({});
+      let adc = await givenAdcData(wafapp);
+
+      await setupEnvs()
+        .then(async () => {
+          let response = await client
+            .post(prefix + '/adcs/' + adc.id + '/action')
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .send({setup: null})
+            .expect(200);
+
+          expect(response.body).containDeep({id: adc.id});
+        })
+        .finally(teardownEnvs);
+    },
+  );
+
+  // TODO: the timeout can only be tested through unit test?
+  //  The following test case leads all tests fail.
+  // it(
+  //   'post ' + prefix + '/adcs/{adcId}/action: setup: bigip not accessible',
+  //   async () => {
+  //     BigipShouldResponseWith({
+  //       '/mgmt/tm/sys': StubResponses.bigipMgmtSysTimeout,
+  //     });
+
+  //     let adc = await givenAdcData(wafapp);
+
+  //     await setupEnvs()
+  //       .then(async () => {
+  //         let response = await client
+  //           .post(prefix + '/adcs/' + adc.id + '/action')
+  //           .set('X-Auth-Token', ExpectedData.userToken)
+  //           .send({setup: null})
+  //           .expect(408);
+  //       })
+  //       .finally(teardownEnvs);
+  //   },
+  // );
 });

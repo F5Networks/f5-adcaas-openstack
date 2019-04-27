@@ -154,13 +154,14 @@ export class ComputeManagerV2 extends ComputeManager {
         security_groups: [{name: serversParams.securityGroupName}],
         name: serversParams.vmName,
         'OS-DCF:diskConfig': 'AUTO',
+        config_drive: true,
       },
     };
     if (serversParams.availableZoneName)
       serversRequestBody.server.available_zone =
         serversParams.availableZoneName;
     if (serversParams.userData)
-      serversRequestBody.server.userData = serversParams.userData;
+      serversRequestBody.server.user_data = serversParams.userData;
 
     serversRequestBody.server.networks.shift();
     if (serversParams.networkId) {
@@ -192,7 +193,8 @@ class ServersRequestBody {
     };
     security_groups: [{name: string}];
 
-    userData?: string;
+    user_data?: string;
+    config_drive: boolean;
   };
 }
 
