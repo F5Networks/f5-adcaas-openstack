@@ -4,8 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {Client, expect, sinon, toJSON} from '@loopback/testlab';
-import {HttpErrors} from '@loopback/rest';
-import {AS3DeployRequest} from '../../src/models';
 import {WafApplication} from '../..';
 import {ApplicationController} from '../../src/controllers';
 import {setupApplication, teardownApplication} from '../helpers/test-helper';
@@ -13,16 +11,7 @@ import {
   givenEmptyDatabase,
   givenApplicationData,
   givenAdcData,
-  givenAdcTenantAssociationData,
-  givenServiceData,
-  givenPoolData,
-  givenMemberData,
-  givenRuleData,
-  givenConditionData,
-  givenActionData,
-  givenEndpointpolicyData,
   createApplicationObject,
-  givenWafpolicyData,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 
@@ -144,136 +133,22 @@ describe('ApplicationController', () => {
   });
 
   it(
-    'post ' +
-      prefix +
-      '/applications/{id}/deploy: no ADC associated with application',
+    'post ' + prefix + '/applications/{id}/deploy: deploy application',
     async () => {
-      const application = await givenApplicationData(wafapp);
-
-      await client
-        .post(prefix + '/applications/' + application.id + '/deploy')
-        .expect(422);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/applications/{id}/deploy: application has no service',
-    async () => {
-      const application = await givenApplicationData(wafapp);
-      const adc = await givenAdcData(wafapp);
-      await givenAdcTenantAssociationData(wafapp, {
-        tenantId: 'default',
+      let adc = await givenAdcData(wafapp);
+      let application = await givenApplicationData(wafapp, {
         adcId: adc.id,
       });
 
-      await client
-        .post(prefix + '/applications/' + application.id + '/deploy')
-        .expect(422);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/applications/{id}/deploy: deploy without wap config',
-    async () => {
-      const adc = await givenAdcData(wafapp);
-      await givenAdcTenantAssociationData(wafapp, {
-        tenantId: 'default',
-        adcId: adc.id,
-      });
-      let pool = await givenPoolData(wafapp, {
-        id: uuid(),
-        name: 'pool1',
-      });
-      await givenMemberData(wafapp, {
-        id: uuid(),
-        poolId: pool.id,
-      });
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-      });
-      await givenRuleData(wafapp, {
-        id: '1234',
-        name: 'rule1',
-        endpointpolicyId: epp.id,
-      });
-      await givenRuleData(wafapp, {
-        id: '2345',
-        name: 'rule2',
-        endpointpolicyId: epp.id,
-      });
-      await givenConditionData(wafapp, {
-        ruleId: '1234',
-        type: 'httpUri',
-        path: {operand: 'contains', values: ['/test1/']},
-      });
-
-      await givenConditionData(wafapp, {
-        ruleId: '1234',
-        type: 'httpUri',
-      });
-      await givenConditionData(wafapp, {
-        ruleId: '1234',
-        type: 'test',
-      });
-      await givenActionData(wafapp, {
-        ruleId: '2345',
-        type: 'waf',
-        policy: {wafpolicy: '12345678'},
-      });
-
-      let application = await givenApplicationData(wafapp);
-      await givenServiceData(wafapp, <string>application.id, {
-        pool: pool.id,
-        endpointpolicy: epp.id,
-      });
-
-      deployStub.returns(Promise.resolve('Hello'));
-
-      await client
-        .post(prefix + '/applications/' + application.id + '/deploy')
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .send({name: 'a-declaration'})
         .expect(200);
 
-      let req = <AS3DeployRequest>deployStub.getCall(0).args[2];
-      req.declaration.toJSON();
-    },
-  );
-
-  it('post ' + prefix + '/applications/{id}/deploy: no adcId', async () => {
-    await givenAdcTenantAssociationData(wafapp, {
-      tenantId: 'default',
-    });
-    let pool = await givenPoolData(wafapp, {
-      name: 'pool1',
-      id: uuid(),
-    });
-    let application = await givenApplicationData(wafapp);
-    await givenServiceData(wafapp, <string>application.id, {
-      pool: pool.id,
-    });
-
-    deployStub.returns(Promise.resolve('Hello'));
-
-    await client
-      .post(prefix + '/applications/' + application.id + '/deploy')
-      .expect(422);
-  });
-
-  it(
-    'post ' + prefix + '/applications/{id}/deploy: no member in pool',
-    async () => {
-      const adc = await givenAdcData(wafapp);
-      await givenAdcTenantAssociationData(wafapp, {
-        tenantId: 'default',
-        adcId: adc.id,
-      });
-      let pool = await givenPoolData(wafapp, {
-        id: uuid(),
-        name: 'pool1',
-      });
-      let application = await givenApplicationData(wafapp);
-      await givenServiceData(wafapp, <string>application.id, {
-        pool: pool.id,
-      });
+      await client
+        .patch(prefix + '/applications/' + application.id)
+        .send({defaultDeclarationId: response.body.declaration.id})
+        .expect(204);
 
       deployStub.returns(Promise.resolve('Hello'));
 
@@ -282,117 +157,59 @@ describe('ApplicationController', () => {
         .expect(200);
     },
   );
-  it(
-    'post ' + prefix + '/applications/{id}/deploy: unprocessable declaration',
-    async () => {
-      const adc = await givenAdcData(wafapp);
-      await givenAdcTenantAssociationData(wafapp, {
-        tenantId: 'default',
-        adcId: adc.id,
-      });
-      let application = await givenApplicationData(wafapp);
-      await givenServiceData(wafapp, <string>application.id);
-
-      deployStub.throws(new HttpErrors.UnprocessableEntity('something wrong'));
-
-      await client
-        .post(prefix + '/applications/' + application.id + '/deploy')
-        .expect(422);
-    },
-  );
 
   it(
-    'post ' + prefix + '/applications/{id}/deploy: deploy with wap config',
+    'post ' + prefix + '/applications/{id}/deploy: deploy without adcId',
     async () => {
-      const adc = await givenAdcData(wafapp);
-      await givenAdcTenantAssociationData(wafapp, {
-        tenantId: 'default',
-        adcId: adc.id,
-      });
-      let pool = await givenPoolData(wafapp, {
-        name: 'pool1',
-        id: uuid(),
-      });
-      await givenMemberData(wafapp, {
-        id: uuid(),
-        poolId: pool.id,
-      });
-
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-      });
-
-      let rule1 = await givenRuleData(wafapp, {
-        name: 'rule1',
-        endpointpolicyId: epp.id,
-      });
-      let rule2 = await givenRuleData(wafapp, {
-        name: 'rule2',
-        endpointpolicyId: epp.id,
-      });
-
-      let waf = await givenWafpolicyData(wafapp, {
-        url: 'http://1.2.3.4/test.xml',
-      });
-
-      await givenConditionData(wafapp, {
-        ruleId: rule1.id,
-        type: 'httpUri',
-        path: {operand: 'contains', values: ['/test1/']},
-      });
-      await givenConditionData(wafapp, {
-        ruleId: rule1.id,
-        type: 'httpUri',
-      });
-      await givenConditionData(wafapp, {
-        ruleId: rule1.id,
-        type: 'httpUri',
-      });
-      await givenConditionData(wafapp, {
-        ruleId: rule2.id,
-        type: 'httpUri',
-      });
-      await givenActionData(wafapp, {
-        ruleId: rule2.id,
-        type: 'waf',
-        policy: {wafpolicy: waf.id},
-      });
-      await givenActionData(wafapp, {
-        ruleId: rule2.id,
-        type: 'waf',
-        policy: {wafpolicy: '12345678'},
-      });
-      await givenActionData(wafapp, {
-        ruleId: rule2.id,
-        type: 'waf',
-        policy: {wafpolicy: waf.id},
-      });
-      await givenActionData(wafapp, {
-        ruleId: rule1.id,
-        type: 'waf',
-        policy: {wafpolicy: waf.id},
-      });
-      await givenActionData(wafapp, {
-        ruleId: rule1.id,
-        type: 'test',
-        policy: {wafpolicy: '12345678'},
-      });
-
       let application = await givenApplicationData(wafapp, {});
 
-      await givenServiceData(wafapp, application.id, {
-        pool: pool.id,
-        endpointpolicy: epp.id,
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/deploy: deploy without declaration',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+
+      let application = await givenApplicationData(wafapp, {
+        adcId: adc.id,
       });
 
       deployStub.returns(Promise.resolve('Hello'));
 
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
-        .expect(200);
+        .expect(422);
+    },
+  );
 
-      let req = <AS3DeployRequest>deployStub.getCall(0).args[2];
-      req.declaration.toJSON();
+  it(
+    'post ' + prefix + '/applications/{id}/cleanup: undeploy application',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let application = await givenApplicationData(wafapp, {
+        adcId: adc.id,
+      });
+
+      deployStub.returns(Promise.resolve('Hello'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/cleanup')
+        .expect(200);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/applications/{id}/cleanup: undeploy without adcId',
+    async () => {
+      let application = await givenApplicationData(wafapp, {});
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/cleanup')
+        .expect(422);
     },
   );
 });

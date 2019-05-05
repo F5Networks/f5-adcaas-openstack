@@ -1,5 +1,5 @@
 import {model, property} from '@loopback/repository';
-import {CommonEntity} from '.';
+import {CommonEntity, AS3Declaration, Monitor} from '.';
 
 @model()
 export class Member extends CommonEntity {
@@ -37,7 +37,21 @@ export class Member extends CommonEntity {
   })
   poolId: string;
 
+  monitors: Monitor[] = [];
+
   constructor(data?: Partial<Member>) {
     super(data);
+    //No AS3 class name
+  }
+
+  getAS3Declaration(): AS3Declaration {
+    let obj: AS3Declaration = {
+      servicePort: this.port,
+      serverAddresses: [this.address],
+    };
+
+    obj.monitors = this.monitors.map(monitor => monitor.getAS3Pointer());
+
+    return obj;
   }
 }

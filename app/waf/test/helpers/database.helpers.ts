@@ -207,6 +207,7 @@ export function createAdcObject(data?: Partial<Adc>) {
   return Object.assign(
     {
       name: 'adc target',
+      description: 'my adc description',
       type: 'HW',
       networks: {
         mgmt1: {
@@ -266,7 +267,7 @@ export async function givenAdcData(
 ) {
   const adcpepo = await wafapp.getRepository(AdcRepository);
   const obj = createAdcObject(data);
-  return await adcpepo.create(new Adc(obj));
+  return await adcpepo.create(obj);
 }
 
 export async function givenAdcTenantAssociationData(
@@ -296,7 +297,7 @@ export async function givenServiceData(
 ) {
   const appRepo = await wafapp.getRepository(ApplicationRepository);
   const obj = createServiceObject(data);
-  return await appRepo.services(appId).create(new Service(obj));
+  return await appRepo.services(appId).create(obj);
 }
 
 export function createServiceObject(data?: Partial<Service>) {

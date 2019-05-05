@@ -1,5 +1,5 @@
 import {model, property} from '@loopback/repository';
-import {CommonEntity} from '.';
+import {CommonEntity, AS3Declaration, Pool, Endpointpolicy} from '.';
 
 @model()
 export class Service extends CommonEntity {
@@ -130,8 +130,12 @@ export class Service extends CommonEntity {
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
     },
+    as3: {
+      property: 'pool',
+      type: 'name',
+    },
   })
-  pool?: string;
+  defaultPoolId?: string;
 
   @property({
     type: 'string',
@@ -310,6 +314,7 @@ export class Service extends CommonEntity {
       response: true,
       example: ['10.100.0.1'],
     },
+    as3: {},
   })
   virtualAddresses: string[];
 
@@ -323,15 +328,13 @@ export class Service extends CommonEntity {
       response: true,
       example: '80',
     },
+    as3: {},
   })
   virtualPort: number;
 
-  //TODO: delete this property after many-to-many relation is done
-  @property({
-    type: 'string',
-    required: false,
-  })
-  endpointpolicy: string;
+  defaultPool?: Pool;
+
+  policies: Endpointpolicy[] = [];
 
   //TODO: many-to-many relation to other objects
   // iRules
@@ -341,5 +344,17 @@ export class Service extends CommonEntity {
 
   constructor(data?: Partial<Service>) {
     super(data);
+  }
+
+  getAS3Class(): string {
+    return 'Service_' + this.type;
+  }
+
+  getAS3Declaration(): AS3Declaration {
+    let obj = super.getAS3Declaration();
+
+    obj.policyEndpoint = this.policies.map(policy => policy.getAS3Name());
+
+    return obj;
   }
 }

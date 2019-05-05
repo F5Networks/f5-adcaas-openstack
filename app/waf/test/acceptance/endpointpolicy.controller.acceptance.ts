@@ -40,7 +40,7 @@ describe('EndpointpolicyController', () => {
   });
 
   it('post ' + prefix + '/endpointpolicies: with no id', async () => {
-    const epp = new Endpointpolicy(createEndpointpolicyObject());
+    const epp = createEndpointpolicyObject();
 
     const response = await client
       .post(prefix + '/endpointpolicies')
@@ -48,15 +48,6 @@ describe('EndpointpolicyController', () => {
       .expect(200);
 
     expect(response.body.endpointpolicy).to.containDeep(toJSON(epp));
-  });
-
-  it('post ' + prefix + '/endpointpolicies: with duplicate id', async () => {
-    const epp = await givenEndpointpolicyData(wafapp);
-
-    await client
-      .post(prefix + '/endpointpolicies')
-      .send(epp)
-      .expect(200);
   });
 
   it(

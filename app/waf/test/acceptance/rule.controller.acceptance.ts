@@ -54,15 +54,6 @@ describe('RuleController', () => {
     expect(response.body.rule).to.containDeep(toJSON(rule));
   });
 
-  it('post ' + prefix + '/rules: with duplicate id', async () => {
-    const rule = await givenRuleData(wafapp);
-
-    await client
-      .post(prefix + '/rules')
-      .send(rule)
-      .expect(200);
-  });
-
   it('post ' + prefix + '/rules: no rule assocated', async () => {
     const rule = createRuleObject({endpointpolicyId: uuid()});
 

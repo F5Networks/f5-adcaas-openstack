@@ -6,6 +6,18 @@ import {
   givenEmptyDatabase,
   givenApplicationData,
   givenDeclarationData,
+  givenServiceData,
+  givenPoolData,
+  givenMemberData,
+  givenMonitorData,
+  givenRuleData,
+  givenConditionData,
+  givenActionData,
+  givenWafpolicyData,
+  givenEndpointpolicyData,
+  givePoolMonitorAssociationData,
+  giveMemberMonitorAssociationData,
+  givenServiceEndpointpolicyAssociationData,
 } from '../helpers/database.helpers';
 
 describe('ApplicationController declaration test', () => {
@@ -44,10 +56,112 @@ describe('ApplicationController declaration test', () => {
     async () => {
       const application = await givenApplicationData(wafapp);
 
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+      });
+
+      let service = await givenServiceData(wafapp, application.id, {
+        defaultPoolId: pool.id,
+      });
+
+      let member = await givenMemberData(wafapp, {
+        poolId: pool.id,
+      });
+
+      let monitor = await givenMonitorData(wafapp);
+
+      await givePoolMonitorAssociationData(wafapp, {
+        poolId: pool.id,
+        monitorId: monitor.id,
+      });
+
+      giveMemberMonitorAssociationData(wafapp, {
+        memberId: member.id,
+        monitorId: monitor.id,
+      });
+
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+
+      await givenServiceEndpointpolicyAssociationData(wafapp, {
+        serviceId: service.id,
+        endpointpolicyId: epp.id,
+      });
+
+      let rule1 = await givenRuleData(wafapp, {
+        name: 'rule1',
+        endpointpolicyId: epp.id,
+      });
+
+      let rule2 = await givenRuleData(wafapp, {
+        name: 'rule2',
+        endpointpolicyId: epp.id,
+      });
+
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'httpUri',
+        path: {operand: 'contains', values: ['/test1/']},
+      });
+
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'httpUri',
+      });
+
+      await givenConditionData(wafapp, {
+        ruleId: rule1.id,
+        type: 'test',
+      });
+
+      let wafpolicy = await givenWafpolicyData(wafapp);
+
+      await givenActionData(wafapp, {
+        ruleId: rule2.id,
+        type: 'waf',
+        policy: wafpolicy.id,
+      });
+
       await client
         .post(prefix + '/applications/' + application.id + '/declarations')
         .send({name: 'a-declaration'})
         .expect(200);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration and policy has no rule',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+      });
+
+      let service = await givenServiceData(wafapp, application.id, {
+        defaultPoolId: pool.id,
+      });
+
+      await givenMemberData(wafapp, {
+        poolId: pool.id,
+      });
+
+      let epp = await givenEndpointpolicyData(wafapp, {
+        name: 'epp1',
+      });
+
+      await givenServiceEndpointpolicyAssociationData(wafapp, {
+        serviceId: service.id,
+        endpointpolicyId: epp.id,
+      });
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .send({name: 'a-declaration'})
+        .expect(422);
     },
   );
 

@@ -1,6 +1,5 @@
-import {Member} from './member.model';
 import {model, property, hasMany} from '@loopback/repository';
-import {CommonEntity} from '.';
+import {CommonEntity, AS3Declaration, Member, Monitor} from '.';
 
 @model()
 export class Pool extends CommonEntity {
@@ -14,11 +13,12 @@ export class Pool extends CommonEntity {
       response: true,
       example: 'round-robin',
     },
+    as3: {},
   })
   loadBalancingMode: string;
 
   @hasMany(() => Member, {keyTo: 'poolId'})
-  members?: Member[];
+  members: Member[] = [];
 
   @property({
     type: 'number',
@@ -85,7 +85,20 @@ export class Pool extends CommonEntity {
   })
   slowRampTime: number;
 
+  monitors: Monitor[] = [];
+
   constructor(data?: Partial<Pool>) {
     super(data);
+    this.as3Class = 'Pool';
+  }
+
+  getAS3Declaration(): AS3Declaration {
+    let obj = super.getAS3Declaration();
+
+    obj.members = this.members.map(member => member.getAS3Declaration());
+
+    obj.monitors = this.monitors.map(monitor => monitor.getAS3Pointer());
+
+    return obj;
   }
 }
