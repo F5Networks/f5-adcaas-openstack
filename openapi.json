@@ -835,6 +835,9 @@
                     "management": {
                       "type": "boolean"
                     },
+                    "trustedDeviceId": {
+                      "type": "boolean"
+                    },
                     "status": {
                       "type": "boolean"
                     }
