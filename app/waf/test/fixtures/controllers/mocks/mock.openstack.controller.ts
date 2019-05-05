@@ -89,4 +89,5 @@ export const ExpectedData = {
   userId: '2d26c96aa0f345eaafc3f5b50d2bbd8e',
   serverId: 'fef1e40c-ed9d-4e10-b10c-d60d3af70623',
   portId: 'fcc768fd-1439-48f2-b2df-6d7e867c86a7',
+  tenantId: 'fdac59f5b20046829ea58720702a74af',
 };
