@@ -3,8 +3,9 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Client, expect, toJSON} from '@loopback/testlab';
+import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
+import {AdcController} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
@@ -19,7 +20,6 @@ import {
   createAdcObject,
   givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
-import {Adc} from '../../src/models';
 import uuid = require('uuid');
 import {
   MockKeyStoneController,
@@ -36,6 +36,10 @@ import {
 describe('AdcController', () => {
   let wafapp: WafApplication;
   let client: Client;
+  let controller: AdcController;
+  let trustStub: sinon.SinonStub;
+  let queryStub: sinon.SinonStub;
+  let untrustStub: sinon.SinonStub;
 
   let mockKeystoneApp: TestingApplication;
   let mockNovaApp: TestingApplication;
@@ -89,11 +93,23 @@ describe('AdcController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
+
+    controller = await wafapp.get<AdcController>('controllers.AdcController');
+
     ShouldResponseWith({});
   });
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
+    trustStub = sinon.stub(controller.trustedDeviceService, 'trust');
+    queryStub = sinon.stub(controller.trustedDeviceService, 'query');
+    untrustStub = sinon.stub(controller.trustedDeviceService, 'untrust');
+  });
+
+  afterEach(async () => {
+    trustStub.restore();
+    queryStub.restore();
+    untrustStub.restore();
   });
 
   let setupEnvs = async () => {
@@ -118,8 +134,39 @@ describe('AdcController', () => {
     teardownRestAppAndClient(mockNeutronApp);
   });
 
-  it('post ' + prefix + '/adcs: with no id', async () => {
-    const adc = new Adc(createAdcObject());
+  it('post ' + prefix + '/adcs: create ADC HW', async () => {
+    await givenAdcData(wafapp, {
+      trustedDeviceId: 'abcdefg',
+    });
+
+    const adc = createAdcObject({
+      type: 'HW',
+      management: {
+        ipAddress: '1.2.3.4',
+        tcpPort: 100,
+      },
+    });
+
+    let id = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    });
+
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'ACTIVE',
+        },
+      ],
+    });
 
     const response = await client
       .post(prefix + '/adcs')
@@ -127,6 +174,114 @@ describe('AdcController', () => {
       .expect(200);
 
     expect(response.body.adc).to.containDeep(toJSON(adc));
+  });
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW without management info',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+      delete adc.management;
+
+      await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .expect(400);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with trust exception',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+
+      trustStub.throws({
+        message: 'Unknown error',
+      });
+
+      await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with wrong trust response',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+
+      trustStub.returns({
+        devices: [{}, {}],
+      });
+
+      await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with error trust response',
+    async () => {
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+        },
+      });
+
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: uuid(),
+            targetHost: '1.2.3.4',
+            state: 'ERROR',
+          },
+        ],
+      });
+
+      await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with trust query exception',
+    async () => {
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'PENDING',
+          },
+        ],
+      });
+
+      queryStub.throws('Not working');
+
+      await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .expect(422);
+    },
+  );
+
+  it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
+    //TODO: timeout UT
   });
 
   it('get ' + prefix + '/adcs: of all', async () => {
@@ -203,6 +358,64 @@ describe('AdcController', () => {
     const adc = await givenAdcData(wafapp);
 
     await client.del(prefix + '/adcs/' + adc.id).expect(204);
+  });
+
+  it('delete ' + prefix + '/adcs/{id}: trusted device', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
+
+    untrustStub.returns({
+      devices: [
+        {
+          state: 'DELETING',
+        },
+      ],
+    });
+
+    await client.del(prefix + '/adcs/' + adc.id).expect(204);
+  });
+
+  it('delete ' + prefix + '/adcs/{id}: untrust exception', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
+
+    untrustStub.throws('Not working');
+
+    await client.del(prefix + '/adcs/' + adc.id).expect(422);
+  });
+
+  it('delete ' + prefix + '/adcs/{id}: empty untrust response', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
+
+    untrustStub.returns({
+      devices: [],
+    });
+
+    await client.del(prefix + '/adcs/' + adc.id).expect(422);
+  });
+
+  it('delete ' + prefix + '/adcs/{id}: wrong untrust state', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
+
+    untrustStub.returns({
+      devices: [
+        {
+          state: 'ERROR',
+        },
+      ],
+    });
+
+    await client.del(prefix + '/adcs/' + adc.id).expect(422);
   });
 
   it(

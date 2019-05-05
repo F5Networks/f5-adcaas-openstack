@@ -140,6 +140,15 @@ export class Adc extends CommonEntity {
 
   @property({
     type: 'string',
+    required: false,
+    schema: {
+      response: false,
+    },
+  })
+  trustedDeviceId?: string;
+
+  @property({
+    type: 'string',
     required: true,
     default: 'NONE',
     schema: {
