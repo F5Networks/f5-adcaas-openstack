@@ -10,6 +10,7 @@ import {
   RequestContext,
   RestBindings,
 } from '@loopback/rest';
+import {inject} from '@loopback/context';
 import {
   Application,
   Declaration,
@@ -19,9 +20,10 @@ import {
   Action,
   Pool,
   Member,
+  AS3DeployRequest,
 } from '../models';
-import {inject} from '@loopback/core';
 import {
+  AdcRepository,
   ApplicationRepository,
   DeclarationRepository,
   PoolRepository,
@@ -34,7 +36,11 @@ import {
   RuleRepository,
   ActionRepository,
 } from '../repositories';
+import {AS3Service} from '../services';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
+
+const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
 
 const prefix = '/adcaas/v1';
 
@@ -62,6 +68,9 @@ export class DeclarationController extends BaseController {
     public ruleRepository: RuleRepository,
     @repository(ActionRepository)
     public actionRepository: ActionRepository,
+    @repository(AdcRepository)
+    public adcRepository: AdcRepository,
+    @inject('services.AS3Service') public as3Service: AS3Service,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -332,5 +341,57 @@ export class DeclarationController extends BaseController {
     await this.applicationRepository
       .declarations(applicationId)
       .delete({and: [{id: declarationId}, {tenantId: await this.tenantId}]});
+  }
+
+  @post(
+    prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy',
+    {
+      responses: {
+        '204': Schema.emptyResponse('Successfully deploy Application resource'),
+        '404': Schema.notFound('Can not find Application resource'),
+        '422': Schema.unprocessableEntity(
+          'Fail to deploy Application resource',
+        ),
+      },
+    },
+  )
+  async deployById(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    applicationId: string,
+    @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
+    declarationId: string,
+  ): Promise<string> {
+    let declarations = await this.applicationRepository
+      .declarations(applicationId)
+      .find({
+        where: {
+          and: [
+            {
+              id: declarationId,
+            },
+            {
+              tenantId: await this.tenantId,
+            },
+          ],
+        },
+      });
+
+    if (declarations.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find Declaration');
+    }
+
+    let application = await this.applicationRepository.findById(applicationId);
+
+    if (!application.adcId) {
+      throw new HttpErrors.UnprocessableEntity(
+        'No target ADC to perform deploy action',
+      );
+    }
+
+    let adc = await this.adcRepository.findById(application.adcId);
+
+    let req = new AS3DeployRequest(adc, application, declarations[0]);
+    return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
   }
 }

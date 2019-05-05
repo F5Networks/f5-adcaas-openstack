@@ -11,6 +11,7 @@ import {
 } from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
+  givenAdcData,
   givenApplicationData,
   givenDeclarationData,
   givenServiceData,
@@ -381,6 +382,115 @@ describe('ApplicationController declaration test', () => {
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'new-name'})
+        .expect(404);
+    },
+  );
+
+  it(
+    'post' +
+      prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy: deploy declaration',
+    async () => {
+      const adc = await givenAdcData(wafapp);
+      const application = await givenApplicationData(wafapp, {
+        adcId: adc.id,
+      });
+      const declaration = await givenDeclarationData(wafapp, {
+        applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
+      });
+
+      deployStub.returns('Hello');
+
+      await client
+        .post(
+          prefix +
+            '/applications/' +
+            application.id +
+            '/declarations/' +
+            declaration.id +
+            '/deploy',
+        )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+    },
+  );
+
+  it(
+    'post' +
+      prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy: deploy non-exist declaration',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      await client
+        .post(
+          prefix +
+            '/applications/' +
+            application.id +
+            '/declarations/do-not-exist/deploy',
+        )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
+    },
+  );
+
+  it(
+    'post' +
+      prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy: deploy without default ADC',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+      const declaration = await givenDeclarationData(wafapp, {
+        applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
+      });
+
+      deployStub.returns('Hello');
+
+      await client
+        .post(
+          prefix +
+            '/applications/' +
+            application.id +
+            '/declarations/' +
+            declaration.id +
+            '/deploy',
+        )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(422);
+    },
+  );
+
+  it(
+    'post' +
+      prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy: deploy with non-exist ADC',
+    async () => {
+      const application = await givenApplicationData(wafapp, {
+        adcId: 'do-not-exist',
+      });
+      const declaration = await givenDeclarationData(wafapp, {
+        applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
+      });
+
+      deployStub.returns('Hello');
+
+      await client
+        .post(
+          prefix +
+            '/applications/' +
+            application.id +
+            '/declarations/' +
+            declaration.id +
+            '/deploy',
+        )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
