@@ -907,12 +907,71 @@
         "operationId": "ApplicationController.count"
       }
     },
-    "/adcaas/v1/applications/{applicationId}/declarations/{declarationId}": {
-      "patch": {
+    "/adcaas/v1/applications/{applicationId}/cleanup": {
+      "post": {
         "x-controller-name": "ApplicationController",
-        "x-operation-name": "updateDeclarationByID",
+        "x-operation-name": "cleanupById",
         "tags": [
           "ApplicationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully cleanup Application resource"
+          },
+          "404": {
+            "description": "Can not find Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ApplicationController.cleanupById"
+      }
+    },
+    "/adcaas/v1/applications/{applicationId}/declarations/{declarationId}": {
+      "patch": {
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "updateByID",
+        "tags": [
+          "DeclarationController"
         ],
         "responses": {
           "204": {
@@ -987,24 +1046,32 @@
                   },
                   "description": {
                     "type": "string"
+                  },
+                  "adcId": {
+                    "type": "string"
+                  },
+                  "defaultDeclarationId": {
+                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description"
+                  "description": "My description",
+                  "adcId": "11111111-2222-3333-4444-555555555555",
+                  "defaultDeclarationId": "11111111-2222-3333-4444-555555555555"
                 }
               }
             }
           },
           "x-parameter-index": 2
         },
-        "operationId": "ApplicationController.updateDeclarationByID"
+        "operationId": "DeclarationController.updateByID"
       },
       "get": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "findDeclarationByID",
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "findByID",
         "tags": [
-          "ApplicationController"
+          "DeclarationController"
         ],
         "responses": {
           "200": {
@@ -1113,13 +1180,13 @@
             }
           }
         ],
-        "operationId": "ApplicationController.findDeclarationByID"
+        "operationId": "DeclarationController.findByID"
       },
       "delete": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "deleteDeclarationByID",
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "deleteByID",
         "tags": [
-          "ApplicationController"
+          "DeclarationController"
         ],
         "responses": {
           "204": {
@@ -1180,19 +1247,19 @@
             }
           }
         ],
-        "operationId": "ApplicationController.deleteDeclarationByID"
+        "operationId": "DeclarationController.deleteByID"
       }
     },
     "/adcaas/v1/applications/{applicationId}/declarations": {
       "post": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "createDeclaration",
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "create",
         "tags": [
-          "ApplicationController"
+          "DeclarationController"
         ],
         "responses": {
           "200": {
-            "description": "Declaration resource that need to be created",
+            "description": "Successfully create Declaration resource",
             "content": {
               "application/json": {
                 "schema": {
@@ -1241,6 +1308,39 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Fail to create Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -1284,13 +1384,13 @@
           },
           "x-parameter-index": 1
         },
-        "operationId": "ApplicationController.createDeclaration"
+        "operationId": "DeclarationController.create"
       },
       "get": {
-        "x-controller-name": "ApplicationController",
-        "x-operation-name": "findDeclarations",
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "find",
         "tags": [
-          "ApplicationController"
+          "DeclarationController"
         ],
         "responses": {
           "200": {
@@ -1360,7 +1460,7 @@
             }
           }
         ],
-        "operationId": "ApplicationController.findDeclarations"
+        "operationId": "DeclarationController.find"
       }
     },
     "/adcaas/v1/applications/{applicationId}/deploy": {
@@ -1401,6 +1501,39 @@
                     "statusCode": 404,
                     "name": "Error",
                     "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Fail to deploy Application resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
                   }
                 }
               }
@@ -1492,11 +1625,19 @@
                   },
                   "description": {
                     "type": "string"
+                  },
+                  "adcId": {
+                    "type": "string"
+                  },
+                  "defaultDeclarationId": {
+                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description"
+                  "description": "My description",
+                  "adcId": "11111111-2222-3333-4444-555555555555",
+                  "defaultDeclarationId": "11111111-2222-3333-4444-555555555555"
                 }
               }
             }
@@ -1542,6 +1683,12 @@
                         },
                         "status": {
                           "type": "string"
+                        },
+                        "adcId": {
+                          "type": "string"
+                        },
+                        "defaultDeclarationId": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -1551,7 +1698,9 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "status": "TBD"
+                        "status": "TBD",
+                        "adcId": "11111111-2222-3333-4444-555555555555",
+                        "defaultDeclarationId": "11111111-2222-3333-4444-555555555555"
                       }
                     }
                   }
@@ -1702,6 +1851,12 @@
                         },
                         "status": {
                           "type": "string"
+                        },
+                        "adcId": {
+                          "type": "string"
+                        },
+                        "defaultDeclarationId": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -1711,7 +1866,9 @@
                         "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "status": "TBD"
+                        "status": "TBD",
+                        "adcId": "11111111-2222-3333-4444-555555555555",
+                        "defaultDeclarationId": "11111111-2222-3333-4444-555555555555"
                       }
                     }
                   }
@@ -1801,12 +1958,16 @@
                   },
                   "tenantId": {
                     "type": "string"
+                  },
+                  "adcId": {
+                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "adcId": "11111111-2222-3333-4444-555555555555"
                 }
               }
             }
@@ -1853,6 +2014,12 @@
                           },
                           "status": {
                             "type": "string"
+                          },
+                          "adcId": {
+                            "type": "string"
+                          },
+                          "defaultDeclarationId": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -1862,7 +2029,9 @@
                           "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "status": "TBD"
+                          "status": "TBD",
+                          "adcId": "11111111-2222-3333-4444-555555555555",
+                          "defaultDeclarationId": "11111111-2222-3333-4444-555555555555"
                         }
                       }
                     }
@@ -1905,6 +2074,12 @@
                       "type": "boolean"
                     },
                     "status": {
+                      "type": "boolean"
+                    },
+                    "adcId": {
+                      "type": "boolean"
+                    },
+                    "defaultDeclarationId": {
                       "type": "boolean"
                     }
                   }
@@ -2481,7 +2656,7 @@
                         "applicationId": {
                           "type": "string"
                         },
-                        "pool": {
+                        "defaultPoolId": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -2500,7 +2675,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
-                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
                         ],
@@ -2582,7 +2757,7 @@
                           "applicationId": {
                             "type": "string"
                           },
-                          "pool": {
+                          "defaultPoolId": {
                             "type": "string"
                           },
                           "virtualAddresses": {
@@ -2601,7 +2776,7 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "HTTP",
                           "applicationId": "11111111-2222-3333-4444-555555555555",
-                          "pool": "11111111-2222-3333-4444-555555555555",
+                          "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                           "virtualAddresses": [
                             "10.100.0.1"
                           ],
@@ -6200,7 +6375,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [],
+                "required": [
+                  "type"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -6214,7 +6391,13 @@
                   "event": {
                     "type": "string"
                   },
+                  "insert": {
+                    "type": "object"
+                  },
                   "location": {
+                    "type": "string"
+                  },
+                  "policy": {
                     "type": "string"
                   },
                   "type": {
@@ -6227,6 +6410,7 @@
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "location": "http://1.2.3.4/index.html",
+                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
                   "type": "httpUri"
                 }
               }
@@ -6276,7 +6460,13 @@
                           "event": {
                             "type": "string"
                           },
+                          "insert": {
+                            "type": "object"
+                          },
                           "location": {
+                            "type": "string"
+                          },
+                          "policy": {
                             "type": "string"
                           },
                           "type": {
@@ -6295,6 +6485,7 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
                           "location": "http://1.2.3.4/index.html",
+                          "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
                           "type": "httpUri",
                           "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                         }
@@ -6405,7 +6596,13 @@
                         "event": {
                           "type": "string"
                         },
+                        "insert": {
+                          "type": "object"
+                        },
                         "location": {
+                          "type": "string"
+                        },
+                        "policy": {
                           "type": "string"
                         },
                         "type": {
@@ -6424,6 +6621,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "event": "request",
                         "location": "http://1.2.3.4/index.html",
+                        "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
                         "type": "httpUri",
                         "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                       }
@@ -6517,7 +6715,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [],
+                "required": [
+                  "type"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -6531,7 +6731,13 @@
                   "event": {
                     "type": "string"
                   },
+                  "insert": {
+                    "type": "object"
+                  },
                   "location": {
+                    "type": "string"
+                  },
+                  "policy": {
                     "type": "string"
                   },
                   "type": {
@@ -6544,6 +6750,7 @@
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "location": "http://1.2.3.4/index.html",
+                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
                   "type": "httpUri"
                 }
               }
@@ -6593,7 +6800,13 @@
                           "event": {
                             "type": "string"
                           },
+                          "insert": {
+                            "type": "object"
+                          },
                           "location": {
+                            "type": "string"
+                          },
+                          "policy": {
                             "type": "string"
                           },
                           "type": {
@@ -6612,6 +6825,7 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
                           "location": "http://1.2.3.4/index.html",
+                          "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
                           "type": "httpUri",
                           "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                         }
@@ -8035,7 +8249,7 @@
                   "description": {
                     "type": "string"
                   },
-                  "pool": {
+                  "defaultPoolId": {
                     "type": "string"
                   },
                   "virtualAddresses": {
@@ -8048,7 +8262,7 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "pool": "11111111-2222-3333-4444-555555555555",
+                  "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                   "virtualAddresses": [
                     "10.100.0.1"
                   ],
@@ -8102,7 +8316,7 @@
                         "applicationId": {
                           "type": "string"
                         },
-                        "pool": {
+                        "defaultPoolId": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -8121,7 +8335,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
-                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
                         ],
@@ -8280,7 +8494,7 @@
                         "applicationId": {
                           "type": "string"
                         },
-                        "pool": {
+                        "defaultPoolId": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -8299,7 +8513,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
-                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
                         ],
@@ -8404,7 +8618,7 @@
                   "applicationId": {
                     "type": "string"
                   },
-                  "pool": {
+                  "defaultPoolId": {
                     "type": "string"
                   },
                   "virtualAddresses": {
@@ -8420,7 +8634,7 @@
                   "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "type": "HTTP",
                   "applicationId": "11111111-2222-3333-4444-555555555555",
-                  "pool": "11111111-2222-3333-4444-555555555555",
+                  "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                   "virtualAddresses": [
                     "10.100.0.1"
                   ],
@@ -8473,7 +8687,7 @@
                         "applicationId": {
                           "type": "string"
                         },
-                        "pool": {
+                        "defaultPoolId": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -8492,7 +8706,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
-                        "pool": "11111111-2222-3333-4444-555555555555",
+                        "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
                         ],
@@ -8588,7 +8802,7 @@
                     "policyNAT": {
                       "type": "boolean"
                     },
-                    "pool": {
+                    "defaultPoolId": {
                       "type": "boolean"
                     },
                     "profileAnalytics": {
@@ -8676,9 +8890,6 @@
                       "type": "boolean"
                     },
                     "virtualPort": {
-                      "type": "boolean"
-                    },
-                    "endpointpolicy": {
                       "type": "boolean"
                     }
                   }
@@ -9489,9 +9700,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "url"
-                ],
+                "required": [],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -10044,7 +10253,7 @@
             "type": "string"
           },
           "policy": {
-            "type": "object"
+            "type": "string"
           },
           "remove": {
             "type": "object"
@@ -10144,7 +10353,7 @@
           "policyNAT": {
             "type": "string"
           },
-          "pool": {
+          "defaultPoolId": {
             "type": "string"
           },
           "profileAnalytics": {
@@ -10236,9 +10445,6 @@
           },
           "virtualPort": {
             "type": "number"
-          },
-          "endpointpolicy": {
-            "type": "string"
           }
         },
         "required": [
