@@ -2,6 +2,8 @@ import {Provider, inject} from '@loopback/core';
 import {BIGIPDataSource} from '../datasources/bigip.datasource';
 import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
+import {probe} from '@network-utils/tcp-ping';
+import {checkAndWait} from '../utils';
 
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
@@ -39,94 +41,65 @@ export class BigIpManager {
     return bigIpMgr;
   }
 
-  async checkAndWaitBigipReady(timeoutInMSecs: number): Promise<boolean> {
-    if (timeoutInMSecs <= 0) {
-      this.logger.debug('Timeout to access to bigip: ' + this.config.ipAddr);
-      return false;
-    }
-
-    let interval = 500;
-    let leftMil = timeoutInMSecs;
+  async getSys(): Promise<object> {
+    await this.mustBeReachable();
 
     let url = `${this.baseUrl}/mgmt/tm/sys`;
-
-    try {
-      let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-      this.logger.debug(JSON.stringify(response));
-      this.logger.debug(
-        `Bigip becomes accessible before timeout time: ${leftMil}`,
-      );
-      return true;
-    } catch (error) {
-      this.logger.debug(`Bigip not accessible, trying after ${interval} secs`);
-      await new Promise(reslFunc => {
-        setTimeout(reslFunc, interval);
-      });
-      return await this.checkAndWaitBigipReady(leftMil - interval);
-    }
-  }
-
-  async checkAndWaitBigipOnboarded(
-    timeoutInMSecs: number,
-    hostname: string,
-  ): Promise<boolean> {
-    if (timeoutInMSecs <= 0) {
-      this.logger.debug('Timeout to access to bigip: ' + this.config.ipAddr);
-      return false;
-    }
-
-    let interval = 500;
-    let leftMil = timeoutInMSecs;
-
-    try {
-      let response = await this.getHostname();
-      this.logger.debug(JSON.stringify(response));
-      if (response !== hostname) throw new Error('');
-      this.logger.debug(`Bigip onboarded before timeout time: ${leftMil}`);
-      return true;
-    } catch (error) {
-      this.logger.debug(
-        `Bigip is still under onboarding, trying after ${interval} secs`,
-      );
-      await new Promise(reslFunc => {
-        setTimeout(reslFunc, interval);
-      });
-      return await this.checkAndWaitBigipOnboarded(
-        leftMil - interval,
-        hostname,
-      );
-    }
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    return JSON.parse(JSON.stringify(response))['body'][0];
   }
 
   async getInterfaces(): Promise<BigipInterfaces> {
-    /**
-     return {
-       <macAddr>: {
-         name: xxxx,
-         macAddress: yyyy,
-       }
-     }
-     */
+    await this.mustBeReachable();
+
     let url = `${this.baseUrl}/mgmt/tm/net/interface`;
 
-    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let impFunc = async () => {
+      let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+      let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+      this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+      return resObj;
+    };
 
-    let resObj = JSON.parse(JSON.stringify(response));
-    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj[0])}`);
+    let checkFunc = async () => {
+      return await impFunc().then(resObj => {
+        let items = resObj['items'];
+        for (let intf of items) {
+          if (intf.macAddress === 'none') {
+            this.logger.warn("bigip interface's mac addr is 'none', waiting..");
+            return false;
+          }
+        }
+        this.logger.debug('bigip mac addresses are ready to get.');
+        return true;
+      });
+    };
 
-    let interfaces: BigipInterfaces = {};
-    for (let intf of resObj['body'][0]['items']) {
-      let macAddr = intf.macAddress;
-      interfaces[macAddr] = {
-        name: intf.name,
-        macAddress: macAddr,
-      };
-    }
-
-    return interfaces;
+    // The interface mac addresses are 'none' at the very beginning of the bigip readiness.
+    return await checkAndWait(checkFunc, 60).then(
+      async () => {
+        return await impFunc().then(resObj => {
+          let items = resObj['items'];
+          let interfaces: BigipInterfaces = {};
+          for (let intf of items) {
+            let macAddr = intf.macAddress;
+            interfaces[macAddr] = {
+              name: intf.name,
+              macAddress: macAddr,
+            };
+          }
+          return interfaces;
+        });
+      },
+      () => {
+        throw new Error('bigip mac addresses are not ready to get.');
+      },
+    );
   }
 
   async getHostname(): Promise<string> {
+    await this.mustBeReachable();
+
     let url = `${this.baseUrl}/mgmt/tm/sys/global-settings`;
 
     let response = await this.bigipService.getInfo(url, this.cred64Encoded);
@@ -138,6 +111,26 @@ export class BigIpManager {
 
     return resObj['body'][0]['hostname'];
   }
+
+  private async reachable(): Promise<boolean> {
+    return await probe(
+      this.config.port,
+      // localhost is 'Invalid IP'
+      this.config.ipAddr === 'localhost' ? '127.0.0.1' : this.config.ipAddr,
+      this.config.timeout,
+    );
+  }
+
+  private async mustBeReachable(): Promise<void> {
+    if (!(await this.reachable()))
+      throw new Error(
+        'Host unreachable: ' +
+          JSON.stringify({
+            ipaddr: this.config.ipAddr,
+            port: this.config.port,
+          }),
+      );
+  }
 }
 
 type BigipConfig = {
@@ -145,6 +138,7 @@ type BigipConfig = {
   password: string;
   ipAddr: string;
   port: number;
+  timeout?: number;
 };
 
 type BigipInterfaces = {

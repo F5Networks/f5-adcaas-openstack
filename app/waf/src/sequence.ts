@@ -101,7 +101,7 @@ export class MySequence implements SequenceHandler {
       .validateUserToken(adminToken.token, <string>hdrToken)
       .then(authedObj => {
         this.logger.debug('Authenticated OK');
-        this.logger.debug(JSON.stringify(authedObj));
+        //this.logger.debug(JSON.stringify(authedObj));
         return authedObj;
       });
 

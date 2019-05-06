@@ -166,18 +166,24 @@ export class OnboardingManager {
         if (obData.networks[n].type === 'mgmt') continue;
 
         let intfs = JSON.parse(JSON.stringify(additionalInfo))['interfaces'];
-        let vlanData = {
-          class: 'VLAN',
-          interfaces: [
-            {
-              name: intfs[obData.networks[n].macAddr!].name,
-              tagged: false,
-            },
-          ],
-          // mtu: TODO: get network information from openstack: mtu.
-        };
-        this.logger.debug('Add new vlan: ' + n);
-        target = Object.assign(target, {['vlan-' + n]: vlanData});
+        if (!(obData.networks[n].macAddr! in intfs)) {
+          this.logger.error(
+            `${obData.networks[n].macAddr!} not found in bigip device.`,
+          );
+        } else {
+          let vlanData = {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: intfs[obData.networks[n].macAddr!].name,
+                tagged: false,
+              },
+            ],
+            // mtu: TODO: get network information from openstack: mtu.
+          };
+          this.logger.debug('Add new vlan: ' + n);
+          target = Object.assign(target, {['vlan-' + n]: vlanData});
+        }
       }
 
       return target;
@@ -199,7 +205,7 @@ export class OnboardingManager {
             vlan: 'vlan-' + n,
             address: obData.networks[n].fixedIp! + '/' + subs[s]['masknum'],
           };
-          this.logger.debug('Add new vlan: ' + n);
+          this.logger.debug('Add new selfip: ' + n);
           target = Object.assign(target, {['selfip-' + n]: selfipData});
         }
       }
@@ -266,6 +272,10 @@ export class OnboardingManager {
       subnets: await this.subnetInfo(obData),
     };
 
+    this.logger.debug(
+      'Additional information for assembling onboarding body: ' +
+        JSON.stringify(addonInfo),
+    );
     let objCommon = doBody.declaration.Common;
     for (let nFunc in this.assembleHandlers) {
       objCommon = this.assembleHandlers[nFunc](objCommon, obData, addonInfo);
