@@ -2,6 +2,9 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {TrustedDeviceDataSource} from '../datasources';
 
+const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
+const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
+
 type TrustedDeviceInfo = {
   targetHost: string;
   targetPort: number;
@@ -49,5 +52,59 @@ export class TrustedDeviceServiceProvider
 
   value(): Promise<TrustedDeviceService> {
     return getService(this.dataSource);
+  }
+}
+
+export class TrustedDeviceManager {
+  private service: TrustedDeviceService;
+
+  constructor(svc: TrustedDeviceService) {
+    this.service = svc;
+  }
+
+  async trust(
+    mgmtIp: string,
+    mgmtPort: number,
+    username: string,
+    password: string,
+  ): Promise<TrustedDevice> {
+    let body: TrustedDeviceRequest = {
+      devices: [
+        {
+          targetHost: mgmtIp,
+          targetPort: mgmtPort,
+          targetUsername: username,
+          targetPassphrase: password,
+        },
+      ],
+    };
+
+    let devices = (await this.service.trust(ASG_HOST, ASG_PORT, body)).devices;
+
+    if (devices.length === 1) {
+      return devices[0];
+    } else {
+      throw new Error('Trusted device response size is ' + devices.length);
+    }
+  }
+
+  async getState(id: string): Promise<string> {
+    let devices = (await this.service.query(ASG_HOST, ASG_PORT, id)).devices;
+
+    if (devices.length === 1) {
+      return devices[0].state;
+    } else {
+      throw new Error('Trusted device response size is ' + devices.length);
+    }
+  }
+
+  async untrust(id: string): Promise<void> {
+    let devices = (await this.service.untrust(ASG_HOST, ASG_PORT, id)).devices;
+
+    if (devices.length === 1 && devices[0].state === 'DELETING') {
+      return;
+    } else {
+      throw new Error('Fail to delete trusted device');
+    }
   }
 }
