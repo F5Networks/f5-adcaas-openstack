@@ -25,7 +25,7 @@ export class CommonRepository<
     return super.create(data, options);
   }
 
-  find(filter?: Filter<T>, options?: Options): Promise<T[]> {
+  async find(filter?: Filter<T>, options?: Options): Promise<T[]> {
     let f: Filter = filter || {};
     if (options !== undefined && options.tenantId) {
       let tenantId = options.tenantId;
