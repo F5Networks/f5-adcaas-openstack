@@ -20,7 +20,7 @@
         "responseHeaders": true
       },
       "functions": {
-        "getSysInfo": [
+        "getInfo": [
           "url",
           "cred64en"
         ]

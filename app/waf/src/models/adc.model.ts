@@ -23,6 +23,7 @@ export type ConfigTypes = {
       type: 'mgmt' | 'ext' | 'int' | 'ha';
       networkId: string;
       fixedIp?: string;
+      macAddr?: string;
       //floatingIp?: string;
       portId?: string; // cannot be appointed.
       ready?: boolean; // cannot be appointed.
@@ -41,35 +42,12 @@ export type ConfigTypes = {
     // cannot be appointed.
     ipAddress: string; // mostly floatingIp.
     tcpPort: number;
-    // no username passphrase, use admin/admin for 1st phase.
+    username: string;
+    password: string;
+    rootPass: string;
   };
   status: 'NONE' | 'POWERON' | 'POWEROFF' | 'BUILDING' | 'ACTIVE' | 'ERROR'; // cannot be appointed.
 };
-
-// TODO: To be extended.
-// onBoarding: {
-//   declaration: {
-//     dsc: {
-//       trusts: [];
-//       sync: {};
-//       failover: {};
-//       group: {};
-//     };
-//     system: {
-//       licenses: {};
-//       provisions: {};
-//       dns: {};
-//       ntp: {};
-//       users: {};
-//       // ...
-//     };
-//     network: {
-//       selfips: [];
-//       vlans: [];
-//       routes: [];
-//     };
-//   };
-// };
 
 @model()
 export class Adc extends CommonEntity {
@@ -156,12 +134,6 @@ export class Adc extends CommonEntity {
     },
   })
   status: ConfigTypes['status'];
-
-  // @property({
-  //   type: 'object',
-  //   required: true,
-  // })
-  // onBoarding: ConfigBody['onBoarding'];
 
   constructor(data?: Partial<Adc>) {
     super(data);

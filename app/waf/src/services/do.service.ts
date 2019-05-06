@@ -1,6 +1,12 @@
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {DoDataSource} from '../datasources';
+import {Adc} from '../models';
+import {factory} from '../log4ts';
+import {BigIpManager} from './bigip.service';
+import {RestApplication} from '@loopback/rest';
+import {WafBindingKeys} from '../keys';
+const ip = require('ip');
 
 export interface DOService {
   doRest(
@@ -25,38 +31,310 @@ export class DOServiceProvider implements Provider<DOService> {
 
 export class OnboardingManager {
   private doService: DOService;
-  private doBody: TypeDOClassDO;
+  private logger = factory.getLogger('services.onboarding.manager');
+  private application: RestApplication;
+  public config: {
+    endpoint: string;
+    async: boolean;
+    timeout: number;
+    licPool: {
+      host: string;
+      username: string;
+      password: string;
+      poolName: string;
+    };
+  };
 
-  constructor(doS: DOService) {
-    this.doService = doS;
-
-    // initial/default values for doBody
+  static async instanlize(
+    app: RestApplication,
+    config: object = {},
+  ): Promise<OnboardingManager> {
+    let doS = await new DOServiceProvider().value();
+    return new OnboardingManager(doS, app, config);
   }
 
-  async onboarding(givenDoBody: TypeDOClassDO) {
-    this.doBody = Object.assign(this.doBody, givenDoBody);
-    // TODO: insert credential in headers
+  constructor(doS: DOService, app: RestApplication, config: object) {
+    this.doService = doS;
+    this.application = app;
+
+    let expectedEmpty = [];
+    for (let n of [
+      'DO_BIGIQ_HOST',
+      'DO_BIGIQ_USERNAME',
+      'DO_BIGIQ_PASSWORD',
+      'DO_BIGIQ_POOL',
+    ]) {
+      if (!process.env[n] || process.env[n] === '') {
+        expectedEmpty.push(n);
+      }
+    }
+    if (expectedEmpty.length !== 0)
+      throw new Error(
+        'Environments should be set: ' + JSON.stringify(expectedEmpty),
+      );
+
+    this.config = {
+      endpoint: process.env.DO_ENDPOINT || 'http://localhost:8081',
+      async: true,
+      timeout: 900, // from onboarding prompt: should be <= 900
+      licPool: {
+        host: process.env.DO_BIGIQ_HOST!,
+        username: process.env.DO_BIGIQ_USERNAME!,
+        password: process.env.DO_BIGIQ_PASSWORD!,
+        poolName: process.env.DO_BIGIQ_POOL!,
+      },
+    };
+    Object.assign(this.config, config);
+  }
+
+  private assembleHandlers: {[key: string]: Function} = {
+    license: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      try {
+        let licData = {
+          class: 'License',
+          licenseType: 'licensePool',
+          bigIqHost: this.config.licPool.host,
+          bigIqUsername: this.config.licPool.username,
+          bigIqPassword: this.config.licPool.password,
+          licensePool: this.config.licPool.poolName,
+          reachable: true,
+          bigIpUsername: obData.management.username,
+          bigIpPassword: obData.management.password,
+        };
+        this.logger.debug('Add new license.');
+        return Object.assign(target, {myLicense: licData});
+      } catch (error) {
+        this.logger.debug('No license found.');
+        return target;
+      }
+    },
+
+    provisions: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      try {
+        // TODO: make it user defined(define it in adc.model)
+        let provData = {
+          class: 'Provision',
+          ltm: 'nominal',
+          asm: 'nominal',
+        };
+
+        this.logger.debug('Add new provision.');
+        return Object.assign(target, {myProvision: provData});
+      } catch (error) {
+        this.logger.debug('No provision found.');
+        return target;
+      }
+    },
+
+    dns: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      try {
+        // TODO: make it user defined(define it in adc.model)
+        let dnsData = {
+          class: 'DNS',
+          nameServers: ['8.8.8.8'],
+          search: ['openstack.local'],
+        };
+
+        this.logger.debug('Add new dns.');
+        return Object.assign(target, {myDns: dnsData});
+      } catch (error) {
+        this.logger.debug('No dns found.');
+        return target;
+      }
+    },
+
+    vlans: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      for (let n of Object.keys(obData.networks)) {
+        // from onboarding prompt:
+        //  "01070607:3: The management interface cannot be configured as a(n) vlan member."
+        if (obData.networks[n].type === 'mgmt') continue;
+
+        let intfs = JSON.parse(JSON.stringify(additionalInfo))['interfaces'];
+        let vlanData = {
+          class: 'VLAN',
+          interfaces: [
+            {
+              name: intfs[obData.networks[n].macAddr!].name,
+              tagged: false,
+            },
+          ],
+          // mtu: TODO: get network information from openstack: mtu.
+        };
+        this.logger.debug('Add new vlan: ' + n);
+        target = Object.assign(target, {['vlan-' + n]: vlanData});
+      }
+
+      return target;
+    },
+
+    selfips: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      let subs = JSON.parse(JSON.stringify(additionalInfo))['subnets'];
+      for (let n of Object.keys(obData.networks)) {
+        if (obData.networks[n].type === 'mgmt') continue;
+
+        for (let s of Object.keys(subs)) {
+          if (obData.networks[n].macAddr! !== s) continue;
+          let selfipData = {
+            class: 'SelfIp',
+            vlan: 'vlan-' + n,
+            address: obData.networks[n].fixedIp! + '/' + subs[s]['masknum'],
+          };
+          this.logger.debug('Add new vlan: ' + n);
+          target = Object.assign(target, {['selfip-' + n]: selfipData});
+        }
+      }
+
+      return target;
+    },
+
+    routes: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      for (let n of Object.keys(obData.networks)) {
+        if (obData.networks[n].type !== 'ext') continue;
+
+        let subs = JSON.parse(JSON.stringify(additionalInfo))['subnets'];
+        for (let s of Object.keys(subs)) {
+          if (obData.networks[n].macAddr! === s) {
+            let routeData = {
+              class: 'Route',
+              gw: subs[s].gateway,
+              network: 'default',
+            };
+            this.logger.debug('Add new route: ' + n);
+            target = Object.assign(target, {['route-' + n]: routeData});
+          }
+        }
+      }
+
+      return target;
+    },
+  };
+
+  async assembleDo(obData: Adc): Promise<TypeDOClassDO> {
+    let doBody: TypeDOClassDO = {
+      class: 'DO',
+      targetHost: obData.management.ipAddress,
+      targetPort: obData.management.tcpPort,
+      targetUsername: obData.management.username,
+      targetPassphrase: obData.management.password,
+      targetTimeout: this.config.timeout.toString(),
+      declaration: {
+        schemaVersion: '1.3.0',
+        class: 'Device',
+        async: this.config.async,
+        label: 'Basic onboarding',
+        Common: {
+          class: 'Tenant',
+          hostname: obData.id + '.f5bigip.local',
+        },
+      },
+    };
+
+    let addonInfo: {[key: string]: object} = {
+      // get bigip interfaces information: name.
+      interfaces: await BigIpManager.instanlize({
+        username: obData.management.username,
+        password: obData.management.password,
+        ipAddr: obData.management.ipAddress,
+        port: obData.management.tcpPort,
+      }).then(async bigipMgr => {
+        return await bigipMgr.getInterfaces();
+      }),
+      subnets: await this.subnetInfo(obData),
+    };
+
+    let objCommon = doBody.declaration.Common;
+    for (let nFunc in this.assembleHandlers) {
+      objCommon = this.assembleHandlers[nFunc](objCommon, obData, addonInfo);
+    }
+
+    doBody.declaration.Common = objCommon;
+    return doBody;
+  }
+
+  private async subnetInfo(adc: Adc): Promise<object> {
+    /**
+     return {
+       macAddr1: {
+         gateway: '192.168.0.1',
+         masknum: '24',
+       }
+     }
+     */
+    let rltObj = {};
+
+    let netDriver = await this.application.get(WafBindingKeys.KeyNetworkDriver);
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeyAdminAuthedToken,
+    );
+
+    for (let net of Object.keys(adc.networks)) {
+      let macAddr = adc.networks[net].macAddr!;
+      let subnetData = await netDriver.getSubnetInfo(
+        adminToken.token,
+        adc.networks[net].networkId,
+      );
+      for (let sub of subnetData) {
+        if (ip.cidrSubnet(sub.cidr).contains(adc.networks[net].fixedIp)) {
+          Object.assign(rltObj, {
+            [macAddr]: {
+              gateway: sub.gatewayIp,
+              masknum: sub.cidr.split('/')[1],
+            },
+          });
+          break;
+        }
+      }
+    }
+    return rltObj;
+  }
+
+  async onboarding(givenDoBody: TypeDOClassDO): Promise<string> {
+    // TODO: insert credential in headers if do gateway needs authorization.
     let headers = {};
 
-    try {
-      await this.doService
-        .doRest(
-          'POST',
-          'http://do-server:8081/mgmt/shared/declarative-onboarding',
-          headers,
-          this.doBody,
-        )
-        .then(
-          response => {
-            // if onboarding succeeds.
-          },
-          reason => {
-            // if onboarding fails.
-          },
-        );
-    } catch (error) {
-      // do error catching.
-    }
+    return await this.doService
+      .doRest(
+        'POST',
+        this.config.endpoint + '/mgmt/shared/declarative-onboarding',
+        headers,
+        givenDoBody,
+      )
+      .then(
+        response => {
+          let resObj = JSON.parse(JSON.stringify(response));
+          return resObj[0]['result']['message'];
+        },
+        reason => {
+          // if onboarding fails.
+          let mesg = 'Failed to onboarding device: ' + JSON.stringify(reason);
+          this.logger.error(mesg);
+          throw new Error(mesg);
+        },
+      );
   }
 }
 
@@ -156,30 +434,9 @@ type TypeDOClassNetworkSchema =
   | TypeDOClassSelfIp
   | TypeDOClassRoute;
 
-type TypeDOClassVLAN = {
-  class: 'VLAN';
-  interfaces: {
-    name: string;
-    tagged?: boolean;
-  }[];
-  mtu?: number;
-  tag?: number;
-};
-
-type TypeDOClassSelfIp = {
-  class: 'SelfIp';
-  address: string;
-  vlan: string;
-  trafficGroup?: 'traffic-group-local-only' | 'traffic-group-1';
-  allowService?: ('all' | 'none' | 'default') | string[];
-};
-
-type TypeDOClassRoute = {
-  class: 'Route';
-  gw: string;
-  network?: 'default' | 'default-inet6';
-  mtu?: number;
-};
+type TypeDOClassVLAN = {class: 'VLAN'} & EntyTypeDOClassVLAN;
+type TypeDOClassSelfIp = {class: 'SelfIp'} & EntyTypeDOClassSelfIp;
+type TypeDOClassRoute = {class: 'Route'} & EntyTypeDOClassRoute;
 
 // system.schema
 type TypeDOClassSystemSchema =
@@ -189,10 +446,7 @@ type TypeDOClassSystemSchema =
   | TypeDOClassDNS
   | TypeDOClassNTP
   | TypeDOClassUser
-  | TypeDOClassPartitionAccess
-  | TypeDOClassRegkeyInfo
-  | TypeDOClassLicensePoolInfo
-  | TypeDOClassbigIqHostInfo;
+  | TypeDOClassPartitionAccess;
 
 type TypeDOClassLicense = TypeDOClassRegkeyInfo | TypeDOClassLicensePoolInfo;
 
@@ -303,3 +557,25 @@ type TypeDOClassRevokeFromObject = {
 };
 
 type TypeDOClassCommonTypes = undefined | string | boolean | number;
+
+export type EntyTypeDOClassSelfIp = {
+  address: string;
+  vlan: string;
+  trafficGroup?: 'traffic-group-local-only' | 'traffic-group-1';
+  allowService?: ('all' | 'none' | 'default') | string[];
+};
+
+export type EntyTypeDOClassVLAN = {
+  interfaces: {
+    name: string;
+    tagged?: boolean;
+  }[];
+  mtu?: number;
+  tag?: number;
+};
+
+export type EntyTypeDOClassRoute = {
+  gw: string;
+  network?: 'default' | 'default-inet6';
+  mtu?: number;
+};

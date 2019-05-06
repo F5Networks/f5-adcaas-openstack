@@ -7,6 +7,16 @@ export class MockBigipController extends MockBaseController {
   async sysInfo(): Promise<object> {
     return await ResponseWith['/mgmt/tm/sys']();
   }
+
+  @get('/mgmt/tm/net/interface')
+  async netInterfaces(): Promise<object> {
+    return await ResponseWith['/mgmt/tm/net/interface']();
+  }
+
+  @get('/mgmt/tm/sys/global-settings')
+  async globalSettings(): Promise<object> {
+    return await ResponseWith['/mgmt/tm/sys/global-settings']();
+  }
 }
 
 let ResponseWith: {[key: string]: Function} = {};
@@ -15,6 +25,8 @@ let ResponseWith: {[key: string]: Function} = {};
 export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
   ResponseWith = {
     '/mgmt/tm/sys': StubResponses.bigipMgmtSys200,
+    '/mgmt/tm/net/interface': StubResponses.bigipNetInterfaces200,
+    '/mgmt/tm/sys/global-settings': StubResponses.bigipGlobalSettings200,
   };
   Object.assign(ResponseWith, spec);
 }

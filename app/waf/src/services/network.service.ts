@@ -81,31 +81,44 @@ export class NetworkDriver {
         const portResp: PortResponse = {
           id: respJson['port']['id'],
           fixedIp: respJson['port']['fixed_ips'][0]['ip_address'],
+          macAddr: respJson['port']['mac_address'],
         };
         return portResp;
       });
   }
 
-  // async getSubnetIds(userToken: string, networkId: string): Promise<[string]> {
-  //   let adminToken = await this.application
-  //     .get(WafBindingKeys.KeyAuthWithOSIdentity)
-  //     .then(authHelper => {
-  //       return authHelper.solveAdminToken();
-  //     });
+  async getSubnetInfo(
+    userToken: string,
+    networkId: string,
+  ): Promise<SubnetInfo[]> {
+    let adminToken = await this.application
+      .get(WafBindingKeys.KeyAuthWithOSIdentity)
+      .then(authHelper => {
+        return authHelper.solveAdminToken();
+      });
 
-  //   let url = adminToken.epSubnets() + '/v2.0/subnets?network_id=' + networkId;
-  //   return await this.networkService
-  //     .v2GetSubnets(url, userToken)
-  //     .then(response => {
-  //       this.logger.debug(
-  //         'access ' + url + ' response: ' + JSON.stringify(response),
-  //       );
-  //       let resp = JSON.parse(JSON.stringify(response))['subnets'];
-  //       return resp.map((v: {[key: string]: string}) => {
-  //         return v.id;
-  //       });
-  //     });
-  // }
+    let url = adminToken.epSubnets() + '?network_id=' + networkId;
+    return await this.networkService
+      .v2GetSubnets(url, userToken)
+      .then(response => {
+        this.logger.debug(
+          'access ' + url + ' response: ' + JSON.stringify(response),
+        );
+        let resp = JSON.parse(JSON.stringify(response))['body'][0]['subnets'];
+        let rlt: SubnetInfo[] = [];
+        for (let n of resp) {
+          let s: SubnetInfo = {
+            gatewayIp: n.gateway_ip,
+            subnetId: n.id,
+            networkId: n.network_id,
+            cidr: n.cidr,
+            ipVersion: n.ip_version,
+          };
+          rlt.push(s);
+        }
+        return rlt;
+      });
+  }
 
   //async createFloatingIp() { }
 }
@@ -142,4 +155,13 @@ export class PortCreationParams {
 export type PortResponse = {
   id: string;
   fixedIp: string;
+  macAddr: string;
+};
+
+export type SubnetInfo = {
+  gatewayIp: string;
+  subnetId: string;
+  networkId: string;
+  ipVersion: number;
+  cidr: string;
 };

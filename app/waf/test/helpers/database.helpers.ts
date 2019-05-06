@@ -38,6 +38,8 @@ import {
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {isNullOrUndefined} from 'util';
+import {RestApplicationPort} from './test-helper';
+import {ExpectedData} from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
@@ -212,20 +214,27 @@ export function createAdcObject(data?: Partial<Adc>) {
       networks: {
         mgmt1: {
           type: 'mgmt',
-          networkId: 'e51c1d5f-7f30-490a-8eab-efb02155096f',
-          fixedIp: '10.250.40.109',
+          networkId: ExpectedData.bigipMgmt.networkId,
+          fixedIp: ExpectedData.bigipMgmt.ipAddr,
+          macAddr: ExpectedData.bigipMgmt.macAddr,
         },
         failover1: {
           type: 'ha',
           networkId: 'd7e8635f-2d3a-42aa-a40e-8fbb177464bf',
+          macAddr: 'fa:16:3e:35:da:15',
+          fixedIp: '192.168.3.3',
         },
         internal1: {
           type: 'int',
           networkId: '6acb25ec-dc68-4e07-ba45-e1a11567f9ca',
+          macAddr: 'fa:16:3e:f3:1a:b2',
+          fixedIp: '192.168.4.3',
         },
         external2: {
           type: 'ext',
           networkId: '1c19251d-7e97-411a-8816-6f7a72403707',
+          macAddr: 'fa:16:3e:fd:0f:ce',
+          fixedIp: '192.168.5.3',
         },
       },
       compute: {
@@ -233,8 +242,10 @@ export function createAdcObject(data?: Partial<Adc>) {
         flavorRef: 'fde45211da0a44ecbf38cb0b644ab30d',
       },
       management: {
-        ipAddress: '10.250.40.109',
-        tcpPort: 443,
+        ipAddress: 'localhost',
+        tcpPort: RestApplicationPort.SSLDefault,
+        username: 'admin',
+        password: 'admin',
       },
     },
     data,

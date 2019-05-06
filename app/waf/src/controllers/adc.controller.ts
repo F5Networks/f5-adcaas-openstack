@@ -35,8 +35,11 @@ import {
   TrustedDeviceRequest,
   TrustedDevice,
   TrustedDeviceService,
+  PortCreationParams,
+  ServersParams,
+  BigIpManager,
+  OnboardingManager,
 } from '../services';
-import {PortCreationParams, ServersParams, BigIpManager} from '../services';
 
 const prefix = '/adcaas/v1';
 
@@ -375,9 +378,8 @@ export class AdcController {
             );
 
           // TODO: Create VM in async way.
-          return await this.createOn(adc).then(async () => {
-            return {id: adc.id};
-          });
+          await this.createOn(adc);
+          return {id: adc.id};
         } catch (error) {
           throw new HttpErrors.BadRequest(error.message);
         }
@@ -386,22 +388,12 @@ export class AdcController {
         break;
 
       case 'setup':
-        let mgr = await BigIpManager.instanlize({
-          username: 'admin',
-          password: 'admin',
-          ipAddr: 'localhost', //adc.management.ipAddress,
-          port: 8443, //adc.management.tcpPort,
-        });
-        let ready = await mgr.checkAndWaitBigipReady(5 * 1000);
-        if (ready) {
-          this.logger.debug('start to do onbarding here.');
-          // DO here.
+        try {
+          // TODO: setup VE in async way.
+          await this.setupOn(adc);
           return {id: adc.id};
-        } else {
-          let errmsg =
-            'bigip is not ready after waiting timeout. Cannot go forwards';
-          this.logger.error(errmsg);
-          throw new HttpErrors.RequestTimeout(errmsg);
+        } catch (error) {
+          throw new HttpErrors.BadRequest(error.message);
         }
 
       default:
@@ -411,7 +403,39 @@ export class AdcController {
     }
   }
 
+  private async setupOn(adc: Adc): Promise<void> {
+    let bigipMgr = await BigIpManager.instanlize({
+      username: adc.management.username,
+      password: adc.management.password,
+      ipAddr: adc.management.ipAddress,
+      port: adc.management.tcpPort,
+    });
+    let ready = await bigipMgr.checkAndWaitBigipReady(240 * 1000);
+    if (ready) {
+      await this.serialize(adc, {status: 'ONBOARDING'});
+      this.logger.debug('start to do onbarding');
+      let doMgr = await OnboardingManager.instanlize(this.wafapp);
+
+      // TODO do it async in the future(maybe.).
+      let doBody = await doMgr.assembleDo(adc);
+      this.logger.debug('Json used for onboarding: ' + JSON.stringify(doBody));
+      await doMgr.onboarding(doBody);
+      let over = await bigipMgr.checkAndWaitBigipOnboarded(
+        240 * 1000,
+        doBody.declaration.Common!.hostname!,
+      );
+      if (over) await this.serialize(adc, {status: 'ONBOARDED'});
+      else await this.serialize(adc, {status: 'ONBOARDERROR'});
+    } else {
+      let errmsg =
+        'bigip is not ready after waiting timeout. Cannot go forwards';
+      this.logger.error(errmsg);
+      throw new Error(errmsg);
+    }
+  }
+
   private async serialize(adc: Adc, data?: object) {
+    // TODO: implement complete object merging.
     if (data) Object.assign(adc, data);
     await this.adcRepository.update(adc);
   }
@@ -434,7 +458,13 @@ export class AdcController {
       this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     ]).then(async ([computeHelper, userToken, tenantId]) => {
-      let userdata: string = await this.cUserdata();
+      let rootPass = Math.random()
+        .toString(36)
+        .slice(-8);
+      let adminPass = Math.random()
+        .toString(36)
+        .slice(-8);
+      let userdata: string = await this.cUserdata(rootPass, adminPass);
 
       let serverParams: ServersParams = {
         userTenantId: tenantId,
@@ -457,14 +487,16 @@ export class AdcController {
         .then(response => {
           adc.compute.vmId = response;
           adc.management = {
+            username: 'admin',
+            password: adminPass,
+            rootPass: rootPass,
             tcpPort: 443, // TODO: remove the hard-code.
             ipAddress: <string>(() => {
-              let ip: string | undefined;
-              Object.keys(adc.networks).forEach(v => {
-                if (adc.networks[v].type === 'mgmt')
-                  return adc.networks[v].fixedIp;
-              });
-              return ip;
+              for (let net in adc.networks) {
+                if (adc.networks[net].type === 'mgmt') {
+                  return adc.networks[net].fixedIp;
+                }
+              }
             })(),
           };
         });
@@ -492,6 +524,7 @@ export class AdcController {
           .createPort(userToken, portParams)
           .then(async port => {
             net.fixedIp = port.fixedIp;
+            net.macAddr = port.macAddr;
             net.portId = port.id;
             net.ready = true;
 
@@ -501,14 +534,10 @@ export class AdcController {
     });
   }
 
-  private async cUserdata(): Promise<string> {
-    let rootPassword: string = Math.random()
-      .toString(36)
-      .slice(-8);
-    let adminPassword: string = Math.random()
-      .toString(36)
-      .slice(-8);
-
+  private async cUserdata(
+    rootPassword: string,
+    adminPassword: string,
+  ): Promise<string> {
     const userData: string = `#cloud-config
     runcmd:
      - "echo \\"root:${rootPassword}\\" | chpasswd"
