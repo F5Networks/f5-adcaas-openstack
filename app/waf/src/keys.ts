@@ -18,8 +18,12 @@ export namespace WafBindingKeys {
     'services.openstack.AuthWithOSIdentity',
   );
 
-  export const KeyAdminAuthedToken = BindingKey.create<AuthedToken>(
-    'services.openstack.AdminAuthedToken',
+  export const KeyInternalAdminTokenSingleton = BindingKey.create<AuthedToken>(
+    'services.openstack.InternalAdminTokenSingleton',
+  );
+
+  export const KeySolvedAdminToken = BindingKey.create<AuthedToken>(
+    'services.openstack.SolvedAdminToken',
   );
 
   export const KeyComputeManager = BindingKey.create<ComputeManager>(

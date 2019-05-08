@@ -11,7 +11,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
-import {AuthWithOSIdentity} from './services';
+import {AuthWithOSIdentity, AuthedToken} from './services';
 import {CoreBindings} from '@loopback/core';
 import {WafApplication} from '.';
 import {WafBindingKeys} from './keys';
@@ -96,14 +96,18 @@ export class MySequence implements SequenceHandler {
       );
     }
 
-    const adminToken = await this.authWithOSIdentity.solveAdminToken();
-    let userToken = await this.authWithOSIdentity
-      .validateUserToken(adminToken.token, <string>hdrToken)
-      .then(authedObj => {
-        this.logger.debug('Authenticated OK');
-        this.logger.debug(JSON.stringify(authedObj));
-        return authedObj;
-      });
+    let userToken: AuthedToken;
+    try {
+      userToken = await this.authWithOSIdentity
+        .validateUserToken(<string>hdrToken)
+        .then(authedObj => {
+          this.logger.debug(`Authenticated OK: Request ID(${context.name})`);
+          this.logger.debug(JSON.stringify(authedObj));
+          return authedObj;
+        });
+    } catch (error) {
+      throw new HttpErrors.Unauthorized(error.message);
+    }
 
     if (request.headers['tenant-id']) {
       userToken.tenantId = <string>request.headers['tenant-id'];

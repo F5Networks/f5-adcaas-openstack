@@ -20,7 +20,17 @@ export class OpenStackComponent implements Component {
   //   'services.IdentityService': IdentityServiceProvider
   // };
 
-  bindingAuth = Binding.bind(
+  bindingSolveAdminToken = Binding.bind(
+    WafBindingKeys.KeySolvedAdminToken,
+  ).toDynamicValue(async () => {
+    return await this.application
+      .get(WafBindingKeys.KeyAuthWithOSIdentity)
+      .then(authHelper => {
+        return authHelper.solveAdminToken();
+      });
+  });
+
+  bindingAuthMgr = Binding.bind(
     WafBindingKeys.KeyAuthWithOSIdentity,
   ).toDynamicValue(async () => {
     try {
@@ -32,7 +42,10 @@ export class OpenStackComponent implements Component {
     } catch (error) {
       return <AuthWithOSIdentity>{};
     }
-  });
+  }); //.inScope(BindingScope.SINGLETON);
+  // Note: Make it a singleton may be not a good way.
+  // The singleton instance stay constant even when some condition happens.
+  // i.e. from the above '<AuthWithOSIdentity>{}' exception case back to normal.
 
   bindingNetwork = Binding.bind(WafBindingKeys.KeyNetworkDriver).toDynamicValue(
     async () => {
@@ -47,5 +60,10 @@ export class OpenStackComponent implements Component {
     return await new ComputeManagerV2(this.application).bindComputeService();
   });
 
-  bindings = [this.bindingAuth, this.bindingNetwork, this.bindingCompute];
+  bindings = [
+    this.bindingSolveAdminToken,
+    this.bindingAuthMgr,
+    this.bindingNetwork,
+    this.bindingCompute,
+  ];
 }
