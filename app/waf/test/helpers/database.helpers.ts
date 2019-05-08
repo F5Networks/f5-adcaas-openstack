@@ -356,6 +356,7 @@ export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
@@ -374,6 +375,7 @@ export function createMemberObject(data?: Partial<Member>) {
     {
       address: '192.0.1.23',
       port: 80,
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );

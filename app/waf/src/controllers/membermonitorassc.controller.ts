@@ -1,5 +1,13 @@
 import {repository} from '@loopback/repository';
-import {post, param, get, del, HttpErrors} from '@loopback/rest';
+import {
+  post,
+  param,
+  get,
+  del,
+  HttpErrors,
+  RequestContext,
+  RestBindings,
+} from '@loopback/rest';
 import {Monitor, Member} from '../models';
 import {
   MemberMonitorAssociationRepository,
@@ -7,10 +15,12 @@ import {
   MonitorRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
+import {inject} from '@loopback/core';
 
 const prefix = '/adcaas/v1';
 
-export class MemberMonitorAssociationController {
+export class MemberMonitorAssociationController extends BaseController {
   constructor(
     @repository(MemberMonitorAssociationRepository)
     public memberMonitorAssociationRepository: MemberMonitorAssociationRepository,
@@ -18,7 +28,11 @@ export class MemberMonitorAssociationController {
     public monitorRepository: MonitorRepository,
     @repository(MemberRepository)
     public memberRepository: MemberRepository,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/members/{memberId}/monitors/{monitorId}', {
     responses: {
@@ -32,8 +46,12 @@ export class MemberMonitorAssociationController {
     @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
     monitorId: string,
   ): Promise<void> {
-    await this.memberRepository.findById(memberId);
-    await this.monitorRepository.findById(monitorId);
+    await this.memberRepository.findById(memberId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.monitorRepository.findById(monitorId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.memberMonitorAssociationRepository.create({
       memberId: memberId,
       monitorId: monitorId,
@@ -57,17 +75,19 @@ export class MemberMonitorAssociationController {
         memberId: id,
       },
     });
-
     let monitorIds = assocs.map(({monitorId}) => monitorId);
     return new CollectionResponse(
       Monitor,
-      await this.monitorRepository.find({
-        where: {
-          id: {
-            inq: monitorIds,
+      await this.monitorRepository.find(
+        {
+          where: {
+            id: {
+              inq: monitorIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -98,7 +118,9 @@ export class MemberMonitorAssociationController {
     } else {
       return new Response(
         Monitor,
-        await this.monitorRepository.findById(assocs[0].monitorId),
+        await this.monitorRepository.findById(assocs[0].monitorId, undefined, {
+          tenantId: await this.tenantId,
+        }),
       );
     }
   }
@@ -124,13 +146,16 @@ export class MemberMonitorAssociationController {
     let memberIds = assocs.map(({memberId}) => memberId);
     return new CollectionResponse(
       Member,
-      await this.memberRepository.find({
-        where: {
-          id: {
-            inq: memberIds,
+      await this.memberRepository.find(
+        {
+          where: {
+            id: {
+              inq: memberIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -161,7 +186,9 @@ export class MemberMonitorAssociationController {
     } else {
       return new Response(
         Member,
-        await this.memberRepository.findById(assocs[0].memberId),
+        await this.memberRepository.findById(assocs[0].memberId, undefined, {
+          tenantId: await this.tenantId,
+        }),
       );
     }
   }
@@ -179,6 +206,12 @@ export class MemberMonitorAssociationController {
     @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
     monitorId: string,
   ): Promise<void> {
+    await this.memberRepository.findById(memberId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.monitorRepository.findById(monitorId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.memberMonitorAssociationRepository.deleteAll({
       memberId: memberId,
       monitorId: monitorId,
