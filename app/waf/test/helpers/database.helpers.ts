@@ -98,6 +98,7 @@ export function createEndpointpolicyObject(data?: Partial<Endpointpolicy>) {
   return Object.assign(
     {
       name: 'E1',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
@@ -317,6 +318,7 @@ export function createServiceObject(data?: Partial<Service>) {
       id: uuid(),
       type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
