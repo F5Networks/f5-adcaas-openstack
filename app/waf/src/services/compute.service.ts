@@ -76,11 +76,9 @@ export class ComputeManagerV2 extends ComputeManager {
     serversParams: ServersParams,
   ): Promise<string> {
     try {
-      let adminToken = await this.application
-        .get(WafBindingKeys.KeyAuthWithOSIdentity)
-        .then(authHelper => {
-          return authHelper.solveAdminToken();
-        });
+      let adminToken = await this.application.get(
+        WafBindingKeys.KeySolvedAdminToken,
+      );
 
       return await Promise.all([
         adminToken.epServers(serversParams.userTenantId),
@@ -109,11 +107,9 @@ export class ComputeManagerV2 extends ComputeManager {
   ): Promise<ServerDetail> {
     if (!tenantId) throw new Error('tenantId is required for compute v2.');
 
-    let adminToken = await this.application
-      .get(WafBindingKeys.KeyAuthWithOSIdentity)
-      .then(authHelper => {
-        return authHelper.solveAdminToken();
-      });
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
 
     let url = adminToken.epServers(tenantId) + '/' + serverId;
 

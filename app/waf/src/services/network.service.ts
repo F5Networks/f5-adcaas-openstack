@@ -55,11 +55,9 @@ export class NetworkDriver {
     userToken: string,
     portParams: PortCreationParams,
   ): Promise<PortResponse> {
-    let adminToken = await this.application
-      .get(WafBindingKeys.KeyAuthWithOSIdentity)
-      .then(authHelper => {
-        return authHelper.solveAdminToken();
-      });
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
 
     let url = adminToken.epPorts();
 
@@ -91,11 +89,9 @@ export class NetworkDriver {
     userToken: string,
     networkId: string,
   ): Promise<SubnetInfo[]> {
-    let adminToken = await this.application
-      .get(WafBindingKeys.KeyAuthWithOSIdentity)
-      .then(authHelper => {
-        return authHelper.solveAdminToken();
-      });
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
 
     let url = adminToken.epSubnets() + '?network_id=' + networkId;
     return await this.networkService

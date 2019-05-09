@@ -56,17 +56,14 @@ export class OpenstackController extends MockBaseController {
     private application: RestApplication,
   ) {
     super();
-    // need to unbind it for re-auth admin token from start.
-    this.application.unbind(WafBindingKeys.KeyAdminAuthedToken);
+    // Need to unbind it for re-auth admin token from start.
+    this.application.unbind(WafBindingKeys.KeyInternalAdminTokenSingleton);
   }
 
   @get('/openstack/adminAuthToken')
   async adminAuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-      return authWithOSIdentity.solveAdminToken();
+      return await this.application.get(WafBindingKeys.KeySolvedAdminToken);
     });
   }
 
@@ -79,13 +76,10 @@ export class OpenstackController extends MockBaseController {
         WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      return await authWithOSIdentity.solveAdminToken().then(async () => {
-        return await authWithOSIdentity.validateUserToken(
-          reqBody.param.adminToken,
-          reqBody.param.userToken,
-          reqBody.param.tenantId,
-        );
-      });
+      return await authWithOSIdentity.validateUserToken(
+        reqBody.param.userToken,
+        reqBody.param.tenantId,
+      );
     });
   }
 
@@ -94,10 +88,6 @@ export class OpenstackController extends MockBaseController {
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-
       const computeMgr = await this.application.get(
         WafBindingKeys.KeyComputeManager,
       );
@@ -113,14 +103,12 @@ export class OpenstackController extends MockBaseController {
       };
 
       // Need to generate admin token to retrieve catalog.
-      return authWithOSIdentity.solveAdminToken().then(async () => {
-        return {
-          id: await computeMgr.createServer(
-            reqBody.param.userToken,
-            serversParams,
-          ),
-        };
-      });
+      return {
+        id: await computeMgr.createServer(
+          reqBody.param.userToken,
+          serversParams,
+        ),
+      };
     });
   }
 
@@ -129,21 +117,15 @@ export class OpenstackController extends MockBaseController {
     @requestBody() reqBody: RequestBody,
   ): Promise<object> {
     return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-
       const computeMgr = await this.application.get(
         WafBindingKeys.KeyComputeManager,
       );
 
-      return authWithOSIdentity.solveAdminToken().then(() => {
-        return computeMgr.getServerDetail(
-          reqBody.param.userToken,
-          reqBody.param.serverId,
-          reqBody.param.tenantId,
-        );
-      });
+      return computeMgr.getServerDetail(
+        reqBody.param.userToken,
+        reqBody.param.serverId,
+        reqBody.param.tenantId,
+      );
     });
   }
 
@@ -153,11 +135,6 @@ export class OpenstackController extends MockBaseController {
       const networkDriver = await this.application.get(
         WafBindingKeys.KeyNetworkDriver,
       );
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-
-      await authWithOSIdentity.solveAdminToken();
 
       let portsParams: PortCreationParams = {
         networkId: reqBody.param.networkId,
@@ -171,7 +148,7 @@ export class OpenstackController extends MockBaseController {
     });
   }
 
-  // TODO: implement it.
+  // TODO: implement it when necessary.
   // @get('/openstack/portDetail')
   // async getPortDetail(
   //   @requestBody() reqBody: RequestBody): Promise<object> {
