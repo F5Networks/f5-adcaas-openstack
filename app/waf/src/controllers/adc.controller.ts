@@ -40,6 +40,7 @@ import {
   BigIpManager,
   OnboardingManager,
 } from '../services';
+import {checkAndWait} from '../utils';
 
 const prefix = '/adcaas/v1';
 
@@ -389,7 +390,6 @@ export class AdcController {
 
       case 'setup':
         try {
-          // TODO: setup VE in async way.
           await this.setupOn(adc);
           return {id: adc.id};
         } catch (error) {
@@ -410,28 +410,46 @@ export class AdcController {
       ipAddr: adc.management.ipAddress,
       port: adc.management.tcpPort,
     });
-    let ready = await bigipMgr.checkAndWaitBigipReady(240 * 1000);
-    if (ready) {
-      await this.serialize(adc, {status: 'ONBOARDING'});
-      this.logger.debug('start to do onbarding');
-      let doMgr = await OnboardingManager.instanlize(this.wafapp);
+    let bigipReady = async (): Promise<boolean> => {
+      return await bigipMgr.getSys().then(() => {
+        return true;
+      });
+    };
+    await checkAndWait(bigipReady, 240).then(
+      async () => {
+        await this.serialize(adc, {status: 'ONBOARDING'});
+        this.logger.debug('start to do onbarding');
+        let doMgr = await OnboardingManager.instanlize(this.wafapp);
 
-      // TODO do it async in the future(maybe.).
-      let doBody = await doMgr.assembleDo(adc);
-      this.logger.debug('Json used for onboarding: ' + JSON.stringify(doBody));
-      await doMgr.onboarding(doBody);
-      let over = await bigipMgr.checkAndWaitBigipOnboarded(
-        240 * 1000,
-        doBody.declaration.Common!.hostname!,
-      );
-      if (over) await this.serialize(adc, {status: 'ONBOARDED'});
-      else await this.serialize(adc, {status: 'ONBOARDERROR'});
-    } else {
-      let errmsg =
-        'bigip is not ready after waiting timeout. Cannot go forwards';
-      this.logger.error(errmsg);
-      throw new Error(errmsg);
-    }
+        // TODO do it async in the future(maybe.).
+        let doBody = await doMgr.assembleDo(adc);
+        this.logger.debug(
+          'Json used for onboarding: ' + JSON.stringify(doBody),
+        );
+        await doMgr.onboarding(doBody);
+
+        let bigipOboarded = async (): Promise<boolean> => {
+          let hostname = await bigipMgr.getHostname();
+          this.logger.debug(`bigip hostname: ${hostname}`);
+
+          return hostname === doBody.declaration.Common!.hostname!;
+        };
+        await checkAndWait(bigipOboarded, 240).then(
+          async () => {
+            await this.serialize(adc, {status: 'ONBOARDED'});
+          },
+          async () => {
+            await this.serialize(adc, {status: 'ONBOARDERROR'});
+          },
+        );
+      },
+      async () => {
+        let errmsg =
+          'bigip is not ready after waiting timeout. Cannot go forwards';
+        this.logger.error(errmsg);
+        throw new Error(errmsg);
+      },
+    );
   }
 
   private async serialize(adc: Adc, data?: object) {
@@ -458,12 +476,15 @@ export class AdcController {
       this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     ]).then(async ([computeHelper, userToken, tenantId]) => {
-      let rootPass = Math.random()
-        .toString(36)
-        .slice(-8);
-      let adminPass = Math.random()
-        .toString(36)
-        .slice(-8);
+      // TODO: uncomment me.
+      // let rootPass = Math.random()
+      //   .toString(36)
+      //   .slice(-8);
+      // let adminPass = Math.random()
+      //   .toString(36)
+      //   .slice(-8);
+      let rootPass = 'default';
+      let adminPass = 'admin';
       let userdata: string = await this.cUserdata(rootPass, adminPass);
 
       let serverParams: ServersParams = {
