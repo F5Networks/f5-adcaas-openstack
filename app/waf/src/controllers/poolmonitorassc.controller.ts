@@ -1,5 +1,13 @@
 import {repository} from '@loopback/repository';
-import {post, param, get, del, HttpErrors} from '@loopback/rest';
+import {
+  post,
+  param,
+  get,
+  del,
+  HttpErrors,
+  RequestContext,
+  RestBindings,
+} from '@loopback/rest';
 import {Monitor, Pool} from '../models';
 import {
   PoolMonitorAssocRepository,
@@ -7,9 +15,11 @@ import {
   MonitorRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
 const prefix = '/adcaas/v1';
+import {inject} from '@loopback/core';
 
-export class PoolMonitorAssocationController {
+export class PoolMonitorAssocationController extends BaseController {
   constructor(
     @repository(PoolMonitorAssocRepository)
     public poolmonitorassocRepository: PoolMonitorAssocRepository,
@@ -17,7 +27,11 @@ export class PoolMonitorAssocationController {
     public poolRepository: PoolRepository,
     @repository(MonitorRepository)
     public mointorRepository: MonitorRepository,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/pools/{poolId}/monitors/{monitorId}', {
     responses: {
@@ -31,8 +45,12 @@ export class PoolMonitorAssocationController {
     @param(Schema.pathParameter('monitorId', 'Pool resource ID'))
     monitorId: string,
   ): Promise<void> {
-    await this.poolRepository.findById(poolId);
-    await this.mointorRepository.findById(monitorId);
+    await this.poolRepository.findById(poolId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.mointorRepository.findById(monitorId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.poolmonitorassocRepository.create({
       poolId: poolId,
       monitorId: monitorId,
@@ -59,13 +77,16 @@ export class PoolMonitorAssocationController {
     let monitorIds = assocs.map(({monitorId}) => monitorId);
     return new CollectionResponse(
       Monitor,
-      await this.mointorRepository.find({
-        where: {
-          id: {
-            inq: monitorIds,
+      await this.mointorRepository.find(
+        {
+          where: {
+            id: {
+              inq: monitorIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -92,7 +113,9 @@ export class PoolMonitorAssocationController {
     } else {
       return new Response(
         Monitor,
-        await this.mointorRepository.findById(assocs[0].monitorId),
+        await this.mointorRepository.findById(assocs[0].monitorId, undefined, {
+          tenantId: await this.tenantId,
+        }),
       );
     }
   }
@@ -118,13 +141,16 @@ export class PoolMonitorAssocationController {
     let poolIds = assocs.map(({poolId}) => poolId);
     return new CollectionResponse(
       Pool,
-      await this.poolRepository.find({
-        where: {
-          id: {
-            inq: poolIds,
+      await this.poolRepository.find(
+        {
+          where: {
+            id: {
+              inq: poolIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -151,7 +177,9 @@ export class PoolMonitorAssocationController {
     } else {
       return new Response(
         Pool,
-        await this.poolRepository.findById(assocs[0].poolId),
+        await this.poolRepository.findById(assocs[0].poolId, undefined, {
+          tenantId: await this.tenantId,
+        }),
       );
     }
   }
@@ -167,6 +195,12 @@ export class PoolMonitorAssocationController {
     @param(Schema.pathParameter('monitorId', 'Pool resource ID'))
     monitorId: string,
   ): Promise<void> {
+    await this.poolRepository.findById(poolId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.mointorRepository.findById(monitorId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.poolmonitorassocRepository.deleteAll({
       poolId: poolId,
       monitorId: monitorId,

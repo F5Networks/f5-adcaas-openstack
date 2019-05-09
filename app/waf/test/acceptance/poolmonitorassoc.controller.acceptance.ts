@@ -1,30 +1,79 @@
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  teardownRestAppAndClient,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenPoolData,
   givenMonitorData,
   givePoolMonitorAssociationData,
 } from '../helpers/database.helpers';
+import {
+  ShouldResponseWith,
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 
 describe('PoolMonitorAssociationController', () => {
   let wafapp: WafApplication;
   let client: Client;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
+  let envs: {[key: string]: string} = {
+    OS_AUTH_URL: 'http://localhost:35357/v2.0',
+    OS_USERNAME: 'wafaas',
+    OS_PASSWORD: '91153c85b8dd4147',
+    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+    OS_DOMAIN_NAME: 'Default',
+    OS_REGION_NAME: 'RegionOne',
+    OS_AVAILABLE_ZONE: 'nova',
+  };
+
   before('setupApplication', async () => {
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
+    ShouldResponseWith({});
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
   });
 
+  let setupEnvs = async () => {
+    process.env.PRODUCT_RELEASE = '1';
+    for (let env of Object.keys(envs)) {
+      process.env[env] = envs[env];
+    }
+  };
+
+  let teardownEnvs = async () => {
+    delete process.env['PRODUCT_RELEASE'];
+    for (let env of Object.keys(envs)) {
+      delete process.env[env];
+    }
+  };
+
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   it('post ' + prefix + '/pools/{poolId}/monitors/{monitorId}', async () => {
@@ -32,6 +81,8 @@ describe('PoolMonitorAssociationController', () => {
     let monitor = await givenMonitorData(wafapp);
     await client
       .post(prefix + '/pools/' + pool.id + '/monitors/' + monitor.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send()
       .expect(204);
   });
@@ -43,6 +94,8 @@ describe('PoolMonitorAssociationController', () => {
     async () => {
       await client
         .post(prefix + '/pools/non-existing/monitors/any')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(404);
     },
@@ -56,6 +109,8 @@ describe('PoolMonitorAssociationController', () => {
       let pool = await givenPoolData(wafapp);
       await client
         .post(prefix + '/pools/' + pool.id + '/monitors/non-existing')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(404);
     },
@@ -75,6 +130,8 @@ describe('PoolMonitorAssociationController', () => {
 
       let response = await client
         .get(prefix + '/pools/' + pool.id + '/monitors')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
       expect(toJSON(monitor)).to.containDeep(response.body.monitors[0]);
     },
@@ -94,6 +151,8 @@ describe('PoolMonitorAssociationController', () => {
 
       let response = await client
         .get(prefix + '/pools/' + pool.id + '/monitors/' + monitor.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(toJSON(monitor)).to.containDeep(response.body.monitor);
@@ -104,7 +163,11 @@ describe('PoolMonitorAssociationController', () => {
     'get ' + prefix + '/pools/{id}/monitors: no Monitor associated with a Pool',
     async () => {
       let pool = await givenPoolData(wafapp);
-      await client.get(prefix + '/pools/' + pool.id + '/monitors').expect(200);
+      await client
+        .get(prefix + '/pools/' + pool.id + '/monitors')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
     },
   );
 
@@ -117,6 +180,8 @@ describe('PoolMonitorAssociationController', () => {
       let monitor = await givenMonitorData(wafapp);
       await client
         .get(prefix + '/pools/' + pool.id + '/monitors/' + monitor.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
@@ -135,6 +200,8 @@ describe('PoolMonitorAssociationController', () => {
 
       let response = await client
         .get(prefix + '/monitors/' + monitor.id + '/pools')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
       expect(toJSON(pool)).to.containDeep(response.body.pools[0]);
     },
@@ -154,6 +221,8 @@ describe('PoolMonitorAssociationController', () => {
 
       let response = await client
         .get(prefix + '/monitors/' + monitor.id + '/pools/' + pool.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(toJSON(pool)).to.containDeep(response.body.pool);
@@ -168,6 +237,8 @@ describe('PoolMonitorAssociationController', () => {
       let monitor = await givenMonitorData(wafapp);
       await client
         .get(prefix + '/monitors/' + monitor.id + '/pools')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
     },
   );
@@ -181,6 +252,8 @@ describe('PoolMonitorAssociationController', () => {
       let monitor = await givenMonitorData(wafapp);
       await client
         .get(prefix + '/monitors/' + monitor.id + '/pools/' + pool.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
@@ -192,7 +265,9 @@ describe('PoolMonitorAssociationController', () => {
     async () => {
       await client
         .del(prefix + '/pools/' + uuid() + '/monitors/' + uuid())
-        .expect(204);
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
     },
   );
 
@@ -210,14 +285,20 @@ describe('PoolMonitorAssociationController', () => {
 
       await client
         .get(prefix + '/pools/' + assoc.poolId + '/monitors/' + assoc.monitorId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       await client
         .del(prefix + '/pools/' + assoc.poolId + '/monitors/' + assoc.monitorId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
 
       await client
         .get(prefix + '/pools/' + assoc.poolId + '/monitors/' + assoc.monitorId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
