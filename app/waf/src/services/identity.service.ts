@@ -41,7 +41,6 @@ export abstract class AuthWithOSIdentity {
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
-    adminToken: string,
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken>;
@@ -59,7 +58,7 @@ export abstract class AuthWithOSIdentity {
   async solveAdminToken(): Promise<AuthedToken> {
     try {
       let authedToken = await this.application.get(
-        WafBindingKeys.KeyAdminAuthedToken,
+        WafBindingKeys.KeyInternalAdminTokenSingleton,
       );
       if (!authedToken.expired()) return authedToken;
       else throw new Error('admin token expires, re-authorizing.');
@@ -67,7 +66,7 @@ export abstract class AuthWithOSIdentity {
       try {
         let authedToken = await this.adminAuthToken();
         this.application
-          .bind(WafBindingKeys.KeyAdminAuthedToken)
+          .bind(WafBindingKeys.KeyInternalAdminTokenSingleton)
           .to(authedToken);
         return authedToken;
       } catch (error) {
@@ -98,26 +97,29 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
         return AuthedToken.buildWith(response);
       });
     } catch (error) {
-      throw new Error('Failed to request /v2.0/tokens: ' + error.message);
+      throw new Error('Failed to authorize admin token: ' + error.message);
     }
   }
 
   async validateUserToken(
-    adminToken: string,
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+
     let url = this.authConfig.osAuthUrl + '/tokens/' + userToken;
     if (tenantId) url = url + '?belongsTo=' + tenantId;
 
     try {
       return await this.identityService
-        .v2ValidateToken(url, adminToken)
+        .v2ValidateToken(url, adminToken.token)
         .then(response => {
           return AuthedToken.buildWith(response);
         });
     } catch (error) {
-      throw new Error('Failed to request identity service: ' + error);
+      throw new Error('Failed to validate user token: ' + error.message);
     }
   }
 }
@@ -153,26 +155,29 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
           return AuthedToken.buildWith(response);
         });
     } catch (e) {
-      throw new Error('Failed to request from identity service: ' + e);
+      throw new Error('Failed to authorize admin token: ' + e.message);
     }
   }
 
   async validateUserToken(
-    adminToken: string,
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+
     // tenantId is useless in v3/auth/tokens
     // since tenant info can be retrieved from token validation.
     let url = this.authConfig.osAuthUrl + '/auth/tokens';
     try {
       return await this.identityService
-        .v3ValidateToken(url, adminToken, userToken)
+        .v3ValidateToken(url, adminToken.token, userToken)
         .then(response => {
           return AuthedToken.buildWith(response);
         });
     } catch (error) {
-      throw new Error('Failed to request from identity service: ' + error);
+      throw new Error('Failed to validate user token: ' + error.message);
     }
   }
 }
@@ -181,11 +186,7 @@ export class AuthWithIdentityUnknown extends AuthWithOSIdentity {
   adminAuthToken(): Promise<AuthedToken> {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
-  validateUserToken(
-    adminToken: string,
-    userToken: string,
-    tenantId: string,
-  ): Promise<AuthedToken> {
+  validateUserToken(userToken: string, tenantId: string): Promise<AuthedToken> {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
 }
@@ -306,10 +307,10 @@ export class AuthedToken {
     let authedToken = new AuthedToken();
     switch (v) {
       case 'v2.0':
-        return authedToken.buildV2_0(response);
+        return authedToken.buildV2_0(response).digExpired();
 
       case 'v3':
-        return authedToken.buildV3(response);
+        return authedToken.buildV3(response).digExpired();
 
       default:
         throw new Error('Not recognized version: ' + v);
@@ -365,6 +366,15 @@ export class AuthedToken {
 
   expired(): boolean {
     return this.expiredAt.getTime() - new Date().getTime() <= 0;
+  }
+
+  private digExpired() {
+    // Make the duration time a little shorter then that of actually
+    // to avoid token expiring error caused by time leak.
+    let duration =
+      ((this.expiredAt.getTime() - this.issuedAt.getTime()) * 4) / 5;
+    this.expiredAt.setTime(Date.now() + duration);
+    return this;
   }
 
   private endpointOf(inf: string, type: string): string {

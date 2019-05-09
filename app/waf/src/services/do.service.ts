@@ -286,19 +286,11 @@ export class OnboardingManager {
   }
 
   private async subnetInfo(adc: Adc): Promise<object> {
-    /**
-     return {
-       macAddr1: {
-         gateway: '192.168.0.1',
-         masknum: '24',
-       }
-     }
-     */
     let rltObj = {};
 
     let netDriver = await this.application.get(WafBindingKeys.KeyNetworkDriver);
     let adminToken = await this.application.get(
-      WafBindingKeys.KeyAdminAuthedToken,
+      WafBindingKeys.KeySolvedAdminToken,
     );
 
     for (let net of Object.keys(adc.networks)) {

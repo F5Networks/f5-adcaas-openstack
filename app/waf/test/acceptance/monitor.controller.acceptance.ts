@@ -92,7 +92,6 @@ describe('MointorController', () => {
 
   it('get ' + prefix + '/monitors', async () => {
     const monitor = await givenMonitorData(wafapp);
-
     const response = await client
       .get(prefix + '/monitors')
       .set('X-Auth-Token', ExpectedData.userToken)
