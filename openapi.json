@@ -7891,44 +7891,6 @@
         "operationId": "RuleController.find"
       }
     },
-    "/adcaas/v1/services/count": {
-      "get": {
-        "x-controller-name": "ServiceController",
-        "x-operation-name": "count",
-        "tags": [
-          "ServiceController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Service model count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "where",
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "operationId": "ServiceController.count"
-      }
-    },
     "/adcaas/v1/services/{serviceId}/endpointpolicies/{endpointpolicyId}": {
       "post": {
         "x-controller-name": "ServiceController",
