@@ -155,6 +155,25 @@ export class OnboardingManager {
       }
     },
 
+    ntp: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ) => {
+      try {
+        let ntpData = {
+          class: 'NTP',
+          servers: ['0.pool.ntp.org', '1.pool.ntp.org', '2.pool.ntp.org'],
+          timezone: 'UTC',
+        };
+        this.logger.debug('Add new ntp.');
+        return Object.assign(target, {myNtp: ntpData});
+      } catch (error) {
+        this.logger.debug('No ntp found.');
+        return target;
+      }
+    },
+
     vlans: (
       target: TypeDOClassDeclaration['Common'],
       obData: Adc,
