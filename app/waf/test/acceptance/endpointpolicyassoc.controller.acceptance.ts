@@ -1,30 +1,79 @@
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  teardownRestAppAndClient,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenServiceData,
   givenEndpointpolicyData,
   givenServiceEndpointpolicyAssociationData,
 } from '../helpers/database.helpers';
+import {
+  ShouldResponseWith,
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 
 describe('EndpointpolicyAssociationController', () => {
   let wafapp: WafApplication;
   let client: Client;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
+  let envs: {[key: string]: string} = {
+    OS_AUTH_URL: 'http://localhost:35357/v2.0',
+    OS_USERNAME: 'wafaas',
+    OS_PASSWORD: '91153c85b8dd4147',
+    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+    OS_DOMAIN_NAME: 'Default',
+    OS_REGION_NAME: 'RegionOne',
+    OS_AVAILABLE_ZONE: 'nova',
+  };
+
   before('setupApplication', async () => {
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
+    ShouldResponseWith({});
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
   });
 
+  let setupEnvs = async () => {
+    process.env.PRODUCT_RELEASE = '1';
+    for (let env of Object.keys(envs)) {
+      process.env[env] = envs[env];
+    }
+  };
+
+  let teardownEnvs = async () => {
+    delete process.env['PRODUCT_RELEASE'];
+    for (let env of Object.keys(envs)) {
+      delete process.env[env];
+    }
+  };
+
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   it(
@@ -38,6 +87,8 @@ describe('EndpointpolicyAssociationController', () => {
         .post(
           prefix + '/services/' + service.id + '/endpointpolicies/' + policy.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(204);
     },
@@ -50,6 +101,8 @@ describe('EndpointpolicyAssociationController', () => {
     async () => {
       await client
         .post(prefix + '/services/non-existing/endpointpolicies/any')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(404);
     },
@@ -65,6 +118,8 @@ describe('EndpointpolicyAssociationController', () => {
         .post(
           prefix + '/services/' + service.id + '/endpointpolicies/non-existing',
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(404);
     },
@@ -84,6 +139,8 @@ describe('EndpointpolicyAssociationController', () => {
 
       let response = await client
         .get(prefix + '/services/' + service.id + '/endpointpolicies')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.endpointpolicies[0]).to.containDeep(toJSON(policy));
@@ -106,6 +163,8 @@ describe('EndpointpolicyAssociationController', () => {
         .get(
           prefix + '/services/' + service.id + '/endpointpolicies/' + policy.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.endpointpolicy).to.containDeep(toJSON(policy));
@@ -120,6 +179,8 @@ describe('EndpointpolicyAssociationController', () => {
       let service = await givenServiceData(wafapp, uuid());
       await client
         .get(prefix + '/services/' + service.id + '/endpointpolicies')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
     },
   );
@@ -135,6 +196,8 @@ describe('EndpointpolicyAssociationController', () => {
         .get(
           prefix + '/services/' + service.id + '/endpointpolicies/' + policy.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
@@ -153,6 +216,8 @@ describe('EndpointpolicyAssociationController', () => {
 
       let response = await client
         .get(prefix + '/endpointpolicies/' + policy.id + '/services')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(toJSON(service)).to.containDeep(response.body.services[0]);
@@ -175,6 +240,8 @@ describe('EndpointpolicyAssociationController', () => {
         .get(
           prefix + '/endpointpolicies/' + policy.id + '/services/' + service.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(toJSON(service)).to.containDeep(response.body.service);
@@ -189,6 +256,8 @@ describe('EndpointpolicyAssociationController', () => {
       let policy = await givenEndpointpolicyData(wafapp);
       await client
         .get(prefix + '/endpointpolicies/' + policy.id + '/services')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
     },
   );
@@ -204,6 +273,8 @@ describe('EndpointpolicyAssociationController', () => {
         .get(
           prefix + '/endpointpolicies/' + policy.id + '/services/' + service.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
@@ -215,7 +286,9 @@ describe('EndpointpolicyAssociationController', () => {
     async () => {
       await client
         .del(prefix + '/services/' + uuid() + '/endpointpolicies/' + uuid())
-        .expect(204);
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
     },
   );
 
@@ -239,6 +312,8 @@ describe('EndpointpolicyAssociationController', () => {
             '/endpointpolicies/' +
             assoc.endpointpolicyId,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       await client
@@ -249,6 +324,8 @@ describe('EndpointpolicyAssociationController', () => {
             '/endpointpolicies/' +
             assoc.endpointpolicyId,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
 
       await client
@@ -259,6 +336,8 @@ describe('EndpointpolicyAssociationController', () => {
             '/endpointpolicies/' +
             assoc.endpointpolicyId,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );

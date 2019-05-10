@@ -1,20 +1,15 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Filter, repository} from '@loopback/repository';
 import {
   post,
   param,
   get,
   getFilterSchemaFor,
-  getWhereSchemaFor,
   patch,
   del,
   requestBody,
   HttpErrors,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {Service, Endpointpolicy} from '../models';
 import {
@@ -24,13 +19,15 @@ import {
   ServiceEndpointpolicyAssociationRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
+import {inject} from '@loopback/core';
 
 const prefix = '/adcaas/v1';
 
 const createDesc = 'Service resource that need to be created';
 const updateDesc = 'Service resource properties that need to be updated';
 
-export class ServiceController {
+export class ServiceController extends BaseController {
   constructor(
     @repository(ServiceRepository)
     public serviceRepository: ServiceRepository,
@@ -40,20 +37,10 @@ export class ServiceController {
     public endpointpolicyRepository: EndpointpolicyRepository,
     @repository(ServiceEndpointpolicyAssociationRepository)
     public serviceEndpointpolicyAssociationRepository: ServiceEndpointpolicyAssociationRepository,
-  ) {}
-
-  @get(prefix + '/services/count', {
-    responses: {
-      '200': {
-        description: 'Service model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(Service)) where?: Where,
-  ): Promise<Count> {
-    return await this.serviceRepository.count(where);
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
   }
 
   @get(prefix + '/services', {
@@ -64,7 +51,9 @@ export class ServiceController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Service)) filter?: Filter,
   ): Promise<CollectionResponse> {
-    let data = await this.serviceRepository.find(filter);
+    let data = await this.serviceRepository.find(filter, {
+      tenantId: await this.tenantId,
+    });
     return new CollectionResponse(Service, data);
   }
 
@@ -77,7 +66,9 @@ export class ServiceController {
   async findById(
     @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
   ): Promise<Response> {
-    let data = await this.serviceRepository.findById(id);
+    let data = await this.serviceRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
     return new Response(Service, data);
   }
 
@@ -111,7 +102,9 @@ export class ServiceController {
     @requestBody(Schema.updateRequest(Service, updateDesc))
     service: Partial<Service>,
   ): Promise<void> {
-    await this.serviceRepository.updateById(id, service);
+    await this.serviceRepository.updateById(id, service, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/services/{serviceId}', {
@@ -123,7 +116,9 @@ export class ServiceController {
   async deleteById(
     @param(Schema.pathParameter('serviceId', 'Service resource ID')) id: string,
   ): Promise<void> {
-    await this.serviceRepository.deleteById(id);
+    await this.serviceRepository.deleteById(id, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @post(prefix + '/services/{serviceId}/endpointpolicies/{endpointpolicyId}', {
@@ -145,8 +140,12 @@ export class ServiceController {
     endpointpolicyId: string,
   ): Promise<void> {
     // Throws HTTP 404, if Service or Endpoint Policy not found.
-    await this.serviceRepository.findById(serviceId);
-    await this.endpointpolicyRepository.findById(endpointpolicyId);
+    await this.serviceRepository.findById(serviceId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.endpointpolicyRepository.findById(endpointpolicyId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.serviceEndpointpolicyAssociationRepository.create({
       serviceId: serviceId,
       endpointpolicyId: endpointpolicyId,
@@ -173,13 +172,16 @@ export class ServiceController {
     let policyIds = assocs.map(({endpointpolicyId}) => endpointpolicyId);
     return new CollectionResponse(
       Endpointpolicy,
-      await this.endpointpolicyRepository.find({
-        where: {
-          id: {
-            inq: policyIds,
+      await this.endpointpolicyRepository.find(
+        {
+          where: {
+            id: {
+              inq: policyIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -213,6 +215,8 @@ export class ServiceController {
         Endpointpolicy,
         await this.endpointpolicyRepository.findById(
           assocs[0].endpointpolicyId,
+          undefined,
+          {tenantId: await this.tenantId},
         ),
       );
     }
@@ -233,6 +237,12 @@ export class ServiceController {
     )
     endpointpolicyId: string,
   ): Promise<void> {
+    await this.serviceRepository.findById(serviceId, undefined, {
+      tenantId: await this.tenantId,
+    });
+    await this.endpointpolicyRepository.findById(endpointpolicyId, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.serviceEndpointpolicyAssociationRepository.deleteAll({
       serviceId: serviceId,
       endpointpolicyId: endpointpolicyId,
