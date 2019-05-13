@@ -38,8 +38,8 @@ import {
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {isNullOrUndefined} from 'util';
-import {RestApplicationPort} from './test-helper';
 import {ExpectedData} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {BigipBuiltInProperties} from '../../src/services';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
@@ -222,6 +222,8 @@ export function createAdcObject(data?: Partial<Adc>) {
           networkId: ExpectedData.bigipMgmt.networkId,
           fixedIp: ExpectedData.bigipMgmt.ipAddr,
           macAddr: ExpectedData.bigipMgmt.macAddr,
+          portId: ExpectedData.portId,
+          ready: true,
         },
         failover1: {
           type: 'ha',
@@ -245,11 +247,12 @@ export function createAdcObject(data?: Partial<Adc>) {
       compute: {
         imageRef: '10b7f45b-2837-4f90-a8d8-eae33f48d1cd',
         flavorRef: 'fde45211da0a44ecbf38cb0b644ab30d',
+        vmId: ExpectedData.vmId,
       },
       management: {
-        ipAddress: 'localhost',
-        tcpPort: RestApplicationPort.SSLDefault,
-        username: 'admin',
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: BigipBuiltInProperties.port,
+        username: BigipBuiltInProperties.admin,
         password: 'admin',
       },
     },

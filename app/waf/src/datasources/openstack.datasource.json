@@ -97,6 +97,24 @@
       }
     },
     {
+      "description": "call compute to delete the virtual server.",
+      "template": {
+        "method": "DELETE",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2DeleteServer": [
+          "url",
+          "userToken"
+        ]
+      }
+    },
+    {
       "description": "get detail of a created virtual server.",
       "template": {
         "method": "GET",
@@ -131,6 +149,24 @@
           "url",
           "userToken",
           "body"
+        ]
+      }
+    },
+    {
+      "description": "delete the port.",
+      "template": {
+        "method": "DELETE",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2DeletePort": [
+          "url",
+          "userToken"
         ]
       }
     },

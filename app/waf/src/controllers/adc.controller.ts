@@ -39,6 +39,7 @@ import {
   ServersParams,
   BigIpManager,
   OnboardingManager,
+  BigipBuiltInProperties,
 } from '../services';
 import {checkAndWait, merge} from '../utils';
 
@@ -384,16 +385,17 @@ export class AdcController extends BaseController {
       case 'create':
         if (adc.status !== 'NONE' && adc.status !== 'POWERERR')
           throw new HttpErrors.BadRequest(
-            'Adc status is ' +
-              adc.status +
-              ". Cannot repeat 'create' on the same ADC.",
+            `Adc status is ' ${
+              adc.status
+            }. Cannot repeat 'create' on the same ADC.`,
           );
 
         this.createOn(adc, addonReq);
         return {id: adc.id};
 
       case 'delete':
-        break;
+        this.deleteOn(adc, addonReq);
+        return {id: adc.id};
 
       case 'setup':
         this.setupOn(adc, addonReq);
@@ -408,10 +410,10 @@ export class AdcController extends BaseController {
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     let bigipMgr = await BigIpManager.instanlize({
-      username: adc.management.username,
-      password: adc.management.password,
-      ipAddr: adc.management.ipAddress,
-      port: adc.management.tcpPort,
+      username: adc.management!.username,
+      password: adc.management!.password,
+      ipAddr: adc.management!.ipAddress,
+      port: adc.management!.tcpPort,
     });
     let bigipReady = async (): Promise<boolean> => {
       return await bigipMgr.getSys().then(() => {
@@ -423,9 +425,7 @@ export class AdcController extends BaseController {
         await this.serialize(adc, {status: 'ONBOARDING'});
         this.logger.debug('start to do onbarding');
         let doMgr = await OnboardingManager.instanlize(this.wafapp);
-
-        // TODO do it async in the future(maybe.).
-        let doBody = await doMgr.assembleDo(adc);
+        let doBody = await doMgr.assembleDo(adc, {onboarding: true});
         this.logger.debug(
           'Json used for onboarding: ' + JSON.stringify(doBody),
         );
@@ -442,6 +442,7 @@ export class AdcController extends BaseController {
 
               return hostname === doBody.declaration.Common!.hostname!;
             };
+
             await checkAndWait(bigipOboarded, 240).then(
               async () => {
                 await this.serialize(adc, {status: 'ONBOARDED'});
@@ -534,10 +535,10 @@ export class AdcController extends BaseController {
           .then(response => {
             adc.compute.vmId = response;
             adc.management = {
-              username: 'admin',
+              username: BigipBuiltInProperties.admin,
               password: adminPass,
               rootPass: rootPass,
-              tcpPort: 443, // TODO: remove the hard-code.
+              tcpPort: BigipBuiltInProperties.port,
               ipAddress: <string>(() => {
                 for (let net in adc.networks) {
                   if (adc.networks[net].type === 'mgmt') {
@@ -593,6 +594,88 @@ export class AdcController extends BaseController {
     const userDataB64Encoded = Buffer.from(userData).toString('base64');
 
     return userDataB64Encoded;
+  }
+
+  private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+    let reclaimFuncs: {[key: string]: Function} = {
+      license: async () => {
+        let doMgr = await OnboardingManager.instanlize(this.wafapp);
+        let doBody = await doMgr.assembleDo(adc, {onboarding: false});
+        this.logger.debug(
+          'Json used for revoke license: ' + JSON.stringify(doBody),
+        );
+        await doMgr.onboarding(doBody).then(async () => {
+          // TODO: create a unified bigipMgr
+          let mgmt = adc.management!;
+          let bigipMgr = await BigIpManager.instanlize({
+            username: mgmt.username,
+            password: mgmt.password,
+            ipAddr: mgmt.ipAddress,
+            port: mgmt.tcpPort,
+          });
+
+          let noLicensed = async () => {
+            return await bigipMgr.getLicense().then(license => {
+              return license.registrationKey === 'none';
+            });
+          };
+          await checkAndWait(noLicensed, 240).catch(() => {
+            throw new Error('Timeout for waiting for reclaiming license.');
+          });
+        });
+      },
+
+      network: async () => {
+        let networkMgr = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
+        for (let network of Object.keys(adc.networks)) {
+          if (!adc.networks[network].ready) continue;
+
+          try {
+            let portId = adc.networks[network].portId!;
+            await networkMgr.deletePort(addon.userToken, portId).then(() => {
+              this.logger.debug(`Deleted port ${portId}`);
+              delete adc.networks[network].portId;
+              delete adc.networks[network].fixedIp;
+              delete adc.networks[network].macAddr;
+              adc.networks[network].ready = false;
+            });
+          } catch (error) {
+            this.logger.error(`delete port for ${network}: ${error.message}`);
+          }
+        }
+      },
+
+      vm: async () => {
+        let computeMgr = await this.wafapp.get(
+          WafBindingKeys.KeyComputeManager,
+        );
+        if (adc.compute.vmId) {
+          await computeMgr
+            .deleteServer(addon.userToken, adc.compute.vmId!, addon.tenantId)
+            .then(() => {
+              this.logger.debug(`Deleted the vm ${adc.compute.vmId!}`);
+              delete adc.compute.vmId;
+              adc.management = undefined;
+            });
+        }
+      },
+
+      trust: () => {},
+    };
+
+    try {
+      this.serialize(adc, {status: 'RECLAIMING'});
+      for (let f of ['trust', 'license', 'vm', 'network']) {
+        await reclaimFuncs[f]();
+      }
+      this.serialize(adc, {status: 'RECLAIMED'});
+    } catch (error) {
+      this.logger.error(`Reclaiming fails: ${error.message}`);
+      this.serialize(adc, {
+        status: 'RECLAIMERR',
+        lastErr: `RECLAIMERR: ${error.message}; Please try again.`,
+      });
+    }
   }
 }
 

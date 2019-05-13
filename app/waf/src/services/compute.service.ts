@@ -12,6 +12,7 @@ export interface ComputeService {
     serversRequestBody: object,
   ): Promise<object>;
   v2VirtualServerDetail(url: string, userToken: string): Promise<object>;
+  v2DeleteServer(url: string, userToken: string): Promise<object>;
 }
 
 export class ComputeServiceProvider implements Provider<ComputeService> {
@@ -46,6 +47,12 @@ export abstract class ComputeManager {
     serversParams: ServersParams,
   ): Promise<string>;
 
+  abstract deleteServer(
+    userToken: string,
+    serverId: string,
+    tenantId: string,
+  ): Promise<void>;
+
   abstract getServerDetail(
     userToken: string,
     serverId: string,
@@ -71,6 +78,8 @@ export abstract class ComputeManager {
 }
 
 export class ComputeManagerV2 extends ComputeManager {
+  protected meta: {version: string} = {version: 'v2'};
+
   async createServer(
     userToken: string,
     serversParams: ServersParams,
@@ -98,6 +107,21 @@ export class ComputeManagerV2 extends ComputeManager {
       newErr.stack += '\n' + error.stack;
       throw newErr;
     }
+  }
+
+  async deleteServer(
+    userToken: string,
+    serverId: string,
+    tenantId: string,
+  ): Promise<void> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epServers(tenantId) + `/${serverId}`;
+
+    await this.computeService.v2DeleteServer(url, userToken).then(resp => {
+      this.logger.debug(`Deleted server: ${serverId}`);
+    });
   }
 
   async getServerDetail(

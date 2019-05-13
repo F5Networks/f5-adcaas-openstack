@@ -406,6 +406,8 @@ export const StubResponses = {
     };
   },
 
+  novaDeleteVM200: () => {},
+
   novaGetVMDetail200: () => {
     return {
       server: {
@@ -501,7 +503,7 @@ export const StubResponses = {
         fixed_ips: [
           {
             subnet_id: '86f9f11b-0895-4af7-b3cf-71acda85f1db',
-            ip_address: '10.0.0.1',
+            ip_address: ExpectedData.bigipMgmt.ipAddr,
           },
         ],
         id: ExpectedData.portId,
@@ -520,6 +522,8 @@ export const StubResponses = {
       },
     };
   },
+
+  neutronDeletePort200: () => {},
 
   neutronGetSubnets200: () => {
     return {
@@ -672,6 +676,16 @@ export const StubResponses = {
     };
   },
 
+  bigipNoLicense200: () => {
+    return {
+      kind: 'tm:sys:license:licensestats',
+      selfLink: 'https://localhost/mgmt/tm/sys/license?ver=13.1.1',
+      apiRawValues: {
+        apiAnonymous: "Can't load license, may not be operational\n",
+      },
+    };
+  },
+
   bigipLiense200: () => {
     return {
       entries: {
@@ -768,6 +782,7 @@ export const StubResponses = {
       usernamePrompt: 'Username',
     };
   },
+
   bigipNetInterfaces200: () => {
     return {
       items: [

@@ -16,11 +16,12 @@ import {MockBaseController} from '../fixtures/controllers/mocks/mock.base.contro
 
 export enum RestApplicationPort {
   // in order, please.
+  SSLDefault = 443,
   RestSelfTest = 2000,
   WafApp = 3000,
   IdentityUser = 5000,
   Onboarding = 8081,
-  SSLDefault = 8443,
+  SSLCustom = 8443,
   Nova = 8774,
   Neutron = 9696,
   IdentityAdmin = 35357,
