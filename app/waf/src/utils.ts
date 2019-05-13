@@ -2,6 +2,14 @@ import {factory} from './log4ts';
 
 const utilsLogger = factory.getLogger('utils.logger');
 
+/**
+ * Check and wait until some condition is fulfilled or timeout.
+ *
+ * @param checkFunc: a function which returns boolean.
+ * @param tryTimes: times for wait.
+ * @param funcArgs: array of any.
+ * @param intervalInMSecs: interval in milli-seconds for sleeping between 2 tries.
+ */
 export async function checkAndWait(
   checkFunc: Function,
   tryTimes: number,
@@ -35,8 +43,56 @@ export async function checkAndWait(
   }
 }
 
+/**
+ * sleep function
+ *
+ * @param milliSecs: milliseconds for the sleep.
+ */
 export async function sleep(milliSecs: number): Promise<void> {
   await new Promise(reslFunc => {
     setTimeout(reslFunc, milliSecs);
   });
+}
+
+/**
+ * Merge two objects incursively.
+ *
+ * @param target: target object or undefined:
+ *    if target is an object, merge sources into target, and return target.
+ *    if target is undefined, merge sources, return the merged object.
+ * @param sources: multiple sources for merging.
+ *    if source[k]'s type is different with that of target[k], this function
+ *    overwrites the target[k] with source[k].
+ */
+export function merge(
+  target: object | undefined,
+  ...sources: (object | undefined)[]
+): object {
+  if (typeof target !== 'object') target = {};
+  let tobj = JSON.parse(JSON.stringify(target));
+
+  for (let source of sources) {
+    if (typeof source === 'undefined') continue;
+    if (typeof source !== 'object')
+      throw new Error(`Data is not mergeable: ${source}`);
+
+    let sobj = JSON.parse(JSON.stringify(source));
+    for (let k of Object.keys(sobj)) {
+      if (
+        tobj[k] &&
+        typeof tobj[k] === 'object' &&
+        typeof sobj[k] === 'object'
+      ) {
+        tobj[k] = merge(tobj[k], sobj[k]);
+      } else {
+        tobj[k] = sobj[k];
+      }
+    }
+  }
+
+  for (let t of Object.keys(tobj)) {
+    // @ts-ignore: it must be an object.
+    target[t] = tobj[t];
+  }
+  return target;
 }
