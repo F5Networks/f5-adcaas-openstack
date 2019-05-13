@@ -671,6 +671,74 @@ export const StubResponses = {
       ],
     };
   },
+
+  bigipLiense200: () => {
+    return {
+      entries: {
+        'https://localhost/mgmt/tm/sys/license/0': {
+          nestedStats: {
+            entries: {
+              'https://localhost/mgmt/tm/sys/license/0/active-modules': {
+                nestedStats: {
+                  entries: {
+                    'https://localhost/mgmt/tm/sys/license/0/active-modules/%22APM,%20Base,%20VE%20GBB%20(500%20CCU,%202500%20Access%20Sessions)%22': {
+                      nestedStats: {
+                        entries: {
+                          featureModules: {
+                            description:
+                              '{ "Anti-Virus Checks" "Base Endpoint Security Checks" "Firewall Checks" "Network Access" "Secure Virtual Keyboard" "APM, Web Application" "Machine Certificate Checks" "Protected Workspace" "Remote Desktop" "App Tunnel" }',
+                          },
+                          key: {
+                            description: 'EQUYKXX-AOPHOGH',
+                          },
+                        },
+                      },
+                    },
+                    'https://localhost/mgmt/tm/sys/license/0/active-modules/%22Best%20Bundle,%20VE-25M%22': {
+                      nestedStats: {
+                        entries: {
+                          featureModules: {
+                            description:
+                              '{ "Rate Shaping" "Routing Bundle, VE" "ASM, VE" "DNS-GTM, Base, 25M" "SSL, VE" "Max Compression, VE" "AFM, VE" "DNSSEC" "PSM, VE" "VE, Carrier Grade NAT (AFM ONLY)" }',
+                          },
+                          key: {
+                            description: 'FXKFKXF-QWEDEWW',
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              licenseEndDate: {
+                description: '2019/06/22',
+              },
+              licenseStartDate: {
+                description: '2019/05/06',
+              },
+              licensedOnDate: {
+                description: '2019/05/07',
+              },
+              licensedVersion: {
+                description: '6.1.0',
+              },
+              platformId: {
+                description: 'Z100',
+              },
+              registrationKey: {
+                description: 'JTSCD-MTSZS-MHVKG-YDMJY-XVSECOT',
+              },
+              serviceCheckDate: {
+                description: '2019/05/04',
+              },
+            },
+          },
+        },
+      },
+      kind: 'tm:sys:license:licensestats',
+      selfLink: 'https://localhost/mgmt/tm/sys/license?ver=13.1.1',
+    };
+  },
   bigipGlobalSettings200: () => {
     return {
       awsApiMaxConcurrency: 1,
