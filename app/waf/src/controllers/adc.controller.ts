@@ -367,34 +367,29 @@ export class AdcController {
     actionBody: ActionsBody,
   ): Promise<object | undefined> {
     let adc = await this.adcRepository.findById(id);
+    let addonReq = {
+      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+      tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+    };
 
     switch (Object.keys(actionBody)[0]) {
       case 'create':
-        try {
-          if (adc.status !== 'NONE' && adc.status !== 'ERROR')
-            throw new HttpErrors.BadRequest(
-              'Adc status is ' +
-                adc.status +
-                ". Cannot repeat 'create' on the same ADC.",
-            );
+        if (adc.status !== 'NONE' && adc.status !== 'ERROR')
+          throw new HttpErrors.BadRequest(
+            'Adc status is ' +
+              adc.status +
+              ". Cannot repeat 'create' on the same ADC.",
+          );
 
-          // TODO: Create VM in async way.
-          await this.createOn(adc);
-          return {id: adc.id};
-        } catch (error) {
-          throw new HttpErrors.BadRequest(error.message);
-        }
+        this.createOn(adc, addonReq);
+        return {id: adc.id};
 
       case 'delete':
         break;
 
       case 'setup':
-        try {
-          await this.setupOn(adc);
-          return {id: adc.id};
-        } catch (error) {
-          throw new HttpErrors.BadRequest(error.message);
-        }
+        this.setupOn(adc, addonReq);
+        return {id: adc.id};
 
       default:
         throw new HttpErrors.BadRequest(
@@ -403,7 +398,7 @@ export class AdcController {
     }
   }
 
-  private async setupOn(adc: Adc): Promise<void> {
+  private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     let bigipMgr = await BigIpManager.instanlize({
       username: adc.management.username,
       password: adc.management.password,
@@ -458,11 +453,11 @@ export class AdcController {
     await this.adcRepository.update(adc);
   }
 
-  private async createOn(adc: Adc): Promise<void> {
+  private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
       await this.serialize(adc, {status: 'BUILDING'})
-        .then(async () => await this.cNet(adc))
-        .then(async () => await this.cSvr(adc));
+        .then(async () => await this.cNet(adc, addon))
+        .then(async () => await this.cSvr(adc, addon));
       await this.serialize(adc, {status: 'POWERON'});
     } catch (error) {
       await this.serialize(adc, {status: 'ERROR'});
@@ -470,89 +465,86 @@ export class AdcController {
     }
   }
 
-  private async cSvr(adc: Adc): Promise<void> {
-    await Promise.all([
-      this.wafapp.get(WafBindingKeys.KeyComputeManager),
-      this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
-      this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
-    ]).then(async ([computeHelper, userToken, tenantId]) => {
-      // TODO: uncomment me.
-      // let rootPass = Math.random()
-      //   .toString(36)
-      //   .slice(-8);
-      // let adminPass = Math.random()
-      //   .toString(36)
-      //   .slice(-8);
-      let rootPass = 'default';
-      let adminPass = 'admin';
-      let userdata: string = await this.cUserdata(rootPass, adminPass);
+  private async cSvr(adc: Adc, addon: AddonReqValues): Promise<void> {
+    await this.wafapp
+      .get(WafBindingKeys.KeyComputeManager)
+      .then(async computeHelper => {
+        // TODO: uncomment me.
+        // let rootPass = Math.random()
+        //   .toString(36)
+        //   .slice(-8);
+        // let adminPass = Math.random()
+        //   .toString(36)
+        //   .slice(-8);
+        let rootPass = 'default';
+        let adminPass = 'admin';
+        let userdata: string = await this.cUserdata(rootPass, adminPass);
 
-      let serverParams: ServersParams = {
-        userTenantId: tenantId,
-        vmName: adc.id,
-        imageRef: adc.compute.imageRef,
-        flavorRef: adc.compute.flavorRef,
-        securityGroupName: 'default', //TODO: remove the hardcode in the future.
-        userData: userdata,
-        ports: (() => {
-          let ports = [];
-          for (let n of Object.keys(adc.networks)) {
-            ports.push(<string>adc.networks[n].portId);
-          }
-          return ports;
-        })(),
-      };
+        let serverParams: ServersParams = {
+          userTenantId: addon.tenantId,
+          vmName: adc.id,
+          imageRef: adc.compute.imageRef,
+          flavorRef: adc.compute.flavorRef,
+          securityGroupName: 'default', //TODO: remove the hardcode in the future.
+          userData: userdata,
+          ports: (() => {
+            let ports = [];
+            for (let n of Object.keys(adc.networks)) {
+              ports.push(<string>adc.networks[n].portId);
+            }
+            return ports;
+          })(),
+        };
 
-      await computeHelper
-        .createServer(userToken, serverParams)
-        .then(response => {
-          adc.compute.vmId = response;
-          adc.management = {
-            username: 'admin',
-            password: adminPass,
-            rootPass: rootPass,
-            tcpPort: 443, // TODO: remove the hard-code.
-            ipAddress: <string>(() => {
-              for (let net in adc.networks) {
-                if (adc.networks[net].type === 'mgmt') {
-                  return adc.networks[net].fixedIp;
+        await computeHelper
+          .createServer(addon.userToken, serverParams)
+          .then(response => {
+            adc.compute.vmId = response;
+            adc.management = {
+              username: 'admin',
+              password: adminPass,
+              rootPass: rootPass,
+              tcpPort: 443, // TODO: remove the hard-code.
+              ipAddress: <string>(() => {
+                for (let net in adc.networks) {
+                  if (adc.networks[net].type === 'mgmt') {
+                    return adc.networks[net].fixedIp;
+                  }
                 }
-              }
-            })(),
-          };
-        });
-    });
+              })(),
+            };
+          });
+      });
   }
 
-  private async cNet(adc: Adc): Promise<void> {
-    await Promise.all([
-      this.wafapp.get(WafBindingKeys.KeyNetworkDriver),
-      this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
-    ]).then(async ([networkHelper, userToken]) => {
-      for (let k of Object.keys(adc.networks)) {
-        let net = adc.networks[k];
-        if (net.portId && net.ready) continue;
+  private async cNet(adc: Adc, addon: AddonReqValues): Promise<void> {
+    await this.wafapp
+      .get(WafBindingKeys.KeyNetworkDriver)
+      .then(async networkHelper => {
+        for (let k of Object.keys(adc.networks)) {
+          let net = adc.networks[k];
+          if (net.portId && net.ready) continue;
 
-        net.ready = false;
+          net.ready = false;
 
-        let portParams: PortCreationParams = {
-          networkId: net.networkId,
-          name: <string>(adc.id + '-' + net.type + '-' + k),
-        };
-        if (net.fixedIp) portParams.fixedIp = net.fixedIp;
+          let portParams: PortCreationParams = {
+            networkId: net.networkId,
+            name: <string>(adc.id + '-' + net.type + '-' + k),
+          };
+          if (net.fixedIp) portParams.fixedIp = net.fixedIp;
 
-        await networkHelper
-          .createPort(userToken, portParams)
-          .then(async port => {
-            net.fixedIp = port.fixedIp;
-            net.macAddr = port.macAddr;
-            net.portId = port.id;
-            net.ready = true;
+          await networkHelper
+            .createPort(addon.userToken, portParams)
+            .then(async port => {
+              net.fixedIp = port.fixedIp;
+              net.macAddr = port.macAddr;
+              net.portId = port.id;
+              net.ready = true;
 
-            await this.serialize(adc);
-          });
-      }
-    });
+              await this.serialize(adc);
+            });
+        }
+      });
   }
 
   private async cUserdata(
@@ -570,3 +562,8 @@ export class AdcController {
     return userDataB64Encoded;
   }
 }
+
+type AddonReqValues = {
+  userToken: string;
+  tenantId: string;
+};
