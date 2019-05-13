@@ -7,6 +7,8 @@ describe('WAFApplication main logic', () => {
   let app: WafApplication;
 
   before('stub WafApplication', async () => {
+    process.env.DATABASE_HOST = '0.0.0.0';
+    process.env.DATABASE_PORT = '5432';
     sinon.stub(WafApplication.prototype, 'migrateSchema');
     sinon.stub(WafApplication.prototype, 'boot');
     sinon.stub(WafApplication.prototype, 'start');
