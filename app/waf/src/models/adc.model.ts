@@ -46,7 +46,18 @@ export type ConfigTypes = {
     password: string;
     rootPass: string;
   };
-  status: 'NONE' | 'POWERON' | 'POWEROFF' | 'BUILDING' | 'ACTIVE' | 'ERROR'; // cannot be appointed.
+  status:
+    | 'NONE'
+    | 'POWERON'
+    | 'POWERING'
+    | 'POWERERR'
+    | 'ONBOARDED'
+    | 'ONBOARDING'
+    | 'ONBOARDERR'
+    | 'TRUSTED'
+    | 'TRUSTING'
+    | 'TRUSTERR'; // cannot be appointed.
+  lastErr: string; // cannot be appointed.
 };
 
 @model()
@@ -134,6 +145,16 @@ export class Adc extends CommonEntity {
     },
   })
   status: ConfigTypes['status'];
+
+  @property({
+    type: 'string',
+    required: false,
+    default: '',
+    schema: {
+      response: true,
+    },
+  })
+  lastErr: ConfigTypes['lastErr'];
 
   constructor(data?: Partial<Adc>) {
     super(data);

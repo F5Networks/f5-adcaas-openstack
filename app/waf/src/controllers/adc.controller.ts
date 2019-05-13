@@ -374,7 +374,7 @@ export class AdcController {
 
     switch (Object.keys(actionBody)[0]) {
       case 'create':
-        if (adc.status !== 'NONE' && adc.status !== 'ERROR')
+        if (adc.status !== 'NONE' && adc.status !== 'POWERERR')
           throw new HttpErrors.BadRequest(
             'Adc status is ' +
               adc.status +
@@ -435,7 +435,13 @@ export class AdcController {
             await this.serialize(adc, {status: 'ONBOARDED'});
           },
           async () => {
-            await this.serialize(adc, {status: 'ONBOARDERROR'});
+            await this.serialize(adc, {
+              status: 'ONBOARDERR',
+              lastErr:
+                `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
+                `Check more details from log.` +
+                `Checking condition: ${bigipOboarded.toString()}`,
+            });
           },
         );
       },
@@ -443,6 +449,10 @@ export class AdcController {
         let errmsg =
           'bigip is not ready after waiting timeout. Cannot go forwards';
         this.logger.error(errmsg);
+        await this.serialize(adc, {
+          status: 'ONBOARDERR',
+          lastErr: `ONBOARDERR: ${errmsg}`,
+        });
         throw new Error(errmsg);
       },
     );
@@ -455,12 +465,15 @@ export class AdcController {
 
   private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
-      await this.serialize(adc, {status: 'BUILDING'})
+      await this.serialize(adc, {status: 'POWERING'})
         .then(async () => await this.cNet(adc, addon))
         .then(async () => await this.cSvr(adc, addon));
       await this.serialize(adc, {status: 'POWERON'});
     } catch (error) {
-      await this.serialize(adc, {status: 'ERROR'});
+      await this.serialize(adc, {
+        status: 'POWERERR',
+        lastErr: `POWERERR: ${error.message}`,
+      });
       throw error;
     }
   }
