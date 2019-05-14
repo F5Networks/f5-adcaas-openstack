@@ -9,5 +9,7 @@ cdir=`cd $(dirname $0); pwd`
 
 (
     cd $cdir/../deploy
+    source appcluster.rc
+    export DATABASE_DATA_DIRECTORY
     docker-compose -f docker-compose.yml up -d --force-recreate
 )

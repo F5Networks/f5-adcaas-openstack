@@ -267,6 +267,29 @@ export class OnboardingManager {
 
       return target;
     },
+
+    configsync: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      for (let n of Object.keys(obData.networks)) {
+        if (obData.networks[n].type === 'ha') {
+          try {
+            target = Object.assign(target, {
+              configsync: {
+                class: 'ConfigSync',
+                configsyncIp: obData.networks[n].fixedIp!,
+              },
+            });
+          } catch (error) {
+            this.logger.debug(`configsync not added: ${error.message}`);
+          }
+          break;
+        }
+      }
+      return target;
+    },
   };
 
   async assembleDo(obData: Adc): Promise<TypeDOClassDO> {
