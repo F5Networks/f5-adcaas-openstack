@@ -431,6 +431,7 @@ export class AdcController {
         let bigipOboarded = async (): Promise<boolean> => {
           let hostname = await bigipMgr.getHostname();
           this.logger.debug(`bigip hostname: ${hostname}`);
+          await bigipMgr.getLicense();
 
           return hostname === doBody.declaration.Common!.hostname!;
         };

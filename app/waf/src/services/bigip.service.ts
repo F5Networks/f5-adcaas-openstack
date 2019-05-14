@@ -97,6 +97,26 @@ export class BigIpManager {
     );
   }
 
+  async getLicense(): Promise<BigipLicense> {
+    await this.mustBeReachable();
+
+    let url = `${this.baseUrl}/mgmt/tm/sys/license`;
+
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+
+    for (let entry of Object.keys(resObj.entries)) {
+      if (!entry.endsWith('/mgmt/tm/sys/license/0')) continue;
+
+      return {
+        registrationKey:
+          resObj.entries[entry].nestedStats.entries.registrationKey.description,
+      };
+    }
+    throw new Error(`License not found: from ${resObj}`);
+  }
+
   async getHostname(): Promise<string> {
     await this.mustBeReachable();
 
@@ -146,4 +166,8 @@ type BigipInterfaces = {
     macAddress: string;
     name: string;
   };
+};
+
+type BigipLicense = {
+  registrationKey: string;
 };

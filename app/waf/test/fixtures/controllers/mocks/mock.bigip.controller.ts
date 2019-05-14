@@ -17,6 +17,11 @@ export class MockBigipController extends MockBaseController {
   async globalSettings(): Promise<object> {
     return await ResponseWith['/mgmt/tm/sys/global-settings']();
   }
+
+  @get('/mgmt/tm/sys/license')
+  async license(): Promise<object> {
+    return await ResponseWith['/mgmt/tm/sys/license']();
+  }
 }
 
 let ResponseWith: {[key: string]: Function} = {};
@@ -27,6 +32,7 @@ export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
     '/mgmt/tm/sys': StubResponses.bigipMgmtSys200,
     '/mgmt/tm/net/interface': StubResponses.bigipNetInterfaces200,
     '/mgmt/tm/sys/global-settings': StubResponses.bigipGlobalSettings200,
+    '/mgmt/tm/sys/license': StubResponses.bigipLiense200,
   };
   Object.assign(ResponseWith, spec);
 }
