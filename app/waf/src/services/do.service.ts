@@ -108,7 +108,7 @@ export class OnboardingManager {
         this.logger.debug('Add new license.');
         return Object.assign(target, {myLicense: licData});
       } catch (error) {
-        this.logger.debug('No license found.');
+        this.logger.debug(`No license found: ${error.message}`);
         return target;
       }
     },
@@ -129,7 +129,7 @@ export class OnboardingManager {
         this.logger.debug('Add new provision.');
         return Object.assign(target, {myProvision: provData});
       } catch (error) {
-        this.logger.debug('No provision found.');
+        this.logger.debug(`No provision found: ${error.message}`);
         return target;
       }
     },
@@ -150,7 +150,7 @@ export class OnboardingManager {
         this.logger.debug('Add new dns.');
         return Object.assign(target, {myDns: dnsData});
       } catch (error) {
-        this.logger.debug('No dns found.');
+        this.logger.debug(`No dns found: ${error.message}`);
         return target;
       }
     },
@@ -184,24 +184,28 @@ export class OnboardingManager {
         //  "01070607:3: The management interface cannot be configured as a(n) vlan member."
         if (obData.networks[n].type === 'mgmt') continue;
 
-        let intfs = JSON.parse(JSON.stringify(additionalInfo))['interfaces'];
-        if (!(obData.networks[n].macAddr! in intfs)) {
-          this.logger.error(
-            `${obData.networks[n].macAddr!} not found in bigip device.`,
-          );
-        } else {
-          let vlanData = {
-            class: 'VLAN',
-            interfaces: [
-              {
-                name: intfs[obData.networks[n].macAddr!].name,
-                tagged: false,
-              },
-            ],
-            // mtu: TODO: get network information from openstack: mtu.
-          };
-          this.logger.debug('Add new vlan: ' + n);
-          target = Object.assign(target, {['vlan-' + n]: vlanData});
+        try {
+          let intfs = JSON.parse(JSON.stringify(additionalInfo))['interfaces'];
+          if (!(obData.networks[n].macAddr! in intfs)) {
+            this.logger.error(
+              `${obData.networks[n].macAddr!} not found in bigip device.`,
+            );
+          } else {
+            let vlanData = {
+              class: 'VLAN',
+              interfaces: [
+                {
+                  name: intfs[obData.networks[n].macAddr!].name,
+                  tagged: false,
+                },
+              ],
+              // mtu: TODO: get network information from openstack: mtu.
+            };
+            this.logger.debug('Add new vlan: ' + n);
+            target = Object.assign(target, {['vlan-' + n]: vlanData});
+          }
+        } catch (error) {
+          this.logger.debug(`vlan  vlan-${n} not added: ${error.message}`);
         }
       }
 
@@ -219,13 +223,17 @@ export class OnboardingManager {
 
         for (let s of Object.keys(subs)) {
           if (obData.networks[n].macAddr! !== s) continue;
-          let selfipData = {
-            class: 'SelfIp',
-            vlan: 'vlan-' + n,
-            address: obData.networks[n].fixedIp! + '/' + subs[s]['masknum'],
-          };
-          this.logger.debug('Add new selfip: ' + n);
-          target = Object.assign(target, {['selfip-' + n]: selfipData});
+          try {
+            let selfipData = {
+              class: 'SelfIp',
+              vlan: 'vlan-' + n,
+              address: obData.networks[n].fixedIp! + '/' + subs[s]['masknum'],
+            };
+            this.logger.debug('Add new selfip: ' + n);
+            target = Object.assign(target, {['selfip-' + n]: selfipData});
+          } catch (error) {
+            this.logger.debug(`selfip selfip-${n} not added: ${error.message}`);
+          }
         }
       }
 
@@ -242,7 +250,8 @@ export class OnboardingManager {
 
         let subs = JSON.parse(JSON.stringify(additionalInfo))['subnets'];
         for (let s of Object.keys(subs)) {
-          if (obData.networks[n].macAddr! === s) {
+          if (obData.networks[n].macAddr! !== s) continue;
+          try {
             let routeData = {
               class: 'Route',
               gw: subs[s].gateway,
@@ -250,6 +259,8 @@ export class OnboardingManager {
             };
             this.logger.debug('Add new route: ' + n);
             target = Object.assign(target, {['route-' + n]: routeData});
+          } catch (error) {
+            this.logger.debug(`route route-${n} not added: ${error.message}`);
           }
         }
       }
