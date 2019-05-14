@@ -36,6 +36,7 @@ import {
   MockDOController,
   DOShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.do.controller';
+import {checkAndWait} from '../../src/utils';
 
 describe('AdcController', () => {
   let wafapp: WafApplication;
@@ -510,7 +511,7 @@ describe('AdcController', () => {
     },
   );
 
-  it('post ' + prefix + '/adcs/{adcId}/action: create', async () => {
+  it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
     let adc = await givenAdcData(wafapp);
 
     await setupEnvs()
@@ -522,31 +523,54 @@ describe('AdcController', () => {
           .expect(200);
 
         expect(response.body).containDeep({id: adc.id});
+
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .expect(200);
+
+          return resp.body.adc.status === 'POWERON';
+        };
+
+        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+          expect(true).true();
+        });
       })
       .finally(teardownEnvs);
   });
 
-  it(
-    'post ' + prefix + '/adcs/{adcId}/action: setup: bigip accessible',
-    async () => {
-      BigipShouldResponseWith({});
-      DOShouldResponseWith({});
-      let adc = await givenAdcData(wafapp);
-      ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+  it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
+    BigipShouldResponseWith({});
+    DOShouldResponseWith({});
+    let adc = await givenAdcData(wafapp);
+    ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
-      await setupEnvs()
-        .then(async () => {
-          let response = await client
-            .post(prefix + '/adcs/' + adc.id + '/action')
+    await setupEnvs()
+      .then(async () => {
+        let response = await client
+          .post(prefix + '/adcs/' + adc.id + '/action')
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .send({setup: null})
+          .expect(200);
+
+        expect(response.body).containDeep({id: adc.id});
+
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
             .set('X-Auth-Token', ExpectedData.userToken)
-            .send({setup: null})
             .expect(200);
 
-          expect(response.body).containDeep({id: adc.id});
-        })
-        .finally(teardownEnvs);
-    },
-  );
+          return resp.body.adc.status === 'ONBOARDED';
+        };
+
+        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+          expect(true).true();
+        });
+      })
+      .finally(teardownEnvs);
+  });
 
   // TODO: the timeout can only be tested through unit test?
   //  The following test case leads all tests fail.
