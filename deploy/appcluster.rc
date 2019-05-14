@@ -8,6 +8,7 @@ export DATABASE_PASSWORD=postgres
 export DATABASE_DB=postgres
 
 export DATABASE_PORT=5432
+export DATABASE_HOST=0.0.0.0
 export DATABASE_DATA_DIRECTORY=../app/waf/data
 
 export OS_AUTH_URL=http://10.145.116.217:35357/v2.0
