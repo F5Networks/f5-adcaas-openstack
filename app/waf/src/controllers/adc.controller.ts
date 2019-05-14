@@ -40,7 +40,7 @@ import {
   BigIpManager,
   OnboardingManager,
 } from '../services';
-import {checkAndWait} from '../utils';
+import {checkAndWait, merge} from '../utils';
 
 const prefix = '/adcaas/v1';
 
@@ -453,8 +453,7 @@ export class AdcController {
   }
 
   private async serialize(adc: Adc, data?: object) {
-    // TODO: implement complete object merging.
-    if (data) Object.assign(adc, data);
+    merge(adc, data);
     await this.adcRepository.update(adc);
   }
 
