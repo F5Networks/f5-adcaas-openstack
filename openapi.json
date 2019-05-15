@@ -350,6 +350,9 @@
                         },
                         "status": {
                           "type": "string"
+                        },
+                        "lastErr": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -545,6 +548,9 @@
                           "type": "object"
                         },
                         "status": {
+                          "type": "string"
+                        },
+                        "lastErr": {
                           "type": "string"
                         }
                       },
@@ -748,6 +754,9 @@
                           },
                           "status": {
                             "type": "string"
+                          },
+                          "lastErr": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -839,6 +848,9 @@
                       "type": "boolean"
                     },
                     "status": {
+                      "type": "boolean"
+                    },
+                    "lastErr": {
                       "type": "boolean"
                     }
                   }
@@ -8999,6 +9011,9 @@
                         },
                         "status": {
                           "type": "string"
+                        },
+                        "lastErr": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -9184,6 +9199,9 @@
                             "type": "object"
                           },
                           "status": {
+                            "type": "string"
+                          },
+                          "lastErr": {
                             "type": "string"
                           }
                         },
