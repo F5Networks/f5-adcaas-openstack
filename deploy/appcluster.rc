@@ -25,9 +25,8 @@ OS_INTERFACE=public
 #OS_AVAILABLE_ZONE=nova
 
 # OnBoarding Parameters
-DO_ENDPOINT=http://localhost:8081
+DO_ENDPOINT=http://do-server:80
 DO_BIGIQ_HOST=10.250.15.105
 DO_BIGIQ_USERNAME=admin
 DO_BIGIQ_PASSWORD=admin
 DO_BIGIQ_POOL=mykeypool
-

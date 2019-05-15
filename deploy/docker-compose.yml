@@ -41,6 +41,8 @@ services:
   ASG:
     image: f5devcentral/f5-api-services-gateway:latest
     container_name: ASG
+    environment:
+      - AUTH=DISABLE
     ports:
       - 8443:443
       - 8080:80
