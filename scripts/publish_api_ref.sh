@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+export DATABASE_PORT=5432
+export DATABASE_HOST=127.0.0.1
 npm --prefix app/waf start >/dev/null 2>&1 &
 sleep 10
 curl -s -X GET http://localhost:3000/adcaas/v1/ping
