@@ -421,26 +421,34 @@ export class AdcController {
         this.logger.debug(
           'Json used for onboarding: ' + JSON.stringify(doBody),
         );
-        await doMgr.onboarding(doBody);
-
-        let bigipOboarded = async (): Promise<boolean> => {
-          let hostname = await bigipMgr.getHostname();
-          this.logger.debug(`bigip hostname: ${hostname}`);
-          await bigipMgr.getLicense();
-
-          return hostname === doBody.declaration.Common!.hostname!;
-        };
-        await checkAndWait(bigipOboarded, 240).then(
+        await doMgr.onboarding(doBody).then(
           async () => {
-            await this.serialize(adc, {status: 'ONBOARDED'});
+            let bigipOboarded = async (): Promise<boolean> => {
+              let hostname = await bigipMgr.getHostname();
+              this.logger.debug(`bigip hostname: ${hostname}`);
+              await bigipMgr.getLicense();
+
+              return hostname === doBody.declaration.Common!.hostname!;
+            };
+            await checkAndWait(bigipOboarded, 240).then(
+              async () => {
+                await this.serialize(adc, {status: 'ONBOARDED'});
+              },
+              async () => {
+                await this.serialize(adc, {
+                  status: 'ONBOARDERR',
+                  lastErr:
+                    `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
+                    `Check more details from log.` +
+                    `Checking condition: ${bigipOboarded.toString()}`,
+                });
+              },
+            );
           },
-          async () => {
+          async reason => {
             await this.serialize(adc, {
               status: 'ONBOARDERR',
-              lastErr:
-                `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
-                `Check more details from log.` +
-                `Checking condition: ${bigipOboarded.toString()}`,
+              lastErr: `ONBOARDERR: ${reason}`,
             });
           },
         );
