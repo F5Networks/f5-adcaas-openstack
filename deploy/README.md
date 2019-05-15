@@ -85,4 +85,13 @@ You can use *\<localrepo>/scripts/start_all.sh* to start all. The script is resp
 2) enable environment settings.
 3) run `docker-compose up -d -f <localrepo>/deploy/docker-compose.yml` to start WAFAAS container and its dependent containers, see that *docker-compose.yml* file.
 
+   Note: On MacOSX, running `start_all.sh` may get the error:
+   ```
+   ERROR: for ASG  Cannot start service ASG: Mounts denied:
+      The path /var/tmp/ASGExtensions is not shared from OS X and is not known to Docker.
+      You can configure shared paths from Docker -> Preferences... -> File Sharing.
+      See https://docs.docker.com/docker-for-mac/osxfs/#namespaces for more info.
+   ```
+   **Solution**: Add `/var/tmp`(better) or `/var/tmp/ASGExtensions` to the settings as it mentions.
+
 Note that for development and test, the WAFAAS container should be stopped and removed since we run WAFaaS application locally instead of the container. Use `docker rm --force WAFAAS` to remove it after `docker-compose up -d`.
