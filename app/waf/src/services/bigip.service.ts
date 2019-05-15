@@ -2,7 +2,7 @@ import {Provider, inject} from '@loopback/core';
 import {BIGIPDataSource} from '../datasources/bigip.datasource';
 import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
-import {probe} from '@network-utils/tcp-ping';
+import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
 
 export interface BigipService {
@@ -135,8 +135,7 @@ export class BigIpManager {
   private async reachable(): Promise<boolean> {
     return await probe(
       this.config.port,
-      // localhost is 'Invalid IP'
-      this.config.ipAddr === 'localhost' ? '127.0.0.1' : this.config.ipAddr,
+      this.config.ipAddr,
       this.config.timeout,
     );
   }

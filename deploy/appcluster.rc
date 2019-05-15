@@ -1,34 +1,33 @@
-export PRODUCT_RELEASE=1
+PRODUCT_RELEASE=1
 
-export WAF_APP_PORT=3000
-export WAF_APP_HOST=0.0.0.0
+WAF_APP_PORT=3000
+WAF_APP_HOST=0.0.0.0
 
-export DATABASE_USER=postgres
-export DATABASE_PASSWORD=postgres
-export DATABASE_DB=postgres
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_DB=postgres
+DATABASE_PORT=5432
+DATABASE_HOST=postgres-server
+DATABASE_DATA_DIRECTORY=../app/waf/data
 
-export DATABASE_PORT=5432
-export DATABASE_HOST=0.0.0.0
-export DATABASE_DATA_DIRECTORY=../app/waf/data
-
-export OS_AUTH_URL=http://10.145.116.217:35357/v2.0
-export OS_USERNAME=wafaas
-export OS_PASSWORD=91153c85b8dd4147
-export OS_TENANT_ID=14bf5399dcc54a5f9d08c4e05cf2555c
+OS_AUTH_URL=http://10.250.13.51:5000/v3
+OS_USERNAME=wafaas
+OS_PASSWORD=91153c85b8dd4147
+OS_TENANT_ID=5d873cbc8e194e20b0db211a82f3b472
 # Required if identity version is v3
-export OS_DOMAIN_NAME=Default
+OS_DOMAIN_NAME=Default
 
 # Optional
-#export OS_REGION_NAME==RegionOne
-#export OS_INTERFACE=public
+OS_REGION_NAME=regionOne
+OS_INTERFACE=public
 
 # Possible useful variable.
-#export OS_AVAILABLE_ZONE=nova
+#OS_AVAILABLE_ZONE=nova
 
 # OnBoarding Parameters
-export DO_ENDPOINT=http://localhost:8081
-export DO_BIGIQ_HOST=10.250.15.105
-export DO_BIGIQ_USERNAME=admin
-export DO_BIGIQ_PASSWORD=admin
-export DO_BIGIQ_POOL=mykeypool
+DO_ENDPOINT=http://localhost:8081
+DO_BIGIQ_HOST=10.250.15.105
+DO_BIGIQ_USERNAME=admin
+DO_BIGIQ_PASSWORD=admin
+DO_BIGIQ_POOL=mykeypool
 

@@ -1,6 +1,6 @@
 import {WafApplication} from './application';
 import {ApplicationConfig} from '@loopback/core';
-import {probe} from '@network-utils/tcp-ping';
+import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from './utils';
 
 export {WafApplication};

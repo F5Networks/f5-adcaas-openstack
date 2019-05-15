@@ -67,7 +67,7 @@
     "typescript-logging": "^0.6.3",
     "uuid": "^3.3.2",
     "ip": "^1.1.5",
-    "@network-utils/tcp-ping": "^1.1.0"
+    "network-utils-tcp-ping": "^1.1.1"
   },
   "devDependencies": {
     "@loopback/build": "^1.0.1",
