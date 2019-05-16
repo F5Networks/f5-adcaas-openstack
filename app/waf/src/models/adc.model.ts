@@ -47,7 +47,7 @@ export type ConfigTypes = {
     rootPass: string;
   };
   status:
-    | 'NONE'
+    | 'NEW'
     | 'POWERON'
     | 'POWERING'
     | 'POWERERR'
@@ -140,7 +140,7 @@ export class Adc extends CommonEntity {
   @property({
     type: 'string',
     required: true,
-    default: 'NONE',
+    default: 'NEW',
     schema: {
       response: true,
     },

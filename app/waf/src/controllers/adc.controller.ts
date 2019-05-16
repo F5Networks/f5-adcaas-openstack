@@ -46,6 +46,7 @@ const prefix = '/adcaas/v1';
 
 export class AdcController extends BaseController {
   asgMgr: ASGManager;
+  private adcStCtr: AdcStateCtrlr;
 
   constructor(
     @repository(AdcRepository)
@@ -395,6 +396,14 @@ export class AdcController extends BaseController {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     };
+    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
+
+    if (adc.status.endsWith('ING'))
+      throw new HttpErrors.UnprocessableEntity(
+        `Adc status is ' ${
+          adc.status
+        }. Cannot be operated on, please wait for its finish.`,
+      );
 
     if (adc.status.endsWith('ING'))
       throw new HttpErrors.UnprocessableEntity(
@@ -405,13 +414,6 @@ export class AdcController extends BaseController {
 
     switch (Object.keys(actionBody)[0]) {
       case 'create':
-        if (adc.status !== 'NONE' && adc.status !== 'POWERERR')
-          throw new HttpErrors.UnprocessableEntity(
-            `Adc status is ' ${
-              adc.status
-            }. Cannot repeat 'create' on the same ADC.`,
-          );
-
         this.createOn(adc, addonReq);
         return {id: adc.id};
 
@@ -428,6 +430,12 @@ export class AdcController extends BaseController {
           'Not supported: ' + Object.keys(actionBody)[0],
         );
     }
+
+    let msg = `Cannot do '${Object.keys(actionBody)[0]}' on adc ${
+      adc.id
+    }, state: ${adc.status}, lasterr: ${adc.lastErr}`;
+    this.logger.error(msg);
+    throw new HttpErrors.UnprocessableEntity(msg);
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
@@ -438,18 +446,10 @@ export class AdcController extends BaseController {
       });
       return;
     }
-    let bigipMgr = await BigIpManager.instanlize({
-      username: adc.management!.username,
-      password: adc.management!.password,
-      ipAddr: adc.management!.ipAddress,
-      port: adc.management!.tcpPort,
-    });
-    let bigipReady = async (): Promise<boolean> => {
-      return await bigipMgr.getSys().then(() => {
-        return true;
-      });
-    };
-    await checkAndWait(bigipReady, 240).then(
+    await checkAndWait(
+      () => this.adcStCtr.readyTo(AdcState.ONBOARDED).then(() => true),
+      240,
+    ).then(
       async () => {
         await this.serialize(adc, {status: 'ONBOARDING'});
         this.logger.debug('start to do onbarding');
@@ -463,24 +463,11 @@ export class AdcController extends BaseController {
             await checkAndWait(() => {
               return doMgr.isDone(doId);
             }, 240);
-            let bigipOnboarded = async (): Promise<boolean> => {
-              return await Promise.all([
-                bigipMgr.getHostname(),
-                bigipMgr.getLicense(),
-                bigipMgr.getVlans(),
-                bigipMgr.getSelfips(),
-                bigipMgr.getConfigsyncIp(),
-              ]).then(([hostname, license, vlans, selfs]) => {
-                return (
-                  hostname === doBody.declaration.Common!.hostname! &&
-                  license.registrationKey !== 'none' &&
-                  Object.keys(vlans).length !== 0 &&
-                  Object.keys(selfs).length !== 0
-                );
-              });
-            };
 
-            await checkAndWait(bigipOnboarded, 240).then(
+            await checkAndWait(
+              () => this.adcStCtr.gotTo(AdcState.ONBOARDED).then(() => true),
+              240,
+            ).then(
               async () => {
                 await this.serialize(adc, {status: 'ONBOARDED'});
 
@@ -496,8 +483,7 @@ export class AdcController extends BaseController {
                   status: 'ONBOARDERR',
                   lastErr:
                     `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
-                    `Check more details from log.` +
-                    `Checking condition: ${bigipOnboarded.toString()}`,
+                    `Check more details from log.`,
                 });
               },
             );
@@ -530,34 +516,12 @@ export class AdcController extends BaseController {
 
   private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
-      await this.serialize(adc, {status: 'POWERING'})
-        .then(async () => await this.cNet(adc, addon))
-        .then(async () => await this.cSvr(adc, addon));
-
-      // TODO: create a unified bigipMgr
-      let mgmt = adc.management!;
-      let bigipMgr = await BigIpManager.instanlize({
-        username: mgmt.username,
-        password: mgmt.password,
-        ipAddr: mgmt.ipAddress,
-        port: mgmt.tcpPort,
-      });
-      let bigipStarted = async (): Promise<boolean> => {
-        return await bigipMgr.getSys().then(() => {
-          return true;
-        });
-      };
-      await checkAndWait(bigipStarted, 240).then(
-        async () => {
-          await this.serialize(adc, {status: 'POWERON'});
-        },
-        async () => {
-          await this.serialize(adc, {
-            status: 'POWERERR',
-            lastErr: `POWERERR: timeout waiting for BIG-IP VE be accessible.`,
-          });
-        },
-      );
+      if (await this.adcStCtr.readyTo(AdcState.POWERON)) {
+        await this.serialize(adc, {status: 'POWERING'})
+          .then(async () => await this.cNet(adc, addon))
+          .then(async () => await this.cSvr(adc, addon));
+        await this.serialize(adc, {status: 'POWERON'});
+      } else throw new Error(`Not ready for bigip VE to : ${AdcState.POWERON}`);
     } catch (error) {
       await this.serialize(adc, {
         status: 'POWERERR',
@@ -751,3 +715,131 @@ type AddonReqValues = {
   userToken: string;
   tenantId: string;
 };
+
+class AdcStateCtrlr {
+  private states: AdcStateEntry[] = [
+    {
+      state: AdcState.NEW,
+      check: Promise.resolve(true),
+      next: [AdcState.POWERON],
+    },
+    {
+      state: AdcState.POWERON,
+      check: this.accessible(),
+      next: [AdcState.ONBOARDED, AdcState.RECLAIMED],
+    },
+    {
+      state: AdcState.ONBOARDED,
+      check: this.onboarded(),
+      next: [AdcState.TRUSTED, AdcState.RECLAIMED],
+    },
+    {
+      state: AdcState.TRUSTED,
+      check: this.trusted(),
+      next: [AdcState.RECLAIMED],
+    },
+    {
+      state: AdcState.RECLAIMED,
+      check: Promise.resolve(this.reclaimed()),
+      next: [AdcState.POWERON],
+    },
+  ];
+
+  constructor(private adc: Adc, private addon: AddonReqValues) {}
+
+  async readyTo(state: string): Promise<boolean> {
+    let stateEntry = this.getStateEntry(this.adc.status);
+    return (await stateEntry.check) && stateEntry.next.includes(state);
+  }
+
+  async gotTo(state: string): Promise<boolean> {
+    return this.getStateEntry(state).check;
+  }
+
+  private getStateEntry(name: string): AdcStateEntry {
+    return this.states.find(s => {
+      return s.state === name;
+    })!;
+  }
+
+  private reclaimed(): boolean {
+    if (this.adc.management) return false;
+    if (this.adc.compute.vmId) return false;
+    for (let net of Object.keys(this.adc.networks)) {
+      if (this.adc.networks[net].portId) return false;
+    }
+    return true;
+  }
+
+  private async trusted(): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
+  private async onboarded(): Promise<boolean> {
+    let bigipMgr = await this.getBigipMgr();
+    return Promise.all([
+      bigipMgr.getHostname(),
+      bigipMgr.getLicense(),
+      bigipMgr.getConfigsyncIp(),
+      bigipMgr.getVlans(),
+      bigipMgr.getSelfips(),
+    ]).then(([hostname, license, vlans, selfs]) => {
+      return (
+        hostname.includes(this.adc.id) &&
+        license.registrationKey !== 'none' &&
+        Object.keys(vlans).length !== 0 &&
+        Object.keys(selfs).length !== 0
+      );
+    });
+  }
+
+  private async accessible(): Promise<boolean> {
+    let bigipMgr = await this.getBigipMgr();
+
+    return bigipMgr
+      .getSys()
+      .then(() => Promise.resolve(true))
+      .catch(() => Promise.reject(false));
+  }
+
+  private async getBigipMgr(): Promise<BigIpManager> {
+    if (!this.adc.management)
+      throw new Error(
+        `The management session of ADC is empty, cannot initialize bigip manager.`,
+      );
+
+    let mgmt = this.adc.management;
+    return BigIpManager.instanlize({
+      username: mgmt.username,
+      password: mgmt.password,
+      ipAddr: mgmt.ipAddress,
+      port: mgmt.tcpPort,
+    });
+  }
+}
+
+type AdcStateEntry = {
+  state: string;
+  check: Promise<boolean>;
+  next: string[];
+};
+
+enum AdcState {
+  NEW = 'NEW',
+
+  POWERON = 'POWERON',
+  POWERING = 'POWERING',
+  POWERERR = 'POWERERR',
+
+  ONBOARDED = 'ONBOARDED',
+  ONBOARDING = 'ONBOARDING',
+  ONBOARDERR = 'ONBOARDERR',
+
+  TRUSTED = 'TRUSTED',
+  TRUSTING = 'TRUSTING',
+  TRUSTERR = 'TRUSTERR',
+
+  RECLAIMED = 'RECLAIMED',
+  RECLAIMING = 'RECLAIMING',
+  RECLAIMERR = 'RECLAIMERR',
+}
