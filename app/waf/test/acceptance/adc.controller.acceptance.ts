@@ -685,7 +685,6 @@ describe('AdcController', () => {
     let adc = await givenAdcData(wafapp);
 
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
-    BigipShouldResponseWith({});
     await setupEnvs()
       .then(async () => {
         let response = await client

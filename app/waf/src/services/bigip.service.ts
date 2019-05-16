@@ -195,6 +195,42 @@ export class BigIpManager {
     return resObj['body'][0]['hostname'];
   }
 
+  async getVlans(): Promise<BigipVlans> {
+    await this.mustBeReachable();
+
+    let url = `${this.baseUrl}/mgmt/tm/net/vlan`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+
+    let vlans: BigipVlans = {};
+    for (let vlan of resObj.items) {
+      let name = vlan.name;
+      vlans[name] = {
+        tag: vlan.tag,
+      };
+    }
+    return vlans;
+  }
+
+  async getSelfips(): Promise<BigipSelfips> {
+    await this.mustBeReachable();
+
+    let url = `${this.baseUrl}/mgmt/tm/net/self`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+
+    let selfips: BigipSelfips = {};
+    for (let self of resObj.items) {
+      let name = self.name;
+      selfips[name] = {
+        address: self.address,
+      };
+    }
+    return selfips;
+  }
+
   private async reachable(): Promise<boolean> {
     return await probe(
       this.config.port,
@@ -232,4 +268,16 @@ type BigipInterfaces = {
 
 type BigipLicense = {
   registrationKey: string;
+};
+
+type BigipVlans = {
+  [key: string]: {
+    tag: number;
+  };
+};
+
+type BigipSelfips = {
+  [key: string]: {
+    address: string;
+  };
 };
