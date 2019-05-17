@@ -381,7 +381,35 @@ export class OnboardingManager {
       .then(
         response => {
           let resObj = JSON.parse(JSON.stringify(response));
-          return resObj[0]['result']['message'];
+          return resObj[0]['id'];
+        },
+        reason => {
+          // if onboarding fails.
+          let mesg = 'Failed to onboarding device: ' + JSON.stringify(reason);
+          this.logger.error(mesg);
+          throw new Error(mesg);
+        },
+      );
+  }
+
+  async isDone(doId: string): Promise<boolean> {
+    // TODO: insert credential in headers if do gateway needs authorization.
+    let headers = {};
+
+    return await this.doService
+      .doRest(
+        'GET',
+        `${
+          this.config.endpoint
+        }/mgmt/shared/declarative-onboarding/task/${doId}`,
+        headers,
+        {},
+      )
+      .then(
+        response => {
+          let resObj = JSON.parse(JSON.stringify(response));
+          this.logger.info(`Onboarding task id: ${resObj[0]['id']}`);
+          return resObj[0]['result']['code'] === 200;
         },
         reason => {
           // if onboarding fails.

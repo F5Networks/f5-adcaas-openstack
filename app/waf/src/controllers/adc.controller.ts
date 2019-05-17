@@ -422,7 +422,11 @@ export class AdcController {
           'Json used for onboarding: ' + JSON.stringify(doBody),
         );
         await doMgr.onboarding(doBody).then(
-          async () => {
+          async doId => {
+            await checkAndWait(() => {
+              return doMgr.isDone(doId);
+            }, 240);
+
             let bigipOboarded = async (): Promise<boolean> => {
               let hostname = await bigipMgr.getHostname();
               this.logger.debug(`bigip hostname: ${hostname}`);
