@@ -50,7 +50,7 @@ services:
       - /var/tmp/ASGExtensions:/root/lx
 
   DO:
-    image: f5devcentral/f5-do-container:latest
+    image: f5devcentral/f5-do-container:1.4.0-1
     container_name: DO
     ports:
       - 9443:443

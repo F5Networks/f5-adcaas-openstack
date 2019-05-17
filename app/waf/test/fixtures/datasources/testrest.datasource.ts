@@ -993,23 +993,217 @@ Reason:
     };
   },
 
+  onboardingSucceed202: () => {
+    return {
+      id: ExpectedData.doTaskId,
+      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${
+        ExpectedData.doTaskId
+      }`,
+      result: {
+        class: 'Result',
+        code: 202,
+        status: 'RUNNING',
+        message: 'processing',
+      },
+      declaration: {
+        schemaVersion: '1.3.0',
+        class: 'Device',
+        async: true,
+        label: 'Basic onboarding',
+        Common: {
+          class: 'Tenant',
+          hostname: 'f250c956-bdd7-41cd-b3d5-03a79c7d90f8.f5bigip.local',
+          myLicense: {
+            class: 'License',
+            licenseType: 'licensePool',
+            bigIqHost: '10.250.15.105',
+            bigIqUsername: 'admin',
+            licensePool: 'mykeypool',
+            reachable: true,
+            bigIpUsername: 'admin',
+            unitOfMeasure: 'monthly',
+            overwrite: false,
+          },
+          myProvision: {
+            class: 'Provision',
+            ltm: 'nominal',
+            asm: 'nominal',
+          },
+          myDns: {
+            class: 'DNS',
+            nameServers: ['8.8.8.8'],
+            search: ['openstack.local'],
+          },
+          myNtp: {
+            class: 'NTP',
+            servers: ['0.pool.ntp.org', '1.pool.ntp.org', '2.pool.ntp.org'],
+            timezone: 'UTC',
+          },
+          'vlan-failover1': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.1',
+                tagged: false,
+              },
+            ],
+          },
+          'vlan-internal1': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.2',
+                tagged: false,
+              },
+            ],
+          },
+          'vlan-external2': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.3',
+                tagged: false,
+              },
+            ],
+          },
+          'selfip-failover1': {
+            class: 'SelfIp',
+            vlan: 'vlan-failover1',
+            address: '10.250.50.6/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'selfip-internal1': {
+            class: 'SelfIp',
+            vlan: 'vlan-internal1',
+            address: '10.250.42.9/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'selfip-external2': {
+            class: 'SelfIp',
+            vlan: 'vlan-external2',
+            address: '10.250.41.13/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'route-external2': {
+            class: 'Route',
+            gw: '10.250.41.1',
+            network: 'default',
+          },
+          configsync: {
+            class: 'ConfigSync',
+            configsyncIp: '10.250.50.6',
+          },
+        },
+      },
+    };
+  },
+
   onboardingSucceed200: () => {
     return {
+      id: ExpectedData.doTaskId,
+      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${
+        ExpectedData.doTaskId
+      }`,
       result: {
         class: 'Result',
         code: 200,
         status: 'OK',
         message: 'success',
-        errors: [],
       },
       declaration: {
         schemaVersion: '1.3.0',
         class: 'Device',
+        async: true,
         label: 'Basic onboarding',
-        async: false,
         Common: {
           class: 'Tenant',
-          hostname: ExpectedData.bigipMgmt.hostname,
+          hostname: 'f250c956-bdd7-41cd-b3d5-03a79c7d90f8.f5bigip.local',
+          myLicense: {
+            class: 'License',
+            licenseType: 'licensePool',
+            bigIqHost: '10.250.15.105',
+            bigIqUsername: 'admin',
+            licensePool: 'mykeypool',
+            reachable: true,
+            bigIpUsername: 'admin',
+            unitOfMeasure: 'monthly',
+            overwrite: false,
+          },
+          myProvision: {
+            class: 'Provision',
+            ltm: 'nominal',
+            asm: 'nominal',
+          },
+          myDns: {
+            class: 'DNS',
+            nameServers: ['8.8.8.8'],
+            search: ['openstack.local'],
+          },
+          myNtp: {
+            class: 'NTP',
+            servers: ['0.pool.ntp.org', '1.pool.ntp.org', '2.pool.ntp.org'],
+            timezone: 'UTC',
+          },
+          'vlan-failover1': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.1',
+                tagged: false,
+              },
+            ],
+          },
+          'vlan-internal1': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.2',
+                tagged: false,
+              },
+            ],
+          },
+          'vlan-external2': {
+            class: 'VLAN',
+            interfaces: [
+              {
+                name: '1.3',
+                tagged: false,
+              },
+            ],
+          },
+          'selfip-failover1': {
+            class: 'SelfIp',
+            vlan: 'vlan-failover1',
+            address: '10.250.50.6/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'selfip-internal1': {
+            class: 'SelfIp',
+            vlan: 'vlan-internal1',
+            address: '10.250.42.9/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'selfip-external2': {
+            class: 'SelfIp',
+            vlan: 'vlan-external2',
+            address: '10.250.41.13/24',
+            trafficGroup: 'traffic-group-local-only',
+            allowService: 'default',
+          },
+          'route-external2': {
+            class: 'Route',
+            gw: '10.250.41.1',
+            network: 'default',
+          },
+          configsync: {
+            class: 'ConfigSync',
+            configsyncIp: '10.250.50.6',
+          },
         },
       },
     };
