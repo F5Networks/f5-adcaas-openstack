@@ -359,7 +359,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
@@ -558,7 +557,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
@@ -676,9 +674,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "type": {
                     "type": "string"
                   },
@@ -689,7 +684,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "type": "VE",
                   "compute": {
                     "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
@@ -763,7 +757,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "VE",
@@ -1125,7 +1118,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
@@ -1309,7 +1301,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
@@ -1381,15 +1372,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -1446,7 +1433,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "applicationId": "11111111-2222-3333-4444-555555555555",
@@ -1707,7 +1693,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "status": "TBD",
@@ -1875,7 +1860,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "status": "TBD",
@@ -1968,9 +1952,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "adcId": {
                     "type": "string"
                   }
@@ -1978,7 +1959,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "adcId": "11111111-2222-3333-4444-555555555555"
                 }
               }
@@ -2038,7 +2018,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "status": "TBD",
@@ -2255,15 +2234,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -2317,7 +2292,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -2434,7 +2408,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -2536,15 +2509,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -2598,7 +2567,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -2682,7 +2650,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
@@ -2783,7 +2750,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "HTTP",
@@ -2887,15 +2853,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -2944,7 +2906,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
@@ -3100,7 +3061,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
@@ -3189,15 +3149,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -3247,7 +3203,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z"
                         }
@@ -3482,7 +3437,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "interval": 5,
@@ -3648,7 +3602,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "interval": 5,
@@ -3736,7 +3689,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "interval": 5,
@@ -3861,7 +3813,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "address": "192.168.1.12",
@@ -3950,7 +3901,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "loadBalancingMode": "round-robin",
@@ -4053,7 +4003,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "loadBalancingMode": "round-robin",
@@ -4157,9 +4106,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "interval": {
                     "type": "number"
                   },
@@ -4179,7 +4125,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "interval": 5,
                   "timeout": 16,
                   "targetAddress": "192.168.10.123",
@@ -4249,7 +4194,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "interval": 5,
@@ -4426,7 +4370,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "interval": 5,
@@ -4521,9 +4464,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "interval": {
                     "type": "number"
                   },
@@ -4543,7 +4483,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "interval": 5,
                   "timeout": 16,
                   "targetAddress": "192.168.10.123",
@@ -4613,7 +4552,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "interval": 5,
@@ -4926,9 +4864,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "address": {
                     "type": "string"
                   },
@@ -4939,7 +4874,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "address": "192.168.1.12",
                   "port": 80
                 }
@@ -5001,7 +4935,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "address": "192.168.1.12",
@@ -5126,7 +5059,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "address": "192.168.1.12",
@@ -5231,9 +5163,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "address": {
                     "type": "string"
                   },
@@ -5244,7 +5173,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "address": "192.168.1.12",
                   "port": 80
                 }
@@ -5306,7 +5234,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "address": "192.168.1.12",
@@ -5459,7 +5386,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "interval": 5,
@@ -5593,7 +5519,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "interval": 5,
@@ -5790,7 +5715,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "loadBalancingMode": "round-robin",
@@ -5970,7 +5894,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "loadBalancingMode": "round-robin",
@@ -6066,9 +5989,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "loadBalancingMode": {
                     "type": "string"
                   },
@@ -6091,7 +6011,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "loadBalancingMode": "round-robin",
                   "minimumMembersActive": 1,
                   "minimumMonitors": 1,
@@ -6165,7 +6084,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "loadBalancingMode": "round-robin",
@@ -6397,9 +6315,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "event": {
                     "type": "string"
                   },
@@ -6419,7 +6334,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "location": "http://1.2.3.4/index.html",
                   "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
@@ -6492,7 +6406,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
@@ -6628,7 +6541,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "event": "request",
@@ -6737,9 +6649,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "event": {
                     "type": "string"
                   },
@@ -6759,7 +6668,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "location": "http://1.2.3.4/index.html",
                   "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
@@ -6832,7 +6740,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
@@ -6920,9 +6827,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "event": {
                     "type": "string"
                   },
@@ -6936,7 +6840,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "index": 1,
                   "type": "httpUri"
@@ -7002,7 +6905,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
@@ -7131,7 +7033,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "event": "request",
@@ -7237,9 +7138,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "event": {
                     "type": "string"
                   },
@@ -7253,7 +7151,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "event": "request",
                   "index": 1,
                   "type": "httpUri"
@@ -7319,7 +7216,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
@@ -7476,7 +7372,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -7636,7 +7531,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -7726,15 +7620,11 @@
                   },
                   "description": {
                     "type": "string"
-                  },
-                  "tenantId": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                  "description": "My description"
                 }
               }
             }
@@ -7787,7 +7677,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
@@ -8011,7 +7900,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z"
                       }
@@ -8125,7 +8013,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z"
                         }
@@ -8304,7 +8191,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
@@ -8482,7 +8368,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
@@ -8583,9 +8468,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "type": {
                     "type": "string"
                   },
@@ -8605,7 +8487,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "type": "HTTP",
                   "applicationId": "11111111-2222-3333-4444-555555555555",
                   "defaultPoolId": "11111111-2222-3333-4444-555555555555",
@@ -8675,7 +8556,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
@@ -9020,7 +8900,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
@@ -9209,7 +9088,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "VE",
@@ -9432,7 +9310,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "file": "/Common/my_waf",
@@ -9596,7 +9473,6 @@
                         "id": "11111111-2222-3333-4444-555555555555",
                         "name": "My name",
                         "description": "My description",
-                        "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "file": "/Common/my_waf",
@@ -9688,9 +9564,6 @@
                   "description": {
                     "type": "string"
                   },
-                  "tenantId": {
-                    "type": "string"
-                  },
                   "url": {
                     "type": "string"
                   }
@@ -9698,7 +9571,6 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                   "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
                 }
               }
@@ -9755,7 +9627,6 @@
                           "id": "11111111-2222-3333-4444-555555555555",
                           "name": "My name",
                           "description": "My description",
-                          "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "file": "/Common/my_waf",
