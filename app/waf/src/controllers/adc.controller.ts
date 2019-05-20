@@ -26,7 +26,7 @@ import {
   ActionsRequest,
 } from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
-import {Schema, Response, CollectionResponse} from '.';
+import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {inject, CoreBindings} from '@loopback/core';
 import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
@@ -53,7 +53,7 @@ async function sleep(time: number): Promise<void> {
   });
 }
 
-export class AdcController {
+export class AdcController extends BaseController {
   constructor(
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
@@ -63,11 +63,13 @@ export class AdcController {
     public trustedDeviceService: TrustedDeviceService,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
-    private reqCxt: RequestContext,
+    protected reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private wafapp: WafApplication,
     private logger = factory.getLogger('controllers.adc'),
-  ) {}
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/adcs', {
     responses: {
@@ -82,6 +84,8 @@ export class AdcController {
     )
     reqBody: Partial<Adc>,
   ): Promise<Response> {
+    reqBody.tenantId = await this.tenantId;
+
     //TODO: Reject create ADC HW request with duplicated mgmt IP address
     if (reqBody.type === 'HW') {
       await this.trustAdc(reqBody);
@@ -209,16 +213,7 @@ export class AdcController {
   async count(
     @param.query.object('where', getWhereSchemaFor(Adc)) where?: Where,
   ): Promise<Count> {
-    try {
-      // TODO: remove this reqCxt usage sample.
-      this.logger.debug(
-        'Checked tenant id: ' +
-          (await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId)),
-      );
-    } catch (error) {
-      // do nothing
-    }
-
+    //TODO: support multi-tenancy
     return await this.adcRepository.count(where);
   }
 
@@ -233,7 +228,9 @@ export class AdcController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Adc)) filter?: Filter,
   ): Promise<CollectionResponse> {
-    let data = await this.adcRepository.find(filter);
+    let data = await this.adcRepository.find(filter, {
+      tenantId: await this.tenantId,
+    });
     return new CollectionResponse(Adc, data);
   }
 
@@ -246,7 +243,9 @@ export class AdcController {
   async findById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<Response> {
-    let data = await this.adcRepository.findById(id);
+    let data = await this.adcRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
     return new Response(Adc, data);
   }
 
@@ -270,7 +269,9 @@ export class AdcController {
     if (adc.status || adc.createdAt || adc.updatedAt || adc.management)
       throw new HttpErrors.BadRequest('Not changable properties.');
 
-    await this.adcRepository.updateById(id, adc);
+    await this.adcRepository.updateById(id, adc, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/adcs/{adcId}', {
@@ -282,7 +283,9 @@ export class AdcController {
   async deleteById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<void> {
-    let adc = await this.adcRepository.findById(id);
+    let adc = await this.adcRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
 
     if (adc.type === 'HW') {
       await this.untrustAdc(adc);
@@ -291,6 +294,7 @@ export class AdcController {
     await this.adcRepository.deleteById(id);
   }
 
+  //TODO: multitenancy sharing model and api
   @get(prefix + '/adcs/{adcId}/tenants', {
     responses: {
       '200': Schema.collectionResponse(
@@ -320,6 +324,7 @@ export class AdcController {
     return new CollectionResponse(Tenant, tenants);
   }
 
+  //TODO: multitenancy sharing model and api
   @get(prefix + '/adcs/{adcId}/tenants/{tenantId}', {
     responses: {
       '200': Schema.response(Tenant, 'Successfully retrieve Tenant resource'),
@@ -366,7 +371,10 @@ export class AdcController {
     @requestBody(Schema.createRequest(ActionsRequest, 'actions request'))
     actionBody: ActionsBody,
   ): Promise<object | undefined> {
-    let adc = await this.adcRepository.findById(id);
+    let adc = await this.adcRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
+
     let addonReq = {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),

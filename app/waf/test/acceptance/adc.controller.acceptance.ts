@@ -116,6 +116,7 @@ describe('AdcController', () => {
     controller = await wafapp.get<AdcController>('controllers.AdcController');
 
     ShouldResponseWith({});
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
@@ -152,6 +153,7 @@ describe('AdcController', () => {
     teardownRestAppAndClient(mockKeystoneApp);
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);
+    teardownEnvs();
   });
 
   it('post ' + prefix + '/adcs: create ADC HW', async () => {
@@ -193,6 +195,8 @@ describe('AdcController', () => {
 
     const response = await client
       .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(adc)
       .expect(200);
 
@@ -207,6 +211,8 @@ describe('AdcController', () => {
 
       await client
         .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(adc)
         .expect(400);
     },
@@ -223,6 +229,8 @@ describe('AdcController', () => {
 
       await client
         .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(adc)
         .expect(422);
     },
@@ -240,6 +248,8 @@ describe('AdcController', () => {
       await client
         .post(prefix + '/adcs')
         .send(adc)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(422);
     },
   );
@@ -270,6 +280,8 @@ describe('AdcController', () => {
 
       await client
         .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(adc)
         .expect(422);
     },
@@ -304,6 +316,8 @@ describe('AdcController', () => {
 
       await client
         .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(adc)
         .expect(422);
     },
@@ -314,10 +328,14 @@ describe('AdcController', () => {
   });
 
   it('get ' + prefix + '/adcs: of all', async () => {
-    const adc = await givenAdcData(wafapp);
+    const adc = await givenAdcData(wafapp, {
+      tenantId: ExpectedData.tenantId,
+    });
 
     let response = await client
       .get(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .expect(200)
       .expect('Content-Type', /application\/json/);
 
@@ -325,10 +343,14 @@ describe('AdcController', () => {
   });
 
   it('get ' + prefix + '/adcs: with filter string', async () => {
-    const adc = await givenAdcData(wafapp);
+    const adc = await givenAdcData(wafapp, {
+      tenantId: ExpectedData.tenantId,
+    });
 
     let response = await client
       .get(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({filter: {where: {id: adc.id}}})
       .expect(200);
 
@@ -336,13 +358,19 @@ describe('AdcController', () => {
   });
 
   it('get ' + prefix + '/adcs/count', async () => {
-    let response = await client.get(prefix + '/adcs/count').expect(200);
+    let response = await client
+      .get(prefix + '/adcs/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
     expect(response.body.count).to.eql(0);
 
     const adc = await givenAdcData(wafapp);
 
     response = await client
       .get(prefix + '/adcs/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({where: {id: adc.id}})
       .expect(200);
     expect(response.body.count).to.eql(1);
@@ -352,13 +380,21 @@ describe('AdcController', () => {
     await givenAdcData(wafapp);
     const adc = await givenAdcData(wafapp);
 
-    let response = await client.get(prefix + '/adcs/' + adc.id).expect(200);
+    let response = await client
+      .get(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
 
     expect(response.body.adc).to.containDeep(toJSON(adc));
   });
 
   it('get ' + prefix + '/adcs/{id}: not found', async () => {
-    await client.get(prefix + '/adcs/' + uuid()).expect(404);
+    await client
+      .get(prefix + '/adcs/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(404);
   });
 
   it('patch ' + prefix + '/adcs/{id}: existing item', async () => {
@@ -367,6 +403,8 @@ describe('AdcController', () => {
 
     await client
       .patch(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(patched_name)
       .expect(204, '');
   });
@@ -375,18 +413,28 @@ describe('AdcController', () => {
     const patched_name = {name: 'new adc name'};
     await client
       .patch(prefix + '/adcs/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(patched_name)
       .expect(404);
   });
 
   it('delete ' + prefix + '/adcs/{id}: non-existing item', async () => {
-    await client.del(prefix + '/adcs/' + uuid()).expect(404);
+    await client
+      .del(prefix + '/adcs/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(404);
   });
 
   it('delete ' + prefix + '/adcs/{id}: existing item', async () => {
     const adc = await givenAdcData(wafapp);
 
-    await client.del(prefix + '/adcs/' + adc.id).expect(204);
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(204);
   });
 
   it('delete ' + prefix + '/adcs/{id}: trusted device', async () => {
@@ -403,7 +451,11 @@ describe('AdcController', () => {
       ],
     });
 
-    await client.del(prefix + '/adcs/' + adc.id).expect(204);
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(204);
   });
 
   it('delete ' + prefix + '/adcs/{id}: untrust exception', async () => {
@@ -414,7 +466,11 @@ describe('AdcController', () => {
 
     untrustStub.throws('Not working');
 
-    await client.del(prefix + '/adcs/' + adc.id).expect(422);
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
   });
 
   it('delete ' + prefix + '/adcs/{id}: empty untrust response', async () => {
@@ -427,7 +483,11 @@ describe('AdcController', () => {
       devices: [],
     });
 
-    await client.del(prefix + '/adcs/' + adc.id).expect(422);
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
   });
 
   it('delete ' + prefix + '/adcs/{id}: wrong untrust state', async () => {
@@ -444,7 +504,11 @@ describe('AdcController', () => {
       ],
     });
 
-    await client.del(prefix + '/adcs/' + adc.id).expect(422);
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
   });
 
   it(
@@ -458,6 +522,8 @@ describe('AdcController', () => {
 
       let response = await client
         .get(prefix + '/adcs/' + adc.id + '/tenants')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.tenants[0].id).to.equal(assoc.tenantId);
@@ -473,6 +539,8 @@ describe('AdcController', () => {
 
       let response = await client
         .get(prefix + '/adcs/' + adc.id + '/tenants')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.tenants.length).to.equal(0);
@@ -492,6 +560,8 @@ describe('AdcController', () => {
 
       let response = await client
         .get(prefix + '/adcs/' + adc.id + '/tenants/' + assoc.tenantId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.tenant.id).to.equal(assoc.tenantId);
@@ -507,6 +577,8 @@ describe('AdcController', () => {
 
       await client
         .get(prefix + '/adcs/' + adc.id + '/tenants/' + '12345678')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
