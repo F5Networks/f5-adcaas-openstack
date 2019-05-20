@@ -6,13 +6,25 @@
 import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {ApplicationController} from '../../src/controllers';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  teardownRestAppAndClient,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
   givenAdcData,
   createApplicationObject,
 } from '../helpers/database.helpers';
+import {
+  ShouldResponseWith,
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 
 describe('ApplicationController', () => {
@@ -20,15 +32,51 @@ describe('ApplicationController', () => {
   let controller: ApplicationController;
   let client: Client;
   let deployStub: sinon.SinonStub;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
+  let envs: {[key: string]: string} = {
+    OS_AUTH_URL: 'http://localhost:35357/v2.0',
+    OS_USERNAME: 'wafaas',
+    OS_PASSWORD: '91153c85b8dd4147',
+    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+    OS_DOMAIN_NAME: 'Default',
+    OS_REGION_NAME: 'RegionOne',
+    OS_AVAILABLE_ZONE: 'nova',
+  };
+
+  let setupEnvs = async () => {
+    process.env.PRODUCT_RELEASE = '1';
+    for (let env of Object.keys(envs)) {
+      process.env[env] = envs[env];
+    }
+  };
+
+  let teardownEnvs = async () => {
+    delete process.env['PRODUCT_RELEASE'];
+    for (let env of Object.keys(envs)) {
+      delete process.env[env];
+    }
+  };
+
   before('setupApplication', async () => {
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<ApplicationController>(
       'controllers.ApplicationController',
     );
+
+    ShouldResponseWith({});
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
@@ -38,6 +86,8 @@ describe('ApplicationController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   afterEach(async () => {
@@ -45,10 +95,14 @@ describe('ApplicationController', () => {
   });
 
   it('post ' + prefix + '/applications: with no id', async () => {
-    const application = createApplicationObject();
+    const application = createApplicationObject({
+      tenantId: ExpectedData.tenantId,
+    });
 
     const response = await client
       .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(application)
       .expect(200);
 
@@ -56,20 +110,28 @@ describe('ApplicationController', () => {
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
-    const application = await givenApplicationData(wafapp);
+    const application = await givenApplicationData(wafapp, {
+      tenantId: ExpectedData.tenantId,
+    });
 
     let response = await client
       .get(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .expect('Content-Type', /application\/json/);
 
     expect(response.body.applications[0]).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications: with filter string', async () => {
-    const application = await givenApplicationData(wafapp);
+    const application = await givenApplicationData(wafapp, {
+      tenantId: ExpectedData.tenantId,
+    });
 
     let response = await client
       .get(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({filter: {where: {id: application.id}}})
       .expect(200);
 
@@ -77,13 +139,19 @@ describe('ApplicationController', () => {
   });
 
   it('get ' + prefix + '/applications/count', async () => {
-    let response = await client.get(prefix + '/applications/count').expect(200);
+    let response = await client
+      .get(prefix + '/applications/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
     expect(response.body.count).to.eql(0);
 
     const application = await givenApplicationData(wafapp);
 
     response = await client
       .get(prefix + '/applications/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({where: {id: application.id}})
       .expect(200);
     expect(response.body.count).to.eql(1);
@@ -95,13 +163,19 @@ describe('ApplicationController', () => {
 
     let response = await client
       .get(prefix + '/applications/' + application.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
     expect(response.body.application).to.containDeep(toJSON(application));
   });
 
   it('get ' + prefix + '/applications/{id}: not found', async () => {
-    await client.get(prefix + '/applications/' + uuid()).expect(404);
+    await client
+      .get(prefix + '/applications/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(404);
   });
 
   it('patch ' + prefix + '/applications/{id}: existing item', async () => {
@@ -110,6 +184,8 @@ describe('ApplicationController', () => {
 
     await client
       .patch(prefix + '/applications/' + application.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(patched_name)
       .expect(204, '');
   });
@@ -118,18 +194,28 @@ describe('ApplicationController', () => {
     const patched_name = {name: 'new application name'};
     await client
       .patch(prefix + '/applications/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(patched_name)
       .expect(404);
   });
 
   it('delete ' + prefix + '/applications/{id}: non-existing item', async () => {
-    await client.del(prefix + '/applications/' + uuid()).expect(404);
+    await client
+      .del(prefix + '/applications/' + uuid())
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(404);
   });
 
   it('delete ' + prefix + '/applications/{id}: existing item', async () => {
     const application = await givenApplicationData(wafapp);
 
-    await client.del(prefix + '/applications/' + application.id).expect(204);
+    await client
+      .del(prefix + '/applications/' + application.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(204);
   });
 
   it(
@@ -142,11 +228,15 @@ describe('ApplicationController', () => {
 
       let response = await client
         .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'a-declaration'})
         .expect(200);
 
       await client
         .patch(prefix + '/applications/' + application.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({defaultDeclarationId: response.body.declaration.id})
         .expect(204);
 
@@ -154,6 +244,8 @@ describe('ApplicationController', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
     },
   );
@@ -165,6 +257,8 @@ describe('ApplicationController', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(422);
     },
   );
@@ -182,6 +276,8 @@ describe('ApplicationController', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(422);
     },
   );
@@ -198,6 +294,8 @@ describe('ApplicationController', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/cleanup')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
     },
   );
@@ -209,6 +307,8 @@ describe('ApplicationController', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/cleanup')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(422);
     },
   );

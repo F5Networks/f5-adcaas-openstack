@@ -18,8 +18,7 @@ import {
   EndpointpolicyRepository,
   ServiceEndpointpolicyAssociationRepository,
 } from '../repositories';
-import {Schema, Response, CollectionResponse} from '.';
-import {BaseController} from './base.controller';
+import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {inject} from '@loopback/core';
 
 const prefix = '/adcaas/v1';
