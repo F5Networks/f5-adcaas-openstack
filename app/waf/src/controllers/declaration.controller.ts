@@ -7,6 +7,8 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {
   Application,
@@ -18,6 +20,7 @@ import {
   Pool,
   Member,
 } from '../models';
+import {inject} from '@loopback/core';
 import {
   ApplicationRepository,
   DeclarationRepository,
@@ -31,11 +34,11 @@ import {
   RuleRepository,
   ActionRepository,
 } from '../repositories';
-import {Schema, Response, CollectionResponse} from '.';
+import {BaseController, Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
 
-export class DeclarationController {
+export class DeclarationController extends BaseController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
@@ -59,7 +62,12 @@ export class DeclarationController {
     public ruleRepository: RuleRepository,
     @repository(ActionRepository)
     public actionRepository: ActionRepository,
-  ) {}
+    //Suppress get injection binding exeption by using {optional: true}
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   private async loadApplication(app: Application): Promise<void> {
     app.services = await this.applicationRepository.services(app.id).find();
@@ -187,7 +195,9 @@ export class DeclarationController {
     reqBody: Partial<Declaration>,
   ): Promise<Response> {
     // Throws HTTP 404, if application does not exist
-    let app = await this.applicationRepository.findById(id);
+    let app = await this.applicationRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
     await this.loadApplication(app);
 
     Object.assign(reqBody, {
@@ -216,7 +226,11 @@ export class DeclarationController {
   ): Promise<CollectionResponse> {
     return new CollectionResponse(
       Declaration,
-      await this.applicationRepository.declarations(id).find(),
+      await this.applicationRepository.declarations(id).find({
+        where: {
+          tenantId: await this.tenantId,
+        },
+      }),
     );
   }
 
@@ -239,7 +253,14 @@ export class DeclarationController {
       .declarations(applicationId)
       .find({
         where: {
-          id: declarationId,
+          and: [
+            {
+              id: declarationId,
+            },
+            {
+              tenantId: await this.tenantId,
+            },
+          ],
         },
       });
 
@@ -276,7 +297,14 @@ export class DeclarationController {
       .declarations(applicationId)
       .find({
         where: {
-          id: declarationId,
+          and: [
+            {
+              id: declarationId,
+            },
+            {
+              tenantId: await this.tenantId,
+            },
+          ],
         },
       });
 
@@ -303,6 +331,6 @@ export class DeclarationController {
   ) {
     await this.applicationRepository
       .declarations(applicationId)
-      .delete({id: declarationId});
+      .delete({and: [{id: declarationId}, {tenantId: await this.tenantId}]});
   }
 }
