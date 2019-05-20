@@ -25,6 +25,8 @@ export class CommonRepository<
     return super.create(data, options);
   }
 
+  //TODO: Implement count() with tenantId option
+
   async find(filter?: Filter<T>, options?: Options): Promise<T[]> {
     let f: Filter = filter || {};
     if (options !== undefined && options.tenantId) {

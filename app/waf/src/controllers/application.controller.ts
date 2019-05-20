@@ -15,6 +15,8 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {inject} from '@loopback/context';
 import {Application, AS3DeployRequest} from '../models';
@@ -24,14 +26,14 @@ import {
   AdcRepository,
 } from '../repositories';
 import {AS3Service} from '../services';
-import {Schema, Response, CollectionResponse} from '.';
+import {BaseController, Schema, Response, CollectionResponse} from '.';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
 const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
 
 const prefix = '/adcaas/v1';
 
-export class ApplicationController {
+export class ApplicationController extends BaseController {
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
@@ -40,7 +42,12 @@ export class ApplicationController {
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
     @inject('services.AS3Service') public as3Service: AS3Service,
-  ) {}
+    //Suppress get injection binding exeption by using {optional: true}
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/applications', {
     responses: {
@@ -62,6 +69,7 @@ export class ApplicationController {
     application: Partial<Application>,
   ): Promise<Response> {
     try {
+      application.tenantId = await this.tenantId;
       return new Response(
         Application,
         await this.applicationRepository.create(application),
@@ -82,6 +90,7 @@ export class ApplicationController {
   async count(
     @param.query.object('where', getWhereSchemaFor(Application)) where?: Where,
   ): Promise<Count> {
+    //TODO: support multi-tenancy
     return await this.applicationRepository.count(where);
   }
 
@@ -99,7 +108,9 @@ export class ApplicationController {
   ): Promise<CollectionResponse> {
     return new CollectionResponse(
       Application,
-      await this.applicationRepository.find(filter),
+      await this.applicationRepository.find(filter, {
+        tenantId: await this.tenantId,
+      }),
     );
   }
 
@@ -118,7 +129,9 @@ export class ApplicationController {
   ): Promise<Response> {
     return new Response(
       Application,
-      await this.applicationRepository.findById(id),
+      await this.applicationRepository.findById(id, undefined, {
+        tenantId: await this.tenantId,
+      }),
     );
   }
 
@@ -139,7 +152,9 @@ export class ApplicationController {
     )
     application: Partial<Application>,
   ): Promise<void> {
-    await this.applicationRepository.updateById(id, application);
+    await this.applicationRepository.updateById(id, application, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/applications/{applicationId}', {
@@ -152,7 +167,9 @@ export class ApplicationController {
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
   ): Promise<void> {
-    await this.applicationRepository.deleteById(id);
+    await this.applicationRepository.deleteById(id, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @post(prefix + '/applications/{applicationId}/deploy', {
@@ -166,7 +183,11 @@ export class ApplicationController {
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
   ): Promise<string> {
-    let application = await this.applicationRepository.findById(id);
+    let tenantId = await this.tenantId;
+
+    let application = await this.applicationRepository.findById(id, undefined, {
+      tenantId: tenantId,
+    });
 
     if (!application.adcId || !application.defaultDeclarationId) {
       throw new HttpErrors.UnprocessableEntity(
@@ -174,9 +195,14 @@ export class ApplicationController {
       );
     }
 
-    let adc = await this.adcRepository.findById(application.adcId);
+    let adc = await this.adcRepository.findById(application.adcId, undefined, {
+      tenantId: tenantId,
+    });
+
     let declaration = await this.declarationRepository.findById(
       application.defaultDeclarationId,
+      undefined,
+      {tenantId: tenantId},
     );
 
     let req = new AS3DeployRequest(adc, application, declaration);
@@ -193,7 +219,11 @@ export class ApplicationController {
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
   ): Promise<string> {
-    let application = await this.applicationRepository.findById(id);
+    let tenantId = await this.tenantId;
+
+    let application = await this.applicationRepository.findById(id, undefined, {
+      tenantId: tenantId,
+    });
 
     if (!application.adcId) {
       throw new HttpErrors.UnprocessableEntity(
@@ -201,7 +231,9 @@ export class ApplicationController {
       );
     }
 
-    let adc = await this.adcRepository.findById(application.adcId);
+    let adc = await this.adcRepository.findById(application.adcId, undefined, {
+      tenantId: tenantId,
+    });
     let req = new AS3DeployRequest(adc, application);
     return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
   }
