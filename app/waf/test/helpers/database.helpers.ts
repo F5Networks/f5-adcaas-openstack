@@ -89,6 +89,7 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
     {
       name: 'test waf policy',
       url: 'http://unknown',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
@@ -107,6 +108,7 @@ export function createRuleObject(data?: Partial<Rule>) {
   return Object.assign(
     {
       name: 'test',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
@@ -117,6 +119,7 @@ export function createConditionObject(data?: Partial<Condition>) {
     {
       type: 'httpUri',
       path: {operand: 'contains', values: ['/test1/']},
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
@@ -125,6 +128,7 @@ export function createActionObject(data?: Partial<Action>) {
   return Object.assign(
     {
       type: 'waf',
+      tenantId: 'fdac59f5b20046829ea58720702a74af',
     },
     data,
   );
