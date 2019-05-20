@@ -1,8 +1,8 @@
 import {
   Filter,
   repository,
-  CountSchema,
   Count,
+  CountSchema,
   Where,
 } from '@loopback/repository';
 import {
@@ -15,6 +15,8 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {Rule, Condition, Action} from '../models';
 import {
@@ -23,6 +25,9 @@ import {
   ActionRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
+import {inject} from '@loopback/core';
+
 const prefix = '/adcaas/v1';
 
 const createDesc: string = 'Rule resource that need to be created';
@@ -36,7 +41,7 @@ const createActionDesc: string = 'Action resource that need to be created';
 const updateActionDesc: string =
   'Action resource properties that need to be updated';
 
-export class RuleController {
+export class RuleController extends BaseController {
   constructor(
     @repository(RuleRepository)
     public ruleRepository: RuleRepository,
@@ -44,7 +49,11 @@ export class RuleController {
     public conditionRepository: ConditionRepository,
     @repository(ActionRepository)
     public actionRepository: ActionRepository,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/rules', {
     responses: {
@@ -58,6 +67,7 @@ export class RuleController {
     reqBody: Partial<Rule>,
   ): Promise<Response> {
     try {
+      reqBody.tenantId = await this.tenantId;
       const data = await this.ruleRepository.create(reqBody);
       return new Response(Rule, data);
     } catch (error) {
@@ -76,7 +86,9 @@ export class RuleController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Rule)) filter?: Filter,
   ): Promise<CollectionResponse> {
-    const data = await this.ruleRepository.find(filter);
+    const data = await this.ruleRepository.find(filter, {
+      tenantId: await this.tenantId,
+    });
     return new CollectionResponse(Rule, data);
   }
 
@@ -92,7 +104,9 @@ export class RuleController {
     @requestBody(Schema.updateRequest(Rule, updateDesc))
     rule: Partial<Rule>,
   ): Promise<void> {
-    await this.ruleRepository.updateById(id, rule);
+    await this.ruleRepository.updateById(id, rule, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/rules/{ruleId}', {
@@ -105,7 +119,7 @@ export class RuleController {
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     id: string,
   ): Promise<void> {
-    await this.ruleRepository.deleteById(id);
+    await this.ruleRepository.deleteById(id, {tenantId: await this.tenantId});
   }
 
   @get(prefix + '/rules/count', {
@@ -132,7 +146,9 @@ export class RuleController {
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     id: string,
   ): Promise<Response> {
-    const data = await this.ruleRepository.findById(id);
+    const data = await this.ruleRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
     return new Response(Rule, data);
   }
 
@@ -152,7 +168,9 @@ export class RuleController {
     @requestBody(Schema.createRequest(Condition, createConditionDesc))
     condition: Partial<Condition>,
   ): Promise<Response> {
-    const data = await this.ruleRepository.conditions(ruleId).create(condition);
+    const data = await this.ruleRepository
+      .conditions(ruleId)
+      .create(condition, {tenantId: await this.tenantId});
     return new Response(Condition, data);
   }
 
@@ -172,7 +190,7 @@ export class RuleController {
   ): Promise<CollectionResponse> {
     const data = await this.ruleRepository
       .conditions(ruleId)
-      .find({where: {id: conditionId}});
+      .find({where: {id: conditionId}}, {tenantId: await this.tenantId});
     return new CollectionResponse(Condition, data);
   }
 
@@ -188,7 +206,9 @@ export class RuleController {
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     ruleId: string,
   ): Promise<CollectionResponse> {
-    const data = await this.ruleRepository.conditions(ruleId).find();
+    const data = await this.ruleRepository
+      .conditions(ruleId)
+      .find(undefined, {tenantId: await this.tenantId});
     return new CollectionResponse(Condition, data);
   }
 
@@ -205,7 +225,9 @@ export class RuleController {
     @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
     conditionId: string,
   ) {
-    await this.ruleRepository.conditions(ruleId).delete({id: conditionId});
+    await this.ruleRepository
+      .conditions(ruleId)
+      .delete({id: conditionId}, {tenantId: await this.tenantId});
   }
 
   @patch(prefix + '/rules/{ruleId}/conditions/{conditionId}', {
@@ -226,7 +248,7 @@ export class RuleController {
   ): Promise<Count> {
     return await this.ruleRepository
       .conditions(ruleId)
-      .patch(condition, {id: conditionId});
+      .patch(condition, {id: conditionId}, {tenantId: await this.tenantId});
   }
 
   @post(prefix + '/rules/{ruleId}/actions', {
@@ -242,7 +264,9 @@ export class RuleController {
     @requestBody(Schema.createRequest(Action, createActionDesc))
     action: Partial<Action>,
   ): Promise<Response> {
-    const data = await this.ruleRepository.actions(ruleId).create(action);
+    const data = await this.ruleRepository
+      .actions(ruleId)
+      .create(action, {tenantId: await this.tenantId});
     return new Response(Action, data);
   }
 
@@ -262,7 +286,7 @@ export class RuleController {
   ): Promise<CollectionResponse> {
     const data = await this.ruleRepository
       .actions(ruleId)
-      .find({where: {id: actionId}});
+      .find({where: {id: actionId}}, {tenantId: await this.tenantId});
     return new CollectionResponse(Action, data);
   }
 
@@ -278,7 +302,9 @@ export class RuleController {
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     ruleId: string,
   ): Promise<CollectionResponse> {
-    const data = await this.ruleRepository.actions(ruleId).find();
+    const data = await this.ruleRepository
+      .actions(ruleId)
+      .find(undefined, {tenantId: await this.tenantId});
     return new CollectionResponse(Action, data);
   }
 
@@ -295,7 +321,9 @@ export class RuleController {
     @param(Schema.pathParameter('actionId', 'Action resource ID'))
     actionId: string,
   ) {
-    await this.ruleRepository.actions(ruleId).delete({id: actionId});
+    await this.ruleRepository
+      .actions(ruleId)
+      .delete({id: actionId}, {tenantId: await this.tenantId});
   }
 
   @patch(prefix + '/rules/{ruleId}/actions/{actionId}', {
@@ -316,6 +344,6 @@ export class RuleController {
   ): Promise<Count> {
     return await this.ruleRepository
       .actions(ruleId)
-      .patch(action, {id: actionId});
+      .patch(action, {id: actionId}, {tenantId: await this.tenantId});
   }
 }
