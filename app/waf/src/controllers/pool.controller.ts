@@ -48,6 +48,7 @@ export class PoolController extends BaseController {
     reqBody: Partial<Pool>,
   ): Promise<Response> {
     try {
+      reqBody.tenantId = await this.tenantId;
       const data = await this.poolRepository.create(reqBody);
       return new Response(Pool, data);
     } catch (error) {
@@ -139,7 +140,7 @@ export class PoolController extends BaseController {
     @requestBody(Schema.createRequest(Member, createMemberDesc))
     member: Partial<Member>,
   ): Promise<Response> {
-    // TODO: tenantId needs to be assigned by code, but not manually.
+    member.tenantId = await this.tenantId;
     const data = await this.poolRepository.members(pool_id).create(member);
     return new Response(Member, data);
   }

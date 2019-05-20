@@ -50,9 +50,7 @@ export abstract class CommonEntity extends Entity {
     //TODO: Need to remove this default value, after we can get it from keystone.
     default: 'default',
     schema: {
-      create: true,
       response: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     },
   })
   tenantId: string;

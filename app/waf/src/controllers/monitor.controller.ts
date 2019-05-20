@@ -44,6 +44,7 @@ export class MonitorController extends BaseController {
     reqBody: Partial<Monitor>,
   ): Promise<Response> {
     try {
+      reqBody.tenantId = await this.tenantId;
       const data = await this.monitorRepository.create(reqBody);
       return new Response(Monitor, data);
     } catch (error) {

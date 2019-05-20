@@ -85,6 +85,7 @@ export class ServiceController extends BaseController {
   ): Promise<Response> {
     const appId = service.applicationId;
     delete service.applicationId;
+    service.tenantId = await this.tenantId;
     return new Response(
       Service,
       await this.applicationRepository.services(appId).create(service),
