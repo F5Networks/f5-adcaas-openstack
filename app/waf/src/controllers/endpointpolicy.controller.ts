@@ -15,6 +15,8 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {Endpointpolicy, Rule, Service} from '../models';
 import {
@@ -23,6 +25,8 @@ import {
   ServiceEndpointpolicyAssociationRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
+import {inject} from '@loopback/core';
 
 const prefix = '/adcaas/v1';
 
@@ -34,7 +38,7 @@ const createRuleDesc: string = 'Rule resource that need to be created';
 const updateRuleDesc: string =
   'Rule resource properties that need to be updated';
 
-export class EndpointpolicyController {
+export class EndpointpolicyController extends BaseController {
   constructor(
     @repository(EndpointpolicyRepository)
     public endpointpolicyRepository: EndpointpolicyRepository,
@@ -42,7 +46,11 @@ export class EndpointpolicyController {
     public serviceRepository: ServiceRepository,
     @repository(ServiceEndpointpolicyAssociationRepository)
     public serviceEndpointpolicyAssociationRepository: ServiceEndpointpolicyAssociationRepository,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/endpointpolicies', {
     responses: {
@@ -61,6 +69,7 @@ export class EndpointpolicyController {
     reqBody: Partial<Endpointpolicy>,
   ): Promise<Response> {
     try {
+      reqBody.tenantId = await this.tenantId;
       const data = await this.endpointpolicyRepository.create(reqBody);
       return new Response(Endpointpolicy, data);
     } catch (error) {
@@ -95,7 +104,9 @@ export class EndpointpolicyController {
     @param.query.object('filter', getFilterSchemaFor(Endpointpolicy))
     filter?: Filter,
   ): Promise<CollectionResponse> {
-    const data = await this.endpointpolicyRepository.find(filter);
+    const data = await this.endpointpolicyRepository.find(filter, {
+      tenantId: await this.tenantId,
+    });
     return new CollectionResponse(Endpointpolicy, data);
   }
 
@@ -114,7 +125,9 @@ export class EndpointpolicyController {
     )
     id: string,
   ): Promise<Response> {
-    const data = await this.endpointpolicyRepository.findById(id);
+    const data = await this.endpointpolicyRepository.findById(id, undefined, {
+      tenantId: await this.tenantId,
+    });
     return new Response(Endpointpolicy, data);
   }
 
@@ -134,7 +147,9 @@ export class EndpointpolicyController {
     @requestBody(Schema.createRequest(Endpointpolicy, updateDesc))
     epp: Endpointpolicy,
   ): Promise<void> {
-    await this.endpointpolicyRepository.updateById(id, epp);
+    await this.endpointpolicyRepository.updateById(id, epp, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/endpointpolicies/{endpointpolicyId}', {
@@ -151,7 +166,9 @@ export class EndpointpolicyController {
     )
     id: string,
   ): Promise<void> {
-    await this.endpointpolicyRepository.deleteById(id);
+    await this.endpointpolicyRepository.deleteById(id, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @post(prefix + '/endpointpolicies/{endpointpolicyId}/rules', {
@@ -171,7 +188,7 @@ export class EndpointpolicyController {
   ): Promise<Response> {
     const data = await this.endpointpolicyRepository
       .rules(endpointpolicyId)
-      .create(rule);
+      .create(rule, {tenantId: await this.tenantId});
     return new Response(Rule, data);
   }
 
@@ -191,7 +208,7 @@ export class EndpointpolicyController {
   ): Promise<CollectionResponse> {
     const data = await this.endpointpolicyRepository
       .rules(endpointpolicyId)
-      .find();
+      .find(undefined, {tenantId: await this.tenantId});
     return new CollectionResponse(Rule, data);
   }
 
@@ -213,7 +230,7 @@ export class EndpointpolicyController {
   ): Promise<CollectionResponse> {
     const data = await this.endpointpolicyRepository
       .rules(endpointpolicyId)
-      .find({where: {id: ruleId}});
+      .find({where: {id: ruleId}}, {tenantId: await this.tenantId});
     return new CollectionResponse(Rule, data);
   }
 
@@ -234,7 +251,7 @@ export class EndpointpolicyController {
   ) {
     await this.endpointpolicyRepository
       .rules(endpointpolicyId)
-      .delete({id: ruleId});
+      .delete({id: ruleId}, {tenantId: await this.tenantId});
   }
 
   @patch(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
@@ -257,7 +274,7 @@ export class EndpointpolicyController {
   ): Promise<Count> {
     return await this.endpointpolicyRepository
       .rules(endpointpolicyId)
-      .patch(rule, {id: ruleId});
+      .patch(rule, {id: ruleId}, {tenantId: await this.tenantId});
   }
 
   @get(prefix + '/endpointpolicies/{endpointpolicyId}/services', {
@@ -283,13 +300,16 @@ export class EndpointpolicyController {
     let serviceIds = assocs.map(({serviceId}) => serviceId);
     return new CollectionResponse(
       Service,
-      await this.serviceRepository.find({
-        where: {
-          id: {
-            inq: serviceIds,
+      await this.serviceRepository.find(
+        {
+          where: {
+            id: {
+              inq: serviceIds,
+            },
           },
         },
-      }),
+        {tenantId: await this.tenantId},
+      ),
     );
   }
 
@@ -318,7 +338,9 @@ export class EndpointpolicyController {
     } else {
       return new Response(
         Service,
-        await this.serviceRepository.findById(assocs[0].serviceId),
+        await this.serviceRepository.findById(assocs[0].serviceId, undefined, {
+          tenantId: await this.tenantId,
+        }),
       );
     }
   }

@@ -1,22 +1,67 @@
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  teardownRestAppAndClient,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   createEndpointpolicyObject,
   givenEndpointpolicyData,
 } from '../helpers/database.helpers';
 import {Endpointpolicy} from '../../src/models';
+import {
+  ShouldResponseWith,
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
+
 import uuid = require('uuid');
 
 describe('EndpointpolicyController', () => {
   let wafapp: WafApplication;
   let client: Client;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
+  let envs: {[key: string]: string} = {
+    OS_AUTH_URL: 'http://localhost:35357/v2.0',
+    OS_USERNAME: 'wafaas',
+    OS_PASSWORD: '91153c85b8dd4147',
+    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+    OS_DOMAIN_NAME: 'Default',
+    OS_REGION_NAME: 'RegionOne',
+    OS_AVAILABLE_ZONE: 'nova',
+  };
+  let setupEnvs = async () => {
+    process.env.PRODUCT_RELEASE = '1';
+    for (let env of Object.keys(envs)) {
+      process.env[env] = envs[env];
+    }
+  };
+
+  let teardownEnvs = async () => {
+    delete process.env['PRODUCT_RELEASE'];
+    for (let env of Object.keys(envs)) {
+      delete process.env[env];
+    }
+  };
 
   before('setupApplication', async () => {
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
     ({wafapp, client} = await setupApplication());
+    ShouldResponseWith({});
+    setupEnvs();
   });
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
@@ -24,6 +69,8 @@ describe('EndpointpolicyController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   it('post ' + prefix + '/endpointpolicies: with id', async () => {
@@ -31,6 +78,8 @@ describe('EndpointpolicyController', () => {
 
     const response = await client
       .post(prefix + '/endpointpolicies')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(epp)
       .expect(200);
 
@@ -44,6 +93,8 @@ describe('EndpointpolicyController', () => {
 
     const response = await client
       .post(prefix + '/endpointpolicies')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send(epp)
       .expect(200);
 
@@ -57,6 +108,8 @@ describe('EndpointpolicyController', () => {
 
       const response = await client
         .post(prefix + '/endpointpolicies')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(request)
         .expect(200);
 
@@ -69,7 +122,11 @@ describe('EndpointpolicyController', () => {
 
   it('get ' + prefix + '/endpointpolicies: of all', async () => {
     const epp = await givenEndpointpolicyData(wafapp);
-    const response = await client.get(prefix + '/endpointpolicies').expect(200);
+    const response = await client
+      .get(prefix + '/endpointpolicies')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
     expect(toJSON(epp)).to.containDeep(response.body.endpointpolicies[0]);
   });
 
@@ -78,6 +135,8 @@ describe('EndpointpolicyController', () => {
 
     const response = await client
       .get(prefix + '/endpointpolicies')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({where: {id: epp.getId()}})
       .expect(200);
     expect(toJSON(epp)).to.containDeep(response.body.endpointpolicies[0]);
@@ -86,6 +145,8 @@ describe('EndpointpolicyController', () => {
   it('get ' + prefix + '/endpointpolicies/count', async () => {
     let response = await client
       .get(prefix + '/endpointpolicies/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
     expect(response.body.count).to.eql(0);
 
@@ -93,6 +154,8 @@ describe('EndpointpolicyController', () => {
 
     response = await client
       .get(prefix + '/endpointpolicies/count')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .query({where: {id: epp.id}})
       .expect(200);
     expect(response.body.count).to.eql(1);
@@ -104,14 +167,22 @@ describe('EndpointpolicyController', () => {
       await givenEndpointpolicyData(wafapp);
       const epp = await givenEndpointpolicyData(wafapp);
 
-      await client.get(prefix + '/endpointpolicies/' + epp.id).expect(200);
+      await client
+        .get(prefix + '/endpointpolicies/' + epp.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
     },
   );
 
   it(
     'get ' + prefix + '/endpointpolicies/{endpointpolicyId}: not found',
     async () => {
-      await client.get(prefix + '/endpointpolicies/' + uuid()).expect(404);
+      await client
+        .get(prefix + '/endpointpolicies/' + uuid())
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
     },
   );
 
@@ -123,9 +194,15 @@ describe('EndpointpolicyController', () => {
 
       await client
         .patch(prefix + `/endpointpolicies/${epp.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(epp)
         .expect(204);
-      await client.get(prefix + `/endpointpolicies/${epp.id}`).expect(200);
+      await client
+        .get(prefix + `/endpointpolicies/${epp.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
     },
   );
 
@@ -137,6 +214,8 @@ describe('EndpointpolicyController', () => {
       const patched_name = {name: 'new endpointpolicy name'};
       await client
         .patch(prefix + '/endpointpolicies/' + uuid())
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(patched_name)
         .expect(404);
     },
@@ -147,7 +226,11 @@ describe('EndpointpolicyController', () => {
       prefix +
       '/endpointpolicies/{endpointpolicyId}: non-existing item',
     async () => {
-      await client.del(prefix + '/endpointpolicies/' + uuid()).expect(404);
+      await client
+        .del(prefix + '/endpointpolicies/' + uuid())
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
     },
   );
 
@@ -156,7 +239,11 @@ describe('EndpointpolicyController', () => {
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
 
-      await client.del(prefix + '/endpointpolicies/' + epp.id).expect(204);
+      await client
+        .del(prefix + '/endpointpolicies/' + epp.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(204);
     },
   );
 
@@ -170,6 +257,8 @@ describe('EndpointpolicyController', () => {
       );
       await client
         .put(prefix + '/endpointpolicies/' + epp.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send(epp)
         .expect(404);
     },
