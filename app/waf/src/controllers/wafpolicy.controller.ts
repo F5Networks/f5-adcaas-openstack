@@ -14,18 +14,26 @@ import {
   patch,
   del,
   requestBody,
+  RequestContext,
+  RestBindings,
 } from '@loopback/rest';
 import {Wafpolicy} from '../models';
 import {WafpolicyRepository} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
+import {BaseController} from './base.controller';
+import {inject} from '@loopback/core';
 
 const prefix = '/adcaas/v1';
 
-export class WafpolicyController {
+export class WafpolicyController extends BaseController {
   constructor(
     @repository(WafpolicyRepository)
     public wafpolicyRepository: WafpolicyRepository,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT)
+    protected reqCxt: RequestContext,
+  ) {
+    super(reqCxt);
+  }
 
   @post(prefix + '/wafpolicies', {
     responses: {
@@ -46,6 +54,7 @@ export class WafpolicyController {
     )
     wafpolicy: Partial<Wafpolicy>,
   ): Promise<Response> {
+    wafpolicy.tenantId = await this.tenantId;
     return new Response(
       Wafpolicy,
       await this.wafpolicyRepository.create(wafpolicy),
@@ -80,7 +89,9 @@ export class WafpolicyController {
   ): Promise<CollectionResponse> {
     return new CollectionResponse(
       Wafpolicy,
-      await this.wafpolicyRepository.find(filter),
+      await this.wafpolicyRepository.find(filter, {
+        tenantId: await this.tenantId,
+      }),
     );
   }
 
@@ -96,7 +107,12 @@ export class WafpolicyController {
   async findById(
     @param(Schema.pathParameter('id', 'WAF Policy resource ID')) id: string,
   ): Promise<Response> {
-    return new Response(Wafpolicy, await this.wafpolicyRepository.findById(id));
+    return new Response(
+      Wafpolicy,
+      await this.wafpolicyRepository.findById(id, undefined, {
+        tenantId: await this.tenantId,
+      }),
+    );
   }
 
   @patch(prefix + '/wafpolicies/{id}', {
@@ -115,7 +131,9 @@ export class WafpolicyController {
     )
     wafpolicy: Partial<Wafpolicy>,
   ): Promise<void> {
-    await this.wafpolicyRepository.updateById(id, wafpolicy);
+    await this.wafpolicyRepository.updateById(id, wafpolicy, {
+      tenantId: await this.tenantId,
+    });
   }
 
   @del(prefix + '/wafpolicies/{id}', {
@@ -127,6 +145,8 @@ export class WafpolicyController {
   async deleteById(
     @param(Schema.pathParameter('id', 'WAF Policy resource ID')) id: string,
   ): Promise<void> {
-    await this.wafpolicyRepository.deleteById(id);
+    await this.wafpolicyRepository.deleteById(id, {
+      tenantId: await this.tenantId,
+    });
   }
 }
