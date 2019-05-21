@@ -1,7 +1,14 @@
 import {Client, expect, sinon} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {ApplicationController} from '../../src/controllers';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  teardownRestAppAndClient,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
@@ -19,21 +26,62 @@ import {
   giveMemberMonitorAssociationData,
   givenServiceEndpointpolicyAssociationData,
 } from '../helpers/database.helpers';
+import {
+  ShouldResponseWith,
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 describe('ApplicationController declaration test', () => {
   let wafapp: WafApplication;
   let controller: ApplicationController;
   let client: Client;
   let deployStub: sinon.SinonStub;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
+  let envs: {[key: string]: string} = {
+    OS_AUTH_URL: 'http://localhost:35357/v2.0',
+    OS_USERNAME: 'wafaas',
+    OS_PASSWORD: '91153c85b8dd4147',
+    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+    OS_DOMAIN_NAME: 'Default',
+    OS_REGION_NAME: 'RegionOne',
+    OS_AVAILABLE_ZONE: 'nova',
+  };
+
+  let setupEnvs = async () => {
+    process.env.PRODUCT_RELEASE = '1';
+    for (let env of Object.keys(envs)) {
+      process.env[env] = envs[env];
+    }
+  };
+
+  let teardownEnvs = async () => {
+    delete process.env['PRODUCT_RELEASE'];
+    for (let env of Object.keys(envs)) {
+      delete process.env[env];
+    }
+  };
+
   before('setupApplication', async () => {
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<ApplicationController>(
       'controllers.ApplicationController',
     );
+
+    ShouldResponseWith({});
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
@@ -43,6 +91,8 @@ describe('ApplicationController declaration test', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   afterEach(async () => {
@@ -125,6 +175,8 @@ describe('ApplicationController declaration test', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'a-declaration'})
         .expect(200);
     },
@@ -160,6 +212,8 @@ describe('ApplicationController declaration test', () => {
 
       await client
         .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'a-declaration'})
         .expect(422);
     },
@@ -172,6 +226,8 @@ describe('ApplicationController declaration test', () => {
     async () => {
       await client
         .post(prefix + '/applications/do-not-exist/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'a-declaration'})
         .expect(404);
     },
@@ -182,13 +238,18 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations: get all declarations',
     async () => {
-      const application = await givenApplicationData(wafapp);
+      const application = await givenApplicationData(wafapp, {
+        tenantId: ExpectedData.tenantId,
+      });
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
         .get(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.declarations[0].id).to.equal(declaration.id);
@@ -204,6 +265,8 @@ describe('ApplicationController declaration test', () => {
 
       let response = await client
         .get(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.declarations.length).to.equal(0);
@@ -215,9 +278,12 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations/{declarationId}: get declaration',
     async () => {
-      const application = await givenApplicationData(wafapp);
+      const application = await givenApplicationData(wafapp, {
+        tenantId: ExpectedData.tenantId,
+      });
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
@@ -228,6 +294,8 @@ describe('ApplicationController declaration test', () => {
             '/declarations/' +
             declaration.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.declaration.id).to.equal(declaration.id);
@@ -248,6 +316,8 @@ describe('ApplicationController declaration test', () => {
             application.id +
             '/declarations/do-not-exist',
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
@@ -257,9 +327,12 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations/{declarationId}: update declaration',
     async () => {
-      const application = await givenApplicationData(wafapp);
+      const application = await givenApplicationData(wafapp, {
+        tenantId: ExpectedData.tenantId,
+      });
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
+        tenantId: ExpectedData.tenantId,
       });
 
       await client
@@ -270,6 +343,8 @@ describe('ApplicationController declaration test', () => {
             '/declarations/' +
             declaration.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'new-name'})
         .expect(204);
 
@@ -281,6 +356,8 @@ describe('ApplicationController declaration test', () => {
             '/declarations/' +
             declaration.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.declaration.name).to.equal('new-name');
@@ -301,6 +378,8 @@ describe('ApplicationController declaration test', () => {
             application.id +
             '/declarations/do-not-exist',
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'new-name'})
         .expect(404);
     },
@@ -324,6 +403,8 @@ describe('ApplicationController declaration test', () => {
             '/declarations/' +
             declaration.id,
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
     },
   );
@@ -342,6 +423,8 @@ describe('ApplicationController declaration test', () => {
             application.id +
             '/declarations/do-not-exist',
         )
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
     },
   );
@@ -353,6 +436,8 @@ describe('ApplicationController declaration test', () => {
     async () => {
       await client
         .del(prefix + '/applications/do-not-exist/declarations/do-not-exist')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
     },
   );
