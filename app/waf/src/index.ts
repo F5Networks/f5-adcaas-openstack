@@ -12,7 +12,11 @@ export async function main(options: ApplicationConfig = {}) {
   await app.boot();
 
   let dbReady = async () => {
-    return probe(+process.env.DATABASE_PORT!, process.env.DATABASE_HOST, 1000);
+    return probe(
+      +process.env.DATABASE_PORT! || 5432,
+      process.env.DATABASE_HOST,
+      1000,
+    );
   };
   await checkAndWait(dbReady, 3).then(async () => {
     await app.migrateSchema();
