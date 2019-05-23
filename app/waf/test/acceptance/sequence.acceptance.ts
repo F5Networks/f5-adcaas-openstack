@@ -3,6 +3,8 @@ import {
   setupRestAppAndClient,
   RestApplicationPort,
   teardownRestAppAndClient,
+  setupEnvs,
+  teardownEnvs,
 } from '../helpers/test-helper';
 import {
   MockKeyStoneController,
@@ -21,16 +23,6 @@ describe('openstack.identity.test', () => {
 
   let testApp: TestingApplication;
   let client: Client;
-
-  let envs: {[key: string]: string} = {
-    OS_AUTH_URL: 'http://localhost:35357/v2.0',
-    OS_USERNAME: 'wafaas',
-    OS_PASSWORD: '91153c85b8dd4147',
-    OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
-    OS_DOMAIN_NAME: 'Default',
-    OS_REGION_NAME: 'RegionOne',
-    OS_AVAILABLE_ZONE: 'nova',
-  };
 
   before('setup', async () => {
     let mockIdAppClient = await setupRestAppAndClient(
@@ -55,17 +47,11 @@ describe('openstack.identity.test', () => {
   });
 
   beforeEach('setup environs', async () => {
-    process.env.PRODUCT_RELEASE = '1';
-    for (let env of Object.keys(envs)) {
-      process.env[env] = envs[env];
-    }
+    setupEnvs();
   });
 
   afterEach('teardown environs', async () => {
-    delete process.env['PRODUCT_RELEASE'];
-    for (let env of Object.keys(envs)) {
-      delete process.env[env];
-    }
+    teardownEnvs();
   });
 
   after('teardown', async () => {
