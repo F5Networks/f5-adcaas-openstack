@@ -2,6 +2,18 @@ import {factory} from './log4ts';
 
 const utilsLogger = factory.getLogger('utils.logger');
 
+let defaultInterval = +process.env.DEFAULT_INTERVAL! || 1000;
+
+export function getDefaultInterval(): number {
+  return defaultInterval;
+}
+
+export function setDefaultInterval(ms: number) {
+  if (ms > 0) {
+    defaultInterval = ms;
+  }
+}
+
 /**
  * Check and wait until some condition is fulfilled or timeout.
  *
@@ -14,7 +26,7 @@ export async function checkAndWait(
   checkFunc: Function,
   tryTimes: number,
   funcArgs: (object | string | number | boolean | undefined)[] = [],
-  intervalInMSecs: number = 1000,
+  intervalInMSecs: number = defaultInterval,
 ): Promise<void> {
   let funcName = checkFunc.name ? checkFunc.name : 'anonymous';
 
