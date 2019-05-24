@@ -32,9 +32,8 @@ import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
 import {
-  TrustedDeviceRequest,
-  TrustedDevice,
   TrustedDeviceService,
+  TrustedDeviceManager,
   PortCreationParams,
   ServersParams,
   BigIpManager,
@@ -45,16 +44,9 @@ import {checkAndWait, merge} from '../utils';
 
 const prefix = '/adcaas/v1';
 
-const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
-const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
-
-async function sleep(time: number): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    setTimeout(resolve, time);
-  });
-}
-
 export class AdcController extends BaseController {
+  tdMgr: TrustedDeviceManager;
+
   constructor(
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
@@ -70,6 +62,7 @@ export class AdcController extends BaseController {
     private logger = factory.getLogger('controllers.adc'),
   ) {
     super(reqCxt);
+    this.tdMgr = new TrustedDeviceManager(this.trustedDeviceService);
   }
 
   @post(prefix + '/adcs', {
@@ -88,119 +81,80 @@ export class AdcController extends BaseController {
     reqBody.tenantId = await this.tenantId;
 
     //TODO: Reject create ADC HW request with duplicated mgmt IP address
-    if (reqBody.type === 'HW') {
-      await this.trustAdc(reqBody);
-    }
-
+    let adc: Adc;
     try {
-      return new Response(Adc, await this.adcRepository.create(reqBody));
+      adc = await this.adcRepository.create(reqBody);
     } catch (e) {
       throw new HttpErrors.UnprocessableEntity(e.message);
     }
-  }
 
-  async trustAdc(adc: Partial<Adc>): Promise<void> {
-    if (!adc.management || !adc.management.ipAddress) {
-      throw new HttpErrors.BadRequest(
-        'IP address and admin passphrase are required to trust ADC hardware',
-      );
+    if (adc.type === 'HW') {
+      //TODO: Do this check in API validator
+      if (!adc.management || !adc.management.ipAddress) {
+        throw new HttpErrors.BadRequest(
+          'IP address and admin passphrase are required to trust ADC hardware',
+        );
+      }
+
+      this.trustAdc(adc);
     }
 
-    let body: TrustedDeviceRequest = {
-      devices: [
-        {
-          targetHost: adc.management.ipAddress,
-          targetPort: adc.management.tcpPort || 443,
-          //TODO: Need away to input admin password of BIG-IP HW
-          targetUsername: 'admin',
-          targetPassphrase: 'admin',
-        },
-      ],
+    return new Response(Adc, adc);
+  }
+
+  async trustAdc(adc: Adc): Promise<void> {
+    let isTrusted = async (deviceId: string): Promise<boolean> => {
+      return await this.tdMgr.getState(deviceId).then(state => {
+        switch (state) {
+          case 'ACTIVE':
+            return true;
+          case 'PENDING':
+            return false;
+          default:
+            //TODO: throw error after checkAndWait() supports error terminating
+            return false;
+        }
+      });
     };
 
-    let devices: TrustedDevice[];
-
     try {
-      devices = (await this.trustedDeviceService.trust(
-        ASG_HOST,
-        ASG_PORT,
-        body,
-      )).devices;
-    } catch (e) {
-      //TODO: Request TrustedDevices to hide admin passphrase in error message
-      throw new HttpErrors.UnprocessableEntity(e.message);
-    }
-
-    //Wait until trusted state become ACTIVE
-    let retries = 0;
-    while (retries < 15) {
-      if (devices.length !== 1) {
-        throw new HttpErrors.UnprocessableEntity(
-          'Trusting device fails: Response size is ' + devices.length,
-        );
-      } else {
-        adc.trustedDeviceId = devices[0].targetUUID;
-        if (devices[0].state === 'ACTIVE') {
-          break;
-        } else if (
-          devices[0].state === 'ERROR' ||
-          devices[0].state === 'UNDISCOVERED'
-        ) {
-          throw new HttpErrors.UnprocessableEntity(
-            'Trusting device fails: Device state is ' + devices[0].state,
-          );
-        }
-      }
-
-      await sleep(1000);
-      retries++;
-
-      try {
-        devices = (await this.trustedDeviceService.query(
-          ASG_HOST,
-          ASG_PORT,
-          adc.trustedDeviceId,
-        )).devices;
-      } catch (e) {
-        throw new HttpErrors.UnprocessableEntity(e.message);
-      }
-    }
-
-    if (retries >= 15) {
-      throw new HttpErrors.UnprocessableEntity(
-        'Trusting ADC' + adc.id + ' timeout',
+      await this.serialize(adc, {status: 'TRUSTING'});
+      //TODO: Need away to input admin password of BIG-IP HW
+      let device = await this.tdMgr.trust(
+        adc.management!.ipAddress,
+        adc.management!.tcpPort,
+        adc.management!.username,
+        adc.management!.password,
       );
+
+      await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
+        async () => {
+          await this.serialize(adc, {status: 'TRUSTED'});
+        },
+        async () => {
+          await this.serialize(adc, {
+            status: 'TRUSTERROR',
+            lastErr: 'Trusting timeout',
+          });
+        },
+      );
+    } catch (err) {
+      await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
     }
   }
 
-  async untrustAdc(adc: Adc): Promise<void> {
+  async untrustAdc(adc: Adc): Promise<boolean> {
     if (!adc.trustedDeviceId) {
-      return;
+      return true;
     }
-
-    let devices: TrustedDevice[];
 
     try {
-      devices = (await this.trustedDeviceService.untrust(
-        ASG_HOST,
-        ASG_PORT,
-        adc.trustedDeviceId,
-      )).devices;
-    } catch (e) {
-      throw new HttpErrors.UnprocessableEntity(e.message);
+      await this.tdMgr.untrust(adc.trustedDeviceId);
+    } catch (err) {
+      await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
+      return false;
     }
-
-    if (devices.length !== 1) {
-      throw new HttpErrors.UnprocessableEntity(
-        'Untrusting device fails: Response size is ' + devices.length,
-      );
-    }
-
-    if (devices[0].state !== 'DELETING') {
-      throw new HttpErrors.UnprocessableEntity(
-        'Untrusting device fails: Device state is ' + devices[0].state,
-      );
-    }
+    return true;
   }
 
   @get(prefix + '/adcs/count', {
@@ -288,8 +242,8 @@ export class AdcController extends BaseController {
       tenantId: await this.tenantId,
     });
 
-    if (adc.type === 'HW') {
-      await this.untrustAdc(adc);
+    if (adc.type === 'HW' && !(await this.untrustAdc(adc))) {
+      throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
     }
 
     await this.adcRepository.deleteById(id);
@@ -439,6 +393,7 @@ export class AdcController extends BaseController {
               let hostname = await bigipMgr.getHostname();
               this.logger.debug(`bigip hostname: ${hostname}`);
               await bigipMgr.getLicense();
+              await bigipMgr.getConfigsyncIp();
 
               return hostname === doBody.declaration.Common!.hostname!;
             };
@@ -446,6 +401,9 @@ export class AdcController extends BaseController {
             await checkAndWait(bigipOboarded, 240).then(
               async () => {
                 await this.serialize(adc, {status: 'ONBOARDED'});
+
+                //Build trust relation to VE
+                await this.trustAdc(adc);
               },
               async () => {
                 await this.serialize(adc, {

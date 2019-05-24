@@ -130,6 +130,56 @@ export class BigIpManager {
     throw new Error(`License not found: from ${resObj}`);
   }
 
+  async getConfigsyncIp(): Promise<string> {
+    await this.mustBeReachable();
+
+    let url = `${this.baseUrl}/mgmt/tm/cm/device`;
+
+    let impFunc = async () => {
+      let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+      let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+      this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+      return resObj;
+    };
+
+    let checkFunc = async () => {
+      return await impFunc().then(resObj => {
+        let items = resObj['items'];
+        for (let item of items) {
+          if (
+            item.managementIp === this.config.ipAddr &&
+            item.configsyncIp !== 'none'
+          ) {
+            return true;
+          } else {
+            this.logger.warn('No configsync IP, waiting...');
+            return false;
+          }
+        }
+        this.logger.debug('Configsync IP is ready.');
+        return true;
+      });
+    };
+
+    return await checkAndWait(checkFunc, 60).then(
+      async () => {
+        return await impFunc().then(resObj => {
+          let items = resObj['items'];
+          let ip = '';
+          for (let item of items) {
+            if (item.managementIp === this.config.ipAddr) {
+              ip = item.configsyncIp;
+            }
+          }
+          return ip;
+        });
+      },
+      () => {
+        throw new Error('No configsync IP');
+      },
+    );
+  }
+
   async getHostname(): Promise<string> {
     await this.mustBeReachable();
 

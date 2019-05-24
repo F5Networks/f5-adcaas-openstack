@@ -753,6 +753,18 @@ export const StubResponses = {
       selfLink: 'https://localhost/mgmt/tm/sys/license?ver=13.1.1',
     };
   },
+
+  bigipCmDevice200: () => {
+    return {
+      items: [
+        {
+          managementIp: ExpectedData.bigipMgmt.ipAddr,
+          configsyncIp: '1.2.3.4',
+        },
+      ],
+    };
+  },
+
   bigipGlobalSettings200: () => {
     return {
       awsApiMaxConcurrency: 1,

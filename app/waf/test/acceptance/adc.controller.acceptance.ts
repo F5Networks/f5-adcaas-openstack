@@ -38,7 +38,7 @@ import {
   MockDOController,
   DOShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.do.controller';
-import {checkAndWait} from '../../src/utils';
+import {checkAndWait, sleep, setDefaultInterval} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 
@@ -108,6 +108,7 @@ describe('AdcController', () => {
     DOShouldResponseWith({});
     BigipShouldResponseWith({});
     setupEnvs();
+    setDefaultInterval(1);
   });
 
   beforeEach('Empty database', async () => {
@@ -133,7 +134,240 @@ describe('AdcController', () => {
     teardownEnvs();
   });
 
-  it('post ' + prefix + '/adcs: create ADC HW', async () => {
+  it('post ' + prefix + '/adcs: create ADC HW', async function() {
+    await givenAdcData(wafapp, {
+      trustedDeviceId: 'abcdefg',
+    });
+
+    const adc = createAdcObject({
+      type: 'HW',
+      management: {
+        ipAddress: '1.2.3.4',
+        tcpPort: 100,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
+
+    let id = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    });
+
+    queryStub.onCall(0).returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'PENDING',
+        },
+      ],
+    });
+
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'ACTIVE',
+        },
+      ],
+    });
+
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).to.containDeep(toJSON(adc));
+
+    await sleep(10);
+
+    response = await client
+      .get(prefix + '/adcs/' + response.body.adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
+
+    expect(response.body.adc.status).to.equal('TRUSTED');
+  });
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW without management info',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+      delete adc.management;
+
+      await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(400);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with trust exception',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+
+      trustStub.throws({
+        message: 'Unknown error',
+      });
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with wrong trust response',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+
+      trustStub.returns({
+        devices: [{}, {}],
+      });
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
+
+  /* TODO: Add it back after checkAndWait() support error terminating"
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with error query response',
+    async () => {
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: uuid(),
+            targetHost: '1.2.3.4',
+            state: 'PENDING',
+          },
+        ],
+      });
+
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: uuid(),
+            targetHost: '1.2.3.4',
+            state: 'ERROR',
+          },
+        ],
+      });
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
+*/
+
+  /* TODO: Add it back after checkAndWait supports error terminating
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with trust query exception',
+    async () => {
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'PENDING',
+          },
+        ],
+      });
+
+      queryStub.throws('Not working');
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
+*/
+
+  it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
     await givenAdcData(wafapp, {
       trustedDeviceId: 'abcdefg',
     });
@@ -165,12 +399,12 @@ describe('AdcController', () => {
         {
           targetUUID: id,
           targetHost: '1.2.3.4',
-          state: 'ACTIVE',
+          state: 'PENDING',
         },
       ],
     });
 
-    const response = await client
+    let response = await client
       .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
@@ -178,130 +412,17 @@ describe('AdcController', () => {
       .expect(200);
 
     expect(response.body.adc).to.containDeep(toJSON(adc));
-  });
 
-  it(
-    'post ' + prefix + '/adcs: create ADC HW without management info',
-    async () => {
-      const adc = createAdcObject({type: 'HW'});
-      delete adc.management;
+    await sleep(50);
 
-      await client
-        .post(prefix + '/adcs')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send(adc)
-        .expect(400);
-    },
-  );
+    response = await client
+      .get(prefix + '/adcs/' + response.body.adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
 
-  it(
-    'post ' + prefix + '/adcs: create ADC HW with trust exception',
-    async () => {
-      const adc = createAdcObject({type: 'HW'});
-
-      trustStub.throws({
-        message: 'Unknown error',
-      });
-
-      await client
-        .post(prefix + '/adcs')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send(adc)
-        .expect(422);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/adcs: create ADC HW with wrong trust response',
-    async () => {
-      const adc = createAdcObject({type: 'HW'});
-
-      trustStub.returns({
-        devices: [{}, {}],
-      });
-
-      await client
-        .post(prefix + '/adcs')
-        .send(adc)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(422);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/adcs: create ADC HW with error trust response',
-    async () => {
-      const adc = createAdcObject({
-        type: 'HW',
-        management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
-        },
-      });
-
-      trustStub.returns({
-        devices: [
-          {
-            targetUUID: uuid(),
-            targetHost: '1.2.3.4',
-            state: 'ERROR',
-          },
-        ],
-      });
-
-      await client
-        .post(prefix + '/adcs')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send(adc)
-        .expect(422);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/adcs: create ADC HW with trust query exception',
-    async () => {
-      const adc = createAdcObject({
-        type: 'HW',
-        management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
-        },
-      });
-
-      let id = uuid();
-      trustStub.returns({
-        devices: [
-          {
-            targetUUID: id,
-            targetHost: '1.2.3.4',
-            state: 'PENDING',
-          },
-        ],
-      });
-
-      queryStub.throws('Not working');
-
-      await client
-        .post(prefix + '/adcs')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send(adc)
-        .expect(422);
-    },
-  );
-
-  it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
-    //TODO: timeout UT
+    expect(response.body.adc.status).to.equal('TRUSTERROR');
+    expect(response.body.adc.lastErr).to.equal('Trusting timeout');
   });
 
   it('get ' + prefix + '/adcs: of all', async () => {
@@ -594,6 +715,28 @@ describe('AdcController', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
     let adc = await givenAdcData(wafapp);
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+    ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
+
+    let trustDeviceId = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    });
+
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'ACTIVE',
+        },
+      ],
+    });
 
     await setupEnvs()
       .then(async () => {
@@ -611,7 +754,7 @@ describe('AdcController', () => {
             .set('X-Auth-Token', ExpectedData.userToken)
             .expect(200);
 
-          return resp.body.adc.status === 'ONBOARDED';
+          return resp.body.adc.status === 'TRUSTED';
         };
 
         await checkAndWait(checkStatus, 5, [], 50).then(() => {
