@@ -27,6 +27,21 @@ export enum RestApplicationPort {
 }
 import {stubLogger, restoreLogger} from './logging.helpers';
 
+let envs: {[key: string]: string} = {
+  OS_AUTH_URL: 'http://localhost:35357/v2.0',
+  OS_USERNAME: 'wafaas',
+  OS_PASSWORD: '91153c85b8dd4147',
+  OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+  OS_DOMAIN_NAME: 'Default',
+  OS_REGION_NAME: 'RegionOne',
+  OS_AVAILABLE_ZONE: 'nova',
+  DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
+  DO_BIGIQ_HOST: '10.250.15.105',
+  DO_BIGIQ_USERNAME: 'admin',
+  DO_BIGIQ_PASSWORD: 'admin',
+  DO_BIGIQ_POOL: 'mykeypool',
+};
+
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
     rest: givenHttpServerConfig({
@@ -107,4 +122,22 @@ export function teardownRestAppAndClient(app: TestingApplication) {
 export interface RestAppAndClient {
   restApp: TestingApplication;
   client: Client;
+}
+
+export async function setupEnvs(addonEnvs: {[key: string]: string} = {}) {
+  process.env.PRODUCT_RELEASE = '1';
+  for (let k of Object.keys(envs)) {
+    process.env[k] = envs[k];
+  }
+  for (let k of Object.keys(addonEnvs)) {
+    envs[k] = addonEnvs[k];
+    process.env[k] = addonEnvs[k];
+  }
+}
+
+export async function teardownEnvs() {
+  delete process.env['PRODUCT_RELEASE'];
+  for (let k of Object.keys(envs)) {
+    delete process.env[k];
+  }
 }
