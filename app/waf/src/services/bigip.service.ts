@@ -5,6 +5,11 @@ import {factory} from '../log4ts';
 import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
 
+export const BigipBuiltInProperties = {
+  admin: 'admin',
+  port: 443,
+};
+
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
 }
@@ -106,14 +111,22 @@ export class BigIpManager {
     let resObj = JSON.parse(JSON.stringify(response))['body'][0];
     this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
 
-    for (let entry of Object.keys(resObj.entries)) {
-      if (!entry.endsWith('/mgmt/tm/sys/license/0')) continue;
+    if (resObj.entries) {
+      for (let entry of Object.keys(resObj.entries)) {
+        if (!entry.endsWith('/mgmt/tm/sys/license/0')) continue;
 
+        return {
+          registrationKey:
+            resObj.entries[entry].nestedStats.entries.registrationKey
+              .description,
+        };
+      }
+    } else if (resObj.apiRawValues) {
       return {
-        registrationKey:
-          resObj.entries[entry].nestedStats.entries.registrationKey.description,
+        registrationKey: 'none',
       };
     }
+
     throw new Error(`License not found: from ${resObj}`);
   }
 

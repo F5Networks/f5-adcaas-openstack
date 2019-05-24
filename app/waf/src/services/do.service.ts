@@ -94,18 +94,23 @@ export class OnboardingManager {
       additionalInfo?: object,
     ): TypeDOClassDeclaration['Common'] => {
       try {
+        let onboarding = JSON.parse(JSON.stringify(additionalInfo))[
+          'onboarding'
+        ];
+        let keyName = onboarding ? 'licensePool' : 'revokeFrom';
+
         let licData = {
           class: 'License',
           licenseType: 'licensePool',
           bigIqHost: this.config.licPool.host,
           bigIqUsername: this.config.licPool.username,
           bigIqPassword: this.config.licPool.password,
-          licensePool: this.config.licPool.poolName,
+          [keyName]: this.config.licPool.poolName,
           reachable: true,
-          bigIpUsername: obData.management.username,
-          bigIpPassword: obData.management.password,
+          bigIpUsername: obData.management!.username,
+          bigIpPassword: obData.management!.password,
         };
-        this.logger.debug('Add new license.');
+        this.logger.debug('Add new license: operation: ' + keyName);
         return Object.assign(target, {myLicense: licData});
       } catch (error) {
         this.logger.debug(`No license found: ${error.message}`);
@@ -292,13 +297,13 @@ export class OnboardingManager {
     },
   };
 
-  async assembleDo(obData: Adc): Promise<TypeDOClassDO> {
+  async assembleDo(obData: Adc, addon: object): Promise<TypeDOClassDO> {
     let doBody: TypeDOClassDO = {
       class: 'DO',
-      targetHost: obData.management.ipAddress,
-      targetPort: obData.management.tcpPort,
-      targetUsername: obData.management.username,
-      targetPassphrase: obData.management.password,
+      targetHost: obData.management!.ipAddress,
+      targetPort: obData.management!.tcpPort,
+      targetUsername: obData.management!.username,
+      targetPassphrase: obData.management!.password,
       targetTimeout: this.config.timeout.toString(),
       declaration: {
         schemaVersion: '1.3.0',
@@ -315,14 +320,15 @@ export class OnboardingManager {
     let addonInfo: {[key: string]: object} = {
       // get bigip interfaces information: name.
       interfaces: await BigIpManager.instanlize({
-        username: obData.management.username,
-        password: obData.management.password,
-        ipAddr: obData.management.ipAddress,
-        port: obData.management.tcpPort,
+        username: obData.management!.username,
+        password: obData.management!.password,
+        ipAddr: obData.management!.ipAddress,
+        port: obData.management!.tcpPort,
       }).then(async bigipMgr => {
         return await bigipMgr.getInterfaces();
       }),
       subnets: await this.subnetInfo(obData),
+      onboarding: JSON.parse(JSON.stringify(addon))['onboarding'],
     };
 
     this.logger.debug(

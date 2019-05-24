@@ -39,6 +39,8 @@ import {
   DOShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.do.controller';
 import {checkAndWait} from '../../src/utils';
+import {BigipBuiltInProperties} from '../../src/services';
+import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 
 describe('AdcController', () => {
   let wafapp: WafApplication;
@@ -83,7 +85,7 @@ describe('AdcController', () => {
 
     mockBigip = await (async () => {
       let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.SSLDefault,
+        RestApplicationPort.SSLCustom,
         MockBigipController,
         'https',
       );
@@ -103,6 +105,8 @@ describe('AdcController', () => {
     controller = await wafapp.get<AdcController>('controllers.AdcController');
 
     ShouldResponseWith({});
+    DOShouldResponseWith({});
+    BigipShouldResponseWith({});
     setupEnvs();
   });
 
@@ -559,6 +563,8 @@ describe('AdcController', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
     let adc = await givenAdcData(wafapp);
 
+    BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
+    BigipShouldResponseWith({});
     await setupEnvs()
       .then(async () => {
         let response = await client
@@ -586,8 +592,6 @@ describe('AdcController', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    BigipShouldResponseWith({});
-    DOShouldResponseWith({});
     let adc = await givenAdcData(wafapp);
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
@@ -608,6 +612,39 @@ describe('AdcController', () => {
             .expect(200);
 
           return resp.body.adc.status === 'ONBOARDED';
+        };
+
+        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+          expect(true).true();
+        });
+      })
+      .finally(teardownEnvs);
+  });
+
+  it('post ' + prefix + '/adcs/{adcId}/action: delete done', async () => {
+    BigipShouldResponseWith({
+      '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
+    });
+    let adc = await givenAdcData(wafapp);
+    ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+
+    await setupEnvs()
+      .then(async () => {
+        let response = await client
+          .post(prefix + '/adcs/' + adc.id + '/action')
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .send({delete: null})
+          .expect(200);
+
+        expect(response.body).containDeep({id: adc.id});
+
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .expect(200);
+
+          return resp.body.adc.status === 'RECLAIMED';
         };
 
         await checkAndWait(checkStatus, 5, [], 50).then(() => {

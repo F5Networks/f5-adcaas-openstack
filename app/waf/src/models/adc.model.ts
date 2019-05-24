@@ -125,7 +125,7 @@ export class Adc extends CommonEntity {
       response: true,
     },
   })
-  management: ConfigTypes['management'];
+  management?: ConfigTypes['management'];
 
   @property({
     type: 'string',

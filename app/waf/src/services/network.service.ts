@@ -11,6 +11,7 @@ export interface NetworkService {
     body: PortsRequest,
   ): Promise<object>;
   v2GetSubnets(url: string, userToken: string): Promise<object>;
+  v2DeletePort(url: string, userToken: string): Promise<object>;
 }
 
 export class NetworkServiceProvider implements Provider<NetworkService> {
@@ -83,6 +84,15 @@ export class NetworkDriver {
         };
         return portResp;
       });
+  }
+
+  async deletePort(userToken: string, portId: string): Promise<void> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+
+    let url = adminToken.epPorts() + `/${portId}`;
+    await this.networkService.v2DeletePort(url, userToken);
   }
 
   async getSubnetInfo(
