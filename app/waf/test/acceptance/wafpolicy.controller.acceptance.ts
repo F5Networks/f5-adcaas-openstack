@@ -104,6 +104,49 @@ describe('WafpolicyController', () => {
     expect(toJSON(wafpolicy)).to.containDeep(response.body.wafpolicies[0]);
   });
 
+  it(
+    'get ' + prefix + '/wafpolicies: of all with public flag two',
+    async () => {
+      await givenWafpolicyData(wafapp, {public: true, tenantId: 'a random id'});
+      await givenWafpolicyData(wafapp, {
+        public: true,
+        tenantId: ExpectedData.tenantId,
+      });
+
+      let response = await client
+        .get(prefix + '/wafpolicies')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
+      expect(response.body.wafpolicies.length).to.eql(2);
+    },
+  );
+
+  it(
+    'get ' + prefix + '/wafpolicies: of all with public flag one',
+    async () => {
+      await givenWafpolicyData(wafapp, {
+        public: false,
+        tenantId: 'a random id',
+      });
+      await givenWafpolicyData(wafapp, {
+        public: true,
+        tenantId: ExpectedData.tenantId,
+      });
+
+      let response = await client
+        .get(prefix + '/wafpolicies')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
+      expect(response.body.wafpolicies.length).to.eql(1);
+    },
+  );
+
   it('get ' + prefix + '/wafpolicies: with filter string', async () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
 
@@ -156,6 +199,25 @@ describe('WafpolicyController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(404);
   });
+
+  it(
+    'get ' + prefix + '/wafpolicies/{id}: selected item with public flag',
+    async () => {
+      await givenWafpolicyData(wafapp);
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        tenantId: 'random tanant id',
+        public: true,
+      });
+
+      let response = await client
+        .get(prefix + '/wafpolicies/' + wafpolicy.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(toJSON(wafpolicy)).to.containDeep(response.body.wafpolicy);
+    },
+  );
 
   it('patch ' + prefix + '/wafpolicies/{id}: existing item', async () => {
     const patched_name = {name: 'new waf policy name'};

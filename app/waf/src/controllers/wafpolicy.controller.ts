@@ -89,8 +89,8 @@ export class WafpolicyController extends BaseController {
   ): Promise<CollectionResponse> {
     return new CollectionResponse(
       Wafpolicy,
-      await this.wafpolicyRepository.find(filter, {
-        tenantId: await this.tenantId,
+      await this.wafpolicyRepository.find({
+        where: {or: [{tenantId: await this.tenantId}, {public: true}]},
       }),
     );
   }
@@ -109,8 +109,13 @@ export class WafpolicyController extends BaseController {
   ): Promise<Response> {
     return new Response(
       Wafpolicy,
-      await this.wafpolicyRepository.findById(id, undefined, {
-        tenantId: await this.tenantId,
+      await this.wafpolicyRepository.findById(id, {
+        where: {
+          and: [
+            {or: [{tenantId: await this.tenantId}, {public: true}]},
+            {id: id},
+          ],
+        },
       }),
     );
   }

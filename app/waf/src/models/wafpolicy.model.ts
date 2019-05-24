@@ -33,6 +33,18 @@ export class Wafpolicy extends CommonEntity {
   })
   url?: string;
 
+  @property({
+    type: 'boolean',
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+    },
+    required: false,
+    default: false,
+  })
+  public: boolean;
+
   constructor(data?: Partial<Wafpolicy>) {
     super(data);
     this.as3Class = 'WAF_Policy';
