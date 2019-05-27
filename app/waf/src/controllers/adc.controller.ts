@@ -32,7 +32,7 @@ import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
 import {
-  ASGService,
+  TrustedDeviceService,
   TrustedDeviceManager,
   PortCreationParams,
   ServersParams,
@@ -52,8 +52,8 @@ export class AdcController extends BaseController {
     public adcRepository: AdcRepository,
     @repository(AdcTenantAssociationRepository)
     public adcTenantAssociationRepository: AdcTenantAssociationRepository,
-    @inject('services.ASGService')
-    public asgService: ASGService,
+    @inject('services.TrustedDeviceService')
+    public trustedDeviceService: TrustedDeviceService,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -62,7 +62,7 @@ export class AdcController extends BaseController {
     private logger = factory.getLogger('controllers.adc'),
   ) {
     super(reqCxt);
-    this.tdMgr = new TrustedDeviceManager(this.asgService);
+    this.tdMgr = new TrustedDeviceManager(this.trustedDeviceService);
   }
 
   @post(prefix + '/adcs', {

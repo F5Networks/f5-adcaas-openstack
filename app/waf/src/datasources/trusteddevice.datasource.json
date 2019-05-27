@@ -15,11 +15,7 @@
         "body": "{body}"
       },
       "functions": {
-        "trust": [
-          "host",
-          "port",
-          "body"
-        ]
+        "trust": ["host","port","body"]
       }
     },
     {
@@ -28,11 +24,7 @@
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices/{deviceId}"
       },
       "functions": {
-        "query": [
-          "host",
-          "port",
-          "deviceId"
-        ]
+        "query": ["host","port","deviceId"]
       }
     },
     {
@@ -41,11 +33,7 @@
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices/{deviceId}"
       },
       "functions": {
-        "untrust": [
-          "host",
-          "port",
-          "deviceId"
-        ]
+        "untrust": ["host","port","deviceId"]
       }
     }
   ]

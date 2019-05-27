@@ -1,6 +1,6 @@
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {ASGDataSource} from '../datasources';
+import {TrustedDeviceDataSource} from '../datasources';
 
 const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
 const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
@@ -29,7 +29,7 @@ export type TrustedDevices = {
   devices: TrustedDevice[];
 };
 
-export interface ASGService {
+export interface TrustedDeviceService {
   // this is where you define the Node.js methods that will be
   // mapped to the SOAP operations as stated in the datasource
   // json file.
@@ -42,22 +42,23 @@ export interface ASGService {
   ): Promise<TrustedDevices>;
 }
 
-export class ASGServiceProvider implements Provider<ASGService> {
+export class TrustedDeviceServiceProvider
+  implements Provider<TrustedDeviceService> {
   constructor(
-    // ASG must match the name property in the datasource json file
-    @inject('datasources.asg')
-    protected dataSource: ASGDataSource = new ASGDataSource(),
+    // TrustedDevice must match the name property in the datasource json file
+    @inject('datasources.TrustedDevice')
+    protected dataSource: TrustedDeviceDataSource = new TrustedDeviceDataSource(),
   ) {}
 
-  value(): Promise<ASGService> {
+  value(): Promise<TrustedDeviceService> {
     return getService(this.dataSource);
   }
 }
 
 export class TrustedDeviceManager {
-  private service: ASGService;
+  private service: TrustedDeviceService;
 
-  constructor(svc: ASGService) {
+  constructor(svc: TrustedDeviceService) {
     this.service = svc;
   }
 

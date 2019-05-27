@@ -113,9 +113,9 @@ describe('AdcController', () => {
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
-    trustStub = sinon.stub(controller.asgService, 'trust');
-    queryStub = sinon.stub(controller.asgService, 'query');
-    untrustStub = sinon.stub(controller.asgService, 'untrust');
+    trustStub = sinon.stub(controller.trustedDeviceService, 'trust');
+    queryStub = sinon.stub(controller.trustedDeviceService, 'query');
+    untrustStub = sinon.stub(controller.trustedDeviceService, 'untrust');
   });
 
   afterEach(async () => {
