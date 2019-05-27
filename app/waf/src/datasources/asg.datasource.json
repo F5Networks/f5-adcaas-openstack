@@ -28,7 +28,7 @@
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices/{deviceId}"
       },
       "functions": {
-        "query": [
+        "queryTrust": [
           "host",
           "port",
           "deviceId"
