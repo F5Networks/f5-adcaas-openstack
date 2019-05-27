@@ -34,7 +34,11 @@ export interface ASGService {
   // mapped to the SOAP operations as stated in the datasource
   // json file.
   trust(host: string, port: number, body: object): Promise<TrustedDevices>;
-  query(host: string, port: number, deviceId: string): Promise<TrustedDevices>;
+  queryTrust(
+    host: string,
+    port: number,
+    deviceId: string,
+  ): Promise<TrustedDevices>;
   untrust(
     host: string,
     port: number,
@@ -54,7 +58,7 @@ export class ASGServiceProvider implements Provider<ASGService> {
   }
 }
 
-export class TrustedDeviceManager {
+export class ASGManager {
   private service: ASGService;
 
   constructor(svc: ASGService) {
@@ -87,8 +91,9 @@ export class TrustedDeviceManager {
     }
   }
 
-  async getState(id: string): Promise<string> {
-    let devices = (await this.service.query(ASG_HOST, ASG_PORT, id)).devices;
+  async getTrustState(id: string): Promise<string> {
+    let devices = (await this.service.queryTrust(ASG_HOST, ASG_PORT, id))
+      .devices;
 
     if (devices.length === 1) {
       return devices[0].state;

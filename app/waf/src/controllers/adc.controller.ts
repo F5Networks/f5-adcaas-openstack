@@ -33,7 +33,7 @@ import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
 import {
   ASGService,
-  TrustedDeviceManager,
+  ASGManager,
   PortCreationParams,
   ServersParams,
   BigIpManager,
@@ -45,7 +45,7 @@ import {checkAndWait, merge} from '../utils';
 const prefix = '/adcaas/v1';
 
 export class AdcController extends BaseController {
-  tdMgr: TrustedDeviceManager;
+  asgMgr: ASGManager;
 
   constructor(
     @repository(AdcRepository)
@@ -62,7 +62,7 @@ export class AdcController extends BaseController {
     private logger = factory.getLogger('controllers.adc'),
   ) {
     super(reqCxt);
-    this.tdMgr = new TrustedDeviceManager(this.asgService);
+    this.asgMgr = new ASGManager(this.asgService);
   }
 
   @post(prefix + '/adcs', {
@@ -104,7 +104,7 @@ export class AdcController extends BaseController {
 
   async trustAdc(adc: Adc): Promise<void> {
     let isTrusted = async (deviceId: string): Promise<boolean> => {
-      return await this.tdMgr.getState(deviceId).then(state => {
+      return await this.asgMgr.getTrustState(deviceId).then(state => {
         switch (state) {
           case 'ACTIVE':
             return true;
@@ -120,7 +120,7 @@ export class AdcController extends BaseController {
     try {
       await this.serialize(adc, {status: 'TRUSTING'});
       //TODO: Need away to input admin password of BIG-IP HW
-      let device = await this.tdMgr.trust(
+      let device = await this.asgMgr.trust(
         adc.management!.ipAddress,
         adc.management!.tcpPort,
         adc.management!.username,
@@ -152,7 +152,7 @@ export class AdcController extends BaseController {
     }
 
     try {
-      await this.tdMgr.untrust(adc.trustedDeviceId);
+      await this.asgMgr.untrust(adc.trustedDeviceId);
     } catch (err) {
       await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
       return false;
