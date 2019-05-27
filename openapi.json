@@ -9250,6 +9250,9 @@
                   },
                   "url": {
                     "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
                   }
                 },
                 "example": {
@@ -9304,6 +9307,9 @@
                         },
                         "url": {
                           "type": "string"
+                        },
+                        "public": {
+                          "type": "boolean"
                         }
                       },
                       "example": {
@@ -9467,6 +9473,9 @@
                         },
                         "url": {
                           "type": "string"
+                        },
+                        "public": {
+                          "type": "boolean"
                         }
                       },
                       "example": {
@@ -9566,6 +9575,9 @@
                   },
                   "url": {
                     "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
                   }
                 },
                 "example": {
@@ -9621,6 +9633,9 @@
                           },
                           "url": {
                             "type": "string"
+                          },
+                          "public": {
+                            "type": "boolean"
                           }
                         },
                         "example": {
@@ -9679,6 +9694,9 @@
                       "type": "boolean"
                     },
                     "url": {
+                      "type": "boolean"
+                    },
+                    "public": {
                       "type": "boolean"
                     }
                   }
