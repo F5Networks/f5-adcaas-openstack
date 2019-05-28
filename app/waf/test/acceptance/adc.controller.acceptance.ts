@@ -199,6 +199,7 @@ describe('AdcController', () => {
       .expect(200);
 
     expect(response.body.adc.status).to.equal('TRUSTED');
+    expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
   it(
