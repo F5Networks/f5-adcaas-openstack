@@ -27,19 +27,26 @@ import {
   givePoolMonitorAssociationData,
   giveMemberMonitorAssociationData,
   givenServiceEndpointpolicyAssociationData,
+  givenAdcData,
 } from '../helpers/database.helpers';
 import {
   ShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {
+  ASGShouldResponseWith,
+  ASGController,
+} from '../fixtures/controllers/mocks/mock.asg.controller';
+import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 
-describe('ApplicationController declaration test', () => {
+describe('DeclarationController', () => {
   let wafapp: WafApplication;
   let controller: ApplicationController;
   let client: Client;
   let deployStub: sinon.SinonStub;
   let mockKeystoneApp: TestingApplication;
+  let mockASG: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
@@ -52,6 +59,15 @@ describe('ApplicationController declaration test', () => {
       return restApp;
     })();
 
+    mockASG = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.ASG,
+        ASGController,
+        'https',
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<ApplicationController>(
@@ -59,6 +75,7 @@ describe('ApplicationController declaration test', () => {
     );
 
     ShouldResponseWith({});
+    ASGShouldResponseWith({});
     setupEnvs();
   });
 
@@ -70,6 +87,7 @@ describe('ApplicationController declaration test', () => {
   after(async () => {
     await teardownApplication(wafapp);
     teardownRestAppAndClient(mockKeystoneApp);
+    teardownRestAppAndClient(mockASG);
     teardownEnvs();
   });
 
@@ -408,4 +426,100 @@ describe('ApplicationController declaration test', () => {
         .expect(204);
     },
   );
+
+  it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: done`, async () => {
+    let application = await givenApplicationData(wafapp);
+    let declaration = await givenDeclarationData(wafapp, {
+      applicationId: application.id,
+      id: ExpectedData.declarationId,
+    });
+
+    let adc = await givenAdcData(wafapp, {
+      status: 'ACTIVE',
+      management: {
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: 443,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
+
+    await client
+      .post(
+        `${prefix}/applications/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
+      )
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({adcId: adc.id})
+      .expect(204);
+  });
+
+  it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 422`, async () => {
+    ASGShouldResponseWith({
+      '/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy422,
+    });
+
+    let application = await givenApplicationData(wafapp);
+    let declaration = await givenDeclarationData(wafapp, {
+      applicationId: application.id,
+      id: ExpectedData.declarationId,
+    });
+
+    let adc = await givenAdcData(wafapp, {
+      status: 'ACTIVE',
+      management: {
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: 443,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
+
+    await client
+      .post(
+        `${prefix}/applications/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
+      )
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({adcId: adc.id})
+      .expect(422);
+  });
+
+  it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 404`, async () => {
+    ASGShouldResponseWith({});
+    let application = await givenApplicationData(wafapp);
+    let declaration = await givenDeclarationData(wafapp, {
+      applicationId: application.id,
+      id: ExpectedData.declarationId,
+      tenantId: 'not-existing-tenant',
+    });
+
+    let adc = await givenAdcData(wafapp, {
+      status: 'ACTIVE',
+      management: {
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: 443,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
+
+    await client
+      .post(
+        `${prefix}/applicaitons/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
+      )
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({adcId: adc.id})
+      .expect(404);
+  });
 });

@@ -123,4 +123,7 @@ export const ExpectedData = {
     networkId: '0e51e68c-08f7-4e32-af54-328d29b93467',
   },
   doTaskId: 'fe96c41e-6850-4210-bf3b-1902ad27dff4',
+  declarationId: '3cc12f17-a6c7-4884-a119-98b456fe2020',
+  memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
+  applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
 };

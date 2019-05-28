@@ -19,6 +19,8 @@ import {
   Action,
   Pool,
   Member,
+  ASGDeployRequest,
+  AS3DeployRequest,
 } from '../models';
 import {inject} from '@loopback/core';
 import {
@@ -33,12 +35,17 @@ import {
   ServiceEndpointpolicyAssociationRepository,
   RuleRepository,
   ActionRepository,
+  AdcRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
+import {ASGManager} from '../services';
+import {factory} from '../log4ts';
 
 const prefix = '/adcaas/v1';
 
 export class DeclarationController extends BaseController {
+  protected logger = factory.getLogger('controllers.DeclarationController');
+
   constructor(
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
@@ -62,6 +69,8 @@ export class DeclarationController extends BaseController {
     public ruleRepository: RuleRepository,
     @repository(ActionRepository)
     public actionRepository: ActionRepository,
+    @repository(AdcRepository)
+    public adcRepository: AdcRepository,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -332,5 +341,70 @@ export class DeclarationController extends BaseController {
     await this.applicationRepository
       .declarations(applicationId)
       .delete({and: [{id: declarationId}, {tenantId: await this.tenantId}]});
+  }
+
+  @post(
+    prefix +
+      '/applications/{applicationId}/declarations/{declarationId}/deploy',
+    {
+      responses: {
+        '204': Schema.emptyResponse('Successfully deploy Declaration resource'),
+        '404': Schema.notFound('Can not find Declaration resource'),
+        '422': Schema.unprocessableEntity(
+          'Fail to deploy Declaration resource',
+        ),
+      },
+    },
+  )
+  async proxyDeploy(
+    @param(Schema.pathParameter('applicationId', 'Application resource ID'))
+    applicationId: string,
+    @param(Schema.pathParameter('declarationId', 'Declaration resource ID'))
+    declarationId: string,
+    @requestBody(
+      Schema.createRequest(
+        ASGDeployRequest,
+        'Deploy the declaration on an ADC.',
+      ),
+    )
+    deployBody: ASGDeployRequest,
+  ): Promise<void> {
+    let adcId = deployBody.adcId!;
+    await Promise.all([
+      this.applicationRepository.findById(applicationId, undefined, {
+        tenantId: await this.tenantId,
+      }),
+      this.declarationRepository.findById(declarationId, undefined, {
+        tenantId: await this.tenantId,
+      }),
+      this.adcRepository.findById(adcId, undefined, {
+        tenantId: await this.tenantId,
+      }),
+    ]).then(
+      async ([application, declaration, adc]) => {
+        // TODO: uncomment it; use adcstate control: gotTo(Active)
+        // if (adc.status !== 'ACTIVE' || !adc.management) {
+        //   throw new HttpErrors.UnprocessableEntity('ADC resource is not ready for deploy.');
+        // }
+
+        let mgmt = adc.management!;
+        let proxyMgr = await ASGManager.instanlize();
+
+        try {
+          let as3Request = new AS3DeployRequest(adc, application, declaration);
+          await proxyMgr.deploy(
+            mgmt.ipAddress,
+            mgmt.tcpPort,
+            as3Request.declaration,
+          );
+        } catch (error) {
+          this.logger.error(`Failed to deploy: ${error.message}`);
+          throw new HttpErrors.UnprocessableEntity(error.message);
+        }
+      },
+      error => {
+        throw new HttpErrors.NotFound(error.message);
+      },
+    );
   }
 }

@@ -1,6 +1,7 @@
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {ASGDataSource} from '../datasources';
+import {factory} from '../log4ts';
 
 const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
 const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
@@ -108,6 +109,8 @@ export interface ASGService {
     trustDeviceId: string,
     wafpolicyName: string,
   ): Promise<WafpolicyResponse>;
+
+  deploy(url: string, body: object): Promise<object>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -124,6 +127,12 @@ export class ASGServiceProvider implements Provider<ASGService> {
 
 export class ASGManager {
   private service: ASGService;
+  private logger = factory.getLogger('services.TrustedProxyManager');
+
+  static async instanlize() {
+    let svc = await new ASGServiceProvider().value();
+    return new ASGManager(svc);
+  }
 
   constructor(svc: ASGService) {
     this.service = svc;
@@ -236,5 +245,25 @@ export class ASGManager {
       trustDeviceId,
       wafpolicyName,
     );
+  }
+
+  async deploy(ipaddr: string, port: number, body: object): Promise<void> {
+    let deployUrl = `https://${ASG_HOST}:${ASG_PORT}/mgmt/shared/TrustedProxy`;
+    let deployBody = {
+      method: 'Post',
+      uri: `https://${ipaddr}:${port}/mgmt/shared/appsvcs/declare`,
+      body: body,
+    };
+    this.logger.debug(`Json to deploy: ${JSON.stringify(deployBody)}`);
+
+    try {
+      await this.service.deploy(deployUrl, deployBody).then(response => {
+        let resObj = JSON.parse(JSON.stringify(response));
+        if (resObj.results[0].code !== 200)
+          throw new Error(`Deployment is something wrong: ${response}`);
+      });
+    } catch (error) {
+      throw new Error(JSON.stringify(error));
+    }
   }
 }

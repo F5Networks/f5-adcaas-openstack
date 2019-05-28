@@ -21,9 +21,10 @@ export enum RestApplicationPort {
   WafApp = 3000,
   IdentityUser = 5000,
   Onboarding = 8081,
-  SSLCustom = 8443,
+  ASG = 8443,
   Nova = 8774,
   Neutron = 9696,
+  SSLCustom = 10443,
   IdentityAdmin = 35357,
 }
 import {stubLogger, restoreLogger} from './logging.helpers';

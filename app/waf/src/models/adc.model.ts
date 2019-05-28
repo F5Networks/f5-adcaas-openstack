@@ -56,7 +56,8 @@ export type ConfigTypes = {
     | 'ONBOARDERR'
     | 'TRUSTED'
     | 'TRUSTING'
-    | 'TRUSTERR'; // cannot be appointed.
+    | 'TRUSTERR'
+    | 'ACTIVE'; // cannot be appointed.
   lastErr: string; // cannot be appointed.
 };
 
