@@ -129,7 +129,10 @@ export class AdcController extends BaseController {
 
       await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
         async () => {
-          await this.serialize(adc, {status: 'TRUSTED'});
+          await this.serialize(adc, {
+            status: 'TRUSTED',
+            trustedDeviceId: device.targetUUID,
+          });
         },
         async () => {
           await this.serialize(adc, {

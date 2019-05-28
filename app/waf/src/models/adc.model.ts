@@ -131,7 +131,8 @@ export class Adc extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      response: false,
+      response: true,
+      example: '2c52df5f-a393-40d8-9013-475eb54f7bef',
     },
   })
   trustedDeviceId?: string;
