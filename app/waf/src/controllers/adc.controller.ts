@@ -338,10 +338,17 @@ export class AdcController extends BaseController {
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     };
 
+    if (adc.status.endsWith('ING'))
+      throw new HttpErrors.UnprocessableEntity(
+        `Adc status is ' ${
+          adc.status
+        }. Cannot be operated on, please wait for its finish.`,
+      );
+
     switch (Object.keys(actionBody)[0]) {
       case 'create':
         if (adc.status !== 'NONE' && adc.status !== 'POWERERR')
-          throw new HttpErrors.BadRequest(
+          throw new HttpErrors.UnprocessableEntity(
             `Adc status is ' ${
               adc.status
             }. Cannot repeat 'create' on the same ADC.`,
@@ -359,13 +366,20 @@ export class AdcController extends BaseController {
         return {id: adc.id};
 
       default:
-        throw new HttpErrors.BadRequest(
+        throw new HttpErrors.UnprocessableEntity(
           'Not supported: ' + Object.keys(actionBody)[0],
         );
     }
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+    if (!adc.management) {
+      this.serialize(adc, {
+        status: 'ONBOARDERR',
+        lastErr: `ONBOARDERR: management information not ready.`,
+      });
+      return;
+    }
     let bigipMgr = await BigIpManager.instanlize({
       username: adc.management!.username,
       password: adc.management!.password,
@@ -391,17 +405,24 @@ export class AdcController extends BaseController {
             await checkAndWait(() => {
               return doMgr.isDone(doId);
             }, 240);
-
-            let bigipOboarded = async (): Promise<boolean> => {
-              let hostname = await bigipMgr.getHostname();
-              this.logger.debug(`bigip hostname: ${hostname}`);
-              await bigipMgr.getLicense();
-              await bigipMgr.getConfigsyncIp();
-
-              return hostname === doBody.declaration.Common!.hostname!;
+            let bigipOnboarded = async (): Promise<boolean> => {
+              return await Promise.all([
+                bigipMgr.getHostname(),
+                bigipMgr.getLicense(),
+                bigipMgr.getVlans(),
+                bigipMgr.getSelfips(),
+                bigipMgr.getConfigsyncIp(),
+              ]).then(([hostname, license, vlans, selfs]) => {
+                return (
+                  hostname === doBody.declaration.Common!.hostname! &&
+                  license.registrationKey !== 'none' &&
+                  Object.keys(vlans).length !== 0 &&
+                  Object.keys(selfs).length !== 0
+                );
+              });
             };
 
-            await checkAndWait(bigipOboarded, 240).then(
+            await checkAndWait(bigipOnboarded, 240).then(
               async () => {
                 await this.serialize(adc, {status: 'ONBOARDED'});
 
@@ -414,7 +435,7 @@ export class AdcController extends BaseController {
                   lastErr:
                     `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
                     `Check more details from log.` +
-                    `Checking condition: ${bigipOboarded.toString()}`,
+                    `Checking condition: ${bigipOnboarded.toString()}`,
                 });
               },
             );
@@ -450,7 +471,31 @@ export class AdcController extends BaseController {
       await this.serialize(adc, {status: 'POWERING'})
         .then(async () => await this.cNet(adc, addon))
         .then(async () => await this.cSvr(adc, addon));
-      await this.serialize(adc, {status: 'POWERON'});
+
+      // TODO: create a unified bigipMgr
+      let mgmt = adc.management!;
+      let bigipMgr = await BigIpManager.instanlize({
+        username: mgmt.username,
+        password: mgmt.password,
+        ipAddr: mgmt.ipAddress,
+        port: mgmt.tcpPort,
+      });
+      let bigipStarted = async (): Promise<boolean> => {
+        return await bigipMgr.getSys().then(() => {
+          return true;
+        });
+      };
+      await checkAndWait(bigipStarted, 240).then(
+        async () => {
+          await this.serialize(adc, {status: 'POWERON'});
+        },
+        async () => {
+          await this.serialize(adc, {
+            status: 'POWERERR',
+            lastErr: `POWERERR: timeout waiting for BIG-IP VE be accessible.`,
+          });
+        },
+      );
     } catch (error) {
       await this.serialize(adc, {
         status: 'POWERERR',

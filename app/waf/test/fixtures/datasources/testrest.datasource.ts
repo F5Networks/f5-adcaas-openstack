@@ -795,6 +795,206 @@ export const StubResponses = {
     };
   },
 
+  bigipNetVlans200: () => {
+    return {
+      kind: 'tm:net:vlan:vlancollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/net/vlan?ver=13.1.1',
+      items: [
+        {
+          kind: 'tm:net:vlan:vlanstate',
+          name: 'vlan-external2',
+          partition: 'Common',
+          fullPath: '/Common/vlan-external2',
+          generation: 375,
+          selfLink:
+            'https://localhost/mgmt/tm/net/vlan/~Common~vlan-external2?ver=13.1.1',
+          autoLasthop: 'default',
+          cmpHash: 'default',
+          dagRoundRobin: 'disabled',
+          dagTunnel: 'outer',
+          failsafe: 'disabled',
+          failsafeAction: 'failover-restart-tm',
+          failsafeTimeout: 90,
+          fwdMode: 'l3',
+          hardwareSyncookie: 'disabled',
+          ifIndex: 176,
+          learning: 'enable-forward',
+          mtu: 1500,
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+            samplingRate: 0,
+            samplingRateGlobal: 'yes',
+          },
+          sourceChecking: 'disabled',
+          synFloodRateLimit: 1000,
+          syncacheThreshold: 6000,
+          tag: 4092,
+          interfacesReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-external2/interfaces?ver=13.1.1',
+            isSubcollection: true,
+          },
+        },
+        {
+          kind: 'tm:net:vlan:vlanstate',
+          name: 'vlan-failover1',
+          partition: 'Common',
+          fullPath: '/Common/vlan-failover1',
+          generation: 357,
+          selfLink:
+            'https://localhost/mgmt/tm/net/vlan/~Common~vlan-failover1?ver=13.1.1',
+          autoLasthop: 'default',
+          cmpHash: 'default',
+          dagRoundRobin: 'disabled',
+          dagTunnel: 'outer',
+          failsafe: 'disabled',
+          failsafeAction: 'failover-restart-tm',
+          failsafeTimeout: 90,
+          fwdMode: 'l3',
+          hardwareSyncookie: 'disabled',
+          ifIndex: 144,
+          learning: 'enable-forward',
+          mtu: 1500,
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+            samplingRate: 0,
+            samplingRateGlobal: 'yes',
+          },
+          sourceChecking: 'disabled',
+          synFloodRateLimit: 1000,
+          syncacheThreshold: 6000,
+          tag: 4094,
+          interfacesReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-failover1/interfaces?ver=13.1.1',
+            isSubcollection: true,
+          },
+        },
+        {
+          kind: 'tm:net:vlan:vlanstate',
+          name: 'vlan-internal1',
+          partition: 'Common',
+          fullPath: '/Common/vlan-internal1',
+          generation: 366,
+          selfLink:
+            'https://localhost/mgmt/tm/net/vlan/~Common~vlan-internal1?ver=13.1.1',
+          autoLasthop: 'default',
+          cmpHash: 'default',
+          dagRoundRobin: 'disabled',
+          dagTunnel: 'outer',
+          failsafe: 'disabled',
+          failsafeAction: 'failover-restart-tm',
+          failsafeTimeout: 90,
+          fwdMode: 'l3',
+          hardwareSyncookie: 'disabled',
+          ifIndex: 160,
+          learning: 'enable-forward',
+          mtu: 1500,
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+            samplingRate: 0,
+            samplingRateGlobal: 'yes',
+          },
+          sourceChecking: 'disabled',
+          synFloodRateLimit: 1000,
+          syncacheThreshold: 6000,
+          tag: 4093,
+          interfacesReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-internal1/interfaces?ver=13.1.1',
+            isSubcollection: true,
+          },
+        },
+      ],
+    };
+  },
+  bigipnetSelfips200: () => {
+    return {
+      kind: 'tm:net:self:selfcollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/net/self?ver=13.1.1',
+      items: [
+        {
+          kind: 'tm:net:self:selfstate',
+          name: 'selfip-external2',
+          partition: 'Common',
+          fullPath: '/Common/selfip-external2',
+          generation: 398,
+          selfLink:
+            'https://localhost/mgmt/tm/net/self/~Common~selfip-external2?ver=13.1.1',
+          address: '10.250.41.5/24',
+          addressSource: 'from-user',
+          floating: 'disabled',
+          inheritedTrafficGroup: 'false',
+          trafficGroup: '/Common/traffic-group-local-only',
+          trafficGroupReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/traffic-group/~Common~traffic-group-local-only?ver=13.1.1',
+          },
+          unit: 0,
+          vlan: '/Common/vlan-external2',
+          vlanReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-external2?ver=13.1.1',
+          },
+          allowService: ['default'],
+        },
+        {
+          kind: 'tm:net:self:selfstate',
+          name: 'selfip-internal1',
+          partition: 'Common',
+          fullPath: '/Common/selfip-internal1',
+          generation: 397,
+          selfLink:
+            'https://localhost/mgmt/tm/net/self/~Common~selfip-internal1?ver=13.1.1',
+          address: '10.250.42.4/24',
+          addressSource: 'from-user',
+          floating: 'disabled',
+          inheritedTrafficGroup: 'false',
+          trafficGroup: '/Common/traffic-group-local-only',
+          trafficGroupReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/traffic-group/~Common~traffic-group-local-only?ver=13.1.1',
+          },
+          unit: 0,
+          vlan: '/Common/vlan-internal1',
+          vlanReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-internal1?ver=13.1.1',
+          },
+          allowService: ['default'],
+        },
+        {
+          kind: 'tm:net:self:selfstate',
+          name: 'selfip-failover1',
+          partition: 'Common',
+          fullPath: '/Common/selfip-failover1',
+          generation: 396,
+          selfLink:
+            'https://localhost/mgmt/tm/net/self/~Common~selfip-failover1?ver=13.1.1',
+          address: '10.250.50.5/24',
+          addressSource: 'from-user',
+          floating: 'disabled',
+          inheritedTrafficGroup: 'false',
+          trafficGroup: '/Common/traffic-group-local-only',
+          trafficGroupReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/traffic-group/~Common~traffic-group-local-only?ver=13.1.1',
+          },
+          unit: 0,
+          vlan: '/Common/vlan-failover1',
+          vlanReference: {
+            link:
+              'https://localhost/mgmt/tm/net/vlan/~Common~vlan-failover1?ver=13.1.1',
+          },
+          allowService: ['default'],
+        },
+      ],
+    };
+  },
+
   bigipNetInterfaces200: () => {
     return {
       items: [
