@@ -23,15 +23,17 @@ export class Wafpolicy extends CommonEntity {
 
   @property({
     type: 'string',
+    required: true,
     schema: {
       create: true,
       update: true,
       response: true,
+      required: true,
       example: 'https://raw.githubusercontent.com/wafrepo/master/my_waf.xml',
     },
     as3: {},
   })
-  url?: string;
+  url: string;
 
   @property({
     type: 'boolean',

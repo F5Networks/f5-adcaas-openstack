@@ -17,3 +17,4 @@ export * from './action.model';
 export * from './monitor.model';
 export * from './membermonitor.model';
 export * from './poolmonitorassoc.model';
+export * from './wafpolicyondevice.model';

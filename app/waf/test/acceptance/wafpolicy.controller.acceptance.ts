@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Client, expect, toJSON} from '@loopback/testlab';
+import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
 import {
   setupApplication,
@@ -19,6 +19,7 @@ import {
   givenEmptyDatabase,
   givenWafpolicyData,
   createWafpolicyObject,
+  givenAdcData,
 } from '../helpers/database.helpers';
 import {
   ShouldResponseWith,
@@ -27,11 +28,15 @@ import {
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 import uuid = require('uuid');
+import {WafpolicyController} from '../../src/controllers';
 
 describe('WafpolicyController', () => {
   let wafapp: WafApplication;
   let client: Client;
   let mockKeystoneApp: TestingApplication;
+  let controller: WafpolicyController;
+  let uploadWafpolicyStub: sinon.SinonStub;
+  let checkWafpolicyStub: sinon.SinonStub;
 
   const prefix = '/adcaas/v1';
 
@@ -44,11 +49,31 @@ describe('WafpolicyController', () => {
       return restApp;
     })();
     ({wafapp, client} = await setupApplication());
+
+    controller = await wafapp.get<WafpolicyController>(
+      'controllers.WafpolicyController',
+    );
+
     ShouldResponseWith({});
     setupEnvs();
   });
+
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
+    uploadWafpolicyStub = sinon.stub(
+      controller.asgService,
+      'uploadWafpolicyByUrl',
+    );
+
+    checkWafpolicyStub = sinon.stub(
+      controller.asgService,
+      'checkWafpolicyByName',
+    );
+  });
+
+  afterEach(async () => {
+    uploadWafpolicyStub.restore();
+    checkWafpolicyStub.restore();
   });
 
   after(async () => {
@@ -69,6 +94,135 @@ describe('WafpolicyController', () => {
 
     expect(response.body.wafpolicy).to.containDeep(toJSON(wafpolicy));
   });
+
+  it(
+    'post ' +
+      prefix +
+      '/wafpolicies/${id}/adcs/${adcId}: uploading wafpolicy with a public wafpolicy',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        tenantId: 'a random id',
+        public: true,
+      });
+
+      const adc = await givenAdcData(wafapp, {
+        trustedDeviceId: uuid(),
+      });
+
+      uploadWafpolicyStub.returns({
+        id: uuid(),
+        name: `${wafpolicy.id}`,
+        enforcementMode: 'blocking',
+        lastChanged: 'random',
+        lastChange: 'random',
+        state: 'UPLOADING',
+        path: `/Common/${wafpolicy.id}`,
+      });
+
+      await client
+        .post(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send()
+        .expect(204);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/wafpolicies/${id}/adcs/${adcId}: uploading wafpolicy with a private wafpolicy',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        public: false,
+      });
+
+      const adc = await givenAdcData(wafapp, {
+        trustedDeviceId: uuid(),
+      });
+
+      uploadWafpolicyStub.returns({
+        id: uuid(),
+        name: `${wafpolicy.id}`,
+        enforcementMode: 'blocking',
+        lastChanged: 'random',
+        lastChange: 'random',
+        state: 'UPLOADING',
+        path: `/Common/${wafpolicy.id}`,
+      });
+
+      await client
+        .post(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send()
+        .expect(204);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/wafpolicies/${id}/adcs/${adcId}: uploading wafpolicy with an untrunsted device',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        public: false,
+      });
+
+      const adc = await givenAdcData(wafapp);
+
+      uploadWafpolicyStub.returns({
+        id: uuid(),
+        name: `${wafpolicy.id}`,
+        enforcementMode: 'blocking',
+        lastChanged: 'random',
+        lastChange: 'random',
+        state: 'UPLOADING',
+        path: `/Common/${wafpolicy.id}`,
+      });
+
+      await client
+        .post(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send()
+        .expect(422);
+    },
+  );
+
+  it(
+    'get ' + prefix + '/wafpolicies/${id}/adcs/${adcId}: get wafpolicy status',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        tenantId: 'a random id',
+        public: true,
+      });
+
+      const adc = await givenAdcData(wafapp, {
+        trustedDeviceId: uuid(),
+      });
+
+      checkWafpolicyStub.returns([
+        {
+          id: uuid(),
+          name: `${wafpolicy.id}`,
+          enforcementMode: 'blocking',
+          lastChanged: 'random',
+          lastChange: 'random',
+          state: 'UPLOADING',
+          path: `/Common/${wafpolicy.id}`,
+        },
+      ]);
+
+      const resp = await client
+        .get(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(resp.body.wafpolicyondevice.state).equal('UPLOADING');
+    },
+  );
 
   it('get ' + prefix + '/wafpolicies: of all', async () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
