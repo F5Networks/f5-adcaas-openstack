@@ -19,7 +19,12 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {inject} from '@loopback/context';
-import {Application, AS3DeployRequest} from '../models';
+import {
+  Application,
+  AS3DeployRequest,
+  AS3PatchReqeust,
+  patchOP,
+} from '../models';
 import {
   ApplicationRepository,
   DeclarationRepository,
@@ -205,8 +210,31 @@ export class ApplicationController extends BaseController {
       {tenantId: tenantId},
     );
 
-    let req = new AS3DeployRequest(adc, application, declaration);
-    return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
+    let operation = patchOP.Replace;
+    let req = new AS3PatchReqeust(adc, application, operation, declaration);
+
+    let res: string = '';
+    try {
+      res = await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
+    } catch (error) {
+      /*We check the return message from BIGIP. If the error value mesage is
+    "path does not exisst",which means the bigip does not contain the tenant
+    yet, then we will deploy the whole declaration to create the tenant
+    partition and add the application. */
+
+      if (
+        JSON.stringify(error).indexOf(
+          'InvalidPatchOperationError: path does not exist',
+        ) !== -1
+      ) {
+        /*Turn to Deploy method */
+        let newReq = new AS3DeployRequest(adc, application, declaration);
+        res = await this.as3Service.deploy(AS3_HOST, AS3_PORT, newReq);
+      } else {
+        res = error;
+      }
+    }
+    return res;
   }
 
   @post(prefix + '/applications/{applicationId}/cleanup', {
@@ -230,11 +258,12 @@ export class ApplicationController extends BaseController {
         'No target ADC to perform deploy action',
       );
     }
-
     let adc = await this.adcRepository.findById(application.adcId, undefined, {
       tenantId: tenantId,
     });
-    let req = new AS3DeployRequest(adc, application);
+
+    let operation = patchOP.Remove;
+    let req = new AS3PatchReqeust(adc, application, operation);
     return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
   }
 }

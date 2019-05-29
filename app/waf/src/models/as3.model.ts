@@ -1,5 +1,10 @@
 import {Adc, Application, Declaration} from '.';
 
+export enum patchOP {
+  Add,
+  Replace,
+  Remove,
+}
 export class AS3Declaration {
   [key: string]: undefined | string | number | boolean | object;
 }
@@ -7,7 +12,58 @@ export class AS3Declaration {
 export function as3Name(id: string) {
   return 'F5_' + id.replace(/-/g, '_');
 }
+export class AS3PatchOp {
+  op: string = 'add';
+  path: string;
+  value: object;
+  constructor(
+    appliaction: Application,
+    operation: patchOP,
+    declararion?: Declaration,
+  ) {
+    this.path =
+      '/' + as3Name(appliaction.tenantId) + '/' + appliaction.getAS3Name();
+    switch (operation) {
+      /* The patch-replace option could also take use of patch-add */
+      case patchOP.Add:
+      case patchOP.Replace:
+        this.op = 'add';
+        if (declararion) {
+          this.value = declararion.content;
+        }
+        break;
+      case patchOP.Remove:
+        this.op = 'remove';
+        break;
+    }
+  }
+}
+export class AS3PatchReqeust {
+  readonly class: string = 'AS3';
+  readonly action: string = 'patch';
+  targetHost: string;
+  targetPort: number;
+  targetUsername: string;
+  targetPassphrase: string;
+  patchBody: AS3PatchOp[];
 
+  constructor(
+    adc: Adc,
+    application: Application,
+    operation: patchOP,
+    declaration?: Declaration,
+  ) {
+    if (adc.management) {
+      this.targetHost = adc.management.ipAddress;
+      this.targetPort = adc.management.tcpPort;
+    }
+    //TODO: remove admin/pass after implement trusted connection
+    this.targetUsername = 'admin';
+    this.targetPassphrase = 'admin';
+    this.patchBody = new Array<AS3PatchOp>();
+    this.patchBody.push(new AS3PatchOp(application, operation, declaration));
+  }
+}
 export class AS3DeployRequest {
   readonly class: string = 'AS3';
   readonly action: 'deploy';
