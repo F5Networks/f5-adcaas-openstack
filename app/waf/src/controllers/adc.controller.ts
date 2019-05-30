@@ -33,7 +33,7 @@ import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
 import {
   ASGService,
-  TrustedDeviceManager,
+  ASGManager,
   PortCreationParams,
   ServersParams,
   BigIpManager,
@@ -45,7 +45,7 @@ import {checkAndWait, merge} from '../utils';
 const prefix = '/adcaas/v1';
 
 export class AdcController extends BaseController {
-  tdMgr: TrustedDeviceManager;
+  asgMgr: ASGManager;
 
   constructor(
     @repository(AdcRepository)
@@ -62,7 +62,7 @@ export class AdcController extends BaseController {
     private logger = factory.getLogger('controllers.adc'),
   ) {
     super(reqCxt);
-    this.tdMgr = new TrustedDeviceManager(this.asgService);
+    this.asgMgr = new ASGManager(this.asgService);
   }
 
   @post(prefix + '/adcs', {
@@ -89,6 +89,7 @@ export class AdcController extends BaseController {
     }
 
     if (adc.type === 'HW') {
+      //TODO: Disable this path after VE path is stable.
       //TODO: Do this check in API validator
       if (!adc.management || !adc.management.ipAddress) {
         throw new HttpErrors.BadRequest(
@@ -96,7 +97,11 @@ export class AdcController extends BaseController {
         );
       }
 
-      this.trustAdc(adc);
+      this.trustAdc(adc).then(() => {
+        if (adc.status === 'TRUSTED') {
+          this.installAS3(adc);
+        }
+      });
     }
 
     return new Response(Adc, adc);
@@ -104,7 +109,7 @@ export class AdcController extends BaseController {
 
   async trustAdc(adc: Adc): Promise<void> {
     let isTrusted = async (deviceId: string): Promise<boolean> => {
-      return await this.tdMgr.getState(deviceId).then(state => {
+      return await this.asgMgr.getTrustState(deviceId).then(state => {
         switch (state) {
           case 'ACTIVE':
             return true;
@@ -120,7 +125,7 @@ export class AdcController extends BaseController {
     try {
       await this.serialize(adc, {status: 'TRUSTING'});
       //TODO: Need away to input admin password of BIG-IP HW
-      let device = await this.tdMgr.trust(
+      let device = await this.asgMgr.trust(
         adc.management!.ipAddress,
         adc.management!.tcpPort,
         adc.management!.username,
@@ -137,7 +142,7 @@ export class AdcController extends BaseController {
         async () => {
           await this.serialize(adc, {
             status: 'TRUSTERROR',
-            lastErr: 'Trusting timeout',
+            lastErr: 'TRUSTERROR: Trusting timeout',
           });
         },
       );
@@ -152,12 +157,65 @@ export class AdcController extends BaseController {
     }
 
     try {
-      await this.tdMgr.untrust(adc.trustedDeviceId);
+      await this.asgMgr.untrust(adc.trustedDeviceId);
     } catch (err) {
       await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
       return false;
     }
     return true;
+  }
+
+  async installAS3(adc: Adc): Promise<void> {
+    // Install AS3 RPM on target device
+    await this.serialize(adc, {status: 'INSTALLING'});
+
+    try {
+      let exist = await this.asgMgr.as3Exists(adc.trustedDeviceId!);
+
+      if (exist) {
+        await this.serialize(adc, {status: 'ACTIVE'});
+        return;
+      }
+    } catch (err) {
+      await this.serialize(adc, {
+        status: 'INSTALLERROR',
+        lastErr: 'INSTALLERROR: ' + err.message,
+      });
+      return;
+    }
+
+    let as3Available = async (deviceId: string): Promise<boolean> => {
+      return await this.asgMgr.getAS3State(deviceId).then(state => {
+        switch (state) {
+          case 'AVAILABLE':
+            return true;
+          default:
+            //TODO: throw error after checkAndWait() supports error terminating
+            return false;
+        }
+      });
+    };
+
+    try {
+      await this.asgMgr.installAS3(adc.trustedDeviceId!);
+
+      await checkAndWait(as3Available, 60, [adc.trustedDeviceId!]).then(
+        async () => {
+          await this.serialize(adc, {status: 'ACTIVE'});
+        },
+        async () => {
+          await this.serialize(adc, {
+            status: 'INSTALLERROR',
+            lastErr: 'INSTALLERROR: Fail to install AS3',
+          });
+        },
+      );
+    } catch (err) {
+      await this.serialize(adc, {
+        status: 'INSTALLERROR',
+        lastErr: 'INSTALLERROR: ' + err.message,
+      });
+    }
   }
 
   @get(prefix + '/adcs/count', {
@@ -426,8 +484,12 @@ export class AdcController extends BaseController {
               async () => {
                 await this.serialize(adc, {status: 'ONBOARDED'});
 
-                //Build trust relation to VE
-                await this.trustAdc(adc);
+                //Build trust relation to VE and install AS3
+                await this.trustAdc(adc).then(async () => {
+                  if (adc.status === 'TRUSTED') {
+                    await this.installAS3(adc);
+                  }
+                });
               },
               async () => {
                 await this.serialize(adc, {

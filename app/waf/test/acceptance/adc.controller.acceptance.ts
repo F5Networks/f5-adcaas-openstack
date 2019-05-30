@@ -49,6 +49,8 @@ describe('AdcController', () => {
   let trustStub: sinon.SinonStub;
   let queryStub: sinon.SinonStub;
   let untrustStub: sinon.SinonStub;
+  let installStub: sinon.SinonStub;
+  let queryExtensionsStub: sinon.SinonStub;
 
   let mockKeystoneApp: TestingApplication;
   let mockNovaApp: TestingApplication;
@@ -114,14 +116,18 @@ describe('AdcController', () => {
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
     trustStub = sinon.stub(controller.asgService, 'trust');
-    queryStub = sinon.stub(controller.asgService, 'query');
+    queryStub = sinon.stub(controller.asgService, 'queryTrust');
     untrustStub = sinon.stub(controller.asgService, 'untrust');
+    installStub = sinon.stub(controller.asgService, 'install');
+    queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
   });
 
   afterEach(async () => {
     trustStub.restore();
     queryStub.restore();
     untrustStub.restore();
+    installStub.restore();
+    queryExtensionsStub.restore();
   });
 
   after(async () => {
@@ -181,6 +187,23 @@ describe('AdcController', () => {
       ],
     });
 
+    queryExtensionsStub.onCall(0).returns([]);
+
+    queryExtensionsStub.onCall(1).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        state: 'UPLOADING',
+      },
+    ]);
+
+    queryExtensionsStub.onCall(2).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'AVAILABLE',
+      },
+    ]);
+
     let response = await client
       .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
@@ -198,7 +221,7 @@ describe('AdcController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal('TRUSTED');
+    expect(response.body.adc.status).to.equal('ACTIVE');
     expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
@@ -423,8 +446,280 @@ describe('AdcController', () => {
       .expect(200);
 
     expect(response.body.adc.status).to.equal('TRUSTERROR');
-    expect(response.body.adc.lastErr).to.equal('Trusting timeout');
+    expect(response.body.adc.lastErr).to.equal('TRUSTERROR: Trusting timeout');
   });
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW whose AS3 exists',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
+
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
+
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
+
+      queryExtensionsStub.returns([
+        {
+          rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+          name: 'f5-appsvcs',
+          state: 'AVAILABLE',
+        },
+      ]);
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      expect(response.body.adc).to.containDeep(toJSON(adc));
+
+      await sleep(10);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('ACTIVE');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with wrong AS3 extension response',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
+
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
+
+      queryStub.onCall(0).returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'PENDING',
+          },
+        ],
+      });
+
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
+
+      queryExtensionsStub.returns([]);
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      expect(response.body.adc).to.containDeep(toJSON(adc));
+
+      await sleep(100);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with query extension exception',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
+
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
+
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
+
+      queryExtensionsStub.throws(new Error('query-not-working'));
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      expect(response.body.adc).to.containDeep(toJSON(adc));
+
+      await sleep(50);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.lastErr).to.equal(
+        'INSTALLERROR: query-not-working',
+      );
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with query extension exception',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
+
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
+
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
+
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
+
+      queryExtensionsStub.returns([]);
+
+      installStub.throws(new Error('install-not-working'));
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
+
+      expect(response.body.adc).to.containDeep(toJSON(adc));
+
+      await sleep(50);
+
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.lastErr).to.equal(
+        'INSTALLERROR: install-not-working',
+      );
+    },
+  );
 
   it('get ' + prefix + '/adcs: of all', async () => {
     const adc = await givenAdcData(wafapp, {
@@ -738,6 +1033,23 @@ describe('AdcController', () => {
       ],
     });
 
+    queryExtensionsStub.onCall(0).returns([]);
+
+    queryExtensionsStub.onCall(1).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        state: 'UPLOADING',
+      },
+    ]);
+
+    queryExtensionsStub.onCall(2).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'AVAILABLE',
+      },
+    ]);
+
     await setupEnvs()
       .then(async () => {
         let response = await client
@@ -754,9 +1066,10 @@ describe('AdcController', () => {
             .set('X-Auth-Token', ExpectedData.userToken)
             .expect(200);
 
-          return resp.body.adc.status === 'TRUSTED';
+          return resp.body.adc.status === 'ACTIVE';
         };
 
+        //TODO: This test can not return comparing failure.
         await checkAndWait(checkStatus, 5, [], 50).then(() => {
           expect(true).true();
         });

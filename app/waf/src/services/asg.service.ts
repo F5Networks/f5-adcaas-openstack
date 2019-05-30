@@ -4,6 +4,9 @@ import {ASGDataSource} from '../datasources';
 
 const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
 const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
+const AS3_RPM_URL: string =
+  process.env.AS3_RPM_URL ||
+  'https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.10.0/f5-appsvcs-3.10.0-5.noarch.rpm';
 
 type TrustedDeviceInfo = {
   targetHost: string;
@@ -29,17 +32,46 @@ export type TrustedDevices = {
   devices: TrustedDevice[];
 };
 
+export type TrustedExtension = {
+  name: string;
+  state: string;
+  rpmFile: string;
+  downloadUrl: string;
+  packageName: string;
+  version: string;
+  release: string;
+  arch: string;
+  tags: string[];
+};
+
+export type TrustedExtensions = TrustedExtension[];
+
 export interface ASGService {
   // this is where you define the Node.js methods that will be
   // mapped to the SOAP operations as stated in the datasource
   // json file.
   trust(host: string, port: number, body: object): Promise<TrustedDevices>;
-  query(host: string, port: number, deviceId: string): Promise<TrustedDevices>;
+  queryTrust(
+    host: string,
+    port: number,
+    deviceId: string,
+  ): Promise<TrustedDevices>;
   untrust(
     host: string,
     port: number,
     deviceId: string,
   ): Promise<TrustedDevices>;
+  queryExtensions(
+    host: string,
+    port: number,
+    deviceId: string,
+  ): Promise<TrustedExtensions>;
+  install(
+    host: string,
+    port: number,
+    deviceId: string,
+    body: object,
+  ): Promise<TrustedExtension>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -54,7 +86,7 @@ export class ASGServiceProvider implements Provider<ASGService> {
   }
 }
 
-export class TrustedDeviceManager {
+export class ASGManager {
   private service: ASGService;
 
   constructor(svc: ASGService) {
@@ -87,8 +119,9 @@ export class TrustedDeviceManager {
     }
   }
 
-  async getState(id: string): Promise<string> {
-    let devices = (await this.service.query(ASG_HOST, ASG_PORT, id)).devices;
+  async getTrustState(id: string): Promise<string> {
+    let devices = (await this.service.queryTrust(ASG_HOST, ASG_PORT, id))
+      .devices;
 
     if (devices.length === 1) {
       return devices[0].state;
@@ -105,5 +138,37 @@ export class TrustedDeviceManager {
     } else {
       throw new Error('Fail to delete trusted device');
     }
+  }
+
+  async installAS3(id: string): Promise<void> {
+    let body = {
+      url: AS3_RPM_URL,
+    };
+
+    await this.service.install(ASG_HOST, ASG_PORT, id, body);
+  }
+
+  async as3Exists(id: string): Promise<boolean> {
+    let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
+
+    for (let ext of exts) {
+      if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async getAS3State(id: string): Promise<string> {
+    let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
+
+    for (let ext of exts) {
+      if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
+        return ext.state;
+      }
+    }
+
+    return 'NONE';
   }
 }
