@@ -75,6 +75,6 @@
     "@types/node": "^10.11.2",
     "coveralls": "^3.0.0",
     "nyc": "^13.0.0",
-    "typescript": "^3.3.1"
+    "typescript": "<=3.4.5"
   }
 }
