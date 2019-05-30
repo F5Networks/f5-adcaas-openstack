@@ -112,11 +112,15 @@ export class ASGManager {
 
     let devices = (await this.service.trust(ASG_HOST, ASG_PORT, body)).devices;
 
-    if (devices.length === 1) {
-      return devices[0];
-    } else {
-      throw new Error('Trusted device response size is ' + devices.length);
+    let expected = ['CREATED', 'PENDING', 'ACTIVE'];
+
+    for (let dev of devices) {
+      if (dev.targetHost === mgmtIp && expected.indexOf(dev.state) !== -1) {
+        return dev;
+      }
     }
+
+    throw new Error('Trusted device response is ' + JSON.stringify(devices));
   }
 
   async getTrustState(id: string): Promise<string> {

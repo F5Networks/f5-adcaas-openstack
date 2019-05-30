@@ -1017,7 +1017,7 @@ describe('AdcController', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: '1.2.3.4',
+          targetHost: adc.management!.ipAddress,
           state: 'CREATED',
         },
       ],
@@ -1027,7 +1027,7 @@ describe('AdcController', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: '1.2.3.4',
+          targetHost: adc.management!.ipAddress,
           state: 'ACTIVE',
         },
       ],
