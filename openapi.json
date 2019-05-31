@@ -9197,6 +9197,206 @@
         "operationId": "WafpolicyController.count"
       }
     },
+    "/adcaas/v1/wafpolicies/{id}/adcs/{adcId}": {
+      "post": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "wafpolicyUpload",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Uploading WAF Policy resource"
+          },
+          "404": {
+            "description": "Can not find trustedDeivceId",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "WAF Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "WafpolicyController.wafpolicyUpload"
+      },
+      "get": {
+        "x-controller-name": "WafpolicyController",
+        "x-operation-name": "wafpolicyCheckStatus",
+        "tags": [
+          "WafpolicyController"
+        ],
+        "responses": {
+          "200": "Status of wafpolicy",
+          "404": {
+            "description": "Can not find relative resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "WAF Policy resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "WafpolicyController.wafpolicyCheckStatus"
+      }
+    },
     "/adcaas/v1/wafpolicies/{id}": {
       "patch": {
         "x-controller-name": "WafpolicyController",
@@ -9585,7 +9785,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [],
+                "required": [
+                  "url"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
