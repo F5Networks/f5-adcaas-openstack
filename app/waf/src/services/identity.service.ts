@@ -448,12 +448,11 @@ export class AuthedToken {
     return this.epNetwork() + '/v2.0/subnets';
   }
 
+  // TODO: Use user token's catalog instead of that of admin's.
   public epServers(tenantId: string) {
     let url = this.epCompute();
-    //TODO: remove if else?
     if (url.endsWith('v2.0'))
       return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
-    // starts from v2.1, tenantId is not included in the url path.
-    else return url + '/servers';
+    else return url.replace(process.env.OS_TENANT_ID!, tenantId) + '/servers';
   }
 }
