@@ -73,9 +73,7 @@ describe('ApplicationController', () => {
   });
 
   it('post ' + prefix + '/applications: with no id', async () => {
-    const application = createApplicationObject({
-      tenantId: ExpectedData.tenantId,
-    });
+    const application = createApplicationObject();
 
     const response = await client
       .post(prefix + '/applications')
@@ -88,9 +86,7 @@ describe('ApplicationController', () => {
   });
 
   it('get ' + prefix + '/applications: of all', async () => {
-    const application = await givenApplicationData(wafapp, {
-      tenantId: ExpectedData.tenantId,
-    });
+    const application = await givenApplicationData(wafapp);
 
     let response = await client
       .get(prefix + '/applications')
@@ -102,9 +98,7 @@ describe('ApplicationController', () => {
   });
 
   it('get ' + prefix + '/applications: with filter string', async () => {
-    const application = await givenApplicationData(wafapp, {
-      tenantId: ExpectedData.tenantId,
-    });
+    const application = await givenApplicationData(wafapp);
 
     let response = await client
       .get(prefix + '/applications')
@@ -231,7 +225,7 @@ describe('ApplicationController', () => {
   it(
     'post ' + prefix + '/applications/{id}/deploy: deploy without adcId',
     async () => {
-      let application = await givenApplicationData(wafapp, {});
+      let application = await givenApplicationData(wafapp);
 
       await client
         .post(prefix + '/applications/' + application.id + '/deploy')
@@ -281,7 +275,7 @@ describe('ApplicationController', () => {
   it(
     'post ' + prefix + '/applications/{id}/cleanup: undeploy without adcId',
     async () => {
-      let application = await givenApplicationData(wafapp, {});
+      let application = await givenApplicationData(wafapp);
 
       await client
         .post(prefix + '/applications/' + application.id + '/cleanup')

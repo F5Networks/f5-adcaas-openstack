@@ -722,9 +722,7 @@ describe('AdcController', () => {
   );
 
   it('get ' + prefix + '/adcs: of all', async () => {
-    const adc = await givenAdcData(wafapp, {
-      tenantId: ExpectedData.tenantId,
-    });
+    const adc = await givenAdcData(wafapp);
 
     let response = await client
       .get(prefix + '/adcs')
@@ -737,9 +735,7 @@ describe('AdcController', () => {
   });
 
   it('get ' + prefix + '/adcs: with filter string', async () => {
-    const adc = await givenAdcData(wafapp, {
-      tenantId: ExpectedData.tenantId,
-    });
+    const adc = await givenAdcData(wafapp);
 
     let response = await client
       .get(prefix + '/adcs')
@@ -986,6 +982,7 @@ describe('AdcController', () => {
         let response = await client
           .post(prefix + '/adcs/' + adc.id + '/action')
           .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
           .send({create: null})
           .expect(200);
 
@@ -995,6 +992,7 @@ describe('AdcController', () => {
           let resp = await client
             .get(prefix + '/adcs/' + adc.id)
             .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
           return resp.body.adc.status === 'POWERON';
@@ -1055,6 +1053,7 @@ describe('AdcController', () => {
         let response = await client
           .post(prefix + '/adcs/' + adc.id + '/action')
           .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
           .send({setup: null})
           .expect(200);
 
@@ -1064,6 +1063,7 @@ describe('AdcController', () => {
           let resp = await client
             .get(prefix + '/adcs/' + adc.id)
             .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
           return resp.body.adc.status === 'ACTIVE';
@@ -1089,17 +1089,17 @@ describe('AdcController', () => {
         let response = await client
           .post(prefix + '/adcs/' + adc.id + '/action')
           .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
           .send({delete: null})
           .expect(200);
-
         expect(response.body).containDeep({id: adc.id});
 
         let checkStatus = async () => {
           let resp = await client
             .get(prefix + '/adcs/' + adc.id)
             .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
-
           return resp.body.adc.status === 'RECLAIMED';
         };
 

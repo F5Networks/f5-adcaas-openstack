@@ -89,7 +89,7 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
     {
       name: 'test waf policy',
       url: 'http://unknown',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -99,7 +99,7 @@ export function createEndpointpolicyObject(data?: Partial<Endpointpolicy>) {
   return Object.assign(
     {
       name: 'E1',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -108,7 +108,7 @@ export function createRuleObject(data?: Partial<Rule>) {
   return Object.assign(
     {
       name: 'test',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -119,7 +119,7 @@ export function createConditionObject(data?: Partial<Condition>) {
     {
       type: 'httpUri',
       path: {operand: 'contains', values: ['/test1/']},
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -128,7 +128,7 @@ export function createActionObject(data?: Partial<Action>) {
   return Object.assign(
     {
       type: 'waf',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -194,7 +194,7 @@ export function createApplicationObject(data?: Partial<Application>) {
       name: 'test application',
       description: 'application test data',
       status: 'Done',
-      tenantId: 'TBD',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -255,6 +255,7 @@ export function createAdcObject(data?: Partial<Adc>) {
         username: BigipBuiltInProperties.admin,
         password: 'admin',
       },
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -275,6 +276,7 @@ export function createDeclarationObject(data?: Partial<Declaration>) {
       id: uuid(),
       name: 'delaration',
       content: {},
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -302,7 +304,7 @@ export function createAdcTenantAssociationObject(
 ) {
   return Object.assign(
     {
-      tenantId: uuid(),
+      tenantId: ExpectedData.tenantId,
       adcId: uuid(),
     },
     data,
@@ -325,7 +327,7 @@ export function createServiceObject(data?: Partial<Service>) {
       id: uuid(),
       type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -365,7 +367,7 @@ export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -384,7 +386,7 @@ export function createMemberObject(data?: Partial<Member>) {
     {
       address: '192.0.1.23',
       port: 80,
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -404,7 +406,7 @@ export function createMonitorObject(data?: Partial<Monitor>) {
       targetAddress: '192.0.1.23',
       targetPort: 80,
       monitorType: 'http',
-      tenantId: 'fdac59f5b20046829ea58720702a74af',
+      tenantId: ExpectedData.tenantId,
     },
     data,
   );
