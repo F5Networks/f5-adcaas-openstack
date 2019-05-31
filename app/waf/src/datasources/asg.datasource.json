@@ -60,11 +60,39 @@
     {
       "template": {
         "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedASMPolicies",
+        "body": "{body}"
+      },
+      "functions": {
+        "uploadWafpolicyByUrl": [
+          "host",
+          "port",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
         "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}",
         "body": "{body}"
       },
       "functions": {
         "install": ["host","port","deviceId","body"]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedASMPolicies/{trustDeviceId}?policyName={wafpolicyName}"
+      },
+      "functions": {
+        "checkWafpolicyByName": [
+          "host",
+          "port",
+          "trustDeviceId",
+          "wafpolicyName"
+        ]
       }
     }
   ]

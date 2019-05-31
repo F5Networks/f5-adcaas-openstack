@@ -46,6 +46,28 @@ export type TrustedExtension = {
 
 export type TrustedExtensions = TrustedExtension[];
 
+export type WafpolicyUrlRequest = {
+  url: string;
+  targetUUID: string;
+  targetPolicyName: string;
+};
+
+export type WafpolicyResponse = [
+  {
+    id: string;
+    name: string;
+    enforcementMode: string;
+    lastChanged: string;
+    lastChange: string;
+    state: string;
+    path: string;
+  }
+];
+
+export type WafpolicyResponses = {
+  wafpolicies: WafpolicyResponse[];
+};
+
 export interface ASGService {
   // this is where you define the Node.js methods that will be
   // mapped to the SOAP operations as stated in the datasource
@@ -61,6 +83,7 @@ export interface ASGService {
     port: number,
     deviceId: string,
   ): Promise<TrustedDevices>;
+
   queryExtensions(
     host: string,
     port: number,
@@ -72,6 +95,19 @@ export interface ASGService {
     deviceId: string,
     body: object,
   ): Promise<TrustedExtension>;
+
+  uploadWafpolicyByUrl(
+    host: string,
+    port: number,
+    body: object,
+  ): Promise<WafpolicyResponse>;
+
+  checkWafpolicyByName(
+    host: string,
+    port: number,
+    trustDeviceId: string,
+    wafpolicyName: string,
+  ): Promise<WafpolicyResponse>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -174,5 +210,31 @@ export class ASGManager {
     }
 
     return 'NONE';
+  }
+
+  async wafpolicyUploadByUrl(
+    url: string,
+    targetUUID: string,
+    targetPolicyName: string,
+  ): Promise<WafpolicyResponse> {
+    let body: WafpolicyUrlRequest = {
+      url: url,
+      targetUUID: targetUUID,
+      targetPolicyName: targetPolicyName,
+    };
+
+    return await this.service.uploadWafpolicyByUrl(ASG_HOST, ASG_PORT, body);
+  }
+
+  async wafpolicyCheckByName(
+    trustDeviceId: string,
+    wafpolicyName: string,
+  ): Promise<WafpolicyResponse> {
+    return await this.service.checkWafpolicyByName(
+      ASG_HOST,
+      ASG_PORT,
+      trustDeviceId,
+      wafpolicyName,
+    );
   }
 }
