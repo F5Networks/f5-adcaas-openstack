@@ -108,9 +108,7 @@ describe('ApplicationController declaration test', () => {
         monitorId: monitor.id,
       });
 
-      let epp = await givenEndpointpolicyData(wafapp, {
-        name: 'epp1',
-      });
+      let epp = await givenEndpointpolicyData(wafapp);
 
       await givenServiceEndpointpolicyAssociationData(wafapp, {
         serviceId: service.id,
@@ -216,12 +214,9 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations: get all declarations',
     async () => {
-      const application = await givenApplicationData(wafapp, {
-        tenantId: ExpectedData.tenantId,
-      });
+      const application = await givenApplicationData(wafapp);
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
-        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
@@ -256,12 +251,9 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations/{declarationId}: get declaration',
     async () => {
-      const application = await givenApplicationData(wafapp, {
-        tenantId: ExpectedData.tenantId,
-      });
+      const application = await givenApplicationData(wafapp);
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
-        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
@@ -305,12 +297,9 @@ describe('ApplicationController declaration test', () => {
       prefix +
       '/applications/{applicationId}/declarations/{declarationId}: update declaration',
     async () => {
-      const application = await givenApplicationData(wafapp, {
-        tenantId: ExpectedData.tenantId,
-      });
+      const application = await givenApplicationData(wafapp);
       const declaration = await givenDeclarationData(wafapp, {
         applicationId: application.id,
-        tenantId: ExpectedData.tenantId,
       });
 
       await client

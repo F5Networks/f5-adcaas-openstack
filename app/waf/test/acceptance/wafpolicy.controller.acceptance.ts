@@ -58,7 +58,7 @@ describe('WafpolicyController', () => {
   });
 
   it('post ' + prefix + '/wafpolicies: with no id', async () => {
-    const wafpolicy = createWafpolicyObject({tenantId: ExpectedData.tenantId});
+    const wafpolicy = createWafpolicyObject();
 
     const response = await client
       .post(prefix + '/wafpolicies')
@@ -89,7 +89,6 @@ describe('WafpolicyController', () => {
       await givenWafpolicyData(wafapp, {public: true, tenantId: 'a random id'});
       await givenWafpolicyData(wafapp, {
         public: true,
-        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
@@ -112,7 +111,6 @@ describe('WafpolicyController', () => {
       });
       await givenWafpolicyData(wafapp, {
         public: true,
-        tenantId: ExpectedData.tenantId,
       });
 
       let response = await client
