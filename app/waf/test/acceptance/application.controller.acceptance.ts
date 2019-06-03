@@ -191,7 +191,45 @@ describe('ApplicationController', () => {
   });
 
   it(
-    'post ' + prefix + '/applications/{id}/deploy: deploy application',
+    'post ' +
+      prefix +
+      '/applications/{id}/deploy: deploy the first application.',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+      let application = await givenApplicationData(wafapp, {
+        adcId: adc.id,
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      await client
+        .patch(prefix + '/applications/' + application.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({defaultDeclarationId: response.body.declaration.id})
+        .expect(204);
+
+      deployStub
+        .onCall(0)
+        .throws(Object('InvalidPatchOperationError: path does not exist'));
+
+      await client
+        .post(prefix + '/applications/' + application.id + '/deploy')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(204);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{id}/deploy: deploy an application with partition',
     async () => {
       let adc = await givenAdcData(wafapp);
       let application = await givenApplicationData(wafapp, {
