@@ -3,7 +3,7 @@ import {inject} from '@loopback/context';
 import {AS3Service} from '../services';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
-const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 7443;
 
 /**
  * OpenAPI response for ping()

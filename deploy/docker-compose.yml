@@ -18,6 +18,7 @@ services:
       - postgres:postgres-server
       - ASG:asg-server
       - DO:do-server
+      - AS3:as3-server
 
   postgres:
     image: postgres:11.1
