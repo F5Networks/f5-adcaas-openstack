@@ -109,6 +109,8 @@ describe('AdcController', () => {
     ShouldResponseWith({});
     DOShouldResponseWith({});
     BigipShouldResponseWith({});
+
+    BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     setupEnvs();
     setDefaultInterval(1);
   });
@@ -976,7 +978,6 @@ describe('AdcController', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
     let adc = await givenAdcData(wafapp);
 
-    BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     await setupEnvs()
       .then(async () => {
         let response = await client
@@ -1006,7 +1007,7 @@ describe('AdcController', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    let adc = await givenAdcData(wafapp);
+    let adc = await givenAdcData(wafapp, {status: 'POWERON'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
 
