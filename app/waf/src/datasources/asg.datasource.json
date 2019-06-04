@@ -54,7 +54,11 @@
         "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}"
       },
       "functions": {
-        "queryExtensions": ["host","port","deviceId"]
+        "queryExtensions": [
+          "host",
+          "port",
+          "deviceId"
+        ]
       }
     },
     {
@@ -78,7 +82,25 @@
         "body": "{body}"
       },
       "functions": {
-        "install": ["host","port","deviceId","body"]
+        "install": [
+          "host",
+          "port",
+          "deviceId",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "{url}",
+        "body": "{body}"
+      },
+      "functions": {
+        "deploy": [
+          "url",
+          "body"
+        ]
       }
     },
     {
