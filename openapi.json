@@ -983,6 +983,129 @@
         "operationId": "ApplicationController.cleanupById"
       }
     },
+    "/adcaas/v1/applications/{applicationId}/declarations/{declarationId}/deploy": {
+      "post": {
+        "x-controller-name": "DeclarationController",
+        "x-operation-name": "proxyDeploy",
+        "tags": [
+          "DeclarationController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deploy Declaration resource"
+          },
+          "404": {
+            "description": "Can not find Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Fail to deploy Declaration resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "applicationId",
+            "description": "Application resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "declarationId",
+            "description": "Declaration resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Deploy the declaration on an ADC.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "adcId": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "adcId": "11111111-2222-3333-4444-555555555555"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "DeclarationController.proxyDeploy"
+      }
+    },
     "/adcaas/v1/applications/{applicationId}/declarations/{declarationId}": {
       "patch": {
         "x-controller-name": "DeclarationController",
@@ -9952,6 +10075,7 @@
   },
   "components": {
     "schemas": {
+      "ASGDeployRequest": {},
       "Endpointpolicy": {
         "title": "Endpointpolicy",
         "properties": {
