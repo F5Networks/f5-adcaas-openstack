@@ -34,7 +34,7 @@ import {AS3Service} from '../services';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
-const AS3_PORT: number = Number(process.env.AS3_PORT) || 8443;
+const AS3_PORT: number = Number(process.env.AS3_PORT) || 7443;
 
 const prefix = '/adcaas/v1';
 

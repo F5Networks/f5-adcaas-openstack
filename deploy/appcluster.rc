@@ -33,3 +33,5 @@ DO_BIGIQ_POOL=mykeypool
 
 ASG_HOST=asg-server
 ASG_PORT=443
+AS3_HOST=as3-server
+AS3_PORT=443
