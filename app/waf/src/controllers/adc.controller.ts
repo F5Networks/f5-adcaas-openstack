@@ -521,7 +521,17 @@ export class AdcController extends BaseController {
         await this.serialize(adc, {status: AdcState.POWERING})
           .then(async () => await this.cNet(adc, addon))
           .then(async () => await this.cSvr(adc, addon));
-        await this.serialize(adc, {status: AdcState.POWERON});
+
+        let poweronFunc = () => {
+          return this.adcStCtr.gotTo(AdcState.POWERON);
+        };
+        await checkAndWait(poweronFunc, 240)
+          .then(async () => {
+            await this.serialize(adc, {status: AdcState.POWERON});
+          })
+          .catch(error => {
+            throw new Error(`Timeout waiting for: ${AdcState.POWERON}`);
+          });
       } else throw new Error(`Not ready for bigip VE to : ${AdcState.POWERON}`);
     } catch (error) {
       await this.serialize(adc, {
