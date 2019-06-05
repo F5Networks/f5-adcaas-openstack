@@ -341,6 +341,156 @@ describe('openstack.identity.test', () => {
     expect(response.body).hasOwnProperty('message');
   });
 
+  it('refresh user token v2: 200', async () => {
+    OSShouldResponseWith({'/v2.0/tokens': StubResponses.v2AuthToken200});
+    let response = await client
+      .get('/openstack/refreshUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v2.0',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body.userId).eql(ExpectedData.userId);
+  });
+
+  it('refresh user token v2: 401', async () => {
+    OSShouldResponseWith({'/v2.0/tokens': StubResponses.response401});
+    let response = await client
+      .get('/openstack/refreshUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v2.0',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body).hasOwnProperty('message');
+  });
+
+  it('refresh user token v3: 200', async () => {
+    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    let response = await client
+      .get('/openstack/refreshUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v3',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body.token).eql(ExpectedData.userToken);
+  });
+
+  it('refresh user token v3: 401', async () => {
+    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
+    let response = await client
+      .get('/openstack/refreshUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v3',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body).hasOwnProperty('message');
+  });
+
+  it('resolve user token v3: 200', async () => {
+    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    let response = await client
+      .get('/openstack/resolveUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v3',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body.token).eql(ExpectedData.userToken);
+  });
+
+  it('resolve user token v3: 401', async () => {
+    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
+    let response = await client
+      .get('/openstack/resolveUserToken')
+      .send({
+        env: {
+          OS_AUTH_URL: 'http://localhost:35357/v3',
+          OS_USERNAME: 'wafaas',
+          OS_PASSWORD: '91153c85b8dd4147',
+          OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+          OS_DOMAIN_NAME: 'Default',
+          OS_REGION_NAME: 'RegionOne',
+          OS_AVAILABLE_ZONE: 'nova',
+        },
+        param: {
+          adminToken: '630daf7125a64d67b309e48603cbe461',
+          userToken: '149bfc5ac96c442db50ced09cf075479',
+          tenantName: '9f91a149-a847-41f9-96e2-2831c65948f4',
+        },
+      })
+      .expect(200);
+
+    expect(response.body).hasOwnProperty('message');
+  });
+
   it('create vm with network id: 200', async () => {
     OSShouldResponseWith({
       '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,

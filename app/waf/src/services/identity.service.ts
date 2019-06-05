@@ -24,12 +24,14 @@ import {WafBindingKeys} from '../keys';
 export interface IdentityService {
   v2AuthToken(url: string, body: object): Promise<object>;
   v2ValidateToken(url: string, adminToken: string): Promise<object>;
+  v2RefreshToken(url: string, body: object): Promise<object>;
   v3AuthToken(url: string, body: object): Promise<object>;
   v3ValidateToken(
     url: string,
     adminToken: string,
     userToken: string,
   ): Promise<object>;
+  v3RefreshToken(url: string, body: object): Promise<object>;
 }
 
 export class IdentityServiceProvider implements Provider<IdentityService> {
@@ -60,6 +62,10 @@ export abstract class AuthWithOSIdentity {
     userToken: string,
     tenantId?: string,
   ): Promise<AuthedToken>;
+  abstract refreshUserToken(
+    userToken: string,
+    tenantId: string,
+  ): Promise<AuthedToken>;
 
   // async bindIdentityService() {
   //   // TODO: use bind/inject to use IdentityService:
@@ -89,6 +95,31 @@ export abstract class AuthWithOSIdentity {
         this.logger.debug('solveAdminToken failed: ' + error.message);
         throw error;
       }
+    }
+  }
+
+  async solveUserToken(
+    oldToken: AuthedToken,
+    expiredAfterSecs: number = 600,
+  ): Promise<AuthedToken> {
+    try {
+      if (oldToken.aboutExpired(expiredAfterSecs)) {
+        this.logger.debug(
+          `The token is about to expire in ${expiredAfterSecs} seconds, refresh it for later operations.`,
+        );
+
+        return await this.application
+          .get(WafBindingKeys.KeyAuthWithOSIdentity)
+          .then(authHelper => {
+            return authHelper.refreshUserToken(
+              oldToken.token,
+              oldToken.tenantId,
+            );
+          });
+      } else return oldToken;
+    } catch (error) {
+      this.logger.debug('solveUserToken failed: ' + error.message);
+      throw error;
     }
   }
 }
@@ -131,6 +162,30 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
     try {
       return await this.identityService
         .v2ValidateToken(url, adminToken.token)
+        .then(response => {
+          return AuthedToken.buildWith(response);
+        });
+    } catch (error) {
+      throw new Error('Failed to validate user token: ' + error.message);
+    }
+  }
+
+  async refreshUserToken(
+    userToken: string,
+    tenantId: string,
+  ): Promise<AuthedToken> {
+    let url = this.authConfig.osAuthUrl + '/tokens';
+    let body = {
+      auth: {
+        token: {
+          id: userToken,
+        },
+        tenantId: tenantId,
+      },
+    };
+    try {
+      return await this.identityService
+        .v2RefreshToken(url, body)
         .then(response => {
           return AuthedToken.buildWith(response);
         });
@@ -196,6 +251,37 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
       throw new Error('Failed to validate user token: ' + error.message);
     }
   }
+
+  async refreshUserToken(
+    userToken: string,
+    tenantId: string,
+  ): Promise<AuthedToken> {
+    let url = this.authConfig.osAuthUrl + '/auth/tokens';
+    let body = {
+      auth: {
+        identity: {
+          methods: ['token'],
+          token: {
+            id: userToken,
+          },
+        },
+        scope: {
+          project: {
+            id: tenantId,
+          },
+        },
+      },
+    };
+    try {
+      return await this.identityService
+        .v3RefreshToken(url, body)
+        .then(response => {
+          return AuthedToken.buildWith(response);
+        });
+    } catch (error) {
+      throw new Error('Failed to validate user token: ' + error.message);
+    }
+  }
 }
 
 export class AuthWithIdentityUnknown extends AuthWithOSIdentity {
@@ -203,6 +289,9 @@ export class AuthWithIdentityUnknown extends AuthWithOSIdentity {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
   validateUserToken(userToken: string, tenantId: string): Promise<AuthedToken> {
+    throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
+  }
+  refreshUserToken(userToken: string, tenantId: string): Promise<AuthedToken> {
     throw new Error('Not Implemented, unknown AuthWithOSIdentity.');
   }
 }
@@ -333,6 +422,10 @@ export class AuthedToken {
     }
   }
 
+  public aboutExpired(sec: number): boolean {
+    return this.expiredAt.getTime() - Date.now() < sec * 1000;
+  }
+
   private buildV2_0(response: object): AuthedToken {
     let respJson = JSON.parse(JSON.stringify(response));
 
@@ -387,8 +480,7 @@ export class AuthedToken {
   private digExpired() {
     // Make the duration time a little shorter then that of actually
     // to avoid token expiring error caused by time leak.
-    let duration =
-      ((this.expiredAt.getTime() - this.issuedAt.getTime()) * 4) / 5;
+    let duration = this.expiredAt.getTime() - this.issuedAt.getTime();
     this.expiredAt.setTime(Date.now() + duration);
     return this;
   }
@@ -468,11 +560,7 @@ export class AuthedToken {
     return this.epNetwork() + '/v2.0/floatingips';
   }
 
-  // TODO: Use user token's catalog instead of that of admin's.
-  public epServers(tenantId: string) {
-    let url = this.epCompute();
-    if (url.endsWith('v2.0'))
-      return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
-    else return url.replace(process.env.OS_TENANT_ID!, tenantId) + '/servers';
+  public epServers() {
+    return this.epCompute() + '/servers';
   }
 }

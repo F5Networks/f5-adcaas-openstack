@@ -18,7 +18,7 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider, CoreBindings, Application} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {factory} from '../log4ts';
-import {WafBindingKeys} from '../keys';
+import {AuthedToken} from './identity.service';
 
 export interface NetworkService {
   v2CreatePort(
@@ -83,14 +83,10 @@ export class NetworkDriver {
   }
 
   async createPort(
-    userToken: string,
+    userToken: AuthedToken,
     portParams: PortCreationParams,
   ): Promise<PortResponse> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epPorts();
+    let url = userToken.epPorts();
 
     let body: PortsCreateRequest = {
       port: {
@@ -105,7 +101,7 @@ export class NetworkDriver {
     body.port.name = 'f5-' + portParams.name;
 
     return await this.networkService
-      .v2CreatePort(url, userToken, body)
+      .v2CreatePort(url, userToken.token, body)
       .then(response => {
         const respJson = JSON.parse(JSON.stringify(response))['body'][0];
         const portResp: PortResponse = {
@@ -118,42 +114,31 @@ export class NetworkDriver {
   }
 
   async updatePort(
-    userToken: string,
+    userToken: AuthedToken,
     portParams: PortsUpdateParams,
   ): Promise<void> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epPorts() + `/${portParams.id}`;
+    let url = userToken.epPorts() + `/${portParams.id}`;
 
     let body: PortUpdateRequest = {port: {}};
     if (portParams.fixedIps) {
       body.port.fixed_ips = portParams.fixedIps!;
     }
 
-    await this.networkService.v2UpdatePort(url, userToken, body);
+    await this.networkService.v2UpdatePort(url, userToken.token, body);
   }
 
-  async deletePort(userToken: string, portId: string): Promise<void> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epPorts() + `/${portId}`;
-    await this.networkService.v2DeletePort(url, userToken);
+  async deletePort(userToken: AuthedToken, portId: string): Promise<void> {
+    let url = userToken.epPorts() + `/${portId}`;
+    await this.networkService.v2DeletePort(url, userToken.token);
   }
 
   async getSubnetInfo(
-    userToken: string,
+    userToken: AuthedToken,
     networkId: string,
   ): Promise<SubnetInfo[]> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epSubnets() + '?network_id=' + networkId;
+    let url = userToken.epSubnets() + '?network_id=' + networkId;
     return await this.networkService
-      .v2GetSubnets(url, userToken)
+      .v2GetSubnets(url, userToken.token)
       .then(response => {
         this.logger.debug(
           'access ' + url + ' response: ' + JSON.stringify(response),
@@ -174,12 +159,9 @@ export class NetworkDriver {
       });
   }
 
-  async getPortInfo(userToken: string, portId: string): Promise<Port> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epPorts() + '/' + portId;
-    let response = await this.networkService.v2GetPorts(url, userToken);
+  async getPortInfo(userToken: AuthedToken, portId: string): Promise<Port> {
+    let url = userToken.epPorts() + '/' + portId;
+    let response = await this.networkService.v2GetPorts(url, userToken.token);
 
     this.logger.debug(
       'access ' + url + ' response: ' + JSON.stringify(response),
@@ -196,14 +178,11 @@ export class NetworkDriver {
   }
 
   async getFloatingIps(
-    userToken: string,
+    userToken: AuthedToken,
     ipAddress?: string,
   ): Promise<FloatingIP[]> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
     let url =
-      adminToken.epFloatingIps() +
+      userToken.epFloatingIps() +
       (ipAddress ? `?floating_ip_address=${ipAddress}` : '');
     let headers = {
       'X-Auth-Token': userToken,
@@ -236,15 +215,12 @@ export class NetworkDriver {
 
   // TODO: redefine the function whenn userToken is AuthedToken.
   async createFloatingIp(
-    userToken: string,
+    userToken: AuthedToken,
     tenantId: string,
     ipAddress?: string,
     portId?: string,
   ): Promise<FloatingIP> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epFloatingIps();
+    let url = userToken.epFloatingIps();
     let headers = {
       'X-Auth-Token': userToken,
       'content-type': 'application/json',
@@ -278,14 +254,11 @@ export class NetworkDriver {
   }
 
   async bindFloatingIpToPort(
-    userToken: string,
+    userToken: AuthedToken,
     floatingIpId: string,
     portId: string,
   ): Promise<FloatingIP> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epFloatingIps() + `/${floatingIpId}`;
+    let url = userToken.epFloatingIps() + `/${floatingIpId}`;
     let headers = {
       'X-Auth-Token': userToken,
       'content-type': 'application/json',
@@ -314,13 +287,10 @@ export class NetworkDriver {
   }
 
   async deleteFloatingIp(
-    userToken: string,
+    userToken: AuthedToken,
     floatingIpId: string,
   ): Promise<void> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epFloatingIps() + `/${floatingIpId}`;
+    let url = userToken.epFloatingIps() + `/${floatingIpId}`;
     let headers = {
       'X-Auth-Token': userToken,
       'content-type': 'application/json',

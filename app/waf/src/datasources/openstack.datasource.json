@@ -41,6 +41,19 @@
       }
     },
     {
+      "description": "identity v2 refresh user's token.",
+      "template": {
+        "method": "POST",
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2RefreshToken": [
+          "url"
+        ]
+      }
+    },
+    {
       "description": "identity v3 get auth token with user/password",
       "template": {
         "method": "POST",
@@ -73,6 +86,22 @@
           "url",
           "adminToken",
           "userToken"
+        ]
+      }
+    },
+    {
+      "description": "identity v3 refresh user's token.",
+      "template": {
+        "method": "POST",
+        "url": "{url}",
+        "responsePath": "$",
+        "responseHeaders": true,
+        "body": "{body}"
+      },
+      "functions": {
+        "v3RefreshToken": [
+          "url",
+          "body"
         ]
       }
     },
