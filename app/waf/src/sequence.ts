@@ -114,11 +114,6 @@ export class MySequence implements SequenceHandler {
         'Unauthorized: invalid X-Auth-Token header.',
       );
     }
-    let hdrTenantId = request.headers['tenant-id'];
-    if (typeof hdrTenantId !== 'string')
-      throw new HttpErrors.Unauthorized(
-        'Unauthorized: invalid tenant-id header.',
-      );
 
     try {
       await this.authWithOSIdentity

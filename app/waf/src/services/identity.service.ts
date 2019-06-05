@@ -190,7 +190,7 @@ class AuthWithIdentityV2 extends AuthWithOSIdentity {
           return AuthedToken.buildWith(response);
         });
     } catch (error) {
-      throw new Error('Failed to validate user token: ' + error.message);
+      throw new Error('Failed to refresh user token: ' + error.message);
     }
   }
 }
@@ -279,7 +279,7 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
           return AuthedToken.buildWith(response);
         });
     } catch (error) {
-      throw new Error('Failed to validate user token: ' + error.message);
+      throw new Error('Failed to refresh user token: ' + error.message);
     }
   }
 }

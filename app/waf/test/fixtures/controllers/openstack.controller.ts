@@ -106,7 +106,7 @@ export class OpenstackController extends MockBaseController {
         WafBindingKeys.KeyAuthWithOSIdentity,
       );
 
-      return await authWithOSIdentity.validateUserToken(
+      return await authWithOSIdentity.refreshUserToken(
         reqBody.param.userToken,
         reqBody.param.tenantId,
       );
