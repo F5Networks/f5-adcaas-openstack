@@ -78,7 +78,7 @@ export type WafpolicyResponse = [
     lastChange: string;
     state: string;
     path: string;
-  },
+  }
 ];
 
 export type WafpolicyResponses = {

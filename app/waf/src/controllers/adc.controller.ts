@@ -40,6 +40,8 @@ import {
   ActionsBody,
   ActionsResponse,
   ActionsRequest,
+  AS3PartitionRequest,
+  as3Name,
 } from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
@@ -197,7 +199,7 @@ export class AdcController extends BaseController {
       let exist = await this.asgMgr.as3Exists(adc.trustedDeviceId!);
 
       if (exist) {
-        await this.serialize(adc, {status: AdcState.ACTIVE});
+        await this.serialize(adc, {status: AdcState.INSTALLED});
         return;
       }
     } catch (err) {
@@ -225,7 +227,7 @@ export class AdcController extends BaseController {
 
       await checkAndWait(as3Available, 60, [adc.trustedDeviceId!]).then(
         async () => {
-          await this.serialize(adc, {status: AdcState.ACTIVE});
+          await this.serialize(adc, {status: AdcState.INSTALLED});
         },
         async () => {
           await this.serialize(adc, {
@@ -239,6 +241,25 @@ export class AdcController extends BaseController {
         status: AdcState.INSTALLERR,
         lastErr: `${AdcState.INSTALLERR}: ${err.message}`,
       });
+    }
+  }
+
+  async installPartition(adc: Adc): Promise<void> {
+    // Install partition after installing the AS3 agent.
+    let tenantName = adc.getAS3Name();
+    let mgmt = adc.management!;
+    let paritionObj = new AS3PartitionRequest(adc);
+    try {
+      await this.serialize(adc, {status: AdcState.PARTITIONING});
+      await this.asgMgr.deploy(mgmt.ipAddress, mgmt.tcpPort, paritionObj);
+      await this.serialize(adc, {status: AdcState.ACTIVE});
+    } catch (err) {
+      this.logger.debug(`Creating partition ${tenantName} Error.`);
+      await this.serialize(adc, {
+        status: AdcState.PARTITIONERR,
+        lastErr: `${AdcState.PARTITIONERR}: Fail to create partition`,
+      });
+      return;
     }
   }
 
@@ -423,7 +444,9 @@ export class AdcController extends BaseController {
 
     if (adc.status.endsWith('ING'))
       throw new HttpErrors.UnprocessableEntity(
-        `Adc status is ' ${adc.status}. Cannot be operated on, please wait for its finish.`,
+        `Adc status is ' ${
+          adc.status
+        }. Cannot be operated on, please wait for its finish.`,
       );
 
     switch (Object.keys(actionBody)[0]) {
@@ -453,7 +476,6 @@ export class AdcController extends BaseController {
           throw new HttpErrors.UnprocessableEntity(
             `Not ready for bigip VE to : ${AdcState.ONBOARDED}`,
           );
-
       default:
         throw new HttpErrors.UnprocessableEntity(
           'Not supported: ' + Object.keys(actionBody)[0],
@@ -478,8 +500,9 @@ export class AdcController extends BaseController {
     // install as3
     if (await this.adcStCtr.readyTo(AdcState.INSTALLED))
       await this.installAS3(adc);
-
     // create tenant
+    if (await this.adcStCtr.readyTo(AdcState.PARTITIONED))
+      await this.installPartition(adc);
   }
 
   private async serialize(adc: Adc, data?: object) {
@@ -749,6 +772,12 @@ export class AdcStateCtrlr {
       failure: AdcState.INSTALLERR,
       state: AdcState.INSTALLED,
       check: this.installed,
+      next: [AdcState.PARTITIONED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.PARTITIONERR,
+      state: AdcState.PARTITIONED,
+      check: this.partitioned,
       next: [AdcState.RECLAIMED, AdcState.ACTIVE],
     },
     {
@@ -855,6 +884,16 @@ export class AdcStateCtrlr {
     });
   }
 
+  private async partitioned(ctrl: AdcStateCtrlr): Promise<boolean> {
+    let bigipMgr = await ctrl.getBigipMgr();
+    try {
+      await bigipMgr.checkPartition(as3Name(ctrl.adc.tenantId));
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
   private async accessible(ctrl: AdcStateCtrlr): Promise<boolean> {
     let bigipMgr = await ctrl.getBigipMgr();
 
@@ -898,6 +937,10 @@ export enum AdcState {
   INSTALLED = 'INSTALLED',
   INSTALLING = 'INSTALLING',
   INSTALLERR = 'INSTALLERROR',
+
+  PARTITIONED = 'PARTITIONED',
+  PARTITIONING = 'PARTITIONING',
+  PARTITIONERR = 'PARTITIONERROR',
 
   RECLAIMED = 'RECLAIMED',
   RECLAIMING = 'RECLAIMING',

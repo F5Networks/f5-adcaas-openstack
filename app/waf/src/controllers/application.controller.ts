@@ -274,9 +274,12 @@ export class ApplicationController extends BaseController {
         'No target ADC to perform deploy action',
       );
     }
+
     let adc = await this.adcRepository.findById(application.adcId, undefined, {
       tenantId: tenantId,
     });
+
+    //  let adc = await this.adcRepository.findById(application.adcId, undefined, undefined,);
 
     let operation = patchOP.Remove;
     let req = new AS3PatchReqeust(adc, application, operation);

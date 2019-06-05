@@ -463,7 +463,9 @@ describe('DeclarationController', () => {
 
     await client
       .post(
-        `${prefix}/applications/${application.id}/declarations/${declaration.id}/deploy`,
+        `${prefix}/applications/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
       )
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
@@ -495,7 +497,9 @@ describe('DeclarationController', () => {
 
     await client
       .post(
-        `${prefix}/applications/${application.id}/declarations/${declaration.id}/deploy`,
+        `${prefix}/applications/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
       )
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
@@ -525,7 +529,9 @@ describe('DeclarationController', () => {
 
     await client
       .post(
-        `${prefix}/applicaitons/${application.id}/declarations/${declaration.id}/deploy`,
+        `${prefix}/applicaitons/${application.id}/declarations/${
+          declaration.id
+        }/deploy`,
       )
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)

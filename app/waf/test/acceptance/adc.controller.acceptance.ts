@@ -256,7 +256,7 @@ describe('AdcController test', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal('ACTIVE');
+    expect(response.body.adc.status).to.equal('INSTALLED');
     expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
@@ -552,7 +552,7 @@ describe('AdcController test', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('ACTIVE');
+      expect(response.body.adc.status).to.equal('INSTALLED');
     },
   );
 
@@ -1104,7 +1104,7 @@ describe('AdcController test', () => {
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
-          return resp.body.adc.status === 'ACTIVE';
+          return resp.body.adc.status === 'INSTALLED';
         };
 
         //TODO: This test can not return comparing failure.

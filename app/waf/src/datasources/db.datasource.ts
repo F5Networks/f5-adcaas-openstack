@@ -40,7 +40,9 @@ export class DbDataSource extends juggler.DataSource {
     dsConfig.user = process.env.DATABASE_USER || dsConfig.user;
     dsConfig.password = process.env.DATABASE_PASSWORD || dsConfig.password;
     dsConfig.database = process.env.DATABASE_DB || dsConfig.database;
-    dsConfig.url = `postgres://${dsConfig.user}:${dsConfig.password}@${dsConfig.host}:${dsConfig.port}/${dsConfig.database}`;
+    dsConfig.url = `postgres://${dsConfig.user}:${dsConfig.password}@${
+      dsConfig.host
+    }:${dsConfig.port}/${dsConfig.database}`;
 
     super(dsConfig);
   }

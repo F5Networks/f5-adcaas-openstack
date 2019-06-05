@@ -422,7 +422,9 @@ export class OnboardingManager {
     return await this.doService
       .doRest(
         'GET',
-        `${this.config.endpoint}/mgmt/shared/declarative-onboarding/task/${doId}`,
+        `${
+          this.config.endpoint
+        }/mgmt/shared/declarative-onboarding/task/${doId}`,
         headers,
         {},
       )
