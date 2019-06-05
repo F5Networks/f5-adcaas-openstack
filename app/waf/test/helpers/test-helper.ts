@@ -127,7 +127,6 @@ export interface RestAppAndClient {
 }
 
 export async function setupEnvs(addonEnvs: {[key: string]: string} = {}) {
-  process.env.PRODUCT_RELEASE = '1';
   for (let k of Object.keys(envs)) {
     process.env[k] = envs[k];
   }
@@ -138,7 +137,6 @@ export async function setupEnvs(addonEnvs: {[key: string]: string} = {}) {
 }
 
 export async function teardownEnvs() {
-  delete process.env['PRODUCT_RELEASE'];
   for (let k of Object.keys(envs)) {
     delete process.env[k];
   }

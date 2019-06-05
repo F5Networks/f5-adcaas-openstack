@@ -72,18 +72,7 @@ describe('openstack.identity.test', () => {
     });
   });
 
-  it('no auth to request, PRODUCT_RELEASE is off', async () => {
-    delete process.env['PRODUCT_RELEASE'];
-    let response = await client
-      .get('/test-openstack-simulation-ok')
-      .expect(200);
-
-    expect(response.body).containDeep({status: 'ok'});
-  });
-
   it('failed auth to request: no x-auth-token header', async () => {
-    process.env.PRODUCT_RELEASE = '1';
-
     let response = await client
       .get('/test-openstack-simulation-ok')
       .expect(401);
