@@ -34,7 +34,7 @@ import {
   RequestContext,
   RestBindings,
 } from '@loopback/rest';
-import {inject} from '@loopback/context';
+import { inject } from '@loopback/context';
 import {
   Application,
   AS3DeployRequest,
@@ -46,8 +46,8 @@ import {
   DeclarationRepository,
   AdcRepository,
 } from '../repositories';
-import {AS3Service} from '../services';
-import {BaseController, Schema, Response, CollectionResponse} from '.';
+import { AS3Service } from '../services';
+import { BaseController, Schema, Response, CollectionResponse } from '.';
 
 const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
 const AS3_PORT: number = Number(process.env.AS3_PORT) || 7443;
@@ -64,7 +64,7 @@ export class ApplicationController extends BaseController {
     public adcRepository: AdcRepository,
     @inject('services.AS3Service') public as3Service: AS3Service,
     //Suppress get injection binding exeption by using {optional: true}
-    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    @inject(RestBindings.Http.CONTEXT, { optional: true })
     protected reqCxt: RequestContext,
   ) {
     super(reqCxt);
@@ -104,7 +104,7 @@ export class ApplicationController extends BaseController {
     responses: {
       '200': {
         description: 'Application model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -223,7 +223,7 @@ export class ApplicationController extends BaseController {
     let declaration = await this.declarationRepository.findById(
       application.defaultDeclarationId,
       undefined,
-      {tenantId: tenantId},
+      { tenantId: tenantId },
     );
 
     let operation = patchOP.Replace;
@@ -274,9 +274,12 @@ export class ApplicationController extends BaseController {
         'No target ADC to perform deploy action',
       );
     }
-    let adc = await this.adcRepository.findById(application.adcId, undefined, {
-      tenantId: tenantId,
-    });
+
+   let adc = await this.adcRepository.findById(application.adcId, undefined, {
+     tenantId: tenantId,
+   });
+
+  //  let adc = await this.adcRepository.findById(application.adcId, undefined, undefined,);
 
     let operation = patchOP.Remove;
     let req = new AS3PatchReqeust(adc, application, operation);
