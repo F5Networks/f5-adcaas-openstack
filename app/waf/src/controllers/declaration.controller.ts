@@ -383,7 +383,7 @@ export class DeclarationController extends BaseController {
     ]).then(
       async ([application, declaration, adc]) => {
         // TODO: uncomment it; use adcstate control: gotTo(Active)
-        // if (adc.status !== 'ACTIVE' || !adc.management) {
+        // if (adc.status !== AdcState.ACTIVE || !adc.management) {
         //   throw new HttpErrors.UnprocessableEntity('ADC resource is not ready for deploy.');
         // }
 

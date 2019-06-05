@@ -46,18 +46,7 @@ export type ConfigTypes = {
     password: string;
     rootPass: string;
   };
-  status:
-    | 'NEW'
-    | 'POWERON'
-    | 'POWERING'
-    | 'POWERERR'
-    | 'ONBOARDED'
-    | 'ONBOARDING'
-    | 'ONBOARDERR'
-    | 'TRUSTED'
-    | 'TRUSTING'
-    | 'TRUSTERR'
-    | 'ACTIVE'; // cannot be appointed.
+  status: string; // cannot be appointed.
   lastErr: string; // cannot be appointed.
 };
 
