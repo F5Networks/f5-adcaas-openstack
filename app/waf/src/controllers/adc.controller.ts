@@ -56,6 +56,7 @@ import {
   OnboardingManager,
   BigipBuiltInProperties,
   ASGServiceProvider,
+  AuthedToken,
 } from '../services';
 import {checkAndWait, merge} from '../utils';
 
@@ -417,7 +418,13 @@ export class AdcController extends BaseController {
     });
 
     let addonReq = {
-      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+      userToken: await this.reqCxt
+        .get(WafBindingKeys.Request.KeyUserToken)
+        .then(token =>
+          this.wafapp
+            .get(WafBindingKeys.KeyAuthWithOSIdentity)
+            .then(authHelper => authHelper.solveUserToken(token)),
+        ),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
@@ -525,7 +532,7 @@ export class AdcController extends BaseController {
         let userdata: string = await this.cUserdata(rootPass, adminPass);
 
         let serverParams: ServersParams = {
-          userTenantId: addon.tenantId,
+          userTenantId: addon.userToken!.tenantId,
           vmName: adc.id,
           imageRef: adc.compute.imageRef,
           flavorRef: adc.compute.flavorRef,
@@ -541,7 +548,7 @@ export class AdcController extends BaseController {
         };
 
         await computeHelper
-          .createServer(addon.userToken, serverParams)
+          .createServer(addon.userToken!, serverParams)
           .then(response => {
             adc.compute.vmId = response;
             adc.management = {
@@ -578,7 +585,7 @@ export class AdcController extends BaseController {
           if (net.fixedIp) portParams.fixedIp = net.fixedIp;
 
           await networkHelper
-            .createPort(addon.userToken, portParams)
+            .createPort(addon.userToken!, portParams)
             .then(async port => {
               net.fixedIp = port.fixedIp;
               net.macAddr = port.macAddr;
@@ -610,7 +617,10 @@ export class AdcController extends BaseController {
     let reclaimFuncs: {[key: string]: Function} = {
       license: async () => {
         let doMgr = await OnboardingManager.instanlize(this.wafapp);
-        let doBody = await doMgr.assembleDo(adc, {onboarding: false});
+        let doBody = await doMgr.assembleDo(
+          adc,
+          Object.assign(addon, {onboarding: false}),
+        );
         this.logger.debug(
           'Json used for revoke license: ' + JSON.stringify(doBody),
         );
@@ -642,7 +652,7 @@ export class AdcController extends BaseController {
 
           try {
             let portId = adc.networks[network].portId!;
-            await networkMgr.deletePort(addon.userToken, portId).then(() => {
+            await networkMgr.deletePort(addon.userToken!, portId).then(() => {
               this.logger.debug(`Deleted port ${portId}`);
               delete adc.networks[network].portId;
               delete adc.networks[network].fixedIp;
@@ -661,7 +671,11 @@ export class AdcController extends BaseController {
         );
         if (adc.compute.vmId) {
           await computeMgr
-            .deleteServer(addon.userToken, adc.compute.vmId!, addon.tenantId)
+            .deleteServer(
+              addon.userToken!,
+              adc.compute.vmId!,
+              addon.userToken!.tenantId,
+            )
             .then(() => {
               this.logger.debug(`Deleted the vm ${adc.compute.vmId!}`);
               delete adc.compute.vmId;
@@ -698,7 +712,10 @@ export class AdcController extends BaseController {
       await this.serialize(adc, {status: AdcState.ONBOARDING});
 
       let doMgr = await OnboardingManager.instanlize(this.wafapp);
-      let doBody = await doMgr.assembleDo(adc, {onboarding: true});
+      let doBody = await doMgr.assembleDo(
+        adc,
+        Object.assign(addon, {onboarding: true}),
+      );
       let doId = await doMgr.onboarding(doBody);
 
       await checkAndWait(() => doMgr.isDone(doId), 240)
@@ -716,8 +733,8 @@ export class AdcController extends BaseController {
 }
 
 export type AddonReqValues = {
-  userToken: string;
-  tenantId: string;
+  userToken?: AuthedToken;
+  onboarding?: boolean;
 };
 
 export class AdcStateCtrlr {
