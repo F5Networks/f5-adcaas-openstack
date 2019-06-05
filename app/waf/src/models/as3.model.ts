@@ -118,3 +118,39 @@ export class AS3DeployRequest {
     }
   }
 }
+
+export class AS3PartitionRequest {
+  readonly class: string = 'AS3';
+  readonly action: 'deploy';
+  targetHost: string;
+  targetPort: number;
+  targetUsername: string;
+  targetPassphrase: string;
+  declaration: AS3Declaration;
+
+  constructor(adc: Adc) {
+    this.targetHost = adc.management!.ipAddress;
+    this.targetPort = adc.management!.tcpPort;
+    //TODO: remove admin/pass after implement trusted connection
+    this.targetUsername = 'admin';
+    this.targetPassphrase = 'admin';
+    this.declaration = {
+      class: 'ADC',
+      schemaVersion: '3.0.0',
+      id: adc.id,
+    };
+
+    let tenant = as3Name(adc.tenantId);
+    this.declaration[tenant] = {
+      class: 'Tenant',
+      label: adc.tenantId,
+    };
+
+    Object.assign(this.declaration[tenant], {
+      ['onboarding']: {
+        class: 'Application',
+        template: 'Service_Generic',
+      },
+    });
+  }
+}

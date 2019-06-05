@@ -196,6 +196,13 @@ export class BigIpManager {
     );
   }
 
+  async getPartition(partition: string): Promise<string> {
+    await this.mustBeReachable();
+    let url = `${this.baseUrl}/mgmt/tm/sys/folder/~${partition}`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.stringify(response);
+    return resObj;
+  }
   async getHostname(): Promise<string> {
     await this.mustBeReachable();
 
