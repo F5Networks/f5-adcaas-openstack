@@ -83,6 +83,20 @@ export class OpenstackController extends MockBaseController {
     });
   }
 
+  @get('/openstack/refreshUserToken')
+  async refreshUserToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    return this.tryRunWithEnvs(reqBody.env, async () => {
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
+      );
+
+      return await authWithOSIdentity.refreshUserToken(
+        reqBody.param.userToken,
+        reqBody.param.tenantId,
+      );
+    });
+  }
+
   @get('/openstack/validateUserToken')
   async validateUserToken(
     @requestBody() reqBody: RequestBody,
@@ -96,6 +110,19 @@ export class OpenstackController extends MockBaseController {
         reqBody.param.userToken,
         reqBody.param.tenantId,
       );
+    });
+  }
+
+  @get('/openstack/resolveUserToken')
+  async resolveUserToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    return this.tryRunWithEnvs(reqBody.env, async () => {
+      const authWithOSIdentity = await this.application.get(
+        WafBindingKeys.KeyAuthWithOSIdentity,
+      );
+
+      return authWithOSIdentity
+        .validateUserToken(reqBody.param.userToken, reqBody.param.tenantId)
+        .then(usertoken => authWithOSIdentity.solveUserToken(usertoken));
     });
   }
 
@@ -117,13 +144,13 @@ export class OpenstackController extends MockBaseController {
         vmName: reqBody.param.vmName,
         ports: [reqBody.param.portId],
       };
+      const adminToken = await this.application.get(
+        WafBindingKeys.KeySolvedAdminToken,
+      );
 
       // Need to generate admin token to retrieve catalog.
       return {
-        id: await computeMgr.createServer(
-          reqBody.param.userToken,
-          serversParams,
-        ),
+        id: await computeMgr.createServer(adminToken, serversParams),
       };
     });
   }
@@ -136,9 +163,12 @@ export class OpenstackController extends MockBaseController {
       const computeMgr = await this.application.get(
         WafBindingKeys.KeyComputeManager,
       );
+      const adminToken = await this.application.get(
+        WafBindingKeys.KeySolvedAdminToken,
+      );
 
       return computeMgr.getServerDetail(
-        reqBody.param.userToken,
+        adminToken,
         reqBody.param.serverId,
         reqBody.param.tenantId,
       );
@@ -151,15 +181,15 @@ export class OpenstackController extends MockBaseController {
       const networkDriver = await this.application.get(
         WafBindingKeys.KeyNetworkDriver,
       );
+      const adminToken = await this.application.get(
+        WafBindingKeys.KeySolvedAdminToken,
+      );
 
       let portsParams: PortCreationParams = {
         networkId: reqBody.param.networkId,
         name: 'adcId-',
       };
-      let port = await networkDriver.createPort(
-        reqBody.param.userToken,
-        portsParams,
-      );
+      let port = await networkDriver.createPort(adminToken, portsParams);
       return Promise.resolve(port);
     });
   }

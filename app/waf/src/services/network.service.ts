@@ -18,7 +18,7 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider, CoreBindings, Application} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {factory} from '../log4ts';
-import {WafBindingKeys} from '../keys';
+import {AuthedToken} from './identity.service';
 
 export interface NetworkService {
   v2CreatePort(
@@ -69,14 +69,10 @@ export class NetworkDriver {
   }
 
   async createPort(
-    userToken: string,
+    userToken: AuthedToken,
     portParams: PortCreationParams,
   ): Promise<PortResponse> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epPorts();
+    let url = userToken.epPorts();
 
     let body: PortsRequest = {
       port: {
@@ -90,7 +86,7 @@ export class NetworkDriver {
     body.port.name = 'f5-' + portParams.name;
 
     return await this.networkService
-      .v2CreatePort(url, userToken, body)
+      .v2CreatePort(url, userToken.token, body)
       .then(response => {
         const respJson = JSON.parse(JSON.stringify(response))['body'][0];
         const portResp: PortResponse = {
@@ -102,26 +98,18 @@ export class NetworkDriver {
       });
   }
 
-  async deletePort(userToken: string, portId: string): Promise<void> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epPorts() + `/${portId}`;
-    await this.networkService.v2DeletePort(url, userToken);
+  async deletePort(userToken: AuthedToken, portId: string): Promise<void> {
+    let url = userToken.epPorts() + `/${portId}`;
+    await this.networkService.v2DeletePort(url, userToken.token);
   }
 
   async getSubnetInfo(
-    userToken: string,
+    userToken: AuthedToken,
     networkId: string,
   ): Promise<SubnetInfo[]> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epSubnets() + '?network_id=' + networkId;
+    let url = userToken.epSubnets() + '?network_id=' + networkId;
     return await this.networkService
-      .v2GetSubnets(url, userToken)
+      .v2GetSubnets(url, userToken.token)
       .then(response => {
         this.logger.debug(
           'access ' + url + ' response: ' + JSON.stringify(response),

@@ -19,7 +19,7 @@ import {inject, Provider, CoreBindings} from '@loopback/core';
 import {OpenstackDataSource} from '../datasources';
 import {RestApplication} from '@loopback/rest';
 import {factory} from '../log4ts';
-import {WafBindingKeys} from '../keys';
+import {AuthedToken} from './identity.service';
 
 export interface ComputeService {
   v2CreateServer(
@@ -59,18 +59,18 @@ export abstract class ComputeManager {
   ) {}
 
   abstract createServer(
-    userToken: string,
+    userToken: AuthedToken,
     serversParams: ServersParams,
   ): Promise<string>;
 
   abstract deleteServer(
-    userToken: string,
+    userToken: AuthedToken,
     serverId: string,
     tenantId: string,
   ): Promise<void>;
 
   abstract getServerDetail(
-    userToken: string,
+    userToken: AuthedToken,
     serverId: string,
     tenantId?: string,
   ): Promise<ServerDetail>;
@@ -97,20 +97,20 @@ export class ComputeManagerV2 extends ComputeManager {
   protected meta: {version: string} = {version: 'v2'};
 
   async createServer(
-    userToken: string,
+    userToken: AuthedToken,
     serversParams: ServersParams,
   ): Promise<string> {
     try {
-      let adminToken = await this.application.get(
-        WafBindingKeys.KeySolvedAdminToken,
-      );
-
       return await Promise.all([
-        adminToken.epServers(serversParams.userTenantId),
+        userToken.epServers(),
         this.assembleRequestBody(serversParams),
       ])
         .then(([url, reqBody]) => {
-          return this.computeService.v2CreateServer(url, userToken, reqBody);
+          return this.computeService.v2CreateServer(
+            url,
+            userToken.token,
+            reqBody,
+          );
         })
         .then(serversResponse => {
           const obj = JSON.parse(JSON.stringify(serversResponse))['body'][0];
@@ -126,35 +126,27 @@ export class ComputeManagerV2 extends ComputeManager {
   }
 
   async deleteServer(
-    userToken: string,
+    userToken: AuthedToken,
     serverId: string,
     tenantId: string,
   ): Promise<void> {
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-    let url = adminToken.epServers(tenantId) + `/${serverId}`;
+    let url = userToken.epServers() + `/${serverId}`;
 
-    await this.computeService.v2DeleteServer(url, userToken).then(resp => {
-      this.logger.debug(`Deleted server: ${serverId}`);
-    });
+    await this.computeService
+      .v2DeleteServer(url, userToken.token)
+      .then(resp => {
+        this.logger.debug(`Deleted server: ${serverId}`);
+      });
   }
 
   async getServerDetail(
-    userToken: string,
+    userToken: AuthedToken,
     serverId: string,
-    tenantId?: string,
   ): Promise<ServerDetail> {
-    if (!tenantId) throw new Error('tenantId is required for compute v2.');
-
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
-
-    let url = adminToken.epServers(tenantId) + '/' + serverId;
+    let url = userToken.epServers() + '/' + serverId;
 
     return await this.computeService
-      .v2VirtualServerDetail(url, userToken)
+      .v2VirtualServerDetail(url, userToken.token)
       .then(response => {
         return this.parseDetailResponse(response);
       });

@@ -102,6 +102,7 @@ describe('openstack.identity.test', () => {
     let response = await client
       .get('/test-openstack-simulation-ok')
       .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send()
       .expect(200);
 

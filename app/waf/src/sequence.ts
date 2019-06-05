@@ -27,7 +27,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {factory} from './log4ts';
-import {AuthWithOSIdentity, AuthedToken} from './services';
+import {AuthWithOSIdentity} from './services';
 import {CoreBindings} from '@loopback/core';
 import {WafApplication} from '.';
 import {WafBindingKeys} from './keys';
@@ -109,33 +109,31 @@ export class MySequence implements SequenceHandler {
     this.logger.debug('start to authenticate user');
 
     let hdrToken = request.header('X-Auth-Token');
-    if (typeof hdrToken !== typeof '') {
+    if (typeof hdrToken !== 'string') {
       throw new HttpErrors.Unauthorized(
         'Unauthorized: invalid X-Auth-Token header.',
       );
     }
+    let hdrTenantId = request.headers['tenant-id'];
+    if (typeof hdrTenantId !== 'string')
+      throw new HttpErrors.Unauthorized(
+        'Unauthorized: invalid tenant-id header.',
+      );
 
-    let userToken: AuthedToken;
     try {
-      userToken = await this.authWithOSIdentity
+      await this.authWithOSIdentity
         .validateUserToken(<string>hdrToken)
-        .then(authedObj => {
-          this.logger.debug(`Authenticated OK: Request ID(${context.name})`);
-          //this.logger.debug(JSON.stringify(authedObj));
-          return authedObj;
+        .then(userToken => {
+          context.bind(WafBindingKeys.Request.KeyUserToken).to(userToken);
+          context
+            .bind(WafBindingKeys.Request.KeyTenantId)
+            .to(userToken.tenantId);
         });
+
+      //this.logger.debug(JSON.stringify(authedObj));
+      this.logger.debug(`Authenticated OK: Request ID(${context.name})`);
     } catch (error) {
       throw new HttpErrors.Unauthorized(error.message);
     }
-
-    if (request.headers['tenant-id']) {
-      userToken.tenantId = <string>request.headers['tenant-id'];
-    }
-    if (!userToken.tenantId || userToken.tenantId === '') {
-      throw new HttpErrors.BadRequest('BadRequest: tenant id is not provided');
-    }
-
-    context.bind(WafBindingKeys.Request.KeyTenantId).to(userToken.tenantId);
-    context.bind(WafBindingKeys.Request.KeyUserToken).to(userToken.token);
   }
 }
