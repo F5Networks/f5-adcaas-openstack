@@ -784,10 +784,11 @@ class AdcStateCtrlr {
       bigipMgr.getConfigsyncIp(),
       bigipMgr.getVlans(),
       bigipMgr.getSelfips(),
-    ]).then(([hostname, license, vlans, selfs]) => {
+    ]).then(([hostname, license, configSyncIp, vlans, selfs]) => {
       return (
         hostname.includes(this.adc.id) &&
         license.registrationKey !== 'none' &&
+        configSyncIp !== 'none' &&
         Object.keys(vlans).length !== 0 &&
         Object.keys(selfs).length !== 0
       );
