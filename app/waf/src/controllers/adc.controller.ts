@@ -99,7 +99,7 @@ export class AdcController extends BaseController {
       }
 
       this.trustAdc(adc).then(() => {
-        if (adc.status === 'TRUSTED') {
+        if (adc.status === AdcState.TRUSTED) {
           this.installAS3(adc);
         }
       });
@@ -124,7 +124,7 @@ export class AdcController extends BaseController {
     };
 
     try {
-      await this.serialize(adc, {status: 'TRUSTING'});
+      await this.serialize(adc, {status: AdcState.TRUSTING});
       //TODO: Need away to input admin password of BIG-IP HW
       let device = await this.asgMgr.trust(
         adc.management!.ipAddress,
@@ -136,19 +136,22 @@ export class AdcController extends BaseController {
       await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
         async () => {
           await this.serialize(adc, {
-            status: 'TRUSTED',
+            status: AdcState.TRUSTED,
             trustedDeviceId: device.targetUUID,
           });
         },
         async () => {
           await this.serialize(adc, {
-            status: 'TRUSTERROR',
-            lastErr: 'TRUSTERROR: Trusting timeout',
+            status: AdcState.TRUSTERR,
+            lastErr: `${AdcState.TRUSTERR}: Trusting timeout`,
           });
         },
       );
     } catch (err) {
-      await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
+      await this.serialize(adc, {
+        status: AdcState.TRUSTERR,
+        lastErr: err.message,
+      });
     }
   }
 
@@ -160,7 +163,10 @@ export class AdcController extends BaseController {
     try {
       await this.asgMgr.untrust(adc.trustedDeviceId);
     } catch (err) {
-      await this.serialize(adc, {status: 'TRUSTERROR', lastErr: err.message});
+      await this.serialize(adc, {
+        status: AdcState.TRUSTERR,
+        lastErr: err.message,
+      });
       return false;
     }
     return true;
@@ -168,19 +174,19 @@ export class AdcController extends BaseController {
 
   async installAS3(adc: Adc): Promise<void> {
     // Install AS3 RPM on target device
-    await this.serialize(adc, {status: 'INSTALLING'});
+    await this.serialize(adc, {status: AdcState.INSTALLING});
 
     try {
       let exist = await this.asgMgr.as3Exists(adc.trustedDeviceId!);
 
       if (exist) {
-        await this.serialize(adc, {status: 'ACTIVE'});
+        await this.serialize(adc, {status: AdcState.ACTIVE});
         return;
       }
     } catch (err) {
       await this.serialize(adc, {
-        status: 'INSTALLERROR',
-        lastErr: 'INSTALLERROR: ' + err.message,
+        status: AdcState.INSTALLERR,
+        lastErr: `${AdcState.INSTALLERR}: ${err.message}`,
       });
       return;
     }
@@ -202,19 +208,19 @@ export class AdcController extends BaseController {
 
       await checkAndWait(as3Available, 60, [adc.trustedDeviceId!]).then(
         async () => {
-          await this.serialize(adc, {status: 'ACTIVE'});
+          await this.serialize(adc, {status: AdcState.ACTIVE});
         },
         async () => {
           await this.serialize(adc, {
-            status: 'INSTALLERROR',
-            lastErr: 'INSTALLERROR: Fail to install AS3',
+            status: AdcState.INSTALLERR,
+            lastErr: `${AdcState.INSTALLERR}: Fail to install AS3`,
           });
         },
       );
     } catch (err) {
       await this.serialize(adc, {
-        status: 'INSTALLERROR',
-        lastErr: 'INSTALLERROR: ' + err.message,
+        status: AdcState.INSTALLERR,
+        lastErr: `${AdcState.INSTALLERR}: ${err.message}`,
       });
     }
   }
@@ -405,13 +411,6 @@ export class AdcController extends BaseController {
         }. Cannot be operated on, please wait for its finish.`,
       );
 
-    if (adc.status.endsWith('ING'))
-      throw new HttpErrors.UnprocessableEntity(
-        `Adc status is ' ${
-          adc.status
-        }. Cannot be operated on, please wait for its finish.`,
-      );
-
     switch (Object.keys(actionBody)[0]) {
       case 'create':
         this.createOn(adc, addonReq);
@@ -441,8 +440,8 @@ export class AdcController extends BaseController {
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     if (!adc.management) {
       this.serialize(adc, {
-        status: 'ONBOARDERR',
-        lastErr: `ONBOARDERR: management information not ready.`,
+        status: AdcState.ONBOARDERR,
+        lastErr: `${AdcState.ONBOARDERR}: management information not ready.`,
       });
       return;
     }
@@ -451,7 +450,7 @@ export class AdcController extends BaseController {
       240,
     ).then(
       async () => {
-        await this.serialize(adc, {status: 'ONBOARDING'});
+        await this.serialize(adc, {status: AdcState.ONBOARDING});
         this.logger.debug('start to do onbarding');
         let doMgr = await OnboardingManager.instanlize(this.wafapp);
         let doBody = await doMgr.assembleDo(adc, {onboarding: true});
@@ -469,20 +468,22 @@ export class AdcController extends BaseController {
               240,
             ).then(
               async () => {
-                await this.serialize(adc, {status: 'ONBOARDED'});
+                await this.serialize(adc, {status: AdcState.ONBOARDED});
 
                 //Build trust relation to VE and install AS3
                 await this.trustAdc(adc).then(async () => {
-                  if (adc.status === 'TRUSTED') {
+                  if (adc.status === AdcState.TRUSTED) {
                     await this.installAS3(adc);
                   }
                 });
               },
               async () => {
                 await this.serialize(adc, {
-                  status: 'ONBOARDERR',
+                  status: AdcState.ONBOARDERR,
                   lastErr:
-                    `ONBOARDERR: The onboarding took too long time to finish: timeout. ` +
+                    `${
+                      AdcState.ONBOARDERR
+                    }: The onboarding took too long time to finish: timeout. ` +
                     `Check more details from log.`,
                 });
               },
@@ -490,8 +491,8 @@ export class AdcController extends BaseController {
           },
           async reason => {
             await this.serialize(adc, {
-              status: 'ONBOARDERR',
-              lastErr: `ONBOARDERR: ${reason}`,
+              status: AdcState.ONBOARDERR,
+              lastErr: `${AdcState.ONBOARDERR}: ${reason}`,
             });
           },
         );
@@ -501,8 +502,8 @@ export class AdcController extends BaseController {
           'bigip is not ready after waiting timeout. Cannot go forwards';
         this.logger.error(errmsg);
         await this.serialize(adc, {
-          status: 'ONBOARDERR',
-          lastErr: `ONBOARDERR: ${errmsg}`,
+          status: AdcState.ONBOARDERR,
+          lastErr: `${AdcState.ONBOARDERR}: ${errmsg}`,
         });
         throw new Error(errmsg);
       },
@@ -517,15 +518,15 @@ export class AdcController extends BaseController {
   private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
       if (await this.adcStCtr.readyTo(AdcState.POWERON)) {
-        await this.serialize(adc, {status: 'POWERING'})
+        await this.serialize(adc, {status: AdcState.POWERING})
           .then(async () => await this.cNet(adc, addon))
           .then(async () => await this.cSvr(adc, addon));
-        await this.serialize(adc, {status: 'POWERON'});
+        await this.serialize(adc, {status: AdcState.POWERON});
       } else throw new Error(`Not ready for bigip VE to : ${AdcState.POWERON}`);
     } catch (error) {
       await this.serialize(adc, {
-        status: 'POWERERR',
-        lastErr: `POWERERR: ${error.message}`,
+        status: AdcState.POWERERR,
+        lastErr: `${AdcState.POWERERR}: ${error.message}`,
       });
       throw error;
     }
@@ -696,16 +697,16 @@ export class AdcController extends BaseController {
     };
 
     try {
-      this.serialize(adc, {status: 'RECLAIMING'});
+      this.serialize(adc, {status: AdcState.RECLAIMING});
       for (let f of ['trust', 'license', 'vm', 'network']) {
         await reclaimFuncs[f]();
       }
-      this.serialize(adc, {status: 'RECLAIMED'});
+      this.serialize(adc, {status: AdcState.RECLAIMED});
     } catch (error) {
       this.logger.error(`Reclaiming fails: ${error.message}`);
       this.serialize(adc, {
-        status: 'RECLAIMERR',
-        lastErr: `RECLAIMERR: ${error.message}; Please try again.`,
+        status: AdcState.RECLAIMERR,
+        lastErr: `${AdcState.RECLAIMERR}: ${error.message}; Please try again.`,
       });
     }
   }
@@ -824,22 +825,28 @@ type AdcStateEntry = {
   next: string[];
 };
 
-enum AdcState {
+export enum AdcState {
   NEW = 'NEW',
 
   POWERON = 'POWERON',
   POWERING = 'POWERING',
-  POWERERR = 'POWERERR',
+  POWERERR = 'POWERERROR',
 
   ONBOARDED = 'ONBOARDED',
   ONBOARDING = 'ONBOARDING',
-  ONBOARDERR = 'ONBOARDERR',
+  ONBOARDERR = 'ONBOARDERROR',
 
   TRUSTED = 'TRUSTED',
   TRUSTING = 'TRUSTING',
-  TRUSTERR = 'TRUSTERR',
+  TRUSTERR = 'TRUSTERROR',
+
+  INSTALLED = 'INSTALLED',
+  INSTALLING = 'INSTALLING',
+  INSTALLERR = 'INSTALLERROR',
 
   RECLAIMED = 'RECLAIMED',
   RECLAIMING = 'RECLAIMING',
-  RECLAIMERR = 'RECLAIMERR',
+  RECLAIMERR = 'RECLAIMERROR',
+
+  ACTIVE = 'ACTIVE',
 }

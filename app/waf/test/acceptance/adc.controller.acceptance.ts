@@ -5,7 +5,7 @@
 
 import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {AdcController} from '../../src/controllers';
+import {AdcController, AdcState} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
@@ -223,7 +223,7 @@ describe('AdcController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal('ACTIVE');
+    expect(response.body.adc.status).to.equal(AdcState.ACTIVE);
     expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
@@ -264,7 +264,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('TRUSTERROR');
+      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
 
@@ -290,7 +290,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('TRUSTERROR');
+      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
 
@@ -342,7 +342,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('TRUSTERROR');
+      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
 */
@@ -388,7 +388,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('TRUSTERROR');
+      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
 */
@@ -447,8 +447,10 @@ describe('AdcController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal('TRUSTERROR');
-    expect(response.body.adc.lastErr).to.equal('TRUSTERROR: Trusting timeout');
+    expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
+    expect(response.body.adc.lastErr).to.equal(
+      `${AdcState.TRUSTERR}: Trusting timeout`,
+    );
   });
 
   it(
@@ -515,7 +517,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('ACTIVE');
+      expect(response.body.adc.status).to.equal(AdcState.ACTIVE);
     },
   );
 
@@ -587,7 +589,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
     },
   );
 
@@ -649,9 +651,9 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
       expect(response.body.adc.lastErr).to.equal(
-        'INSTALLERROR: query-not-working',
+        `${AdcState.INSTALLERR}: query-not-working`,
       );
     },
   );
@@ -716,9 +718,9 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
       expect(response.body.adc.lastErr).to.equal(
-        'INSTALLERROR: install-not-working',
+        `${AdcState.INSTALLERR}: install-not-working`,
       );
     },
   );
@@ -996,7 +998,7 @@ describe('AdcController', () => {
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
-          return resp.body.adc.status === 'POWERON';
+          return resp.body.adc.status === AdcState.POWERON;
         };
 
         await checkAndWait(checkStatus, 5, [], 50).then(() => {
@@ -1007,7 +1009,7 @@ describe('AdcController', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    let adc = await givenAdcData(wafapp, {status: 'POWERON'});
+    let adc = await givenAdcData(wafapp, {status: AdcState.POWERON});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
 
@@ -1067,7 +1069,7 @@ describe('AdcController', () => {
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
-          return resp.body.adc.status === 'ACTIVE';
+          return resp.body.adc.status === AdcState.ACTIVE;
         };
 
         //TODO: This test can not return comparing failure.
@@ -1101,7 +1103,7 @@ describe('AdcController', () => {
             .set('X-Auth-Token', ExpectedData.userToken)
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
-          return resp.body.adc.status === 'RECLAIMED';
+          return resp.body.adc.status === AdcState.RECLAIMED;
         };
 
         await checkAndWait(checkStatus, 5, [], 50).then(() => {
