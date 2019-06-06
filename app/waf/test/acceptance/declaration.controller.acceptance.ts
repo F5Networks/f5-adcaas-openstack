@@ -52,7 +52,7 @@ import {
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   ASGShouldResponseWith,
-  ASGController,
+  MockASGController,
 } from '../fixtures/controllers/mocks/mock.asg.controller';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 
@@ -78,7 +78,7 @@ describe('DeclarationController', () => {
     mockASG = await (async () => {
       let {restApp} = await setupRestAppAndClient(
         RestApplicationPort.ASG,
-        ASGController,
+        MockASGController,
         'https',
       );
       return restApp;
@@ -473,7 +473,7 @@ describe('DeclarationController', () => {
 
   it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 422`, async () => {
     ASGShouldResponseWith({
-      '/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy422,
+      'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy422,
     });
 
     let application = await givenApplicationData(wafapp);
