@@ -33,7 +33,6 @@ export class WafApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   private logger = factory.getLogger('application.setup');
-
   constructor(options: ApplicationConfig = {}) {
     super(options);
 

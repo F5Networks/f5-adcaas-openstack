@@ -1552,6 +1552,18 @@ Reason:
     };
   },
 
+  trustDeviceStatusPending200: () => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'PENDING',
+        },
+      ],
+    };
+  },
+
   trustDeviceStatusCreated200: () => {
     return {
       devices: [

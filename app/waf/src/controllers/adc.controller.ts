@@ -55,9 +55,9 @@ import {
   BigIpManager,
   OnboardingManager,
   BigipBuiltInProperties,
+  ASGServiceProvider,
 } from '../services';
 import {checkAndWait, merge} from '../utils';
-import {AdcState, AddonReqValues, AdcStateCtrlr} from '../services/adc.helper';
 
 const prefix = '/adcaas/v1';
 
@@ -106,46 +106,55 @@ export class AdcController extends BaseController {
       throw new HttpErrors.UnprocessableEntity(e.message);
     }
 
-    // if (adc.type === 'HW') {
-    //   //TODO: Disable this path after VE path is stable.
-    //   //TODO: Do this check in API validator
-    //   if (!adc.management || !adc.management.ipAddress) {
-    //     throw new HttpErrors.BadRequest(
-    //       'IP address and admin passphrase are required to trust ADC hardware',
-    //     );
-    //   }
+    if (adc.type === 'HW') {
+      //TODO: Disable this path after VE path is stable.
+      //TODO: Do this check in API validator
+      if (!adc.management || !adc.management.ipAddress) {
+        throw new HttpErrors.BadRequest(
+          'IP address and admin passphrase are required to trust ADC hardware',
+        );
+      }
 
-    //   this.trustAdc(adc).then(() => {
-    //     if (adc.status === AdcState.TRUSTED) {
-    //       this.installAS3(adc);
-    //     }
-    //   });
-    // }
+      this.trustAdc(adc).then(() => {
+        if (adc.status === AdcState.TRUSTED) {
+          this.installAS3(adc);
+        }
+      });
+    }
 
     return new Response(Adc, adc);
   }
 
   async trustAdc(adc: Adc): Promise<void> {
+    let isTrusted = async (deviceId: string): Promise<boolean> => {
+      return await this.asgMgr.getTrustState(deviceId).then(state => {
+        switch (state) {
+          case 'ACTIVE':
+            return true;
+          case 'PENDING':
+            return false;
+          default:
+            //TODO: throw error after checkAndWait() supports error terminating
+            return false;
+        }
+      });
+    };
+
     try {
       await this.serialize(adc, {status: AdcState.TRUSTING});
       //TODO: Need away to input admin password of BIG-IP HW
-      await this.asgMgr
-        .trust(
-          adc.management!.ipAddress,
-          adc.management!.tcpPort,
-          adc.management!.username,
-          adc.management!.password,
-        )
-        .then(device =>
-          this.serialize(adc, {
-            trustedDeviceId: device.targetUUID,
-          }),
-        );
+      let device = await this.asgMgr.trust(
+        adc.management!.ipAddress,
+        adc.management!.tcpPort,
+        adc.management!.username,
+        adc.management!.password,
+      );
 
-      await checkAndWait(() => this.adcStCtr.gotTo(AdcState.TRUSTED), 30).then(
+      await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
         async () => {
           await this.serialize(adc, {
             status: AdcState.TRUSTED,
+            trustedDeviceId: device.targetUUID,
           });
         },
         async () => {
@@ -314,14 +323,13 @@ export class AdcController extends BaseController {
   async deleteById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
   ): Promise<void> {
-    //let adc = await this.adcRepository.findById(id, undefined, {
-    await this.adcRepository.findById(id, undefined, {
+    let adc = await this.adcRepository.findById(id, undefined, {
       tenantId: await this.tenantId,
     });
 
-    // if (adc.type === 'HW' && !(await this.untrustAdc(adc))) {
-    //   throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
-    // }
+    if (adc.type === 'HW' && !(await this.untrustAdc(adc))) {
+      throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
+    }
 
     await this.adcRepository.deleteById(id);
   }
@@ -459,6 +467,21 @@ export class AdcController extends BaseController {
     throw new HttpErrors.UnprocessableEntity(msg);
   }
 
+  private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+    // onboarding
+    if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
+      await this.onboarding(adc, addon);
+
+    // trust
+    if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) await this.trustAdc(adc);
+
+    // install as3
+    if (await this.adcStCtr.readyTo(AdcState.INSTALLED))
+      await this.installAS3(adc);
+
+    // create tenant
+  }
+
   private async serialize(adc: Adc, data?: object) {
     merge(adc, data);
     await this.adcRepository.update(adc);
@@ -481,108 +504,6 @@ export class AdcController extends BaseController {
         lastErr: `${AdcState.POWERERR}: ${error.message}`,
       });
       throw error;
-    }
-  }
-
-  private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
-    // onboarding
-    if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
-      await this.onboarding(adc, addon);
-
-    // trust
-    if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) await this.trustAdc(adc);
-
-    // install as3
-    if (await this.adcStCtr.readyTo(AdcState.INSTALLED))
-      await this.installAS3(adc);
-
-    // create tenant
-  }
-
-  private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
-    let reclaimFuncs: {[key: string]: Function} = {
-      license: async () => {
-        let doMgr = await OnboardingManager.instanlize(this.wafapp);
-        let doBody = await doMgr.assembleDo(adc, {onboarding: false});
-        this.logger.debug(
-          'Json used for revoke license: ' + JSON.stringify(doBody),
-        );
-
-        await doMgr.onboarding(doBody).then(async () => {
-          // TODO: create a unified bigipMgr
-          let mgmt = adc.management!;
-          let bigipMgr = await BigIpManager.instanlize({
-            username: mgmt.username,
-            password: mgmt.password,
-            ipAddr: mgmt.ipAddress,
-            port: mgmt.tcpPort,
-          });
-
-          let noLicensed = async () => {
-            return await bigipMgr.getLicense().then(license => {
-              return license.registrationKey === 'none';
-            });
-          };
-          await checkAndWait(noLicensed, 240).catch(() => {
-            throw new Error('Timeout for waiting for reclaiming license.');
-          });
-        });
-      },
-
-      network: async () => {
-        let networkMgr = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
-        for (let network of Object.keys(adc.networks)) {
-          if (!adc.networks[network].ready) continue;
-
-          try {
-            let portId = adc.networks[network].portId!;
-            await networkMgr.deletePort(addon.userToken, portId).then(() => {
-              this.logger.debug(`Deleted port ${portId}`);
-              delete adc.networks[network].portId;
-              delete adc.networks[network].fixedIp;
-              delete adc.networks[network].macAddr;
-              adc.networks[network].ready = false;
-            });
-          } catch (error) {
-            this.logger.error(`delete port for ${network}: ${error.message}`);
-          }
-        }
-      },
-
-      vm: async () => {
-        let computeMgr = await this.wafapp.get(
-          WafBindingKeys.KeyComputeManager,
-        );
-        if (adc.compute.vmId) {
-          await computeMgr
-            .deleteServer(addon.userToken, adc.compute.vmId!, addon.tenantId)
-            .then(() => {
-              this.logger.debug(`Deleted the vm ${adc.compute.vmId!}`);
-              delete adc.compute.vmId;
-              adc.management = undefined;
-            });
-        }
-      },
-
-      trust: async () => {
-        await this.untrustAdc(adc);
-      },
-
-      install: () => {},
-    };
-
-    try {
-      this.serialize(adc, {status: AdcState.RECLAIMING});
-      for (let f of ['trust', 'license', 'vm', 'network']) {
-        await reclaimFuncs[f]();
-      }
-      this.serialize(adc, {status: AdcState.RECLAIMED});
-    } catch (error) {
-      this.logger.error(`Reclaiming fails: ${error.message}`);
-      this.serialize(adc, {
-        status: AdcState.RECLAIMERR,
-        lastErr: `${AdcState.RECLAIMERR}: ${error.message}; Please try again.`,
-      });
     }
   }
 
@@ -683,6 +604,92 @@ export class AdcController extends BaseController {
     return userDataB64Encoded;
   }
 
+  private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+    let reclaimFuncs: {[key: string]: Function} = {
+      license: async () => {
+        let doMgr = await OnboardingManager.instanlize(this.wafapp);
+        let doBody = await doMgr.assembleDo(adc, {onboarding: false});
+        this.logger.debug(
+          'Json used for revoke license: ' + JSON.stringify(doBody),
+        );
+        await doMgr.onboarding(doBody).then(async () => {
+          // TODO: create a unified bigipMgr
+          let mgmt = adc.management!;
+          let bigipMgr = await BigIpManager.instanlize({
+            username: mgmt.username,
+            password: mgmt.password,
+            ipAddr: mgmt.ipAddress,
+            port: mgmt.tcpPort,
+          });
+
+          let noLicensed = async () => {
+            return await bigipMgr.getLicense().then(license => {
+              return license.registrationKey === 'none';
+            });
+          };
+          await checkAndWait(noLicensed, 240).catch(() => {
+            throw new Error('Timeout for waiting for reclaiming license.');
+          });
+        });
+      },
+
+      network: async () => {
+        let networkMgr = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
+        for (let network of Object.keys(adc.networks)) {
+          if (!adc.networks[network].ready) continue;
+
+          try {
+            let portId = adc.networks[network].portId!;
+            await networkMgr.deletePort(addon.userToken, portId).then(() => {
+              this.logger.debug(`Deleted port ${portId}`);
+              delete adc.networks[network].portId;
+              delete adc.networks[network].fixedIp;
+              delete adc.networks[network].macAddr;
+              adc.networks[network].ready = false;
+            });
+          } catch (error) {
+            this.logger.error(`delete port for ${network}: ${error.message}`);
+          }
+        }
+      },
+
+      vm: async () => {
+        let computeMgr = await this.wafapp.get(
+          WafBindingKeys.KeyComputeManager,
+        );
+        if (adc.compute.vmId) {
+          await computeMgr
+            .deleteServer(addon.userToken, adc.compute.vmId!, addon.tenantId)
+            .then(() => {
+              this.logger.debug(`Deleted the vm ${adc.compute.vmId!}`);
+              delete adc.compute.vmId;
+              adc.management = undefined;
+            });
+        }
+      },
+
+      trust: async () => {
+        await this.untrustAdc(adc);
+      },
+
+      install: () => {},
+    };
+
+    try {
+      this.serialize(adc, {status: AdcState.RECLAIMING});
+      for (let f of ['trust', 'license', 'vm', 'network']) {
+        await reclaimFuncs[f]();
+      }
+      this.serialize(adc, {status: AdcState.RECLAIMED});
+    } catch (error) {
+      this.logger.error(`Reclaiming fails: ${error.message}`);
+      this.serialize(adc, {
+        status: AdcState.RECLAIMERR,
+        lastErr: `${AdcState.RECLAIMERR}: ${error.message}; Please try again.`,
+      });
+    }
+  }
+
   private async onboarding(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
       this.logger.debug('start to do onbarding');
@@ -704,4 +711,197 @@ export class AdcController extends BaseController {
       });
     }
   }
+}
+
+export type AddonReqValues = {
+  userToken: string;
+  tenantId: string;
+};
+
+export class AdcStateCtrlr {
+  private states: AdcStateEntry[] = [
+    {
+      state: AdcState.NEW,
+      check: (ctrl: AdcStateCtrlr) => {
+        return Promise.resolve(true);
+      },
+      next: [AdcState.POWERON],
+    },
+    {
+      failure: AdcState.POWERERR,
+      state: AdcState.POWERON,
+      check: this.accessible,
+      next: [AdcState.ONBOARDED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.ONBOARDERR,
+      state: AdcState.ONBOARDED,
+      check: this.onboarded,
+      next: [AdcState.TRUSTED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.TRUSTERR,
+      state: AdcState.TRUSTED,
+      check: this.trusted,
+      next: [AdcState.INSTALLED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.INSTALLERR,
+      state: AdcState.INSTALLED,
+      check: this.installed,
+      next: [AdcState.RECLAIMED, AdcState.ACTIVE],
+    },
+    {
+      failure: AdcState.RECLAIMERR,
+      state: AdcState.RECLAIMED,
+      check: this.reclaimed,
+      next: [AdcState.POWERON],
+    },
+    {
+      state: AdcState.ACTIVE,
+      check: (ctrl: AdcStateCtrlr) => {
+        return Promise.resolve(true);
+      },
+      next: [AdcState.RECLAIMED],
+    },
+  ];
+
+  constructor(private adc: Adc, private addon: AddonReqValues) {}
+
+  async readyTo(state: string): Promise<boolean> {
+    let stateEntry = this.getStateEntry(this.adc.status);
+
+    if (this.adc.status.endsWith('ERROR')) {
+      if (state === stateEntry.state) return true;
+      else return false;
+    }
+
+    return stateEntry.next.includes(state) && (await stateEntry['check'](this));
+  }
+
+  async gotTo(state: string): Promise<boolean> {
+    return this.getStateEntry(state)['check'](this);
+  }
+
+  private getStateEntry(name: string): AdcStateEntry {
+    return this.states.find(s => {
+      return s.state === name || s.failure === name;
+    })!;
+  }
+
+  private async getBigipMgr(): Promise<BigIpManager> {
+    if (!this.adc.management)
+      throw new Error(
+        `The management session of ADC is empty, cannot initialize bigip manager.`,
+      );
+
+    let mgmt = this.adc.management;
+    return BigIpManager.instanlize({
+      username: mgmt.username,
+      password: mgmt.password,
+      ipAddr: mgmt.ipAddress,
+      port: mgmt.tcpPort,
+    });
+  }
+
+  private async getAsgMgr(): Promise<ASGManager> {
+    let svc = await new ASGServiceProvider().value();
+    return new ASGManager(svc);
+  }
+
+  // Notices:
+  // Why not use 'this' in the following functions:
+  // The scope of 'this' changes when placing 'this.onboarded/trusted/...'
+  // in the AdcStateEntry declaration in the above 'states' member.
+  // So, please pass in the 'ctrl' object to when accessing AdcStateCtrlr.
+
+  private reclaimed(ctrl: AdcStateCtrlr): Promise<boolean> {
+    return Promise.resolve(
+      ((): boolean => {
+        if (ctrl.adc.management) return false;
+        if (ctrl.adc.compute.vmId) return false;
+        for (let net of Object.keys(ctrl.adc.networks)) {
+          if (ctrl.adc.networks[net].portId) return false;
+        }
+        return true;
+      })(),
+    );
+  }
+
+  private async trusted(ctrl: AdcStateCtrlr): Promise<boolean> {
+    if (!ctrl.adc.trustedDeviceId!) return false;
+
+    let asgMgr = await ctrl.getAsgMgr();
+    let state = await asgMgr.getTrustState(ctrl.adc.trustedDeviceId!);
+    return state === 'ACTIVE';
+  }
+
+  private async onboarded(ctrl: AdcStateCtrlr): Promise<boolean> {
+    let bigipMgr = await ctrl.getBigipMgr();
+    return Promise.all([
+      bigipMgr.getHostname(),
+      bigipMgr.getLicense(),
+      bigipMgr.getConfigsyncIp(),
+      bigipMgr.getVlans(),
+      bigipMgr.getSelfips(),
+    ]).then(([hostname, license, configSyncIp, vlans, selfs]) => {
+      return (
+        hostname.includes(ctrl.adc.id) &&
+        license.registrationKey !== 'none' &&
+        configSyncIp !== 'none' &&
+        Object.keys(vlans).length !== 0 &&
+        Object.keys(selfs).length !== 0
+      );
+    });
+  }
+
+  private async accessible(ctrl: AdcStateCtrlr): Promise<boolean> {
+    let bigipMgr = await ctrl.getBigipMgr();
+
+    return bigipMgr
+      .getSys()
+      .then(() => Promise.resolve(true))
+      .catch(() => Promise.reject(false));
+  }
+
+  private async installed(ctrl: AdcStateCtrlr): Promise<boolean> {
+    let asgMgr = await ctrl.getAsgMgr();
+
+    return (
+      (await asgMgr.getAS3State(ctrl.adc.trustedDeviceId!)) === 'AVAILABLE'
+    );
+  }
+}
+
+type AdcStateEntry = {
+  failure?: string;
+  state: string;
+  check: (ctr: AdcStateCtrlr) => Promise<boolean>;
+  next: string[];
+};
+
+export enum AdcState {
+  NEW = 'NEW',
+
+  POWERON = 'POWERON',
+  POWERING = 'POWERING',
+  POWERERR = 'POWERERROR',
+
+  ONBOARDED = 'ONBOARDED',
+  ONBOARDING = 'ONBOARDING',
+  ONBOARDERR = 'ONBOARDERROR',
+
+  TRUSTED = 'TRUSTED',
+  TRUSTING = 'TRUSTING',
+  TRUSTERR = 'TRUSTERROR',
+
+  INSTALLED = 'INSTALLED',
+  INSTALLING = 'INSTALLING',
+  INSTALLERR = 'INSTALLERROR',
+
+  RECLAIMED = 'RECLAIMED',
+  RECLAIMING = 'RECLAIMING',
+  RECLAIMERR = 'RECLAIMERROR',
+
+  ACTIVE = 'ACTIVE',
 }

@@ -36,6 +36,7 @@ import {
   givenEmptyDatabase,
   givenAdcData,
   givenAdcTenantAssociationData,
+  createAdcObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 import {
@@ -53,10 +54,9 @@ import {
   MockDOController,
   DOShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.do.controller';
-import {checkAndWait, setDefaultInterval} from '../../src/utils';
+import {checkAndWait, setDefaultInterval, sleep} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
-import {AdcState} from '../../src/services/adc.helper';
 import {
   ASGShouldResponseWith,
   MockASGController,
@@ -153,6 +153,7 @@ describe('AdcController test', () => {
     untrustStub = sinon.stub(controller.asgService, 'untrust');
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
+    ASGShouldResponseWith({});
   });
 
   afterEach(async () => {
@@ -174,157 +175,157 @@ describe('AdcController test', () => {
     teardownEnvs();
   });
 
-  // it('post ' + prefix + '/adcs: create ADC HW', async function () {
-  //   await givenAdcData(wafapp, {
-  //     trustedDeviceId: 'abcdefg',
-  //   });
+  it('post ' + prefix + '/adcs: create ADC HW', async function() {
+    await givenAdcData(wafapp, {
+      trustedDeviceId: 'abcdefg',
+    });
 
-  //   const adc = createAdcObject({
-  //     type: 'HW',
-  //     management: {
-  //       ipAddress: '1.2.3.4',
-  //       tcpPort: 100,
-  //       username: 'admin',
-  //       password: 'admin',
-  //       rootPass: 'default',
-  //     },
-  //   });
+    const adc = createAdcObject({
+      type: 'HW',
+      management: {
+        ipAddress: '1.2.3.4',
+        tcpPort: 100,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
 
-  //   let id = uuid();
-  //   trustStub.returns({
-  //     devices: [
-  //       {
-  //         targetUUID: id,
-  //         targetHost: '1.2.3.4',
-  //         state: 'CREATED',
-  //       },
-  //     ],
-  //   });
+    let id = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    });
 
-  //   queryStub.onCall(0).returns({
-  //     devices: [
-  //       {
-  //         targetUUID: id,
-  //         targetHost: '1.2.3.4',
-  //         state: 'PENDING',
-  //       },
-  //     ],
-  //   });
+    queryStub.onCall(0).returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'PENDING',
+        },
+      ],
+    });
 
-  //   queryStub.returns({
-  //     devices: [
-  //       {
-  //         targetUUID: id,
-  //         targetHost: '1.2.3.4',
-  //         state: 'ACTIVE',
-  //       },
-  //     ],
-  //   });
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'ACTIVE',
+        },
+      ],
+    });
 
-  //   queryExtensionsStub.onCall(0).returns([]);
+    queryExtensionsStub.onCall(0).returns([]);
 
-  //   queryExtensionsStub.onCall(1).returns([
-  //     {
-  //       rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-  //       state: 'UPLOADING',
-  //     },
-  //   ]);
+    queryExtensionsStub.onCall(1).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        state: 'UPLOADING',
+      },
+    ]);
 
-  //   queryExtensionsStub.onCall(2).returns([
-  //     {
-  //       rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-  //       name: 'f5-appsvcs',
-  //       state: 'AVAILABLE',
-  //     },
-  //   ]);
+    queryExtensionsStub.onCall(2).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'AVAILABLE',
+      },
+    ]);
 
-  //   let response = await client
-  //     .post(prefix + '/adcs')
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .send(adc)
-  //     .expect(200);
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
 
-  //   expect(response.body.adc).to.containDeep(toJSON(adc));
+    expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //   await sleep(10);
+    await sleep(10);
 
-  //   response = await client
-  //     .get(prefix + '/adcs/' + response.body.adc.id)
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .expect(200);
+    response = await client
+      .get(prefix + '/adcs/' + response.body.adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
 
-  //   expect(response.body.adc.status).to.equal(AdcState.NEW);
-  //   expect(response.body.adc.trustedDeviceId).to.equal(id);
-  // });
+    expect(response.body.adc.status).to.equal('ACTIVE');
+    expect(response.body.adc.trustedDeviceId).to.equal(id);
+  });
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW without management info',
-  //   async () => {
-  //     const adc = createAdcObject({ type: 'HW' });
-  //     delete adc.management;
+  it(
+    'post ' + prefix + '/adcs: create ADC HW without management info',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
+      delete adc.management;
 
-  //     await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(400);
-  //   },
-  // );
+      await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(400);
+    },
+  );
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW with trust exception',
-  //   async () => {
-  //     const adc = createAdcObject({ type: 'HW' });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with trust exception',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
 
-  //     trustStub.throws({
-  //       message: 'Unknown error',
-  //     });
+      trustStub.throws({
+        message: 'Unknown error',
+      });
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW with wrong trust response',
-  //   async () => {
-  //     const adc = createAdcObject({ type: 'HW' });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with wrong trust response',
+    async () => {
+      const adc = createAdcObject({type: 'HW'});
 
-  //     trustStub.returns({
-  //       devices: [{}, {}],
-  //     });
+      trustStub.returns({
+        devices: [{}, {}],
+      });
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .send(adc)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .send(adc)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
+    },
+  );
 
   /* TODO: Add it back after checkAndWait() support error terminating"
   it(
@@ -425,337 +426,339 @@ describe('AdcController test', () => {
   );
 */
 
-  // it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
-  //   await givenAdcData(wafapp, {
-  //     trustedDeviceId: 'abcdefg',
-  //   });
+  it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
+    ASGShouldResponseWith({
+      'GET:/mgmt/shared/TrustedDevices/{deviceId}':
+        StubResponses.trustDeviceStatusPending200,
+    });
+    await givenAdcData(wafapp, {
+      trustedDeviceId: 'abcdefg',
+    });
 
-  //   const adc = createAdcObject({
-  //     type: 'HW',
-  //     management: {
-  //       ipAddress: '1.2.3.4',
-  //       tcpPort: 100,
-  //       username: 'admin',
-  //       password: 'admin',
-  //       rootPass: 'default',
-  //     },
-  //   });
+    const adc = createAdcObject({
+      type: 'HW',
+      management: {
+        ipAddress: '1.2.3.4',
+        tcpPort: 100,
+        username: 'admin',
+        password: 'admin',
+        rootPass: 'default',
+      },
+    });
 
-  //   let id = uuid();
-  //   trustStub.returns({
-  //     devices: [
-  //       {
-  //         targetUUID: id,
-  //         targetHost: '1.2.3.4',
-  //         state: 'CREATED',
-  //       },
-  //     ],
-  //   });
+    let id = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    });
 
-  //   queryStub.returns({
-  //     devices: [
-  //       {
-  //         targetUUID: id,
-  //         targetHost: '1.2.3.4',
-  //         state: 'PENDING',
-  //       },
-  //     ],
-  //   });
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: id,
+          targetHost: '1.2.3.4',
+          state: 'PENDING',
+        },
+      ],
+    });
 
-  //   let response = await client
-  //     .post(prefix + '/adcs')
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .send(adc)
-  //     .expect(200);
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
 
-  //   expect(response.body.adc).to.containDeep(toJSON(adc));
+    expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //   await sleep(50);
+    await sleep(50);
 
-  //   response = await client
-  //     .get(prefix + '/adcs/' + response.body.adc.id)
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .expect(200);
+    response = await client
+      .get(prefix + '/adcs/' + response.body.adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
 
-  //   expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
-  //   expect(response.body.adc.lastErr).to.equal(
-  //     `${AdcState.TRUSTERR}: Trusting timeout`,
-  //   );
-  // });
+    expect(response.body.adc.status).to.equal('TRUSTERROR');
+    expect(response.body.adc.lastErr).to.equal(`TRUSTERROR: Trusting timeout`);
+  });
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW whose AS3 exists',
-  //   async function () {
-  //     await givenAdcData(wafapp, {
-  //       trustedDeviceId: 'abcdefg',
-  //     });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW whose AS3 exists',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
 
-  //     const adc = createAdcObject({
-  //       type: 'HW',
-  //       management: {
-  //         ipAddress: '1.2.3.4',
-  //         tcpPort: 100,
-  //         username: 'admin',
-  //         password: 'admin',
-  //         rootPass: 'default',
-  //       },
-  //     });
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
 
-  //     let id = uuid();
-  //     trustStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'CREATED',
-  //         },
-  //       ],
-  //     });
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
 
-  //     queryStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'ACTIVE',
-  //         },
-  //       ],
-  //     });
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
 
-  //     queryExtensionsStub.returns([
-  //       {
-  //         rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-  //         name: 'f5-appsvcs',
-  //         state: 'AVAILABLE',
-  //       },
-  //     ]);
+      queryExtensionsStub.returns([
+        {
+          rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+          name: 'f5-appsvcs',
+          state: 'AVAILABLE',
+        },
+      ]);
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
 
-  //     expect(response.body.adc).to.containDeep(toJSON(adc));
+      expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //     await sleep(10);
+      await sleep(10);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.ACTIVE);
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('ACTIVE');
+    },
+  );
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW with wrong AS3 extension response',
-  //   async function () {
-  //     await givenAdcData(wafapp, {
-  //       trustedDeviceId: 'abcdefg',
-  //     });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with wrong AS3 extension response',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
 
-  //     const adc = createAdcObject({
-  //       type: 'HW',
-  //       management: {
-  //         ipAddress: '1.2.3.4',
-  //         tcpPort: 100,
-  //         username: 'admin',
-  //         password: 'admin',
-  //         rootPass: 'default',
-  //       },
-  //     });
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
 
-  //     let id = uuid();
-  //     trustStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'CREATED',
-  //         },
-  //       ],
-  //     });
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
 
-  //     queryStub.onCall(0).returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'PENDING',
-  //         },
-  //       ],
-  //     });
+      queryStub.onCall(0).returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'PENDING',
+          },
+        ],
+      });
 
-  //     queryStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'ACTIVE',
-  //         },
-  //       ],
-  //     });
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
 
-  //     queryExtensionsStub.returns([]);
+      queryExtensionsStub.returns([]);
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
 
-  //     expect(response.body.adc).to.containDeep(toJSON(adc));
+      expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //     await sleep(100);
+      await sleep(100);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+    },
+  );
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW with query extension exception',
-  //   async function () {
-  //     await givenAdcData(wafapp, {
-  //       trustedDeviceId: 'abcdefg',
-  //     });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with query extension exception',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
 
-  //     const adc = createAdcObject({
-  //       type: 'HW',
-  //       management: {
-  //         ipAddress: '1.2.3.4',
-  //         tcpPort: 100,
-  //         username: 'admin',
-  //         password: 'admin',
-  //         rootPass: 'default',
-  //       },
-  //     });
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
 
-  //     let id = uuid();
-  //     trustStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'CREATED',
-  //         },
-  //       ],
-  //     });
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
 
-  //     queryStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'ACTIVE',
-  //         },
-  //       ],
-  //     });
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
 
-  //     queryExtensionsStub.throws(new Error('query-not-working'));
+      queryExtensionsStub.throws(new Error('query-not-working'));
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
 
-  //     expect(response.body.adc).to.containDeep(toJSON(adc));
+      expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //     await sleep(50);
+      await sleep(50);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
-  //     expect(response.body.adc.lastErr).to.equal(
-  //       `${AdcState.INSTALLERR}: query-not-working`,
-  //     );
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.lastErr).to.equal(
+        `INSTALLERROR: query-not-working`,
+      );
+    },
+  );
 
-  // it(
-  //   'post ' + prefix + '/adcs: create ADC HW with query extension exception',
-  //   async function () {
-  //     await givenAdcData(wafapp, {
-  //       trustedDeviceId: 'abcdefg',
-  //     });
+  it(
+    'post ' + prefix + '/adcs: create ADC HW with query extension exception',
+    async function() {
+      await givenAdcData(wafapp, {
+        trustedDeviceId: 'abcdefg',
+      });
 
-  //     const adc = createAdcObject({
-  //       type: 'HW',
-  //       management: {
-  //         ipAddress: '1.2.3.4',
-  //         tcpPort: 100,
-  //         username: 'admin',
-  //         password: 'admin',
-  //         rootPass: 'default',
-  //       },
-  //     });
+      const adc = createAdcObject({
+        type: 'HW',
+        management: {
+          ipAddress: '1.2.3.4',
+          tcpPort: 100,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+      });
 
-  //     let id = uuid();
-  //     trustStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'CREATED',
-  //         },
-  //       ],
-  //     });
+      let id = uuid();
+      trustStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'CREATED',
+          },
+        ],
+      });
 
-  //     queryStub.returns({
-  //       devices: [
-  //         {
-  //           targetUUID: id,
-  //           targetHost: '1.2.3.4',
-  //           state: 'ACTIVE',
-  //         },
-  //       ],
-  //     });
+      queryStub.returns({
+        devices: [
+          {
+            targetUUID: id,
+            targetHost: '1.2.3.4',
+            state: 'ACTIVE',
+          },
+        ],
+      });
 
-  //     queryExtensionsStub.returns([]);
+      queryExtensionsStub.returns([]);
 
-  //     installStub.throws(new Error('install-not-working'));
+      installStub.throws(new Error('install-not-working'));
 
-  //     let response = await client
-  //       .post(prefix + '/adcs')
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .send(adc)
-  //       .expect(200);
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(200);
 
-  //     expect(response.body.adc).to.containDeep(toJSON(adc));
+      expect(response.body.adc).to.containDeep(toJSON(adc));
 
-  //     await sleep(50);
+      await sleep(50);
 
-  //     response = await client
-  //       .get(prefix + '/adcs/' + response.body.adc.id)
-  //       .set('X-Auth-Token', ExpectedData.userToken)
-  //       .set('tenant-id', ExpectedData.tenantId)
-  //       .expect(200);
+      response = await client
+        .get(prefix + '/adcs/' + response.body.adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-  //     expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
-  //     expect(response.body.adc.lastErr).to.equal(
-  //       `${AdcState.INSTALLERR}: install-not-working`,
-  //     );
-  //   },
-  // );
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      expect(response.body.adc.lastErr).to.equal(
+        `INSTALLERROR: install-not-working`,
+      );
+    },
+  );
 
   it('get ' + prefix + '/adcs: of all', async () => {
     const adc = await givenAdcData(wafapp);
@@ -884,58 +887,58 @@ describe('AdcController test', () => {
       .expect(204);
   });
 
-  // it('delete ' + prefix + '/adcs/{id}: untrust exception', async () => {
-  //   let id = uuid();
-  //   const adc = await givenAdcData(wafapp, {
-  //     trustedDeviceId: id,
-  //   });
+  it('delete ' + prefix + '/adcs/{id}: untrust exception', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
 
-  //   untrustStub.throws('Not working');
+    untrustStub.throws('Not working');
 
-  //   await client
-  //     .del(prefix + '/adcs/' + adc.id)
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .expect(422);
-  // });
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
+  });
 
-  // it('delete ' + prefix + '/adcs/{id}: empty untrust response', async () => {
-  //   let id = uuid();
-  //   const adc = await givenAdcData(wafapp, {
-  //     trustedDeviceId: id,
-  //   });
+  it('delete ' + prefix + '/adcs/{id}: empty untrust response', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
 
-  //   untrustStub.returns({
-  //     devices: [],
-  //   });
+    untrustStub.returns({
+      devices: [],
+    });
 
-  //   await client
-  //     .del(prefix + '/adcs/' + adc.id)
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .expect(422);
-  // });
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
+  });
 
-  // it('delete ' + prefix + '/adcs/{id}: wrong untrust state', async () => {
-  //   let id = uuid();
-  //   const adc = await givenAdcData(wafapp, {
-  //     trustedDeviceId: id,
-  //   });
+  it('delete ' + prefix + '/adcs/{id}: wrong untrust state', async () => {
+    let id = uuid();
+    const adc = await givenAdcData(wafapp, {
+      trustedDeviceId: id,
+    });
 
-  //   untrustStub.returns({
-  //     devices: [
-  //       {
-  //         state: 'ERROR',
-  //       },
-  //     ],
-  //   });
+    untrustStub.returns({
+      devices: [
+        {
+          state: 'ERROR',
+        },
+      ],
+    });
 
-  //   await client
-  //     .del(prefix + '/adcs/' + adc.id)
-  //     .set('X-Auth-Token', ExpectedData.userToken)
-  //     .set('tenant-id', ExpectedData.tenantId)
-  //     .expect(422);
-  // });
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(422);
+  });
 
   it(
     'get ' + prefix + '/adcs/{adcId}/adcs: find Tenants associated with ADC',
@@ -1012,32 +1015,36 @@ describe('AdcController test', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
     let adc = await givenAdcData(wafapp);
 
-    let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .send({create: null})
-      .expect(200);
+    await setupEnvs()
+      .then(async () => {
+        let response = await client
+          .post(prefix + '/adcs/' + adc.id + '/action')
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .send({create: null})
+          .expect(200);
 
-    expect(response.body).containDeep({id: adc.id});
+        expect(response.body).containDeep({id: adc.id});
 
-    let checkStatus = async () => {
-      let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
+            .expect(200);
 
-      return resp.body.adc.status === AdcState.POWERON;
-    };
+          return resp.body.adc.status === 'POWERON';
+        };
 
-    await checkAndWait(checkStatus, 5, [], 50).then(() => {
-      expect(true).true();
-    });
+        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+          expect(true).true();
+        });
+      })
+      .finally(teardownEnvs);
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    let adc = await givenAdcData(wafapp, {status: AdcState.POWERON});
+    let adc = await givenAdcData(wafapp, {status: 'POWERON'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
 
@@ -1079,58 +1086,66 @@ describe('AdcController test', () => {
       },
     ]);
 
-    let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .send({setup: null})
-      .expect(200);
+    await setupEnvs()
+      .then(async () => {
+        let response = await client
+          .post(prefix + '/adcs/' + adc.id + '/action')
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .send({setup: null})
+          .expect(200);
 
-    expect(response.body).containDeep({id: adc.id});
+        expect(response.body).containDeep({id: adc.id});
 
-    let checkStatus = async () => {
-      let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
+            .expect(200);
 
-      return resp.body.adc.status === AdcState.ACTIVE;
-    };
+          return resp.body.adc.status === 'ACTIVE';
+        };
 
-    //TODO: This test can not return comparing failure.
-    await checkAndWait(checkStatus, 50, [], 5).then(() => {
-      expect(true).true();
-    });
+        //TODO: This test can not return comparing failure.
+        await checkAndWait(checkStatus, 50, [], 5).then(() => {
+          expect(true).true();
+        });
+      })
+      .finally(teardownEnvs);
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: delete done', async () => {
     BigipShouldResponseWith({
       '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
     });
-    let adc = await givenAdcData(wafapp, {status: AdcState.ACTIVE});
+    let adc = await givenAdcData(wafapp, {status: 'ACTIVE'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
-    let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .send({delete: null})
-      .expect(200);
-    expect(response.body).containDeep({id: adc.id});
+    await setupEnvs()
+      .then(async () => {
+        let response = await client
+          .post(prefix + '/adcs/' + adc.id + '/action')
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .send({delete: null})
+          .expect(200);
+        expect(response.body).containDeep({id: adc.id});
 
-    let checkStatus = async () => {
-      let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-      return resp.body.adc.status === AdcState.RECLAIMED;
-    };
+        let checkStatus = async () => {
+          let resp = await client
+            .get(prefix + '/adcs/' + adc.id)
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
+            .expect(200);
+          return resp.body.adc.status === 'RECLAIMED';
+        };
 
-    await checkAndWait(checkStatus, 50, [], 5).then(() => {
-      expect(true).true();
-    });
+        await checkAndWait(checkStatus, 50, [], 5).then(() => {
+          expect(true).true();
+        });
+      })
+      .finally(teardownEnvs);
   });
 
   // TODO: the timeout can only be tested through unit test?
