@@ -1223,9 +1223,7 @@ Reason:
   onboardingSucceed202: () => {
     return {
       id: ExpectedData.doTaskId,
-      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${
-        ExpectedData.doTaskId
-      }`,
+      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${ExpectedData.doTaskId}`,
       result: {
         class: 'Result',
         code: 202,
@@ -1331,9 +1329,7 @@ Reason:
   onboardingSucceed200: () => {
     return {
       id: ExpectedData.doTaskId,
-      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${
-        ExpectedData.doTaskId
-      }`,
+      selfLink: `https://localhost/mgmt/shared/declarative-onboarding/task/${ExpectedData.doTaskId}`,
       result: {
         class: 'Result',
         code: 200,
