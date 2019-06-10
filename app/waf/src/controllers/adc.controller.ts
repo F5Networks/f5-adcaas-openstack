@@ -406,9 +406,7 @@ export class AdcController extends BaseController {
 
     if (adc.status.endsWith('ING'))
       throw new HttpErrors.UnprocessableEntity(
-        `Adc status is ' ${
-          adc.status
-        }. Cannot be operated on, please wait for its finish.`,
+        `Adc status is ' ${adc.status}. Cannot be operated on, please wait for its finish.`,
       );
 
     switch (Object.keys(actionBody)[0]) {
@@ -481,9 +479,7 @@ export class AdcController extends BaseController {
                 await this.serialize(adc, {
                   status: AdcState.ONBOARDERR,
                   lastErr:
-                    `${
-                      AdcState.ONBOARDERR
-                    }: The onboarding took too long time to finish: timeout. ` +
+                    `${AdcState.ONBOARDERR}: The onboarding took too long time to finish: timeout. ` +
                     `Check more details from log.`,
                 });
               },
