@@ -44,6 +44,10 @@ import {
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
+import {
+  MockASGController,
+  ASGShouldResponseWith,
+} from '../fixtures/controllers/mocks/mock.asg.controller';
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;
@@ -51,6 +55,7 @@ describe('ApplicationController', () => {
   let client: Client;
   let deployStub: sinon.SinonStub;
   let mockKeystoneApp: TestingApplication;
+  let mockASGApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
@@ -62,6 +67,14 @@ describe('ApplicationController', () => {
       );
       return restApp;
     })();
+    mockASGApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.ASG,
+        MockASGController,
+        'https',
+      );
+      return restApp;
+    })();
 
     ({wafapp, client} = await setupApplication());
 
@@ -70,18 +83,20 @@ describe('ApplicationController', () => {
     );
 
     ShouldResponseWith({});
+    ASGShouldResponseWith({});
     setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
-    deployStub = sinon.stub(controller.as3Service, 'deploy');
+    deployStub = sinon.stub(controller.asgService, 'deploy');
   });
 
   after(async () => {
     await teardownApplication(wafapp);
     teardownRestAppAndClient(mockKeystoneApp);
     teardownEnvs();
+    teardownRestAppAndClient(mockASGApp);
   });
 
   afterEach(async () => {
@@ -272,7 +287,7 @@ describe('ApplicationController', () => {
         .post(prefix + '/applications/' + application.id + '/deploy')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        .expect(204);
     },
   );
 
@@ -322,7 +337,7 @@ describe('ApplicationController', () => {
         .post(prefix + '/applications/' + application.id + '/cleanup')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        .expect(204);
     },
   );
 

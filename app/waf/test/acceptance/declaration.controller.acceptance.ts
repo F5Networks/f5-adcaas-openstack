@@ -97,7 +97,7 @@ describe('DeclarationController', () => {
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
-    deployStub = sinon.stub(controller.as3Service, 'deploy');
+    deployStub = sinon.stub(controller.asgService, 'deploy');
   });
 
   after(async () => {
