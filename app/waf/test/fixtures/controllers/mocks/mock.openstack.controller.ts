@@ -142,4 +142,5 @@ export const ExpectedData = {
   declarationId: '3cc12f17-a6c7-4884-a119-98b456fe2020',
   memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
   applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
+  trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
 };

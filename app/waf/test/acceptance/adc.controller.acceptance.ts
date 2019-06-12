@@ -21,7 +21,7 @@
 
 import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {AdcController, AdcState} from '../../src/controllers';
+import {AdcController} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
@@ -35,8 +35,8 @@ import {
 import {
   givenEmptyDatabase,
   givenAdcData,
-  createAdcObject,
   givenAdcTenantAssociationData,
+  createAdcObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 import {
@@ -54,11 +54,15 @@ import {
   MockDOController,
   DOShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.do.controller';
-import {checkAndWait, sleep, setDefaultInterval} from '../../src/utils';
+import {checkAndWait, setDefaultInterval, sleep} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+import {
+  ASGShouldResponseWith,
+  MockASGController,
+} from '../fixtures/controllers/mocks/mock.asg.controller';
 
-describe('AdcController', () => {
+describe('AdcController test', () => {
   let wafapp: WafApplication;
   let client: Client;
   let controller: AdcController;
@@ -73,6 +77,7 @@ describe('AdcController', () => {
   let mockNeutronApp: TestingApplication;
   let mockBigip: TestingApplication;
   let mockDO: TestingApplication;
+  let mockASG: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
@@ -118,6 +123,15 @@ describe('AdcController', () => {
       return restApp;
     })();
 
+    mockASG = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.ASG,
+        MockASGController,
+        'https',
+      );
+      return restApp;
+    })();
+
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<AdcController>('controllers.AdcController');
@@ -125,6 +139,7 @@ describe('AdcController', () => {
     ShouldResponseWith({});
     DOShouldResponseWith({});
     BigipShouldResponseWith({});
+    ASGShouldResponseWith({});
 
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     setupEnvs();
@@ -138,6 +153,7 @@ describe('AdcController', () => {
     untrustStub = sinon.stub(controller.asgService, 'untrust');
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
+    ASGShouldResponseWith({});
   });
 
   afterEach(async () => {
@@ -155,6 +171,7 @@ describe('AdcController', () => {
     teardownRestAppAndClient(mockKeystoneApp);
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);
+    teardownRestAppAndClient(mockASG);
     teardownEnvs();
   });
 
@@ -239,7 +256,7 @@ describe('AdcController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal(AdcState.ACTIVE);
+    expect(response.body.adc.status).to.equal('ACTIVE');
     expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
@@ -280,7 +297,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
     },
   );
 
@@ -306,7 +323,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
+      expect(response.body.adc.status).to.equal('TRUSTERROR');
     },
   );
 
@@ -410,6 +427,10 @@ describe('AdcController', () => {
 */
 
   it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
+    ASGShouldResponseWith({
+      'GET:/mgmt/shared/TrustedDevices/{deviceId}':
+        StubResponses.trustDeviceStatusPending200,
+    });
     await givenAdcData(wafapp, {
       trustedDeviceId: 'abcdefg',
     });
@@ -463,10 +484,8 @@ describe('AdcController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
-    expect(response.body.adc.lastErr).to.equal(
-      `${AdcState.TRUSTERR}: Trusting timeout`,
-    );
+    expect(response.body.adc.status).to.equal('TRUSTERROR');
+    expect(response.body.adc.lastErr).to.equal(`TRUSTERROR: Trusting timeout`);
   });
 
   it(
@@ -533,7 +552,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.ACTIVE);
+      expect(response.body.adc.status).to.equal('ACTIVE');
     },
   );
 
@@ -605,7 +624,7 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
     },
   );
 
@@ -667,9 +686,9 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
       expect(response.body.adc.lastErr).to.equal(
-        `${AdcState.INSTALLERR}: query-not-working`,
+        `INSTALLERROR: query-not-working`,
       );
     },
   );
@@ -734,9 +753,9 @@ describe('AdcController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.INSTALLERR);
+      expect(response.body.adc.status).to.equal('INSTALLERROR');
       expect(response.body.adc.lastErr).to.equal(
-        `${AdcState.INSTALLERR}: install-not-working`,
+        `INSTALLERROR: install-not-working`,
       );
     },
   );
@@ -1014,7 +1033,7 @@ describe('AdcController', () => {
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
-          return resp.body.adc.status === AdcState.POWERON;
+          return resp.body.adc.status === 'POWERON';
         };
 
         await checkAndWait(checkStatus, 5, [], 50).then(() => {
@@ -1025,7 +1044,7 @@ describe('AdcController', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    let adc = await givenAdcData(wafapp, {status: AdcState.POWERON});
+    let adc = await givenAdcData(wafapp, {status: 'POWERON'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
 
@@ -1085,11 +1104,11 @@ describe('AdcController', () => {
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
 
-          return resp.body.adc.status === AdcState.ACTIVE;
+          return resp.body.adc.status === 'ACTIVE';
         };
 
         //TODO: This test can not return comparing failure.
-        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+        await checkAndWait(checkStatus, 50, [], 5).then(() => {
           expect(true).true();
         });
       })
@@ -1100,7 +1119,7 @@ describe('AdcController', () => {
     BigipShouldResponseWith({
       '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
     });
-    let adc = await givenAdcData(wafapp);
+    let adc = await givenAdcData(wafapp, {status: 'ACTIVE'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
     await setupEnvs()
@@ -1119,10 +1138,10 @@ describe('AdcController', () => {
             .set('X-Auth-Token', ExpectedData.userToken)
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
-          return resp.body.adc.status === AdcState.RECLAIMED;
+          return resp.body.adc.status === 'RECLAIMED';
         };
 
-        await checkAndWait(checkStatus, 5, [], 50).then(() => {
+        await checkAndWait(checkStatus, 50, [], 5).then(() => {
           expect(true).true();
         });
       })

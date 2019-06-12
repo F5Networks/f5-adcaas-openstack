@@ -357,6 +357,7 @@ export class OnboardingManager {
     }
 
     doBody.declaration.Common = objCommon;
+    this.logger.debug(`Assembled do body: ${JSON.stringify(doBody)}`);
     return doBody;
   }
 

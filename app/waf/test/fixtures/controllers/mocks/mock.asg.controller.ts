@@ -14,23 +14,71 @@
  * limitations under the License.
  */
 
-import {post, requestBody} from '@loopback/rest';
+import {post, requestBody, param, get, del} from '@loopback/rest';
 import {StubResponses} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
 
-export class ASGController extends MockBaseController {
+export class MockASGController extends MockBaseController {
   @post('/mgmt/shared/TrustedProxy')
   async trustedProxyPost(@requestBody() reqBody: object): Promise<object> {
-    return ResponseWith['/mgmt/shared/TrustedProxy']();
+    return ResponseWith['POST:/mgmt/shared/TrustedProxy']();
+  }
+
+  @get('/mgmt/shared/TrustedDevices/{deviceId}')
+  async queryTrustDevice(
+    @param.path.string('deviceId') id: string,
+  ): Promise<object> {
+    let s = statusTrustDevice.shift();
+    return ResponseWith['GET:/mgmt/shared/TrustedDevices/{deviceId}'](s);
+  }
+
+  @post('/mgmt/shared/TrustedDevices')
+  async trustDevice(@requestBody() body: object): Promise<object> {
+    return ResponseWith['POST:/mgmt/shared/TrustedDevices']();
+  }
+
+  @del('/mgmt/shared/TrustedDevices/{deviceId}')
+  async untrustDevice(
+    @param.path.string('deviceId') id: string,
+  ): Promise<object> {
+    return ResponseWith['DEL:/mgmt/shared/TrustedDevices/{deviceId}']();
+  }
+
+  @post('/mgmt/shared/TrustedExtensions/{deviceId}')
+  async installExtension(
+    @param.path.string('deviceId') id: string,
+    @requestBody() body: object,
+  ): Promise<object> {
+    return ResponseWith['POST:/mgmt/shared/TrustedExtensions/{deviceId}']();
+  }
+
+  @get('/mgmt/shared/TrustedExtensions/{deviceId}')
+  async queryExtension(
+    @param.path.string('deviceId') id: string,
+  ): Promise<object> {
+    let s = statusTrustExtension.shift();
+    return ResponseWith['GET:/mgmt/shared/TrustedExtensions/{deviceId}'](s);
   }
 }
 
+let statusTrustDevice = ['PENDING', 'PENDING', 'ACTIVE'];
+let statusTrustExtension = [undefined, 'UPLOADING', 'AVAILABLE'];
 let ResponseWith: {[key: string]: Function} = {};
 
 //TODO combine it with the one in openstack.
 export function ASGShouldResponseWith(spec: {[key: string]: Function}) {
   ResponseWith = {
-    '/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy200,
+    'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy200,
+    'GET:/mgmt/shared/TrustedDevices/{deviceId}':
+      StubResponses.trustDeviceStatusActive200,
+    'POST:/mgmt/shared/TrustedDevices':
+      StubResponses.trustDeviceStatusCreated200,
+    'DEL:/mgmt/shared/TrustedDevices/{deviceId}':
+      StubResponses.untrustDevice200,
+    'POST:/mgmt/shared/TrustedExtensions/{deviceId}':
+      StubResponses.installTrustedExtensions200,
+    'GET:/mgmt/shared/TrustedExtensions/{deviceId}':
+      StubResponses.queryTrustedExtensionsAvailable200,
   };
   Object.assign(ResponseWith, spec);
 }

@@ -1527,4 +1527,98 @@ Reason:
       '{"method":"Post","uri":"https://10.250.15.146:443/mgmt/shared/appsvcs/declare","body":{"class":"ADC","schemaVersion":"3.0.0","id":"b9942494-1106-46da-bfe8-e2c47154904c","F5_62a18d5f73c0447985f47cd034256ff5":{"class":"Tenant","label":"62a18d5f73c0447985f47cd034256ff5","F5_3cc12f17_a6c7_4884_a119_98b456fe2020":{"class":"Application","label":"3cc12f17-a6c7-4884-a119-98b456fe2020","template":"generic","F5_9601765a_e585_4355_bbd0_b60301d3bbdc":{"class":"Service_HTTP","label":"9601765a-e585-4355-bbd0-b60301d3bbdc","pool":"F5_7f8aea96_7389_4660_94f8_a68caab4f670","virtualAddresses":["10.250.41.17"],"virtualPort":80},"F5_7f8aea96_7389_4660_94f8_a68caab4f670":{"class":"Pool","label":"7f8aea96-7389-4660-94f8-a68caab4f670","loadBalancingMode":"round-robin","members":[{"servicePort":80,"serverAddresses":["10.250.42.46"],"monitors":[{"use":"F5_2b70cc27_6sdsfd8_41e7_8e97_0355cc77067b"}]}],"monitors":[{"use":"F5_895cc33f_7af6_4477_adc4_c286908f0e72"}]},"F5_895cc33f_7af6_4477_adc4_c286908f0e72":{"class":"Monitor","label":"895cc33f-7af6-4477-adc4-c286908f0e72","monitorType":"icmp"},"F5_2b70cc27_6fd8_41e7_8e97_0355cc77067b":{"class":"Monitor","label":"2b70cc27-6fd8-41e7-8e97-0355cc77067b","monitorType":"icmp"}}}}}';
     throw err;
   },
+
+  trustDeviceStatusChanging200: (state: string) => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: state,
+        },
+      ],
+    };
+  },
+
+  trustDeviceStatusActive200: (state: string) => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'ACTIVE',
+        },
+      ],
+    };
+  },
+
+  trustDeviceStatusPending200: () => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'PENDING',
+        },
+      ],
+    };
+  },
+
+  trustDeviceStatusCreated200: () => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: '1.2.3.4',
+          state: 'CREATED',
+        },
+      ],
+    };
+  },
+
+  untrustDevice200: () => {
+    return {
+      devices: [
+        {
+          state: 'DELETING',
+        },
+      ],
+    };
+  },
+
+  untrustDevice400: () => {
+    throw new Error('Not working');
+  },
+
+  untrustDeviceEmpty200: () => {
+    return {
+      devices: [],
+    };
+  },
+
+  queryTrustedExtensionsChanging200: (state: string | undefined) => {
+    if (!state) return [];
+    return [
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        state: state,
+      },
+    ];
+  },
+
+  queryTrustedExtensionsAvailable200: (state: string | undefined) => {
+    if (!state) return [];
+    return [
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        state: 'AVAILABLE',
+      },
+    ];
+  },
+
+  installTrustedExtensions400: () => {
+    throw new Error('install-not-working');
+  },
+
+  installTrustedExtensions200: () => {},
 };
