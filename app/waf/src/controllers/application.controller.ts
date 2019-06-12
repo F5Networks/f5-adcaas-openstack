@@ -46,7 +46,7 @@ import {
   DeclarationRepository,
   AdcRepository,
 } from '../repositories';
-import {ASGService, ASGManager} from '../services';
+import {ASGManager} from '../services';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 
 const prefix = '/adcaas/v1';
@@ -59,7 +59,6 @@ export class ApplicationController extends BaseController {
     public declarationRepository: DeclarationRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
-    @inject('services.ASGService') public asgService: ASGService,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,

@@ -21,7 +21,6 @@
 
 import {Client, expect, sinon, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {ApplicationController} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
@@ -48,14 +47,15 @@ import {
   MockASGController,
   ASGShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.asg.controller';
+import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;
-  let controller: ApplicationController;
   let client: Client;
   let deployStub: sinon.SinonStub;
   let mockKeystoneApp: TestingApplication;
   let mockASGApp: TestingApplication;
+  let asg: ASGService;
 
   const prefix = '/adcaas/v1';
 
@@ -78,9 +78,7 @@ describe('ApplicationController', () => {
 
     ({wafapp, client} = await setupApplication());
 
-    controller = await wafapp.get<ApplicationController>(
-      'controllers.ApplicationController',
-    );
+    asg = await new ASGServiceProvider().value();
 
     ShouldResponseWith({});
     ASGShouldResponseWith({});
@@ -89,7 +87,7 @@ describe('ApplicationController', () => {
 
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
-    deployStub = sinon.stub(controller.asgService, 'deploy');
+    deployStub = sinon.stub(asg, 'deploy');
   });
 
   after(async () => {
