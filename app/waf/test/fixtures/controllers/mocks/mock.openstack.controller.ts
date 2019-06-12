@@ -22,6 +22,7 @@ import {
   RestBindings,
   RequestContext,
   del,
+  put,
 } from '@loopback/rest';
 import {RequestBody} from '../openstack.controller';
 import {StubResponses} from '../../datasources/testrest.datasource';
@@ -100,11 +101,28 @@ export class MockNeutronController extends MockBaseController {
     return ResponseWith['/v2.0/ports']();
   }
 
+  @get('/v2.0/ports')
+  async v2GetPorts(@requestBody() reqBody: RequestBody): Promise<object> {
+    return ResponseWith['GET:/v2.0/ports']();
+  }
+
   @del('/v2.0/ports/{portId}')
   async v2DeletePort(
     @param.path.string('portId') portId: string,
   ): Promise<void> {
     return ResponseWith['DELETE:/v2.0/ports/{portId}']();
+  }
+
+  @put('/v2.0/ports/{portId}')
+  async v2UpdatePort(
+    @param.path.string('portId') portId: string,
+  ): Promise<void> {
+    return ResponseWith['PUT:/v2.0/ports/{portId}']();
+  }
+
+  @get('/v2.0/ports/{portId}')
+  async v2GetPort(@param.path.string('portId') portId: string): Promise<void> {
+    return ResponseWith['GET:/v2.0/ports/{portId}']();
   }
 
   @get('/v2.0/subnets')
@@ -121,10 +139,13 @@ export function ShouldResponseWith(spec: {[key: string]: Function}) {
     '/v3/auth/tokens': StubResponses.v3AuthToken200,
     '/v2.0/ports': StubResponses.neutronCreatePort200,
     'DELETE:/v2.0/ports/{portId}': StubResponses.neutronDeletePort200,
+    'PUT:/v2.0/ports/{portId}': StubResponses.neutronUpdatePort200,
+    'GET:/v2.0/ports/{portId}': StubResponses.neutronGetPort200,
     '/v2.0/subnets': StubResponses.neutronGetSubnets200,
     '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,
     'DELETE:/v2/{tenantId}/servers/{serverId}': StubResponses.novaDeleteVM200,
     '/v2/{tenantId}/servers/{serverId}': StubResponses.novaGetVMDetail200,
+    'GET:/v2.0/ports': StubResponses.neutronGetPorts200,
   };
   Object.assign(ResponseWith, spec);
 }
@@ -148,4 +169,5 @@ export const ExpectedData = {
   memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
   applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
   trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
+  virtualAddress: '10.0.0.23',
 };

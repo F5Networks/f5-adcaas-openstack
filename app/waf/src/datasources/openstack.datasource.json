@@ -182,6 +182,26 @@
       }
     },
     {
+      "description": "update a port within the specific network.",
+      "template": {
+        "method": "PUT",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}",
+        "body": "{body}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2UpdatePort": [
+          "url",
+          "userToken",
+          "body"
+        ]
+      }
+    },
+    {
       "description": "delete the port.",
       "template": {
         "method": "DELETE",
@@ -212,6 +232,24 @@
       },
       "functions": {
         "v2GetSubnets": [
+          "url",
+          "userToken"
+        ]
+      }
+    },
+    {
+      "description": "get a specific network's ports.",
+      "template": {
+        "method": "GET",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json"
+        },
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "v2GetPorts": [
           "url",
           "userToken"
         ]
