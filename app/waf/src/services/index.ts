@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export * from './as3.service';
 export * from './asg.service';
 export * from './identity.service';
 export * from './compute.service';
