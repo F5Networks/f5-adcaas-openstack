@@ -46,11 +46,8 @@ import {
   DeclarationRepository,
   AdcRepository,
 } from '../repositories';
-import {AS3Service} from '../services';
+import {ASGManager} from '../services';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
-
-const AS3_HOST: string = process.env.AS3_HOST || 'localhost';
-const AS3_PORT: number = Number(process.env.AS3_PORT) || 7443;
 
 const prefix = '/adcaas/v1';
 
@@ -62,7 +59,6 @@ export class ApplicationController extends BaseController {
     public declarationRepository: DeclarationRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
-    @inject('services.AS3Service') public as3Service: AS3Service,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -203,7 +199,7 @@ export class ApplicationController extends BaseController {
   async deployById(
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
-  ): Promise<string> {
+  ): Promise<void> {
     let tenantId = await this.tenantId;
 
     let application = await this.applicationRepository.findById(id, undefined, {
@@ -220,6 +216,9 @@ export class ApplicationController extends BaseController {
       tenantId: tenantId,
     });
 
+    let mgmt = adc.management!;
+    let asgManager = await ASGManager.instanlize();
+
     let declaration = await this.declarationRepository.findById(
       application.defaultDeclarationId,
       undefined,
@@ -229,9 +228,8 @@ export class ApplicationController extends BaseController {
     let operation = patchOP.Replace;
     let req = new AS3PatchReqeust(adc, application, operation, declaration);
 
-    let res: string = '';
     try {
-      res = await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
+      await asgManager.deploy(mgmt.ipAddress, mgmt.tcpPort, req);
     } catch (error) {
       /*We check the return message from BIGIP. If the error value mesage is
     "path does not exisst",which means the bigip does not contain the tenant
@@ -239,18 +237,19 @@ export class ApplicationController extends BaseController {
     partition and add the application. */
 
       if (
-        JSON.stringify(error).indexOf(
+        JSON.stringify(error.message).indexOf(
           'InvalidPatchOperationError: path does not exist',
         ) !== -1
       ) {
         /*Turn to Deploy method */
         let newReq = new AS3DeployRequest(adc, application, declaration);
-        res = await this.as3Service.deploy(AS3_HOST, AS3_PORT, newReq);
-      } else {
-        res = error;
+        await asgManager.deploy(
+          mgmt.ipAddress,
+          mgmt.tcpPort,
+          newReq.declaration,
+        );
       }
     }
-    return res;
   }
 
   @post(prefix + '/applications/{applicationId}/cleanup', {
@@ -262,7 +261,7 @@ export class ApplicationController extends BaseController {
   async cleanupById(
     @param(Schema.pathParameter('applicationId', 'Application resource ID'))
     id: string,
-  ): Promise<string> {
+  ): Promise<void> {
     let tenantId = await this.tenantId;
 
     let application = await this.applicationRepository.findById(id, undefined, {
@@ -278,8 +277,11 @@ export class ApplicationController extends BaseController {
       tenantId: tenantId,
     });
 
+    let mgmt = adc.management!;
+    let asgManager = await ASGManager.instanlize();
+
     let operation = patchOP.Remove;
     let req = new AS3PatchReqeust(adc, application, operation);
-    return await this.as3Service.deploy(AS3_HOST, AS3_PORT, req);
+    await asgManager.deploy(mgmt.ipAddress, mgmt.tcpPort, req);
   }
 }
