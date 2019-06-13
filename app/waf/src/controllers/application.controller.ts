@@ -237,7 +237,7 @@ export class ApplicationController extends BaseController {
     partition and add the application. */
 
       if (
-        JSON.stringify(error).indexOf(
+        JSON.stringify(error.message).indexOf(
           'InvalidPatchOperationError: path does not exist',
         ) !== -1
       ) {

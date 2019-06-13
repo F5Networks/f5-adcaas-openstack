@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Client, expect } from '@loopback/testlab';
-import { WafApplication } from '../..';
+import {Client, expect} from '@loopback/testlab';
+import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
@@ -39,10 +39,10 @@ describe('PingController', () => {
   let mockKeystoneApp: TestingApplication;
 
   before('setupApplication', async () => {
-    ({ wafapp, client } = await setupApplication());
+    ({wafapp, client} = await setupApplication());
 
     mockKeystoneApp = await (async () => {
-      let { restApp } = await setupRestAppAndClient(
+      let {restApp} = await setupRestAppAndClient(
         RestApplicationPort.IdentityAdmin,
         MockKeyStoneController,
       );
@@ -58,7 +58,6 @@ describe('PingController', () => {
   });
 
   it('invokes GET ' + prefix + '/ping', async () => {
-
     const res = await client
       .get(prefix + '/ping')
       .set('X-Auth-Token', ExpectedData.userToken)
