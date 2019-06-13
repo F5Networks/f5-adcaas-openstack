@@ -141,7 +141,7 @@ export class AdcController extends BaseController {
     };
 
     try {
-      await this.serialize(adc, {status: AdcState.TRUSTING});
+      await this.serialize(adc, {status: AdcState.TRUSTING, lastErr: ''});
       //TODO: Need away to input admin password of BIG-IP HW
       let device = await this.asgMgr.trust(
         adc.management!.ipAddress,
@@ -155,6 +155,7 @@ export class AdcController extends BaseController {
           await this.serialize(adc, {
             status: AdcState.TRUSTED,
             trustedDeviceId: device.targetUUID,
+            lastErr: '',
           });
         },
         async () => {
@@ -191,13 +192,13 @@ export class AdcController extends BaseController {
 
   async installAS3(adc: Adc): Promise<void> {
     // Install AS3 RPM on target device
-    await this.serialize(adc, {status: AdcState.INSTALLING});
+    await this.serialize(adc, {status: AdcState.INSTALLING, lastErr: ''});
 
     try {
       let exist = await this.asgMgr.as3Exists(adc.trustedDeviceId!);
 
       if (exist) {
-        await this.serialize(adc, {status: AdcState.ACTIVE});
+        await this.serialize(adc, {status: AdcState.ACTIVE, lastErr: ''});
         return;
       }
     } catch (err) {
@@ -225,7 +226,7 @@ export class AdcController extends BaseController {
 
       await checkAndWait(as3Available, 60, [adc.trustedDeviceId!]).then(
         async () => {
-          await this.serialize(adc, {status: AdcState.ACTIVE});
+          await this.serialize(adc, {status: AdcState.ACTIVE, lastErr: ''});
         },
         async () => {
           await this.serialize(adc, {
@@ -489,12 +490,14 @@ export class AdcController extends BaseController {
 
   private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
-      await this.serialize(adc, {status: AdcState.POWERING})
+      await this.serialize(adc, {status: AdcState.POWERING, lastErr: ''})
         .then(() => this.cNet(adc, addon))
         .then(() => this.cSvr(adc, addon));
 
       await checkAndWait(() => this.adcStCtr.gotTo(AdcState.POWERON), 240)
-        .then(() => this.serialize(adc, {status: AdcState.POWERON}))
+        .then(() =>
+          this.serialize(adc, {status: AdcState.POWERON, lastErr: ''}),
+        )
         .catch(error => {
           throw new Error(`Timeout waiting for: ${AdcState.POWERON}`);
         });
@@ -503,7 +506,6 @@ export class AdcController extends BaseController {
         status: AdcState.POWERERR,
         lastErr: `${AdcState.POWERERR}: ${error.message}`,
       });
-      throw error;
     }
   }
 
@@ -676,11 +678,11 @@ export class AdcController extends BaseController {
     };
 
     try {
-      this.serialize(adc, {status: AdcState.RECLAIMING});
+      this.serialize(adc, {status: AdcState.RECLAIMING, lastErr: ''});
       for (let f of ['trust', 'license', 'vm', 'network']) {
         await reclaimFuncs[f]();
       }
-      this.serialize(adc, {status: AdcState.RECLAIMED});
+      this.serialize(adc, {status: AdcState.RECLAIMED, lastErr: ''});
     } catch (error) {
       this.logger.error(`Reclaiming fails: ${error.message}`);
       this.serialize(adc, {
