@@ -21,22 +21,44 @@
 
 import {Client, expect, toJSON} from '@loopback/testlab';
 import {WafApplication} from '../..';
-import {setupApplication, teardownApplication} from '../helpers/test-helper';
+import {
+  setupApplication,
+  teardownApplication,
+  TestingApplication,
+  setupRestAppAndClient,
+  RestApplicationPort,
+  setupEnvs,
+  teardownRestAppAndClient,
+  teardownEnvs,
+} from '../helpers/test-helper';
 import {
   givenEmptyDatabase,
   givenAdcData,
   givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
+import {
+  MockKeyStoneController,
+  ExpectedData,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 describe('TenantAssociationController', () => {
   let wafapp: WafApplication;
   let client: Client;
+  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
     ({wafapp, client} = await setupApplication());
+    mockKeystoneApp = await (async () => {
+      let {restApp} = await setupRestAppAndClient(
+        RestApplicationPort.IdentityAdmin,
+        MockKeyStoneController,
+      );
+      return restApp;
+    })();
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
@@ -45,12 +67,16 @@ describe('TenantAssociationController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
+    teardownRestAppAndClient(mockKeystoneApp);
+    teardownEnvs();
   });
 
   it('post ' + prefix + '/tenants/{tenantId}/adcs/{adcId}', async () => {
     let adc = await givenAdcData(wafapp);
     await client
       .post(prefix + '/tenants/1234/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
       .send()
       .expect(204);
   });
@@ -60,6 +86,8 @@ describe('TenantAssociationController', () => {
     async () => {
       await client
         .post(prefix + '/tenants/1234/adcs/non-existing')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .send()
         .expect(404);
     },
@@ -73,6 +101,8 @@ describe('TenantAssociationController', () => {
 
       let response = await client
         .get(prefix + '/tenants/' + assoc.tenantId + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       expect(response.body.adcs[0]).to.containDeep(toJSON(adc));
@@ -82,7 +112,11 @@ describe('TenantAssociationController', () => {
   it(
     'get ' + prefix + '/tenants/{id}/adcs: no ADC associated with a tenant',
     async () => {
-      await client.get(prefix + '/tenants/' + uuid() + '/adcs').expect(200);
+      await client
+        .get(prefix + '/tenants/' + uuid() + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
     },
   );
 
@@ -93,6 +127,8 @@ describe('TenantAssociationController', () => {
     async () => {
       await client
         .del(prefix + '/tenants/' + uuid() + '/adcs/' + uuid())
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
     },
   );
@@ -107,14 +143,20 @@ describe('TenantAssociationController', () => {
 
       await client
         .get(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
       await client
         .del(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(204);
 
       await client
         .get(prefix + '/tenants/' + assoc.tenantId + '/adcs/' + assoc.adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
     },
   );
