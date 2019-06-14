@@ -99,9 +99,12 @@ export class MySequence implements SequenceHandler {
   }
 
   async authRequest(context: RequestContext) {
-    if (!process.env.PRODUCT_RELEASE) return;
-
     let {request} = context;
+
+    let ignoredAuthPaths = ['/openapi.json', '/explorer'];
+    for (let u of ignoredAuthPaths) {
+      if (request.path.startsWith(u)) return;
+    }
 
     this.logger.debug('start to authenticate user');
 

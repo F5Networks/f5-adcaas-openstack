@@ -21,6 +21,7 @@ export enum patchOP {
   Replace,
   Remove,
 }
+
 export class AS3Declaration {
   [key: string]: undefined | string | number | boolean | object;
 }
@@ -28,6 +29,7 @@ export class AS3Declaration {
 export function as3Name(id: string) {
   return 'F5_' + id.replace(/-/g, '_');
 }
+
 export class AS3PatchOp {
   op: string = 'add';
   path: string;
@@ -54,6 +56,7 @@ export class AS3PatchOp {
     }
   }
 }
+
 export class AS3PatchReqeust {
   readonly class: string = 'AS3';
   readonly action: string = 'patch';
@@ -80,6 +83,7 @@ export class AS3PatchReqeust {
     this.patchBody.push(new AS3PatchOp(application, operation, declaration));
   }
 }
+
 export class AS3DeployRequest {
   readonly class: string = 'AS3';
   readonly action: 'deploy';

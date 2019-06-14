@@ -90,11 +90,13 @@ export interface ASGService {
   // mapped to the SOAP operations as stated in the datasource
   // json file.
   trust(host: string, port: number, body: object): Promise<TrustedDevices>;
+
   queryTrust(
     host: string,
     port: number,
     deviceId: string,
   ): Promise<TrustedDevices>;
+
   untrust(
     host: string,
     port: number,
@@ -106,6 +108,7 @@ export interface ASGService {
     port: number,
     deviceId: string,
   ): Promise<TrustedExtensions>;
+
   install(
     host: string,
     port: number,
