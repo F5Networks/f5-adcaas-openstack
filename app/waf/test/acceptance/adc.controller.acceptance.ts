@@ -616,15 +616,24 @@ describe('AdcController test', () => {
 
       expect(response.body.adc).to.containDeep(toJSON(adc));
 
-      await sleep(100);
+      let expectStatus = 'INSTALLERROR';
+      let checkFunc = async () => {
+        response = await client
+          .get(prefix + '/adcs/' + response.body.adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
+        return response.body.adc.status === expectStatus;
+      };
 
-      response = await client
-        .get(prefix + '/adcs/' + response.body.adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-
-      expect(response.body.adc.status).to.equal('INSTALLERROR');
+      await checkAndWait(checkFunc, 240, [], 1).then(
+        () => {
+          expect(response.body.adc.status).eql(expectStatus);
+        },
+        () => {
+          expect(response.body.adc.status).eql(expectStatus);
+        },
+      );
     },
   );
 
@@ -694,7 +703,7 @@ describe('AdcController test', () => {
   );
 
   it(
-    'post ' + prefix + '/adcs: create ADC HW with query extension exception',
+    'post ' + prefix + '/adcs: create ADC HW with install extension exception',
     async function() {
       await givenAdcData(wafapp, {
         trustedDeviceId: 'abcdefg',

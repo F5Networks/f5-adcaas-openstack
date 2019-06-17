@@ -220,9 +220,7 @@ export class ASGManager {
     let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
 
     for (let ext of exts) {
-      if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
-        return true;
-      }
+      if (ext.name === 'f5-appsvcs' && ext.state === 'AVAILABLE') return true;
     }
 
     return false;
@@ -232,9 +230,10 @@ export class ASGManager {
     let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
 
     for (let ext of exts) {
-      if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
-        return ext.state;
-      }
+      // if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
+      //   return ext.state;
+      // }
+      if (ext.name === 'f5-appsvcs') return ext.state;
     }
 
     return 'NONE';
