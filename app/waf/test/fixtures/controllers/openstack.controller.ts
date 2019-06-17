@@ -83,20 +83,6 @@ export class OpenstackController extends MockBaseController {
     });
   }
 
-  @get('/openstack/refreshUserToken')
-  async refreshUserToken(@requestBody() reqBody: RequestBody): Promise<object> {
-    return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-
-      return await authWithOSIdentity.refreshUserToken(
-        reqBody.param.userToken,
-        reqBody.param.tenantId,
-      );
-    });
-  }
-
   @get('/openstack/validateUserToken')
   async validateUserToken(
     @requestBody() reqBody: RequestBody,
@@ -110,19 +96,6 @@ export class OpenstackController extends MockBaseController {
         reqBody.param.userToken,
         reqBody.param.tenantId,
       );
-    });
-  }
-
-  @get('/openstack/resolveUserToken')
-  async resolveUserToken(@requestBody() reqBody: RequestBody): Promise<object> {
-    return this.tryRunWithEnvs(reqBody.env, async () => {
-      const authWithOSIdentity = await this.application.get(
-        WafBindingKeys.KeyAuthWithOSIdentity,
-      );
-
-      return authWithOSIdentity
-        .validateUserToken(reqBody.param.userToken, reqBody.param.tenantId)
-        .then(usertoken => authWithOSIdentity.solveUserToken(usertoken));
     });
   }
 

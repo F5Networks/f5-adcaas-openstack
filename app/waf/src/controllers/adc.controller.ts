@@ -431,13 +431,7 @@ export class AdcController extends BaseController {
     });
 
     let addonReq = {
-      userToken: await this.reqCxt
-        .get(WafBindingKeys.Request.KeyUserToken)
-        .then(token =>
-          this.wafapp
-            .get(WafBindingKeys.KeyAuthWithOSIdentity)
-            .then(authHelper => authHelper.solveUserToken(token)),
-        ),
+      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
