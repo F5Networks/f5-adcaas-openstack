@@ -33,17 +33,24 @@ export function setDefaultInterval(ms: number) {
 /**
  * Check and wait until some condition is fulfilled or timeout.
  *
- * @param checkFunc: a function which returns boolean.
+ * @param checkFunc: a function which
+ *   resolves true if condition is satisfied;
+ *   rejects true if condition failed and we quit waiting for it.
+ *   Otherwise attempt to check the condition again after designated sleep interval.
  * @param tryTimes: times for wait.
  * @param funcArgs: array of any.
  * @param intervalInMSecs: interval in milli-seconds for sleeping between 2 tries.
- */
+ * @return:
+ *  resolve true: success quit.
+ *  reject true: stop quit.
+ *  reject false: timeout.
+ *  */
 export async function checkAndWait(
   checkFunc: Function,
   tryTimes: number,
   funcArgs: (object | string | number | boolean | undefined)[] = [],
   intervalInMSecs: number = defaultInterval,
-): Promise<void> {
+): Promise<boolean> {
   let funcName = checkFunc.name ? checkFunc.name : 'anonymous';
 
   utilsLogger.debug(
@@ -51,7 +58,7 @@ export async function checkAndWait(
   );
   if (tryTimes <= 0) {
     utilsLogger.error(`'${funcName}' timeout.`);
-    return Promise.reject();
+    return Promise.reject(false);
   }
 
   let hdlr = async (b: boolean | Error): Promise<boolean> => {
@@ -62,12 +69,30 @@ export async function checkAndWait(
     else throw new Error();
   };
 
+  let errHdlr = async (b: boolean | Error): Promise<boolean> => {
+    utilsLogger.debug(
+      `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
+    );
+    if (typeof b === 'boolean' && b)
+      throw new Error('checkAndWait error terminate');
+    else throw new Error();
+  };
+
   try {
-    await checkFunc(...funcArgs).then(hdlr, hdlr);
+    return await checkFunc(...funcArgs).then(hdlr, errHdlr);
     //await checkFunc(...funcArgs);
   } catch (error) {
+    if (error.message === 'checkAndWait error terminate') {
+      utilsLogger.error(`'${funcName}' failure quit.`);
+      return Promise.reject(true);
+    }
     await sleep(intervalInMSecs);
-    await checkAndWait(checkFunc, tryTimes - 1, funcArgs, intervalInMSecs);
+    return await checkAndWait(
+      checkFunc,
+      tryTimes - 1,
+      funcArgs,
+      intervalInMSecs,
+    );
   }
 }
 
