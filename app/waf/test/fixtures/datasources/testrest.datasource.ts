@@ -1607,10 +1607,11 @@ Reason:
   },
 
   queryTrustedExtensionsAvailable200: (state: string | undefined) => {
-    if (!state) return [];
+    //if (!state) return [];
     return [
       {
         rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
         state: 'AVAILABLE',
       },
     ];

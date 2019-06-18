@@ -256,7 +256,7 @@ describe('AdcController test', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.adc.status).to.equal('ACTIVE');
+    expect(response.body.adc.status).to.equal('INSTALLED');
     expect(response.body.adc.trustedDeviceId).to.equal(id);
   });
 
@@ -552,7 +552,7 @@ describe('AdcController test', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.adc.status).to.equal('ACTIVE');
+      expect(response.body.adc.status).to.equal('INSTALLED');
     },
   );
 
@@ -1083,11 +1083,12 @@ describe('AdcController test', () => {
     queryExtensionsStub.onCall(1).returns([
       {
         rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
         state: 'UPLOADING',
       },
     ]);
 
-    queryExtensionsStub.onCall(2).returns([
+    queryExtensionsStub.returns([
       {
         rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
         name: 'f5-appsvcs',
@@ -1112,7 +1113,6 @@ describe('AdcController test', () => {
             .set('X-Auth-Token', ExpectedData.userToken)
             .set('tenant-id', ExpectedData.tenantId)
             .expect(200);
-
           return resp.body.adc.status === 'ACTIVE';
         };
 
@@ -1157,8 +1157,8 @@ describe('AdcController test', () => {
       .finally(teardownEnvs);
   });
 
-  // TODO: the timeout can only be tested through unit test?
-  //  The following test case leads all tests fail.
+  //TODO: the timeout can only be tested through unit test?
+  //The following test case leads all tests fail.
   // it(
   //   'post ' + prefix + '/adcs/{adcId}/action: setup: bigip not accessible',
   //   async () => {
