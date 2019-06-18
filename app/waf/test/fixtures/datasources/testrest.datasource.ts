@@ -539,6 +539,98 @@ export const StubResponses = {
     };
   },
 
+  neutronUpdatePort200: () => {
+    return {
+      port: {
+        allowed_address_pairs: [],
+        extra_dhcp_opts: [],
+        updated_at: '2019-06-14T03:54:35Z',
+        device_owner: 'compute:nova',
+        revision_number: 10,
+        'binding:profile': {},
+        port_security_enabled: true,
+        fixed_ips: [
+          {
+            subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
+            ip_address: '10.250.41.46',
+          },
+          {
+            subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
+            ip_address: '10.250.41.56',
+          },
+        ],
+        id: 'cfa3f632-41c4-4683-8a21-5438c76d2fa8',
+        security_groups: ['da974cc7-febd-479b-9452-20c7894f7c79'],
+        'binding:vif_details': {
+          port_filter: true,
+          datapath_type: 'system',
+          ovs_hybrid_plug: true,
+        },
+        'binding:vif_type': 'ovs',
+        mac_address: 'fa:16:3e:91:93:6e',
+        project_id: 'ebce159403624ae38376161574130473',
+        status: 'ACTIVE',
+        'binding:host_id': 'overcloud-compute-1.localdomain',
+        description: '',
+        tags: [],
+        qos_policy_id: null,
+        name: 'f5-14d3de1c-b73b-48ce-886f-619999d2cea8-ext-external2',
+        admin_state_up: true,
+        network_id: '9bdbf55c-678a-4549-b0d6-fadf58b3a3ec',
+        tenant_id: 'ebce159403624ae38376161574130473',
+        created_at: '2019-06-14T01:06:29Z',
+        'binding:vnic_type': 'normal',
+        device_id: '0956d723-344b-4efa-b15f-9721751755f4',
+      },
+    };
+  },
+
+  neutronGetPort200: () => {
+    return {
+      port: {
+        allowed_address_pairs: [],
+        extra_dhcp_opts: [],
+        updated_at: '2019-06-14T03:54:35Z',
+        device_owner: 'compute:nova',
+        revision_number: 10,
+        'binding:profile': {},
+        port_security_enabled: true,
+        fixed_ips: [
+          {
+            subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
+            ip_address: '10.250.41.46',
+          },
+          {
+            subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
+            ip_address: '10.250.41.56',
+          },
+        ],
+        id: 'cfa3f632-41c4-4683-8a21-5438c76d2fa8',
+        security_groups: ['da974cc7-febd-479b-9452-20c7894f7c79'],
+        'binding:vif_details': {
+          port_filter: true,
+          datapath_type: 'system',
+          ovs_hybrid_plug: true,
+        },
+        'binding:vif_type': 'ovs',
+        mac_address: 'fa:16:3e:91:93:6e',
+        project_id: 'ebce159403624ae38376161574130473',
+        status: 'ACTIVE',
+        'binding:host_id': 'overcloud-compute-1.localdomain',
+        description: '',
+        tags: [],
+        qos_policy_id: null,
+        name: 'f5-14d3de1c-b73b-48ce-886f-619999d2cea8-ext-external2',
+        admin_state_up: true,
+        network_id: '9bdbf55c-678a-4549-b0d6-fadf58b3a3ec',
+        tenant_id: 'ebce159403624ae38376161574130473',
+        created_at: '2019-06-14T01:06:29Z',
+        'binding:vnic_type': 'normal',
+        device_id: '0956d723-344b-4efa-b15f-9721751755f4',
+      },
+    };
+  },
+
   neutronDeletePort200: () => {},
 
   neutronGetSubnets200: () => {

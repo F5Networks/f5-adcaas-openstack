@@ -305,7 +305,7 @@ export function createDeclarationObject(data?: Partial<Declaration>) {
             template: 'http',
             serviceMain: {
               class: 'Service_HTTP',
-              virtualAddresses: ['10.0.1.10'],
+              virtualAddresses: [ExpectedData.virtualAddress],
               pool: 'web_pool',
             },
             web_pool: {

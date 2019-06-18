@@ -24,9 +24,15 @@ export interface NetworkService {
   v2CreatePort(
     url: string,
     userToken: string,
-    body: PortsRequest,
+    body: PortsCreateRequest,
+  ): Promise<object>;
+  v2UpdatePort(
+    url: string,
+    userToken: string,
+    body: PortUpdateRequest,
   ): Promise<object>;
   v2GetSubnets(url: string, userToken: string): Promise<object>;
+  v2GetPorts(url: string, userToken: string): Promise<object>;
   v2DeletePort(url: string, userToken: string): Promise<object>;
 }
 
@@ -78,7 +84,7 @@ export class NetworkDriver {
 
     let url = adminToken.epPorts();
 
-    let body: PortsRequest = {
+    let body: PortsCreateRequest = {
       port: {
         network_id: portParams.networkId,
       },
@@ -100,6 +106,23 @@ export class NetworkDriver {
         };
         return portResp;
       });
+  }
+
+  async updatePort(
+    userToken: string,
+    portParams: PortsUpdateParams,
+  ): Promise<void> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epPorts() + `/${portParams.id}`;
+
+    let body: PortUpdateRequest = {port: {}};
+    if (portParams.fixedIps) {
+      body.port.fixed_ips = portParams.fixedIps!;
+    }
+
+    await this.networkService.v2UpdatePort(url, userToken, body);
   }
 
   async deletePort(userToken: string, portId: string): Promise<void> {
@@ -142,10 +165,30 @@ export class NetworkDriver {
       });
   }
 
+  async getPortInfo(userToken: string, portId: string): Promise<Port> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epPorts() + '/' + portId;
+    let response = await this.networkService.v2GetPorts(url, userToken);
+
+    this.logger.debug(
+      'access ' + url + ' response: ' + JSON.stringify(response),
+    );
+    let portObj = JSON.parse(JSON.stringify(response))['body'][0]['port'];
+
+    let portRtn: Port = {
+      fixedIps: portObj.fixed_ips,
+      id: portObj.id,
+      networkId: portObj.network_id,
+    };
+
+    return portRtn;
+  }
   //async createFloatingIp() { }
 }
 
-type PortsRequest = {
+type PortsCreateRequest = {
   port: {
     network_id: string;
     name?: string;
@@ -168,17 +211,50 @@ type PortsRequest = {
   };
 };
 
+type PortUpdateRequest = {
+  port: {
+    fixed_ips?: {
+      ip_address?: string;
+      subnet_id?: string;
+    }[];
+  };
+};
+
 export class PortCreationParams {
   networkId: string;
   fixedIp?: string;
   name: string;
 }
 
+// TODO: combine PortCreationParams and PortUpdateParams?
+export type PortsUpdateParams = {
+  id: string;
+  fixedIps?: {
+    ip_address?: string;
+    subnet_id?: string;
+  }[];
+  //...
+};
+
 export type PortResponse = {
   id: string;
   fixedIp: string;
   macAddr: string;
 };
+
+export type FixedIP = {
+  ip_address: string;
+  subnet_id: string;
+};
+
+// TODO: remove this type, and merge it into PortsCreateParam or ..
+export type Port = {
+  id: string;
+  networkId: string;
+  fixedIps: FixedIP[];
+};
+
+export type PortsResponse = Port[];
 
 export type SubnetInfo = {
   gatewayIp: string;

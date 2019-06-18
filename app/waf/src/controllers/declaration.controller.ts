@@ -37,8 +37,10 @@ import {
   Member,
   ASGDeployRequest,
   AS3DeployRequest,
+  Adc,
+  AS3Declaration,
 } from '../models';
-import {inject} from '@loopback/core';
+import {inject, CoreBindings} from '@loopback/core';
 import {
   ApplicationRepository,
   DeclarationRepository,
@@ -54,8 +56,11 @@ import {
   AdcRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
-import {ASGManager} from '../services';
+import {ASGManager, PortsUpdateParams} from '../services';
 import {factory} from '../log4ts';
+import {findByKey} from '../utils';
+import {WafApplication} from '../application';
+import {WafBindingKeys} from '../keys';
 
 const prefix = '/adcaas/v1';
 
@@ -90,6 +95,8 @@ export class DeclarationController extends BaseController {
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
+    @inject(CoreBindings.APPLICATION_INSTANCE)
+    private wafapp: WafApplication,
   ) {
     super(reqCxt);
   }
@@ -408,11 +415,10 @@ export class DeclarationController extends BaseController {
 
         try {
           let as3Request = new AS3DeployRequest(adc, application, declaration);
-          await proxyMgr.deploy(
-            mgmt.ipAddress,
-            mgmt.tcpPort,
-            as3Request.declaration,
-          );
+          let declBody = as3Request.declaration;
+
+          await this.TryBindVirtualAddressToExt(adc, declBody);
+          await proxyMgr.deploy(mgmt.ipAddress, mgmt.tcpPort, declBody);
         } catch (error) {
           this.logger.error(`Failed to deploy: ${error.message}`);
           throw new HttpErrors.UnprocessableEntity(error.message);
@@ -422,5 +428,38 @@ export class DeclarationController extends BaseController {
         throw new HttpErrors.NotFound(error.message);
       },
     );
+  }
+
+  async TryBindVirtualAddressToExt(
+    adc: Adc,
+    declaration: AS3Declaration,
+  ): Promise<void> {
+    let portId = (() => {
+      for (let netName of Object.keys(adc.networks)) {
+        let net = adc.networks[netName];
+        if (net.type === 'ext') return net.portId!;
+      }
+    })();
+
+    let netHelper = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
+
+    let userToken = await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken);
+
+    // get port addresses, add one more, then update port.
+    // TODO: use async-lock to make the operation automic.
+    let port = await netHelper.getPortInfo(userToken, portId!);
+    let portParams: PortsUpdateParams = {
+      id: portId!,
+      fixedIps: port.fixedIps,
+    };
+
+    let addresses = findByKey(declaration, 'virtualAddresses');
+    for (let addrs of addresses) {
+      for (let addr of <string[]>addrs) {
+        portParams.fixedIps!.push({ip_address: addr});
+      }
+    }
+
+    await netHelper.updatePort(userToken, portParams);
   }
 }

@@ -149,3 +149,34 @@ export function merge(
   }
   return target;
 }
+
+/**
+ * Find the sub object with keyName from target, target can be an object or an array.
+ *
+ * @returns an array of found, each of which is the value.
+ * @param target the object to find from.
+ * @param key key name to find.
+ */
+export function findByKey(
+  target: object,
+  key: string,
+): (object | string | boolean)[] {
+  let findByKeyImpl = function(
+    t: object,
+    kn: string,
+    r: (object | string | boolean)[],
+  ) {
+    let ks = Object.keys(t);
+    for (let k of ks) {
+      // @ts-ignore t[k] always be index-able.
+      let v = t[k];
+      if (k === kn) r.push(v);
+      if (typeof v === 'object') findByKeyImpl(v, kn, r);
+    }
+  };
+
+  let rlt: (object | string | boolean)[] = [];
+  findByKeyImpl(target, key, rlt);
+
+  return rlt;
+}
