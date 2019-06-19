@@ -873,6 +873,27 @@ export const StubResponses = {
     };
   },
 
+  bigipAS3Info200: () => {
+    return {
+      version: '3.10.0',
+      release: '5',
+      schemaCurrent: '3.10.0',
+      schemaMinimum: '3.0.0',
+    };
+  },
+
+  bigipAS3Info404: () => {
+    throw new HttpErrors.NotFound(
+      'Public URI path not registered. Please see /var/log/restjavad.0.log and /var/log/restnoded/restnoded.log for details.',
+    );
+  },
+
+  bigipPartition200: () => {
+    return {
+      name: 'F5_' + ExpectedData.tenantId,
+    };
+  },
+
   bigipGlobalSettings200: () => {
     return {
       awsApiMaxConcurrency: 1,

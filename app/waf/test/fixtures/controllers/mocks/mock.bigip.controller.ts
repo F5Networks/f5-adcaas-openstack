@@ -15,7 +15,7 @@
  */
 
 import {MockBaseController} from './mock.base.controller';
-import {get} from '@loopback/rest';
+import {get, param} from '@loopback/rest';
 import {StubResponses} from '../../datasources/testrest.datasource';
 
 export class MockBigipController extends MockBaseController {
@@ -52,6 +52,18 @@ export class MockBigipController extends MockBaseController {
   async cmDevice(): Promise<object> {
     return await ResponseWith['/mgmt/tm/cm/device']();
   }
+
+  @get('/mgmt/shared/appsvcs/info')
+  async as3Info(): Promise<object> {
+    return await ResponseWith['/mgmt/shared/appsvcs/info']();
+  }
+
+  @get('/mgmt/tm/sys/folder/~{partition}')
+  async partitionInfo(
+    @param.path.string('partition') partition: string,
+  ): Promise<object> {
+    return await ResponseWith['/mgmt/tm/sys/folder/~{partition}']();
+  }
 }
 
 let ResponseWith: {[key: string]: Function} = {};
@@ -66,6 +78,8 @@ export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
     '/mgmt/tm/sys/global-settings': StubResponses.bigipGlobalSettings200,
     '/mgmt/tm/sys/license': StubResponses.bigipLiense200,
     '/mgmt/tm/cm/device': StubResponses.bigipCmDevice200,
+    '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info200,
+    '/mgmt/tm/sys/folder/~{partition}': StubResponses.bigipPartition200,
   };
   Object.assign(ResponseWith, spec);
 }

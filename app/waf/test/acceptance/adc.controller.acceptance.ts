@@ -136,11 +136,6 @@ describe('AdcController test', () => {
 
     controller = await wafapp.get<AdcController>('controllers.AdcController');
 
-    ShouldResponseWith({});
-    DOShouldResponseWith({});
-    BigipShouldResponseWith({});
-    ASGShouldResponseWith({});
-
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     setupEnvs();
     setDefaultInterval(1);
@@ -153,6 +148,10 @@ describe('AdcController test', () => {
     untrustStub = sinon.stub(controller.asgService, 'untrust');
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
+
+    ShouldResponseWith({});
+    DOShouldResponseWith({});
+    BigipShouldResponseWith({});
     ASGShouldResponseWith({});
   });
 
@@ -183,8 +182,8 @@ describe('AdcController test', () => {
     const adc = createAdcObject({
       type: 'HW',
       management: {
-        ipAddress: '1.2.3.4',
-        tcpPort: 100,
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: 'admin',
         password: 'admin',
         rootPass: 'default',
@@ -196,7 +195,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -206,7 +205,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -216,7 +215,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -248,7 +247,7 @@ describe('AdcController test', () => {
 
     expect(response.body.adc).to.containDeep(toJSON(adc));
 
-    await sleep(10);
+    await sleep(50);
 
     response = await client
       .get(prefix + '/adcs/' + response.body.adc.id)
@@ -334,8 +333,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -346,7 +345,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -356,7 +355,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'ERROR',
           },
         ],
@@ -387,8 +386,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -400,7 +399,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -438,8 +437,8 @@ describe('AdcController test', () => {
     const adc = createAdcObject({
       type: 'HW',
       management: {
-        ipAddress: '1.2.3.4',
-        tcpPort: 100,
+        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: 'admin',
         password: 'admin',
         rootPass: 'default',
@@ -451,7 +450,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -461,7 +460,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -498,8 +497,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -511,7 +510,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -521,7 +520,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -544,7 +543,7 @@ describe('AdcController test', () => {
 
       expect(response.body.adc).to.containDeep(toJSON(adc));
 
-      await sleep(10);
+      await sleep(150);
 
       response = await client
         .get(prefix + '/adcs/' + response.body.adc.id)
@@ -566,8 +565,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -579,7 +578,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -589,7 +588,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -599,13 +598,16 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'ACTIVE',
           },
         ],
       });
 
       queryExtensionsStub.returns([]);
+      BigipShouldResponseWith({
+        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      });
 
       let response = await client
         .post(prefix + '/adcs')
@@ -647,8 +649,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -660,7 +662,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -670,13 +672,16 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'ACTIVE',
           },
         ],
       });
 
       queryExtensionsStub.throws(new Error('query-not-working'));
+      BigipShouldResponseWith({
+        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      });
 
       let response = await client
         .post(prefix + '/adcs')
@@ -687,17 +692,25 @@ describe('AdcController test', () => {
 
       expect(response.body.adc).to.containDeep(toJSON(adc));
 
-      await sleep(50);
+      let func = async () => {
+        let resp = await client
+          .get(prefix + '/adcs/' + response.body.adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
 
-      response = await client
-        .get(prefix + '/adcs/' + response.body.adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-
-      expect(response.body.adc.status).to.equal('INSTALLERROR');
-      expect(response.body.adc.lastErr).to.equal(
-        `INSTALLERROR: query-not-working`,
+        return (
+          resp.body.adc.status === 'INSTALLERROR' &&
+          resp.body.adc.lastErr === `INSTALLERROR: Fail to install AS3`
+        );
+      };
+      await checkAndWait(func, 500).then(
+        () => {
+          expect(true).eql(true);
+        },
+        () => {
+          expect(true).eql(false);
+        },
       );
     },
   );
@@ -712,8 +725,8 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: '1.2.3.4',
-          tcpPort: 100,
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
           rootPass: 'default',
@@ -725,7 +738,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -735,7 +748,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: '1.2.3.4',
+            targetHost: ExpectedData.bigipMgmt.ipAddr,
             state: 'ACTIVE',
           },
         ],
