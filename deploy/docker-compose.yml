@@ -12,11 +12,17 @@ services:
       - postgres
       - ASG
       - DO
-
+      - FLUENTD
     links:
       - postgres:postgres-server
       - ASG:asg-server
       - DO:do-server
+
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: '0.0.0.0:24224'
+        tag: f5-wafaas
 
   postgres:
     image: postgres:11.1
@@ -29,6 +35,13 @@ services:
       - ${DATABASE_PORT:-5432}:5432
     volumes:
       - ${DATABASE_DATA_DIRECTORY:?"DATABASE_DATA_DIRECTORY must not be empty"}:/var/lib/postgresql/data
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: '0.0.0.0:24224'
+        tag: postgres
 
   ASG:
     image: f5devcentral/f5-api-services-gateway:latest
@@ -40,6 +53,13 @@ services:
       - 8080:80
     volumes:
       - /var/tmp/ASGExtensions:/root/lx
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: '0.0.0.0:24224'
+        tag: f5-asg
 
   DO:
     image: f5devcentral/f5-do-container:1.4.0-1
@@ -47,6 +67,23 @@ services:
     ports:
       - 9443:443
       - 8081:80
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: '0.0.0.0:24224'
+        tag: f5-do
+
+  FLUENTD:
+    image: fluent/fluentd:latest
+    container_name: FLUENTD
+    ports:
+      - 24224:24224
+    volumes:
+      - ./fluentd.conf:/fluentd/etc/test.conf
+    environment:
+      - FLUENTD_CONF=test.conf
 
 # networks:
 #   app_net:
@@ -55,20 +92,4 @@ services:
 #       driver: default
 #       config:
 #       - subnet: ${WAF_APP_NETWORK-172.16.238.0/24}
-
-#   # TODO: enable logging.
-#   LOG:
-#     image: balabit/syslog-ng:latest
-#     container_name: syslog-server
-#     volumes:
-#       - path/to/log-volumes:/var/log/syslog
-#     ports:
-#       - 514:514/udp
-#       - 601:601
-  
-# x-logging:
-#   &default-logging
-#   driver: syslog
-#   options:
-#     syslog-address: "tcp://syslog-server:514"
 
