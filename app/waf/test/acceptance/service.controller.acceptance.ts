@@ -35,7 +35,16 @@ import {
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {deepcopy} from '../../src/utils';
+
 import uuid = require('uuid');
+
+const defaultRequest = {
+  type: 'HTTPS',
+  virtualAddresses: ['10.0.1.11'],
+  virtualPort: 443,
+  applicationId: uuid(),
+};
 
 describe('ServiceController', () => {
   let wafapp: WafApplication;
@@ -92,13 +101,7 @@ describe('ServiceController', () => {
   });
 
   it('post ' + prefix + '/services', async () => {
-    const request = {
-      type: 'HTTPS',
-      virtualAddresses: ['10.0.1.11', '10.0.2.11'],
-      virtualPort: 443,
-      applicationId: uuid(),
-      defaultPoolId: uuid(),
-    };
+    const request = deepcopy(defaultRequest);
 
     const response = await client
       .post(prefix + '/services')
@@ -111,6 +114,233 @@ describe('ServiceController', () => {
       .to.not.empty()
       .and.type('string');
     expect(response.body.service).to.containDeep(request);
+  });
+
+  it('post ' + prefix + '/services without body', async () => {
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send()
+      .expect(400);
+
+    expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
+  });
+
+  it('post ' + prefix + '/services without required property', async () => {
+    let request = deepcopy(defaultRequest);
+    delete request.type;
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('required');
+  });
+
+  it('post ' + prefix + '/services with invalid property', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {abc: 'ABC'});
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.name).to.equal('ValidationError');
+    expect(response.body.error.details.codes).to.containDeep({
+      abc: ['unknown-property'],
+    });
+  });
+
+  it('post ' + prefix + '/services with invalid value type', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {virtualPort: 1.23});
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('type');
+  });
+
+  it('post ' + prefix + '/services with invalid enum value', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {type: 'WRONG'});
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('enum');
+  });
+
+  it(
+    'post ' + prefix + '/services with value exceeds valid range',
+    async () => {
+      let request = Object.assign(deepcopy(defaultRequest), {virtualPort: -10});
+
+      const response = await client
+        .post(prefix + '/services')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(request)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+      expect(response.body.error.details[0].code).to.equal('minimum');
+    },
+  );
+
+  it('post ' + prefix + '/services with very long name', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {name: ''});
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('minLength');
+  });
+
+  it('post ' + prefix + '/services with very long name', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      name: 'a'.repeat(100),
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('maxLength');
+  });
+
+  it('post ' + prefix + '/services with incorrect uuid format', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      applicationId: 'a'.repeat(30),
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('format');
+  });
+
+  it('post ' + prefix + '/services with incorrect uuid format', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      virtualAddresses: [],
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('minItems');
+  });
+
+  it('post ' + prefix + '/services with incorrect uuid format', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      virtualAddresses: ['10.0.1.11', '10.0.2.11'],
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('maxItems');
+  });
+
+  it('post ' + prefix + '/services with incorrect vip type', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      virtualAddresses: [123],
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('type');
+  });
+
+  it('post ' + prefix + '/services with incorrect vip format', async () => {
+    let request = Object.assign(deepcopy(defaultRequest), {
+      virtualAddresses: ['1.2.3.a'],
+    });
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('format');
+  });
+
+  it('patch' + prefix + '/services/{id}', async () => {
+    const service = await givenServiceData(wafapp, uuid(), {name: 'old name'});
+
+    await client
+      .patch(prefix + '/services/' + service.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({name: 'new name'})
+      .expect(204);
+
+    const response = await client
+      .get(prefix + `/services/${service.id}`)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
+
+    expect(response.body.service.name).to.equal('new name');
+  });
+
+  it('patch' + prefix + '/services/{id} without body', async () => {
+    const response = await client
+      .patch(prefix + '/services/abcd')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send()
+      .expect(400);
+
+    expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
   });
 
   it('delete' + prefix + '/services/{id}', async () => {

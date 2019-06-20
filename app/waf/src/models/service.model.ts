@@ -27,6 +27,10 @@ export class Service extends CommonEntity {
       response: true,
       required: true,
       example: 'HTTP',
+      openapi: {
+        enum: ['HTTP', 'HTTPS'],
+        //TODO: add L4, TCP and UDP to enum list.
+      },
     },
   })
   type: string;
@@ -39,6 +43,9 @@ export class Service extends CommonEntity {
       required: true,
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
+      openapi: {
+        format: 'uuid',
+      },
     },
   })
   applicationId: string;
@@ -329,6 +336,14 @@ export class Service extends CommonEntity {
       required: true,
       response: true,
       example: ['10.100.0.1'],
+      openapi: {
+        items: {
+          type: 'string',
+          format: 'ipv4',
+        },
+        minItems: 1,
+        maxItems: 1,
+      },
     },
     as3: {},
   })
@@ -343,6 +358,11 @@ export class Service extends CommonEntity {
       update: true,
       response: true,
       example: '80',
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maxmium: 65535,
+      },
     },
     as3: {},
   })

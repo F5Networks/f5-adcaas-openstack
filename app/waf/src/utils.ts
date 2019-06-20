@@ -30,6 +30,10 @@ export function setDefaultInterval(ms: number) {
   }
 }
 
+export function deepcopy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 /**
  * Check and wait until some condition is fulfilled or timeout.
  *

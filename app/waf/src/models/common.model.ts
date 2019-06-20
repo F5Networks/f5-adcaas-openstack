@@ -44,6 +44,10 @@ export abstract class CommonEntity extends Entity {
       update: true,
       response: true,
       example: 'My name',
+      openapi: {
+        minLength: 1,
+        maxLength: 50,
+      },
     },
   })
   name?: string;
@@ -56,6 +60,10 @@ export abstract class CommonEntity extends Entity {
       update: true,
       response: true,
       example: 'My description',
+      openapi: {
+        minLength: 1,
+        maxLength: 200,
+      },
     },
   })
   description?: string;
