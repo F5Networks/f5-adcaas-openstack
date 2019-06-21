@@ -137,7 +137,7 @@ describe('EndpointpolicyAssociationController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.endpointpolicies[0]).to.containDeep(toJSON(policy));
+      expect(toJSON(policy)).to.containDeep(response.body.endpointpolicies[0]);
     },
   );
 
@@ -161,7 +161,7 @@ describe('EndpointpolicyAssociationController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.endpointpolicy).to.containDeep(toJSON(policy));
+      expect(toJSON(policy)).to.containDeep(response.body.endpointpolicy);
     },
   );
 

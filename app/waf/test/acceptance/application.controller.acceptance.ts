@@ -123,7 +123,7 @@ describe('ApplicationController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect('Content-Type', /application\/json/);
 
-    expect(response.body.applications[0]).to.containDeep(toJSON(application));
+    expect(toJSON(application)).to.containDeep(response.body.applications[0]);
   });
 
   it('get ' + prefix + '/applications: with filter string', async () => {
@@ -136,7 +136,7 @@ describe('ApplicationController', () => {
       .query({filter: {where: {id: application.id}}})
       .expect(200);
 
-    expect(response.body.applications[0]).to.containDeep(toJSON(application));
+    expect(toJSON(application)).to.containDeep(response.body.applications[0]);
   });
 
   it('get ' + prefix + '/applications/count', async () => {
@@ -168,7 +168,7 @@ describe('ApplicationController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.application).to.containDeep(toJSON(application));
+    expect(toJSON(application)).to.containDeep(response.body.application);
   });
 
   it('get ' + prefix + '/applications/{id}: not found', async () => {
