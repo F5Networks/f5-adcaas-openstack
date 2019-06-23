@@ -33,7 +33,7 @@ import {
 } from '../helpers/database.helpers';
 import {Endpointpolicy} from '../../src/models';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -56,7 +56,7 @@ describe('EndpointpolicyController', () => {
       return restApp;
     })();
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
   beforeEach('Empty database', async () => {

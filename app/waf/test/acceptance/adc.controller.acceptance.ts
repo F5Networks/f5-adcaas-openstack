@@ -44,7 +44,7 @@ import {
   MockNovaController,
   MockNeutronController,
   ExpectedData,
-  ShouldResponseWith,
+  OSShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   MockBigipController,
@@ -137,8 +137,8 @@ describe('AdcController test', () => {
     controller = await wafapp.get<AdcController>('controllers.AdcController');
 
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
-    setupEnvs();
     setDefaultInterval(1);
+    setupEnvs();
   });
 
   beforeEach('Empty database', async () => {
@@ -149,7 +149,7 @@ describe('AdcController test', () => {
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
 
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     DOShouldResponseWith({});
     BigipShouldResponseWith({});
     ASGShouldResponseWith({});
@@ -171,7 +171,6 @@ describe('AdcController test', () => {
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);
     teardownRestAppAndClient(mockASG);
-    teardownEnvs();
   });
 
   it('post ' + prefix + '/adcs: create ADC HW', async function() {
@@ -1084,6 +1083,91 @@ describe('AdcController test', () => {
       })
       .finally(teardownEnvs);
   });
+
+  it(
+    'post ' +
+      prefix +
+      '/adcs/{adcId}/action: create failed with wrong floatingip state',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+
+      OSShouldResponseWith({
+        'GET:/v2.0/floatingips':
+          StubResponses.neutronGetFloatingIpsStateActive200,
+      });
+
+      await setupEnvs()
+        .then(async () => {
+          let response = await client
+            .post(prefix + '/adcs/' + adc.id + '/action')
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
+            .send({create: null})
+            .expect(200);
+
+          expect(response.body).containDeep({id: adc.id});
+
+          let checkStatus = async () => {
+            let resp = await client
+              .get(prefix + '/adcs/' + adc.id)
+              .set('X-Auth-Token', ExpectedData.userToken)
+              .set('tenant-id', ExpectedData.tenantId)
+              .expect(200);
+
+            return resp.body.adc.status === 'POWERERROR';
+          };
+
+          await checkAndWait(checkStatus, 5, [], 50).then(() => {
+            expect(true).true();
+          });
+        })
+        .finally(teardownEnvs);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/adcs/{adcId}/action: create done with floatingIP created',
+    async () => {
+      let adc = await givenAdcData(wafapp);
+
+      OSShouldResponseWith({
+        'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
+      });
+      await setupEnvs()
+        .then(async () => {
+          let response = await client
+            .post(prefix + '/adcs/' + adc.id + '/action')
+            .set('X-Auth-Token', ExpectedData.userToken)
+            .set('tenant-id', ExpectedData.tenantId)
+            .send({create: null})
+            .expect(200);
+
+          expect(response.body).containDeep({id: adc.id});
+
+          let checkStatus = async () => {
+            let resp = await client
+              .get(prefix + '/adcs/' + adc.id)
+              .set('X-Auth-Token', ExpectedData.userToken)
+              .set('tenant-id', ExpectedData.tenantId)
+              .expect(200);
+
+            return resp.body.adc.status === 'POWERON';
+          };
+
+          await checkAndWait(checkStatus, 5, [], 50).then(
+            () => {
+              expect(true).true();
+            },
+            () => {
+              expect(true).false();
+            },
+          );
+        })
+        .finally(teardownEnvs);
+    },
+  );
 
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
     let adc = await givenAdcData(wafapp, {status: 'POWERON'});

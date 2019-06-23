@@ -34,7 +34,7 @@ import {
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -56,7 +56,7 @@ describe('MemberController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
 

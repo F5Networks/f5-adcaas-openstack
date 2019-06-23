@@ -24,7 +24,7 @@ import {
 } from '../helpers/test-helper';
 import {
   MockKeyStoneController,
-  ShouldResponseWith,
+  OSShouldResponseWith,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {MockSelfTestController} from '../fixtures/controllers/mocks/mock.selftest.controller';
@@ -59,7 +59,7 @@ describe('openstack.identity.test', () => {
 
     stubLogger();
 
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
   });
 
   beforeEach('setup environs', async () => {

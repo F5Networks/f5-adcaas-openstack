@@ -34,6 +34,11 @@ export interface NetworkService {
   v2GetSubnets(url: string, userToken: string): Promise<object>;
   v2GetPorts(url: string, userToken: string): Promise<object>;
   v2DeletePort(url: string, userToken: string): Promise<object>;
+
+  getInfo(url: string, headers: object): Promise<object>;
+  putInfo(url: string, headers: object, body: object): Promise<object>;
+  postInfo(url: string, headers: object, body: object): Promise<object>;
+  deleteInfo(url: string, headers: object): Promise<object>;
 }
 
 export class NetworkServiceProvider implements Provider<NetworkService> {
@@ -54,6 +59,7 @@ export class NetworkDriver {
   // @inject('services.ComputeService')
   protected networkService: NetworkService;
 
+  private floatingIpNetworkId: string | undefined;
   protected logger = factory.getLogger(
     'compute.process.NetworkDriver.' + this.meta.version,
   );
@@ -61,7 +67,9 @@ export class NetworkDriver {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
     protected application: Application,
-  ) {}
+  ) {
+    this.floatingIpNetworkId = process.env.OS_FLOATINGIP_NETWORK_ID;
+  }
 
   async bindNetworkService(): Promise<NetworkDriver> {
     // TODO: use bind/inject to use bindComputeService:
@@ -186,7 +194,143 @@ export class NetworkDriver {
 
     return portRtn;
   }
-  //async createFloatingIp() { }
+
+  async getFloatingIps(
+    userToken: string,
+    ipAddress?: string,
+  ): Promise<FloatingIP[]> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url =
+      adminToken.epFloatingIps() +
+      (ipAddress ? `?floating_ip_address=${ipAddress}` : '');
+    let headers = {
+      'X-Auth-Token': userToken,
+      'content-type': 'application/json',
+    };
+    let response = await this.networkService.getInfo(url, headers);
+
+    this.logger.debug(
+      'access ' + url + ' response: ' + JSON.stringify(response),
+    );
+
+    let fipsObj = JSON.parse(JSON.stringify(response))['body'][0][
+      'floatingips'
+    ];
+
+    let fips: FloatingIP[] = [];
+    for (let fip of fipsObj) {
+      let f: FloatingIP = {
+        id: fip.id,
+        fixed_ip_address: fip.fixed_ip_address,
+        port_id: fip.port_id,
+        status: fip.status,
+        tenant_id: fip.tenant_id,
+      };
+      fips.push(f);
+    }
+
+    return fips;
+  }
+
+  // TODO: redefine the function whenn userToken is AuthedToken.
+  async createFloatingIp(
+    userToken: string,
+    tenantId: string,
+    ipAddress?: string,
+    portId?: string,
+  ): Promise<FloatingIP> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epFloatingIps();
+    let headers = {
+      'X-Auth-Token': userToken,
+      'content-type': 'application/json',
+    };
+    let body: object = {
+      floatingip: {
+        floating_network_id: this.floatingIpNetworkId,
+        tenant_id: tenantId,
+        project_id: tenantId,
+      },
+    };
+
+    // @ts-ignore body.floatingip may have floating_ip_address key.
+    if (ipAddress) body.floatingip.floating_ip_address = ipAddress;
+    // @ts-ignore body.floatingip may have port_id key.
+    if (portId) body.floatingip.port_id = portId;
+
+    let response = await this.networkService.postInfo(url, headers, body);
+    this.logger.debug(
+      'access ' + url + ' response: ' + JSON.stringify(response),
+    );
+    let fip = JSON.parse(JSON.stringify(response))['body'][0]['floatingip'];
+
+    return {
+      id: fip.id,
+      fixed_ip_address: fip.fixed_ip_address,
+      port_id: fip.port_id,
+      status: fip.status,
+      tenant_id: fip.tenant_id,
+    };
+  }
+
+  async bindFloatingIpToPort(
+    userToken: string,
+    floatingIpId: string,
+    portId: string,
+  ): Promise<FloatingIP> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epFloatingIps() + `/${floatingIpId}`;
+    let headers = {
+      'X-Auth-Token': userToken,
+      'content-type': 'application/json',
+    };
+    let body: object = {
+      floatingip: {
+        port_id: portId,
+      },
+    };
+
+    let response = await this.networkService.putInfo(url, headers, body);
+
+    this.logger.debug(
+      'access ' + url + ' response: ' + JSON.stringify(response),
+    );
+
+    let fip = JSON.parse(JSON.stringify(response))['body'][0]['floatingip'];
+
+    return {
+      id: fip.id,
+      fixed_ip_address: fip.fixed_ip_address,
+      port_id: fip.port_id,
+      status: fip.status,
+      tenant_id: fip.tenant_id,
+    };
+  }
+
+  async deleteFloatingIp(
+    userToken: string,
+    floatingIpId: string,
+  ): Promise<void> {
+    let adminToken = await this.application.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let url = adminToken.epFloatingIps() + `/${floatingIpId}`;
+    let headers = {
+      'X-Auth-Token': userToken,
+      'content-type': 'application/json',
+    };
+
+    let response = await this.networkService.deleteInfo(url, headers);
+    this.logger.debug(
+      'access ' + url + ' response: ' + JSON.stringify(response),
+    );
+  }
 }
 
 type PortsCreateRequest = {
@@ -195,7 +339,7 @@ type PortsCreateRequest = {
     port_security_enabled: boolean;
     name?: string;
     admin_state_up?: boolean;
-    tenent_id?: string;
+    tenant_id?: string;
     mac_address?: string;
     fixed_ips?: {
       ip_address?: string;
@@ -247,6 +391,14 @@ export type PortResponse = {
 export type FixedIP = {
   ip_address: string;
   subnet_id: string;
+};
+
+export type FloatingIP = {
+  id: string;
+  tenant_id: string;
+  fixed_ip_address: string;
+  port_id?: string;
+  status: 'DOWN' | 'ACTIVE';
 };
 
 // TODO: remove this type, and merge it into PortsCreateParam or ..

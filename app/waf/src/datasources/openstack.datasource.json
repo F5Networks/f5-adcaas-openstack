@@ -225,6 +225,70 @@
           "userToken"
         ]
       }
+    },
+    {
+      "description": "common GET datasource",
+      "template": {
+        "method": "GET",
+        "headers": "{headers}",
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "getInfo": [
+          "url",
+          "headers"
+        ]
+      }
+    },
+    {
+      "description": "common PUT datasource",
+      "template": {
+        "method": "PUT",
+        "headers": "{headers}",
+        "url": "{url}",
+        "body": "{body}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "putInfo": [
+          "url",
+          "headers",
+          "body"
+        ]
+      }
+    },
+    {
+      "description": "common POST datasource",
+      "template": {
+        "method": "POST",
+        "headers": "{headers}",
+        "url": "{url}",
+        "body": "{body}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "postInfo": [
+          "url",
+          "headers",
+          "body"
+        ]
+      }
+    },
+    {
+      "description": "common DELETE datasource",
+      "template": {
+        "method": "DELETE",
+        "headers": "{headers}",
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "deleteInfo": [
+          "url",
+          "headers"
+        ]
+      }
     }
   ]
 }

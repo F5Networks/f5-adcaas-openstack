@@ -785,6 +785,129 @@ export const StubResponses = {
     };
   },
 
+  neutronIpAddressAlreadyAllocated409: () => {
+    //   {
+    //     "NeutronError": {
+    //         "message": "IP address 10.250.14.112 already allocated in subnet 9519c0c5-0c09-48ee-89a1-90ff7bb8fd9c",
+    //         "type": "IpAddressAlreadyAllocated",
+    //         "detail": ""
+    //     }
+    // }
+    throw new HttpErrors.Conflict(
+      'IP address 10.250.14.112 already allocated in subnet 9519c0c5-0c09-48ee-89a1-90ff7bb8fd9c',
+    );
+  },
+
+  neutronExternalGatewayForFloatingIPNotFound404: () => {
+    //   {
+    //     "NeutronError": {
+    //         "message": "External network a33f84be-e058-482b-9efd-5cef248a6ca4 is not reachable from subnet 23863fb0-9709-4808-87b5-0d3411d63a9a.  Therefore, cannot associate Port 5dbfc746-6617-427f-a848-b94084754094 with a Floating IP.",
+    //         "type": "ExternalGatewayForFloatingIPNotFound",
+    //         "detail": ""
+    //     }
+    // }
+
+    throw new HttpErrors.NotFound(
+      'External network a33f84be-e058-482b-9efd-5cef248a6ca4 is not reachable from subnet 23863fb0-9709-4808-87b5-0d3411d63a9a.  Therefore, cannot associate Port 5dbfc746-6617-427f-a848-b94084754094 with a Floating IP.',
+    );
+  },
+
+  neutronPutFloatingIp200: () => {
+    return {
+      floatingip: {
+        router_id: '66787d19-a76d-4543-8694-03f86e64500e',
+        status: 'DOWN',
+        description: '',
+        tags: [],
+        tenant_id: '610be7617fff469c88b71301cffd4c06',
+        created_at: '2019-06-23T08:41:54Z',
+        updated_at: '2019-06-23T08:54:15Z',
+        floating_network_id: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
+        fixed_ip_address: '192.168.1.101',
+        floating_ip_address: '10.250.14.110',
+        revision_number: 1,
+        project_id: '610be7617fff469c88b71301cffd4c06',
+        port_id: 'f18a9989-c5f4-4337-9aeb-53aa78e9d99a',
+        id: 'ec0a314f-657e-4755-b321-2cdc13cd7eef',
+      },
+    };
+  },
+
+  neutronPostFloatingIp201: () => {
+    return {
+      floatingip: {
+        router_id: null,
+        status: 'DOWN',
+        description: '',
+        tags: [],
+        tenant_id: '610be7617fff469c88b71301cffd4c06',
+        created_at: '2019-06-23T08:41:54Z',
+        updated_at: '2019-06-23T08:41:54Z',
+        floating_network_id: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
+        fixed_ip_address: null,
+        floating_ip_address: '10.250.14.110',
+        revision_number: 0,
+        project_id: '610be7617fff469c88b71301cffd4c06',
+        port_id: null,
+        id: 'ec0a314f-657e-4755-b321-2cdc13cd7eef',
+      },
+    };
+  },
+
+  neutronGetFloatingIps200: () => {
+    return {
+      floatingips: [
+        {
+          router_id: null,
+          status: 'DOWN',
+          description: '',
+          tags: [],
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-06-21T08:32:29Z',
+          updated_at: '2019-06-21T08:32:29Z',
+          floating_network_id: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
+          fixed_ip_address: null,
+          floating_ip_address: '10.250.14.112',
+          revision_number: 0,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          port_id: null,
+          id: 'bcda6252-ce92-4b18-a903-ab681bb935aa',
+        },
+      ],
+    };
+  },
+
+  neutronGetFloatingIpsStateActive200: () => {
+    return {
+      floatingips: [
+        {
+          router_id: null,
+          status: 'ACTIVE',
+          description: '',
+          tags: [],
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-06-21T08:32:29Z',
+          updated_at: '2019-06-21T08:32:29Z',
+          floating_network_id: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
+          fixed_ip_address: null,
+          floating_ip_address: '10.250.14.112',
+          revision_number: 0,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          port_id: null,
+          id: 'bcda6252-ce92-4b18-a903-ab681bb935aa',
+        },
+      ],
+    };
+  },
+
+  neutronGetFloatingIpsEmpty200: () => {
+    return {
+      floatingips: [],
+    };
+  },
+
+  neutronDeleteFloatingIp204: () => {},
+
   bigipNoLicense200: () => {
     return {
       kind: 'tm:sys:license:licensestats',
@@ -1141,7 +1264,7 @@ export const StubResponses = {
           kind: 'tm:net:interface:interfacestate',
           lldpAdmin: 'txonly',
           lldpTlvmap: 130943,
-          macAddress: 'fa:16:3e:fd:0f:ce',
+          macAddress: ExpectedData.ExtNetwork.MacAddr,
           mediaActive: 'none',
           mediaFixed: '10000T-FD',
           mediaMax: 'auto',

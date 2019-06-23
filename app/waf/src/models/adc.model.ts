@@ -39,8 +39,8 @@ export type ConfigTypes = {
       type: 'mgmt' | 'ext' | 'int' | 'ha';
       networkId: string;
       fixedIp?: string;
-      //floatingIp?: string;
       //vips?: [string]; // cannot be appointed.
+      floatingIp?: string;
     };
   };
   compute: {
@@ -66,7 +66,9 @@ export type ConfigTypes = {
         macAddr?: string;
         //floatingIp?: string;
         portId?: string; // cannot be appointed.
-        //vips?: [string]; // cannot be appointed.
+        floatingIp?: string;
+        floatingIpId?: string;
+        floatingIpCreated?: boolean;
       };
     };
     trustedDeviceId?: string;
@@ -112,6 +114,7 @@ export class Adc extends CommonEntity {
         external2: {
           type: 'ext',
           networkId: 'c25eca10-5aa0-11e9-9721-3b33816a88bd',
+          floatingIp: '10.250.14.160',
         },
       },
     },

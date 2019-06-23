@@ -45,7 +45,7 @@ import {
   givenAdcData,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
   MockNeutronController,
@@ -104,7 +104,7 @@ describe('DeclarationController', () => {
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
     deployStub = sinon.stub(asg, 'deploy');
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     ASGShouldResponseWith({});
   });
 
@@ -491,7 +491,9 @@ describe('DeclarationController', () => {
       id: ExpectedData.declarationId,
     });
 
-    ShouldResponseWith({'PUT:/v2.0/ports/{portId}': StubResponses.response400});
+    OSShouldResponseWith({
+      'PUT:/v2.0/ports/{portId}': StubResponses.response400,
+    });
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {

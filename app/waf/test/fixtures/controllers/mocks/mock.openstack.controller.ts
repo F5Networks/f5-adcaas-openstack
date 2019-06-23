@@ -120,11 +120,37 @@ export class MockNeutronController extends MockBaseController {
   async v2GetSubnets(): Promise<object> {
     return ResponseWith['/v2.0/subnets']();
   }
+
+  @post('/v2.0/floatingips')
+  async v2CreateFloatingIp(
+    @requestBody() reqBody: RequestBody,
+  ): Promise<object> {
+    return ResponseWith['POST:/v2.0/floatingips']();
+  }
+
+  @get('/v2.0/floatingips')
+  async v2GetFloatingIps(): Promise<object> {
+    return ResponseWith['GET:/v2.0/floatingips']();
+  }
+
+  @put('/v2.0/floatingips/{floatingIpId}')
+  async v2UpdateFloatingIp(
+    @param.path.string('floatingIpId') portId: string,
+  ): Promise<void> {
+    return ResponseWith['PUT:/v2.0/floatingips/{floatingIpId}']();
+  }
+
+  @del('/v2.0/floatingips/{floatingIpId}')
+  async v2DeleteFloatingIp(
+    @param.path.string('floatingIpId') floatingIpId: string,
+  ): Promise<void> {
+    return ResponseWith['DELETE:/v2.0/floatingips/{floatingIpId}']();
+  }
 }
 
 let ResponseWith: {[key: string]: Function} = {};
 
-export function ShouldResponseWith(spec: {[key: string]: Function}) {
+export function OSShouldResponseWith(spec: {[key: string]: Function}) {
   ResponseWith = {
     '/v2.0/tokens': StubResponses.v2AuthToken200,
     '/v3/auth/tokens': StubResponses.v3AuthToken200,
@@ -136,6 +162,12 @@ export function ShouldResponseWith(spec: {[key: string]: Function}) {
     '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,
     'DELETE:/v2/{tenantId}/servers/{serverId}': StubResponses.novaDeleteVM200,
     '/v2/{tenantId}/servers/{serverId}': StubResponses.novaGetVMDetail200,
+    'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIps200,
+    'POST:/v2.0/floatingips': StubResponses.neutronPostFloatingIp201,
+    'PUT:/v2.0/floatingips/{floatingIpId}':
+      StubResponses.neutronPutFloatingIp200,
+    'DELETE:/v2.0/floatingips/{floatingIpId}':
+      StubResponses.neutronDeleteFloatingIp204,
   };
   Object.assign(ResponseWith, spec);
 }
@@ -161,4 +193,8 @@ export const ExpectedData = {
   applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
   trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
   virtualAddress: '10.0.0.23',
+  ExtNetwork: {
+    MacAddr: 'f2:16:4e:c4:65:b8',
+    IpAddr: '10.1.1.3',
+  },
 };
