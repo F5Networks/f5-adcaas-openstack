@@ -28,6 +28,7 @@ import {RequestBody} from '../openstack.controller';
 import {StubResponses} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
 import {inject} from '@loopback/core';
+import {RestApplicationPort} from '../../../helpers/test-helper';
 
 export class MockKeyStoneController extends MockBaseController {
   constructor(
@@ -150,6 +151,7 @@ export const ExpectedData = {
     hostname: 'test-asm.example1234.openstack.com',
     macAddr: 'fa:16:3e:a2:25:bc',
     ipAddr: '127.0.0.1',
+    tcpPort: RestApplicationPort.SSLCustom,
     ipPoolCIDR: '127.0.0.1/24',
     networkId: '0e51e68c-08f7-4e32-af54-328d29b93467',
   },
