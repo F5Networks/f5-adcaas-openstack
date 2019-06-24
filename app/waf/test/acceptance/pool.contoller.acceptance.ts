@@ -107,19 +107,19 @@ describe('PoolController', () => {
   });
 
   it('patch ' + prefix + '/pools/{id}', async () => {
-    const pool = await givenPoolData(wafapp);
+    const poolInDb = await givenPoolData(wafapp);
     // pzhang(NOTE): return no content
-    pool.name = 'test';
+    let pool = createPoolObject({name: 'new name'});
 
     await client
-      .patch(prefix + `/pools/${pool.id}`)
+      .patch(prefix + `/pools/${poolInDb.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .send(pool)
       .expect(204);
 
     await client
-      .get(prefix + `/pools/${pool.id}`)
+      .get(prefix + `/pools/${poolInDb.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);

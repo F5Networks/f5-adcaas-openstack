@@ -72,7 +72,7 @@ describe('MemberController', () => {
 
   it('post ' + prefix + '/pools/{pool_id}/members', async () => {
     const pool = await givenPoolData(wafapp);
-    const member = createMemberObject({id: uuid()});
+    const member = createMemberObject();
 
     const response = await client
       .post(prefix + `/pools/${pool.id}/members`)
@@ -140,12 +140,11 @@ describe('MemberController', () => {
       poolId: pool.id,
     });
     const member = createMemberObject({
-      id: memberInDb.id,
       port: 4789,
     });
 
     await client
-      .patch(prefix + `/pools/${pool.id}/members/${member.id}`)
+      .patch(prefix + `/pools/${pool.id}/members/${memberInDb.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .send(member)

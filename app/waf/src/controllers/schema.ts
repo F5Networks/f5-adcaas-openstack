@@ -22,8 +22,8 @@ import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
 let plural = require('plural');
 
 class SchemaProperties {
-  public create: {[key: string]: object} = {};
-  public update: {[key: string]: object} = {};
+  public create: {[key: string]: object | boolean} = {};
+  public update: {[key: string]: object | boolean} = {};
   public response: {[key: string]: object} = {};
   public required: string[] = [];
   public createExample: {[key: string]: object} = {};
@@ -54,14 +54,18 @@ export function buildProperties(entity: typeof Entity): SchemaProperties {
     let schema = meta.schema;
 
     if (schema) {
-      if (schema.create) {
+      if (schema.create === true) {
         props.create[key] = Object.assign({type: meta.type}, schema.openapi);
         props.createExample[key] = schema.example;
+      } else if (schema.create === false) {
+        props.create[key] = false;
       }
 
-      if (schema.update) {
+      if (schema.update === true) {
         props.update[key] = Object.assign({type: meta.type}, schema.openapi);
         props.updateExample[key] = schema.example;
+      } else if (schema.update === false) {
+        props.update[key] = false;
       }
 
       if (schema.response) {

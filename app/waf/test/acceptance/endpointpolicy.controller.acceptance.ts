@@ -69,21 +69,6 @@ describe('EndpointpolicyController', () => {
     teardownEnvs();
   });
 
-  it('post ' + prefix + '/endpointpolicies: with id', async () => {
-    const epp = createEndpointpolicyObject({id: uuid()});
-
-    const response = await client
-      .post(prefix + '/endpointpolicies')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .send(epp)
-      .expect(200);
-
-    expect(response.body.endpointpolicy.id)
-      .to.not.empty()
-      .and.type('string');
-  });
-
   it('post ' + prefix + '/endpointpolicies: with no id', async () => {
     const epp = createEndpointpolicyObject();
 
@@ -185,20 +170,23 @@ describe('EndpointpolicyController', () => {
   it(
     'patch ' + prefix + '/endpointpolicies/{endpointpolicyId}: existing item',
     async () => {
-      const epp = await givenEndpointpolicyData(wafapp);
-      epp.name = 'test';
+      const eppInDb = await givenEndpointpolicyData(wafapp);
+      const epp = createEndpointpolicyObject({name: 'new epp'});
 
       await client
-        .patch(prefix + `/endpointpolicies/${epp.id}`)
+        .patch(prefix + `/endpointpolicies/${eppInDb.id}`)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send(epp)
         .expect(204);
-      await client
-        .get(prefix + `/endpointpolicies/${epp.id}`)
+
+      let response = await client
+        .get(prefix + `/endpointpolicies/${eppInDb.id}`)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
+
+      expect(response.body.endpointpolicy.name).to.equal(epp.name);
     },
   );
 

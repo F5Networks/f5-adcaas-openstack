@@ -71,7 +71,7 @@ describe('ConditionController', () => {
 
   it('post ' + prefix + '/rules/{ruleId}/conditions', async () => {
     const rule = await givenRuleData(wafapp);
-    const condition = createConditionObject({id: uuid()});
+    const condition = createConditionObject();
 
     const response = await client
       .post(prefix + `/rules/${rule.id}/conditions`)

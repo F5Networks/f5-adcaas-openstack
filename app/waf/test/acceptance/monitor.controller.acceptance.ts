@@ -109,7 +109,6 @@ describe('MointorController', () => {
     const monitor = await givenMonitorData(wafapp);
 
     const monitorObject = createMonitorObject({
-      id: monitor.id,
       interval: 10,
       targetAddress: '192.0.1.23',
       targetPort: 22,
