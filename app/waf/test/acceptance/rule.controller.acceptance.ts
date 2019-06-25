@@ -183,7 +183,7 @@ describe('RuleController', () => {
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .send(patched_name)
-      .expect(204, '');
+      .expect(204);
   });
 
   it('patch ' + prefix + '/rules/{id}: non-existing item', async () => {
@@ -300,20 +300,18 @@ describe('RuleController', () => {
     'patch ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
-      const rule = await givenRuleData(wafapp, {
+      const ruleInDb = await givenRuleData(wafapp, {
         id: uuid(),
         endpointpolicyId: epp.id,
       });
-      const patched_name = {id: rule.id, name: 'test'};
+      const rule = {name: 'test'};
 
-      const response = await client
-        .patch(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
-        .send(patched_name)
+      await client
+        .patch(prefix + `/endpointpolicies/${epp.id}/rules/${ruleInDb.id}`)
+        .send(rule)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-
-      expect(response.body.count).to.eql(1);
+        .expect(204);
     },
   );
 });

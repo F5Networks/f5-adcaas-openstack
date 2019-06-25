@@ -259,10 +259,10 @@ export class RuleController extends BaseController {
     ruleId: string,
     @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
     conditionId: string,
-    @requestBody(Schema.createRequest(Condition, updateConditionDesc))
+    @requestBody(Schema.updateRequest(Condition, updateConditionDesc))
     condition: Partial<Condition>,
-  ): Promise<Count> {
-    return await this.ruleRepository
+  ): Promise<void> {
+    await this.ruleRepository
       .conditions(ruleId)
       .patch(condition, {id: conditionId}, {tenantId: await this.tenantId});
   }
@@ -355,10 +355,10 @@ export class RuleController extends BaseController {
     ruleId: string,
     @param(Schema.pathParameter('actionId', 'Action resource ID'))
     actionId: string,
-    @requestBody(Schema.createRequest(Action, updateActionDesc))
+    @requestBody(Schema.updateRequest(Action, updateActionDesc))
     action: Partial<Action>,
-  ): Promise<Count> {
-    return await this.ruleRepository
+  ): Promise<void> {
+    await this.ruleRepository
       .actions(ruleId)
       .patch(action, {id: actionId}, {tenantId: await this.tenantId});
   }

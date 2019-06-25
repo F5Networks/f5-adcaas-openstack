@@ -160,7 +160,7 @@ export class EndpointpolicyController extends BaseController {
       Schema.pathParameter('endpointpolicyId', 'Endpointpolicy resource ID'),
     )
     id: string,
-    @requestBody(Schema.createRequest(Endpointpolicy, updateDesc))
+    @requestBody(Schema.updateRequest(Endpointpolicy, updateDesc))
     epp: Endpointpolicy,
   ): Promise<void> {
     await this.endpointpolicyRepository.updateById(id, epp, {
@@ -285,10 +285,10 @@ export class EndpointpolicyController extends BaseController {
     endpointpolicyId: string,
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     ruleId: string,
-    @requestBody(Schema.createRequest(Rule, updateRuleDesc))
+    @requestBody(Schema.updateRequest(Rule, updateRuleDesc))
     rule: Partial<Rule>,
-  ): Promise<Count> {
-    return await this.endpointpolicyRepository
+  ): Promise<void> {
+    await this.endpointpolicyRepository
       .rules(endpointpolicyId)
       .patch(rule, {id: ruleId}, {tenantId: await this.tenantId});
   }

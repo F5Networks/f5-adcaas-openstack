@@ -231,7 +231,7 @@ export class PoolController extends BaseController {
     pool_id: string,
     @param(Schema.pathParameter('memberId', 'Member resource ID'))
     member_id: string,
-    @requestBody(Schema.createRequest(Member, updateMemberDesc))
+    @requestBody(Schema.updateRequest(Member, updateMemberDesc))
     member: Partial<Member>,
   ): Promise<void> {
     await this.poolRepository
