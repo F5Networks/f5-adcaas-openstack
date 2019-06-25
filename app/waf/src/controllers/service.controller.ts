@@ -31,6 +31,7 @@ import {Service, Endpointpolicy} from '../models';
 import {
   ServiceRepository,
   ApplicationRepository,
+  PoolRepository,
   EndpointpolicyRepository,
   ServiceEndpointpolicyAssociationRepository,
 } from '../repositories';
@@ -48,6 +49,8 @@ export class ServiceController extends BaseController {
     public serviceRepository: ServiceRepository,
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
+    @repository(PoolRepository)
+    public poolRepository: PoolRepository,
     @repository(EndpointpolicyRepository)
     public endpointpolicyRepository: EndpointpolicyRepository,
     @repository(ServiceEndpointpolicyAssociationRepository)
@@ -100,6 +103,13 @@ export class ServiceController extends BaseController {
   ): Promise<Response> {
     const appId = service.applicationId;
     delete service.applicationId;
+
+    await this.applicationRepository.findById(appId);
+
+    if (service.defaultPoolId) {
+      await this.poolRepository.findById(service.defaultPoolId);
+    }
+
     service.tenantId = await this.tenantId;
     return new Response(
       Service,
@@ -118,6 +128,10 @@ export class ServiceController extends BaseController {
     @requestBody(Schema.updateRequest(Service, updateDesc))
     service: Partial<Service>,
   ): Promise<void> {
+    if (service.defaultPoolId) {
+      await this.poolRepository.findById(service.defaultPoolId);
+    }
+
     await this.serviceRepository.updateById(id, service, {
       tenantId: await this.tenantId,
     });
