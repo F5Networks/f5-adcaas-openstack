@@ -238,8 +238,6 @@ export function createAdcObject(data?: Partial<Adc>) {
           networkId: ExpectedData.bigipMgmt.networkId,
           fixedIp: ExpectedData.bigipMgmt.ipAddr,
           macAddr: ExpectedData.bigipMgmt.macAddr,
-          portId: ExpectedData.portId,
-          ready: true,
         },
         failover1: {
           type: 'ha',
@@ -266,10 +264,31 @@ export function createAdcObject(data?: Partial<Adc>) {
         vmId: ExpectedData.vmId,
       },
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: BigipBuiltInProperties.port,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
+        networks: {
+          mgmt1: {
+            fixedIp: ExpectedData.bigipMgmt.ipAddr,
+            macAddr: ExpectedData.bigipMgmt.macAddr,
+            portId: ExpectedData.portId,
+          },
+          failover1: {
+            macAddr: 'fa:16:3e:35:da:15',
+            fixedIp: '192.168.3.3',
+          },
+          internal1: {
+            macAddr: 'fa:16:3e:f3:1a:b2',
+            fixedIp: '192.168.4.3',
+          },
+          external2: {
+            macAddr: 'fa:16:3e:fd:0f:ce',
+            fixedIp: '192.168.5.3',
+          },
+        },
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: BigipBuiltInProperties.port,
+          username: BigipBuiltInProperties.admin,
+          password: 'admin',
+        },
       },
       tenantId: ExpectedData.tenantId,
     },

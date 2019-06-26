@@ -39,10 +39,7 @@ export type ConfigTypes = {
       type: 'mgmt' | 'ext' | 'int' | 'ha';
       networkId: string;
       fixedIp?: string;
-      macAddr?: string;
       //floatingIp?: string;
-      portId?: string; // cannot be appointed.
-      ready?: boolean; // cannot be appointed.
       //vips?: [string]; // cannot be appointed.
     };
   };
@@ -50,17 +47,28 @@ export type ConfigTypes = {
     imageRef: string;
     flavorRef: string;
     userData?: string;
-    vmId?: string; // cannot be appointed.
   };
   //floatingNetworkId?: string;
   securityGroup?: [string];
   management: {
     // cannot be appointed.
-    ipAddress: string; // mostly floatingIp.
-    tcpPort: number;
-    username: string;
-    password: string;
-    rootPass: string;
+    connection?: {
+      ipAddress: string; // mostly floatingIp.
+      tcpPort: number;
+      username: string;
+      password: string;
+      rootPass: string;
+    };
+    vmId?: string; // cannot be appointed.
+    networks: {
+      [key: string]: {
+        fixedIp?: string;
+        macAddr?: string;
+        //floatingIp?: string;
+        portId?: string; // cannot be appointed.
+        //vips?: [string]; // cannot be appointed.
+      };
+    };
   };
   status: string; // cannot be appointed.
   lastErr: string; // cannot be appointed.
@@ -131,7 +139,7 @@ export class Adc extends CommonEntity {
       response: true,
     },
   })
-  management?: ConfigTypes['management'];
+  management: ConfigTypes['management'];
 
   @property({
     type: 'string',

@@ -111,7 +111,7 @@ export class AdcController extends BaseController {
     if (adc.type === 'HW') {
       //TODO: Disable this path after VE path is stable.
       //TODO: Do this check in API validator
-      if (!adc.management || !adc.management.ipAddress) {
+      if (!adc.management.connection || !adc.management.connection.ipAddress) {
         throw new HttpErrors.BadRequest(
           'IP address and admin passphrase are required to trust ADC hardware',
         );
@@ -152,10 +152,10 @@ export class AdcController extends BaseController {
       await this.serialize(adc, {status: AdcState.TRUSTING, lastErr: ''});
       //TODO: Need away to input admin password of BIG-IP HW
       let device = await this.asgMgr.trust(
-        adc.management!.ipAddress,
-        adc.management!.tcpPort,
-        adc.management!.username,
-        adc.management!.password,
+        adc.management.connection!.ipAddress,
+        adc.management.connection!.tcpPort,
+        adc.management.connection!.username,
+        adc.management.connection!.password,
       );
 
       await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
@@ -230,11 +230,11 @@ export class AdcController extends BaseController {
   async installPartition(adc: Adc): Promise<void> {
     // Install partition after installing the AS3 agent.
     let tenantName = adc.getAS3Name();
-    let mgmt = adc.management!;
+    let cnct = adc.management.connection!;
     let paritionObj = new AS3PartitionRequest(adc);
     try {
       await this.serialize(adc, {status: AdcState.PARTITIONING, lastErr: ''});
-      await this.asgMgr.deploy(mgmt.ipAddress, mgmt.tcpPort, paritionObj);
+      await this.asgMgr.deploy(cnct.ipAddress, cnct.tcpPort, paritionObj);
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.PARTITIONED),
         60,
@@ -547,7 +547,8 @@ export class AdcController extends BaseController {
           ports: (() => {
             let ports = [];
             for (let n of Object.keys(adc.networks)) {
-              ports.push(<string>adc.networks[n].portId);
+              if (adc.management.networks[n])
+                ports.push(<string>adc.management.networks[n].portId);
             }
             return ports;
           })(),
@@ -556,8 +557,7 @@ export class AdcController extends BaseController {
         await computeHelper
           .createServer(addon.userToken, serverParams)
           .then(response => {
-            adc.compute.vmId = response;
-            adc.management = {
+            adc.management.connection = {
               username: BigipBuiltInProperties.admin,
               password: adminPass,
               rootPass: rootPass,
@@ -565,11 +565,12 @@ export class AdcController extends BaseController {
               ipAddress: <string>(() => {
                 for (let net in adc.networks) {
                   if (adc.networks[net].type === 'mgmt') {
-                    return adc.networks[net].fixedIp;
+                    return adc.management.networks[net].fixedIp;
                   }
                 }
               })(),
             };
+            adc.management.vmId = response;
           });
       });
   }
@@ -578,11 +579,12 @@ export class AdcController extends BaseController {
     await this.wafapp
       .get(WafBindingKeys.KeyNetworkDriver)
       .then(async networkHelper => {
+        merge(adc.management, {networks: {}});
         for (let k of Object.keys(adc.networks)) {
           let net = adc.networks[k];
-          if (net.portId && net.ready) continue;
-
-          net.ready = false;
+          if (adc.management.networks[k] && adc.management.networks[k].portId) {
+            continue;
+          }
 
           let portParams: PortCreationParams = {
             networkId: net.networkId,
@@ -593,10 +595,11 @@ export class AdcController extends BaseController {
           await networkHelper
             .createPort(addon.userToken, portParams)
             .then(async port => {
-              net.fixedIp = port.fixedIp;
-              net.macAddr = port.macAddr;
-              net.portId = port.id;
-              net.ready = true;
+              adc.management.networks[k] = {
+                fixedIp: port.fixedIp,
+                macAddr: port.macAddr,
+                portId: port.id,
+              };
 
               await this.serialize(adc);
             });
@@ -629,12 +632,12 @@ export class AdcController extends BaseController {
         );
         await doMgr.onboarding(doBody).then(async () => {
           // TODO: create a unified bigipMgr
-          let mgmt = adc.management!;
+          let cnct = adc.management.connection!;
           let bigipMgr = await BigIpManager.instanlize({
-            username: mgmt.username,
-            password: mgmt.password,
-            ipAddr: mgmt.ipAddress,
-            port: mgmt.tcpPort,
+            username: cnct.username,
+            password: cnct.password,
+            ipAddr: cnct.ipAddress,
+            port: cnct.tcpPort,
           });
 
           let noLicensed = async () => {
@@ -651,16 +654,13 @@ export class AdcController extends BaseController {
       network: async () => {
         let networkMgr = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
         for (let network of Object.keys(adc.networks)) {
-          if (!adc.networks[network].ready) continue;
+          if (!adc.management.networks[network]) continue;
 
           try {
-            let portId = adc.networks[network].portId!;
+            let portId = adc.management.networks[network].portId!;
             await networkMgr.deletePort(addon.userToken, portId).then(() => {
               this.logger.debug(`Deleted port ${portId}`);
-              delete adc.networks[network].portId;
-              delete adc.networks[network].fixedIp;
-              delete adc.networks[network].macAddr;
-              adc.networks[network].ready = false;
+              delete adc.management.networks[network];
             });
           } catch (error) {
             this.logger.error(`delete port for ${network}: ${error.message}`);
@@ -672,13 +672,13 @@ export class AdcController extends BaseController {
         let computeMgr = await this.wafapp.get(
           WafBindingKeys.KeyComputeManager,
         );
-        if (adc.compute.vmId) {
+        if (adc.management.vmId) {
           await computeMgr
-            .deleteServer(addon.userToken, adc.compute.vmId!, addon.tenantId)
+            .deleteServer(addon.userToken, adc.management.vmId!, addon.tenantId)
             .then(() => {
-              this.logger.debug(`Deleted the vm ${adc.compute.vmId!}`);
-              delete adc.compute.vmId;
-              adc.management = undefined;
+              this.logger.debug(`Deleted the vm ${adc.management.vmId!}`);
+              delete adc.management.vmId;
+              adc.management.connection = undefined;
             });
         }
       },
@@ -811,17 +811,17 @@ export class AdcStateCtrlr {
   }
 
   private async getBigipMgr(): Promise<BigIpManager> {
-    if (!this.adc.management)
+    if (!this.adc.management.connection)
       throw new Error(
         `The management session of ADC is empty, cannot initialize bigip manager.`,
       );
 
-    let mgmt = this.adc.management;
+    let cnct = this.adc.management.connection;
     return BigIpManager.instanlize({
-      username: mgmt.username,
-      password: mgmt.password,
-      ipAddr: mgmt.ipAddress,
-      port: mgmt.tcpPort,
+      username: cnct.username,
+      password: cnct.password,
+      ipAddr: cnct.ipAddress,
+      port: cnct.tcpPort,
     });
   }
 
@@ -839,10 +839,14 @@ export class AdcStateCtrlr {
   private reclaimed(ctrl: AdcStateCtrlr): Promise<boolean> {
     return Promise.resolve(
       ((): boolean => {
-        if (ctrl.adc.management) return false;
-        if (ctrl.adc.compute.vmId) return false;
+        if (ctrl.adc.management.connection) return false;
+        if (ctrl.adc.management.vmId) return false;
         for (let net of Object.keys(ctrl.adc.networks)) {
-          if (ctrl.adc.networks[net].portId) return false;
+          if (
+            ctrl.adc.management.networks[net] &&
+            ctrl.adc.management.networks[net].portId
+          )
+            return false;
         }
         return true;
       })(),

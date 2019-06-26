@@ -410,7 +410,7 @@ export class DeclarationController extends BaseController {
         //   throw new HttpErrors.UnprocessableEntity('ADC resource is not ready for deploy.');
         // }
 
-        let mgmt = adc.management!;
+        let mgmt = adc.management;
         let proxyMgr = await ASGManager.instanlize();
 
         try {
@@ -418,7 +418,11 @@ export class DeclarationController extends BaseController {
           let declBody = as3Request.declaration;
 
           await this.TryBindVirtualAddressToExt(adc, declBody);
-          await proxyMgr.deploy(mgmt.ipAddress, mgmt.tcpPort, declBody);
+          await proxyMgr.deploy(
+            mgmt.connection!.ipAddress,
+            mgmt.connection!.tcpPort,
+            declBody,
+          );
         } catch (error) {
           this.logger.error(`Failed to deploy: ${error.message}`);
           throw new HttpErrors.UnprocessableEntity(error.message);
@@ -437,7 +441,8 @@ export class DeclarationController extends BaseController {
     let portId = (() => {
       for (let netName of Object.keys(adc.networks)) {
         let net = adc.networks[netName];
-        if (net.type === 'ext') return net.portId!;
+        if (net.type === 'ext' && adc.management.networks[netName])
+          return adc.management.networks[netName].portId!;
       }
     })();
 

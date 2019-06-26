@@ -182,11 +182,14 @@ describe('AdcController test', () => {
     const adc = createAdcObject({
       type: 'HW',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 
@@ -263,7 +266,7 @@ describe('AdcController test', () => {
     'post ' + prefix + '/adcs: create ADC HW without management info',
     async () => {
       const adc = createAdcObject({type: 'HW'});
-      delete adc.management;
+      delete adc.management.connection;
 
       await client
         .post(prefix + '/adcs')
@@ -437,11 +440,14 @@ describe('AdcController test', () => {
     const adc = createAdcObject({
       type: 'HW',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 
@@ -497,11 +503,14 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
-          tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
+          connection: {
+            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
         },
       });
 
@@ -565,11 +574,14 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
-          tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
+          connection: {
+            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
         },
       });
 
@@ -649,11 +661,15 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
-          tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
+          connection: {
+            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
         },
       });
 
@@ -725,11 +741,14 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
-          tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
+          connection: {
+            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
         },
       });
 
@@ -1068,14 +1087,14 @@ describe('AdcController test', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
     let adc = await givenAdcData(wafapp, {status: 'POWERON'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-    ExpectedData.bigipMgmt.ipAddr = adc.management!.ipAddress;
+    ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
 
     let trustDeviceId = uuid();
     trustStub.returns({
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: adc.management!.ipAddress,
+          targetHost: adc.management.connection!.ipAddress,
           state: 'CREATED',
         },
       ],
@@ -1085,7 +1104,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: adc.management!.ipAddress,
+          targetHost: adc.management.connection!.ipAddress,
           state: 'ACTIVE',
         },
       ],
