@@ -463,11 +463,14 @@ describe('DeclarationController', () => {
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: 443,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: 443,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 
@@ -492,11 +495,14 @@ describe('DeclarationController', () => {
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: 443,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: 443,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 
@@ -524,11 +530,14 @@ describe('DeclarationController', () => {
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: 443,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: 443,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 
@@ -554,11 +563,14 @@ describe('DeclarationController', () => {
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
-        tcpPort: 443,
-        username: 'admin',
-        password: 'admin',
-        rootPass: 'default',
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: 443,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
       },
     });
 

@@ -123,8 +123,8 @@ export class OnboardingManager {
           bigIqPassword: this.config.licPool.password,
           [keyName]: this.config.licPool.poolName,
           reachable: true,
-          bigIpUsername: obData.management!.username,
-          bigIpPassword: obData.management!.password,
+          bigIpUsername: obData.management.connection!.username,
+          bigIpPassword: obData.management.connection!.password,
         };
         this.logger.debug('Add new license: operation: ' + keyName);
         return Object.assign(target, {myLicense: licData});
@@ -207,16 +207,17 @@ export class OnboardingManager {
 
         try {
           let intfs = JSON.parse(JSON.stringify(additionalInfo))['interfaces'];
-          if (!(obData.networks[n].macAddr! in intfs)) {
+          if (!(obData.management.networks[n].macAddr! in intfs)) {
             this.logger.error(
-              `${obData.networks[n].macAddr!} not found in bigip device.`,
+              `${obData.management.networks[n]
+                .macAddr!} not found in bigip device.`,
             );
           } else {
             let vlanData = {
               class: 'VLAN',
               interfaces: [
                 {
-                  name: intfs[obData.networks[n].macAddr!].name,
+                  name: intfs[obData.management.networks[n].macAddr!].name,
                   tagged: false,
                 },
               ],
@@ -243,12 +244,15 @@ export class OnboardingManager {
         if (obData.networks[n].type === 'mgmt') continue;
 
         for (let s of Object.keys(subs)) {
-          if (obData.networks[n].macAddr! !== s) continue;
+          if (obData.management.networks[n].macAddr! !== s) continue;
           try {
             let selfipData = {
               class: 'SelfIp',
               vlan: 'vlan-' + n,
-              address: obData.networks[n].fixedIp! + '/' + subs[s]['masknum'],
+              address:
+                obData.management.networks[n].fixedIp! +
+                '/' +
+                subs[s]['masknum'],
             };
             this.logger.debug('Add new selfip: ' + n);
             target = Object.assign(target, {['selfip-' + n]: selfipData});
@@ -271,7 +275,7 @@ export class OnboardingManager {
 
         let subs = JSON.parse(JSON.stringify(additionalInfo))['subnets'];
         for (let s of Object.keys(subs)) {
-          if (obData.networks[n].macAddr! !== s) continue;
+          if (obData.management.networks[n].macAddr! !== s) continue;
           try {
             let routeData = {
               class: 'Route',
@@ -300,7 +304,7 @@ export class OnboardingManager {
             target = Object.assign(target, {
               configsync: {
                 class: 'ConfigSync',
-                configsyncIp: obData.networks[n].fixedIp!,
+                configsyncIp: obData.management.networks[n].fixedIp!,
               },
             });
           } catch (error) {
@@ -316,10 +320,10 @@ export class OnboardingManager {
   async assembleDo(obData: Adc, addon: object): Promise<TypeDOClassDO> {
     let doBody: TypeDOClassDO = {
       class: 'DO',
-      targetHost: obData.management!.ipAddress,
-      targetPort: obData.management!.tcpPort,
-      targetUsername: obData.management!.username,
-      targetPassphrase: obData.management!.password,
+      targetHost: obData.management.connection!.ipAddress,
+      targetPort: obData.management.connection!.tcpPort,
+      targetUsername: obData.management.connection!.username,
+      targetPassphrase: obData.management.connection!.password,
       targetTimeout: this.config.timeout.toString(),
       declaration: {
         schemaVersion: '1.3.0',
@@ -336,10 +340,10 @@ export class OnboardingManager {
     let addonInfo: {[key: string]: object} = {
       // get bigip interfaces information: name.
       interfaces: await BigIpManager.instanlize({
-        username: obData.management!.username,
-        password: obData.management!.password,
-        ipAddr: obData.management!.ipAddress,
-        port: obData.management!.tcpPort,
+        username: obData.management.connection!.username,
+        password: obData.management.connection!.password,
+        ipAddr: obData.management.connection!.ipAddress,
+        port: obData.management.connection!.tcpPort,
       }).then(async bigipMgr => {
         return await bigipMgr.getInterfaces();
       }),
@@ -370,13 +374,15 @@ export class OnboardingManager {
     );
 
     for (let net of Object.keys(adc.networks)) {
-      let macAddr = adc.networks[net].macAddr!;
+      let macAddr = adc.management.networks[net].macAddr!;
       let subnetData = await netDriver.getSubnetInfo(
         adminToken.token,
         adc.networks[net].networkId,
       );
       for (let sub of subnetData) {
-        if (ip.cidrSubnet(sub.cidr).contains(adc.networks[net].fixedIp)) {
+        if (
+          ip.cidrSubnet(sub.cidr).contains(adc.management.networks[net].fixedIp)
+        ) {
           Object.assign(rltObj, {
             [macAddr]: {
               gateway: sub.gatewayIp,

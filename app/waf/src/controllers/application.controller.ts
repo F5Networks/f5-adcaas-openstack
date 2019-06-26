@@ -216,7 +216,7 @@ export class ApplicationController extends BaseController {
       tenantId: tenantId,
     });
 
-    let mgmt = adc.management!;
+    let mgmt = adc.management;
     let asgManager = await ASGManager.instanlize();
 
     let declaration = await this.declarationRepository.findById(
@@ -229,7 +229,11 @@ export class ApplicationController extends BaseController {
     let req = new AS3PatchReqeust(adc, application, operation, declaration);
 
     try {
-      await asgManager.deploy(mgmt.ipAddress, mgmt.tcpPort, req);
+      await asgManager.deploy(
+        mgmt.connection!.ipAddress,
+        mgmt.connection!.tcpPort,
+        req,
+      );
     } catch (error) {
       /*We check the return message from BIGIP. If the error value mesage is
     "path does not exisst",which means the bigip does not contain the tenant
@@ -244,8 +248,8 @@ export class ApplicationController extends BaseController {
         /*Turn to Deploy method */
         let newReq = new AS3DeployRequest(adc, application, declaration);
         await asgManager.deploy(
-          mgmt.ipAddress,
-          mgmt.tcpPort,
+          mgmt.connection!.ipAddress,
+          mgmt.connection!.tcpPort,
           newReq.declaration,
         );
       }
@@ -278,11 +282,15 @@ export class ApplicationController extends BaseController {
       tenantId: tenantId,
     });
 
-    let mgmt = adc.management!;
+    let mgmt = adc.management;
     let asgManager = await ASGManager.instanlize();
 
     let operation = patchOP.Remove;
     let req = new AS3PatchReqeust(adc, application, operation);
-    await asgManager.deploy(mgmt.ipAddress, mgmt.tcpPort, req);
+    await asgManager.deploy(
+      mgmt.connection!.ipAddress,
+      mgmt.connection!.tcpPort,
+      req,
+    );
   }
 }
