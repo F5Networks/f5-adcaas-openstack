@@ -122,7 +122,9 @@ describe('WafpolicyController', () => {
       });
 
       const adc = await givenAdcData(wafapp, {
-        trustedDeviceId: uuid(),
+        management: {
+          trustedDeviceId: uuid(),
+        },
       });
 
       uploadWafpolicyStub.returns({
@@ -154,7 +156,9 @@ describe('WafpolicyController', () => {
       });
 
       const adc = await givenAdcData(wafapp, {
-        trustedDeviceId: uuid(),
+        management: {
+          trustedDeviceId: uuid(),
+        },
       });
 
       uploadWafpolicyStub.returns({
@@ -215,7 +219,9 @@ describe('WafpolicyController', () => {
       });
 
       const adc = await givenAdcData(wafapp, {
-        trustedDeviceId: uuid(),
+        management: {
+          trustedDeviceId: uuid(),
+        },
       });
 
       checkWafpolicyStub.returns([
