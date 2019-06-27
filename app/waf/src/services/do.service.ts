@@ -115,17 +115,27 @@ export class OnboardingManager {
         ];
         let keyName = onboarding ? 'licensePool' : 'revokeFrom';
 
-        let licData = {
-          class: 'License',
-          licenseType: 'licensePool',
-          bigIqHost: this.config.licPool.host,
-          bigIqUsername: this.config.licPool.username,
-          bigIqPassword: this.config.licPool.password,
-          [keyName]: this.config.licPool.poolName,
-          reachable: true,
-          bigIpUsername: obData.management.connection!.username,
-          bigIpPassword: obData.management.connection!.password,
-        };
+        let licData = {};
+        if (obData.license) {
+          licData = {
+            class: 'License',
+            licenseType: 'regKey',
+            regKey: obData.license!,
+            overwrite: true,
+          };
+        } else {
+          licData = {
+            class: 'License',
+            licenseType: 'licensePool',
+            bigIqHost: this.config.licPool.host,
+            bigIqUsername: this.config.licPool.username,
+            bigIqPassword: this.config.licPool.password,
+            [keyName]: this.config.licPool.poolName,
+            reachable: true,
+            bigIpUsername: obData.management.connection!.username,
+            bigIpPassword: obData.management.connection!.password,
+          };
+        }
         this.logger.debug('Add new license: operation: ' + keyName);
         return Object.assign(target, {myLicense: licData});
       } catch (error) {
