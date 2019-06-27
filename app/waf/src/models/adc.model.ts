@@ -144,6 +144,14 @@ export class Adc extends CommonEntity {
 
   @property({
     type: 'string',
+    schema: {
+      response: true,
+    },
+  })
+  license?: string;
+
+  @property({
+    type: 'string',
     required: true,
     default: 'NEW',
     schema: {

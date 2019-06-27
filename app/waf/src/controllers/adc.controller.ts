@@ -643,6 +643,7 @@ export class AdcController extends BaseController {
           });
 
           let noLicensed = async () => {
+            if (adc.license) return true;
             return await bigipMgr.getLicense().then(license => {
               return license.registrationKey === 'none';
             });
