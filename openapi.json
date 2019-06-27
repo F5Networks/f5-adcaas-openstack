@@ -348,9 +348,6 @@
                         "management": {
                           "type": "object"
                         },
-                        "trustedDeviceId": {
-                          "type": "string"
-                        },
                         "status": {
                           "type": "string"
                         },
@@ -388,8 +385,7 @@
                           "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                           "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
                           "userData": "#!/bin/bash \necho userData is optional \n"
-                        },
-                        "trustedDeviceId": "2c52df5f-a393-40d8-9013-475eb54f7bef"
+                        }
                       }
                     }
                   }
@@ -550,9 +546,6 @@
                         "management": {
                           "type": "object"
                         },
-                        "trustedDeviceId": {
-                          "type": "string"
-                        },
                         "status": {
                           "type": "string"
                         },
@@ -590,8 +583,7 @@
                           "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                           "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
                           "userData": "#!/bin/bash \necho userData is optional \n"
-                        },
-                        "trustedDeviceId": "2c52df5f-a393-40d8-9013-475eb54f7bef"
+                        }
                       }
                     }
                   }
@@ -754,9 +746,6 @@
                           "management": {
                             "type": "object"
                           },
-                          "trustedDeviceId": {
-                            "type": "string"
-                          },
                           "status": {
                             "type": "string"
                           },
@@ -794,8 +783,7 @@
                             "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                             "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
                             "userData": "#!/bin/bash \necho userData is optional \n"
-                          },
-                          "trustedDeviceId": "2c52df5f-a393-40d8-9013-475eb54f7bef"
+                          }
                         }
                       }
                     }
@@ -847,9 +835,6 @@
                       "type": "boolean"
                     },
                     "management": {
-                      "type": "boolean"
-                    },
-                    "trustedDeviceId": {
                       "type": "boolean"
                     },
                     "status": {
@@ -9024,9 +9009,6 @@
                         "management": {
                           "type": "object"
                         },
-                        "trustedDeviceId": {
-                          "type": "string"
-                        },
                         "status": {
                           "type": "string"
                         },
@@ -9064,8 +9046,7 @@
                           "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                           "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
                           "userData": "#!/bin/bash \necho userData is optional \n"
-                        },
-                        "trustedDeviceId": "2c52df5f-a393-40d8-9013-475eb54f7bef"
+                        }
                       }
                     }
                   }
@@ -9216,9 +9197,6 @@
                           "management": {
                             "type": "object"
                           },
-                          "trustedDeviceId": {
-                            "type": "string"
-                          },
                           "status": {
                             "type": "string"
                           },
@@ -9256,8 +9234,7 @@
                             "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                             "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
                             "userData": "#!/bin/bash \necho userData is optional \n"
-                          },
-                          "trustedDeviceId": "2c52df5f-a393-40d8-9013-475eb54f7bef"
+                          }
                         }
                       }
                     }
