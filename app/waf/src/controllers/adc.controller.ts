@@ -162,7 +162,9 @@ export class AdcController extends BaseController {
         async () => {
           await this.serialize(adc, {
             status: AdcState.TRUSTED,
-            trustedDeviceId: device.targetUUID,
+            management: {
+              trustedDeviceId: device.targetUUID,
+            },
             lastErr: '',
           });
         },
@@ -182,12 +184,12 @@ export class AdcController extends BaseController {
   }
 
   async untrustAdc(adc: Adc): Promise<boolean> {
-    if (!adc.trustedDeviceId) {
+    if (!adc.management.trustedDeviceId!) {
       return true;
     }
 
     try {
-      await this.asgMgr.untrust(adc.trustedDeviceId);
+      await this.asgMgr.untrust(adc.management.trustedDeviceId!);
     } catch (err) {
       await this.serialize(adc, {
         status: AdcState.TRUSTERR,
@@ -203,7 +205,7 @@ export class AdcController extends BaseController {
     await this.serialize(adc, {status: AdcState.INSTALLING, lastErr: ''});
 
     try {
-      await this.asgMgr.installAS3(adc.trustedDeviceId!);
+      await this.asgMgr.installAS3(adc.management.trustedDeviceId!);
 
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.INSTALLED),
@@ -854,10 +856,12 @@ export class AdcStateCtrlr {
   }
 
   private async trusted(ctrl: AdcStateCtrlr): Promise<boolean> {
-    if (!ctrl.adc.trustedDeviceId!) return false;
+    if (!ctrl.adc.management.trustedDeviceId) return false;
 
     let asgMgr = await ctrl.getAsgMgr();
-    let state = await asgMgr.getTrustState(ctrl.adc.trustedDeviceId!);
+    let state = await asgMgr.getTrustState(
+      ctrl.adc.management.trustedDeviceId!,
+    );
     return state === 'ACTIVE';
   }
 
@@ -901,7 +905,7 @@ export class AdcStateCtrlr {
     return Promise.all([ctrl.getAsgMgr(), ctrl.getBigipMgr()])
       .then(([asgMgr, bigipMgr]) => {
         return Promise.all([
-          asgMgr.getAS3State(ctrl.adc.trustedDeviceId!),
+          asgMgr.getAS3State(ctrl.adc.management.trustedDeviceId!),
           bigipMgr.getAS3Info(),
         ]);
       })

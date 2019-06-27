@@ -169,7 +169,7 @@ export class WafpolicyController extends BaseController {
       tenantId: await this.tenantId,
     });
 
-    if (adc.trustedDeviceId === undefined) {
+    if (!adc.management.trustedDeviceId) {
       throw new HttpErrors.UnprocessableEntity(`Adc: ${adc.id} is not trusted`);
     }
 
@@ -178,7 +178,7 @@ export class WafpolicyController extends BaseController {
     try {
       await this.asgMgr.wafpolicyUploadByUrl(
         wafpolicy.url,
-        adc.trustedDeviceId,
+        adc.management.trustedDeviceId!,
         wafpolicy.id,
       );
     } catch (error) {
@@ -214,7 +214,7 @@ export class WafpolicyController extends BaseController {
       tenantId: await this.tenantId,
     });
 
-    if (adc.trustedDeviceId === undefined) {
+    if (!adc.management.trustedDeviceId) {
       throw new HttpErrors.UnprocessableEntity(`Adc: ${adc.id} is not trusted`);
     }
 
@@ -223,7 +223,7 @@ export class WafpolicyController extends BaseController {
     let resp = undefined;
     try {
       resp = await this.asgMgr.wafpolicyCheckByName(
-        adc.trustedDeviceId,
+        adc.management.trustedDeviceId!,
         wafpolicy.id,
       );
     } catch (error) {

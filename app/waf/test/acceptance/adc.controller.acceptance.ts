@@ -176,7 +176,7 @@ describe('AdcController test', () => {
 
   it('post ' + prefix + '/adcs: create ADC HW', async function() {
     await givenAdcData(wafapp, {
-      trustedDeviceId: 'abcdefg',
+      management: {trustedDeviceId: 'abcdefg'},
     });
 
     const adc = createAdcObject({
@@ -259,13 +259,14 @@ describe('AdcController test', () => {
       .expect(200);
 
     expect(response.body.adc.status).to.equal('INSTALLED');
-    expect(response.body.adc.trustedDeviceId).to.equal(id);
+    expect(response.body.adc.management.trustedDeviceId).to.equal(id);
   });
 
   it(
     'post ' + prefix + '/adcs: create ADC HW without management info',
     async () => {
       const adc = createAdcObject({type: 'HW'});
+      // @ts-ignore adc have management property.
       delete adc.management.connection;
 
       await client
@@ -380,7 +381,7 @@ describe('AdcController test', () => {
       expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
-*/
+  */
 
   /* TODO: Add it back after checkAndWait supports error terminating
   it(
@@ -426,7 +427,7 @@ describe('AdcController test', () => {
       expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
     },
   );
-*/
+  */
 
   it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
     ASGShouldResponseWith({
@@ -434,7 +435,7 @@ describe('AdcController test', () => {
         StubResponses.trustDeviceStatusPending200,
     });
     await givenAdcData(wafapp, {
-      trustedDeviceId: 'abcdefg',
+      management: {trustedDeviceId: 'abcdefg'},
     });
 
     const adc = createAdcObject({
@@ -497,7 +498,7 @@ describe('AdcController test', () => {
     'post ' + prefix + '/adcs: create ADC HW whose AS3 exists',
     async function() {
       await givenAdcData(wafapp, {
-        trustedDeviceId: 'abcdefg',
+        management: {trustedDeviceId: 'abcdefg'},
       });
 
       const adc = createAdcObject({
@@ -568,7 +569,7 @@ describe('AdcController test', () => {
     'post ' + prefix + '/adcs: create ADC HW with wrong AS3 extension response',
     async function() {
       await givenAdcData(wafapp, {
-        trustedDeviceId: 'abcdefg',
+        management: {trustedDeviceId: 'abcdefg'},
       });
 
       const adc = createAdcObject({
@@ -655,7 +656,7 @@ describe('AdcController test', () => {
     'post ' + prefix + '/adcs: create ADC HW with query extension exception',
     async function() {
       await givenAdcData(wafapp, {
-        trustedDeviceId: 'abcdefg',
+        management: {trustedDeviceId: 'abcdefg'},
       });
 
       const adc = createAdcObject({
@@ -735,7 +736,7 @@ describe('AdcController test', () => {
     'post ' + prefix + '/adcs: create ADC HW with install extension exception',
     async function() {
       await givenAdcData(wafapp, {
-        trustedDeviceId: 'abcdefg',
+        management: {trustedDeviceId: 'abcdefg'},
       });
 
       const adc = createAdcObject({
@@ -910,7 +911,7 @@ describe('AdcController test', () => {
   it('delete ' + prefix + '/adcs/{id}: trusted device', async () => {
     let id = uuid();
     const adc = await givenAdcData(wafapp, {
-      trustedDeviceId: id,
+      management: {trustedDeviceId: id},
     });
 
     untrustStub.returns({
@@ -931,7 +932,7 @@ describe('AdcController test', () => {
   it('delete ' + prefix + '/adcs/{id}: untrust exception', async () => {
     let id = uuid();
     const adc = await givenAdcData(wafapp, {
-      trustedDeviceId: id,
+      management: {trustedDeviceId: id},
     });
 
     untrustStub.throws('Not working');
@@ -946,7 +947,7 @@ describe('AdcController test', () => {
   it('delete ' + prefix + '/adcs/{id}: empty untrust response', async () => {
     let id = uuid();
     const adc = await givenAdcData(wafapp, {
-      trustedDeviceId: id,
+      management: {trustedDeviceId: id},
     });
 
     untrustStub.returns({
@@ -963,7 +964,7 @@ describe('AdcController test', () => {
   it('delete ' + prefix + '/adcs/{id}: wrong untrust state', async () => {
     let id = uuid();
     const adc = await givenAdcData(wafapp, {
-      trustedDeviceId: id,
+      management: {trustedDeviceId: id},
     });
 
     untrustStub.returns({

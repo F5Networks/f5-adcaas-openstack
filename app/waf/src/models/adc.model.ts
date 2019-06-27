@@ -69,6 +69,7 @@ export type ConfigTypes = {
         //vips?: [string]; // cannot be appointed.
       };
     };
+    trustedDeviceId?: string;
   };
   status: string; // cannot be appointed.
   lastErr: string; // cannot be appointed.
@@ -140,16 +141,6 @@ export class Adc extends CommonEntity {
     },
   })
   management: ConfigTypes['management'];
-
-  @property({
-    type: 'string',
-    required: false,
-    schema: {
-      response: true,
-      example: '2c52df5f-a393-40d8-9013-475eb54f7bef',
-    },
-  })
-  trustedDeviceId?: string;
 
   @property({
     type: 'string',
