@@ -348,6 +348,9 @@
                         "management": {
                           "type": "object"
                         },
+                        "license": {
+                          "type": "string"
+                        },
                         "status": {
                           "type": "string"
                         },
@@ -545,6 +548,9 @@
                         },
                         "management": {
                           "type": "object"
+                        },
+                        "license": {
+                          "type": "string"
                         },
                         "status": {
                           "type": "string"
@@ -746,6 +752,9 @@
                           "management": {
                             "type": "object"
                           },
+                          "license": {
+                            "type": "string"
+                          },
                           "status": {
                             "type": "string"
                           },
@@ -835,6 +844,9 @@
                       "type": "boolean"
                     },
                     "management": {
+                      "type": "boolean"
+                    },
+                    "license": {
                       "type": "boolean"
                     },
                     "status": {
@@ -9009,6 +9021,9 @@
                         "management": {
                           "type": "object"
                         },
+                        "license": {
+                          "type": "string"
+                        },
                         "status": {
                           "type": "string"
                         },
@@ -9196,6 +9211,9 @@
                           },
                           "management": {
                             "type": "object"
+                          },
+                          "license": {
+                            "type": "string"
                           },
                           "status": {
                             "type": "string"
