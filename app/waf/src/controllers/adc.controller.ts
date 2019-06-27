@@ -581,7 +581,7 @@ export class AdcController extends BaseController {
     await this.wafapp
       .get(WafBindingKeys.KeyNetworkDriver)
       .then(async networkHelper => {
-        merge(adc.management, {networks: {}});
+        Object.assign(adc, {management: merge(adc.management, {networks: {}})});
         for (let k of Object.keys(adc.networks)) {
           let net = adc.networks[k];
           if (adc.management.networks[k] && adc.management.networks[k].portId) {

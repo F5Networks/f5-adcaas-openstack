@@ -121,7 +121,7 @@ export function merge(
   target: object | undefined,
   ...sources: (object | undefined)[]
 ): object {
-  if (typeof target !== 'object') target = {};
+  if (!target || typeof target !== 'object') target = {};
   let tobj = JSON.parse(JSON.stringify(target));
 
   for (let source of sources) {
