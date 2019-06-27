@@ -42,12 +42,14 @@ import {
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
-import uuid = require('uuid');
+
 import {
   MockASGController,
   ASGShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.asg.controller';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
+
+import uuid = require('uuid');
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;
@@ -349,6 +351,151 @@ describe('ApplicationController', () => {
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(422);
+    },
+  );
+
+  it('post ' + prefix + '/applications without body', async () => {
+    const response = await client
+      .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send()
+      .expect(400);
+
+    expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
+  });
+
+  it('post ' + prefix + '/applications with invalid property', async () => {
+    let request = {
+      abc: 'ABC',
+    };
+
+    const response = await client
+      .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.name).to.equal('ValidationError');
+    expect(response.body.error.details.codes).to.containDeep({
+      abc: ['unknown-property'],
+    });
+  });
+
+  it('post ' + prefix + '/applications with invalid value type', async () => {
+    let request = {
+      adcId: 1.21,
+    };
+    const response = await client
+      .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('type');
+  });
+
+  it(
+    'post ' + prefix + '/applications with incorrect uuid format',
+    async () => {
+      let request = {
+        adcId: 'a'.repeat(30),
+      };
+
+      const response = await client
+        .post(prefix + '/applications')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(request)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+      expect(response.body.error.details[0].code).to.equal('format');
+    },
+  );
+
+  it('post ' + prefix + '/applications with very long name', async () => {
+    let request = {name: ''};
+
+    const response = await client
+      .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('minLength');
+  });
+
+  it('post ' + prefix + '/applications with very long name', async () => {
+    let request = {
+      name: 'a'.repeat(100),
+    };
+
+    const response = await client
+      .post(prefix + '/applications')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('maxLength');
+  });
+
+  it('patch' + prefix + '/applications/{applicationId}', async () => {
+    let adc = await givenAdcData(wafapp);
+    let application = await givenApplicationData(wafapp, {
+      adcId: adc.id,
+    });
+
+    await client
+      .patch(prefix + '/applications/' + application.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({adcId: adc.id})
+      .expect(204);
+
+    const response = await client
+      .get(prefix + `/applications/${application.id}`)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(200);
+
+    expect(response.body.application.adcId).to.equal(adc.id);
+  });
+
+  it(
+    'patch' + prefix + '/applications/{applicationId} without body',
+    async () => {
+      const response = await client
+        .patch(prefix + '/applications/abcd')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send()
+        .expect(400);
+
+      expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
+    },
+  );
+
+  it(
+    'patch' + prefix + '/applications/{applicationId} with incorrect adc id',
+    async () => {
+      let application = await givenApplicationData(wafapp, {
+        adcId: uuid(),
+      });
+
+      await client
+        .patch(prefix + '/applications/' + application.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({adcId: uuid()})
+        .expect(404);
     },
   );
 });

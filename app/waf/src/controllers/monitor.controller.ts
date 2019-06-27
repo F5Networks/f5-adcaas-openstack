@@ -23,7 +23,6 @@ import {
   patch,
   del,
   requestBody,
-  HttpErrors,
   RequestContext,
   RestBindings,
 } from '@loopback/rest';
@@ -59,13 +58,9 @@ export class MonitorController extends BaseController {
     @requestBody(Schema.createRequest(Monitor, createDesc))
     reqBody: Partial<Monitor>,
   ): Promise<Response> {
-    try {
-      reqBody.tenantId = await this.tenantId;
-      const data = await this.monitorRepository.create(reqBody);
-      return new Response(Monitor, data);
-    } catch (error) {
-      throw new HttpErrors.BadRequest(error.message);
-    }
+    reqBody.tenantId = await this.tenantId;
+    const data = await this.monitorRepository.create(reqBody);
+    return new Response(Monitor, data);
   }
 
   @get(prefix + '/monitors', {

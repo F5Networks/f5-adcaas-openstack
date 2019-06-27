@@ -36,6 +36,9 @@ export class Application extends CommonEntity {
       update: true,
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
+      openapi: {
+        format: 'uuid',
+      },
     },
   })
   adcId?: string;
@@ -47,6 +50,9 @@ export class Application extends CommonEntity {
       update: true,
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
+      openapi: {
+        format: 'uuid',
+      },
     },
   })
   defaultDeclarationId?: string;

@@ -34,6 +34,10 @@ export class Action extends CommonEntity {
       create: true,
       response: true,
       example: 'request',
+      openapi: {
+        minLength: 1,
+        maxLength: 50,
+      },
     },
   })
   event: string;
@@ -57,6 +61,10 @@ export class Action extends CommonEntity {
       create: true,
       response: true,
       example: 'http://1.2.3.4/index.html',
+      openapi: {
+        minLength: 1,
+        maxLength: 200,
+      },
     },
   })
   location?: string;
@@ -69,6 +77,10 @@ export class Action extends CommonEntity {
       update: true,
       response: true,
       example: '2d3h896a-2312-40ee-8d08-55550dbc191',
+      openapi: {
+        minLength: 1,
+        maxLength: 200,
+      },
     },
     as3: {
       type: 'bigip',
@@ -105,6 +117,10 @@ export class Action extends CommonEntity {
       response: true,
       required: true,
       example: 'httpUri',
+      openapi: {
+        minLength: 1,
+        maxLength: 50,
+      },
     },
     as3: {},
   })
