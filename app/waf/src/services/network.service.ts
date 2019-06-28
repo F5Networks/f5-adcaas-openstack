@@ -87,6 +87,7 @@ export class NetworkDriver {
     let body: PortsCreateRequest = {
       port: {
         network_id: portParams.networkId,
+        port_security_enabled: false,
       },
     };
     if (portParams.fixedIp) {
@@ -191,6 +192,7 @@ export class NetworkDriver {
 type PortsCreateRequest = {
   port: {
     network_id: string;
+    port_security_enabled: boolean;
     name?: string;
     admin_state_up?: boolean;
     tenent_id?: string;

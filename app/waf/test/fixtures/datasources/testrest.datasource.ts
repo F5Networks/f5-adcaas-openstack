@@ -535,6 +535,7 @@ export const StubResponses = {
         mac_address: ExpectedData.bigipMgmt.macAddr,
         project_id: 'ef9fd3e3df664e558f043bd24c1fca21',
         created_at: '2019-03-14T03:16:34Z',
+        port_security_enabled: false,
       },
     };
   },
@@ -548,7 +549,7 @@ export const StubResponses = {
         device_owner: 'compute:nova',
         revision_number: 10,
         'binding:profile': {},
-        port_security_enabled: true,
+        port_security_enabled: false,
         fixed_ips: [
           {
             subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
@@ -594,7 +595,7 @@ export const StubResponses = {
         device_owner: 'compute:nova',
         revision_number: 10,
         'binding:profile': {},
-        port_security_enabled: true,
+        port_security_enabled: false,
         fixed_ips: [
           {
             subnet_id: 'c20e13cb-ebce-414f-8319-43cc30476aea',
