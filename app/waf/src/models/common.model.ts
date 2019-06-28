@@ -141,7 +141,7 @@ export abstract class CommonEntity extends Entity {
           }
           case 'bigip': {
             obj[propName] = {
-              bigip: this[key],
+              bigip: '/Common/' + this[key],
             };
             break;
           }

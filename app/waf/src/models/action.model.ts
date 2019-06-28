@@ -71,7 +71,7 @@ export class Action extends CommonEntity {
       example: '2d3h896a-2312-40ee-8d08-55550dbc191',
     },
     as3: {
-      type: 'use',
+      type: 'bigip',
     },
   })
   policy?: string;

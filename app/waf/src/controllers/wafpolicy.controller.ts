@@ -182,7 +182,7 @@ export class WafpolicyController extends BaseController {
         wafpolicy.id,
       );
     } catch (error) {
-      throw new HttpErrors.unprocessableEntity(
+      throw new HttpErrors.UnprocessableEntity(
         'upload wafpolicy to asg service failed',
       );
     }

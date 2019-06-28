@@ -89,18 +89,6 @@ export class Application extends CommonEntity {
 
       service.policies.forEach(policy => {
         obj[policy.getAS3Name()] = policy.getAS3Declaration();
-
-        policy.rules.forEach(rule => {
-          rule.actions.forEach(action => {
-            if (action.type === 'waf' && action.wafpolicy) {
-              obj[
-                action.wafpolicy.getAS3Name()
-              ] = action.wafpolicy.getAS3Declaration();
-            }
-
-            //TODO: Get Pools from Endpointpolicy
-          });
-        });
       });
     });
 
