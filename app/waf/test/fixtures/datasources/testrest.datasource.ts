@@ -1658,7 +1658,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -1670,7 +1670,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -1682,8 +1682,20 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: '1.2.3.4',
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
           state: 'CREATED',
+        },
+      ],
+    };
+  },
+
+  trustDevices200: () => {
+    return {
+      devices: [
+        {
+          targetUUID: ExpectedData.trustDeviceId,
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          state: 'ACTIVE',
         },
       ],
     };
