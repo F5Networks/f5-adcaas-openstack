@@ -112,10 +112,11 @@ export async function sleep(milliSecs: number): Promise<void> {
  *
  * @param target: target object or undefined:
  *    if target is an object, merge sources into target, and return target.
- *    if target is undefined, merge sources, return the merged object.
+ *    if target is undefined, merge sources, return the merged object, target keeps undefined.
+ *    if source is undefined, keep target and return target.
+ *    if both target and sources are undefined, keep target sources undefined and return {}.
+ *    if source[k]'s type is different with that of target[k], this function overwrites the target[k] with source[k].
  * @param sources: multiple sources for merging.
- *    if source[k]'s type is different with that of target[k], this function
- *    overwrites the target[k] with source[k].
  */
 export function merge(
   target: object | undefined,
@@ -126,8 +127,6 @@ export function merge(
 
   for (let source of sources) {
     if (typeof source === 'undefined') continue;
-    if (typeof source !== 'object')
-      throw new Error(`Data is not mergeable: ${source}`);
 
     let sobj = JSON.parse(JSON.stringify(source));
     for (let k of Object.keys(sobj)) {
