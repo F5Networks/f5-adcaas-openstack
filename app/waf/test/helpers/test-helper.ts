@@ -58,6 +58,8 @@ let envs: {[key: string]: string} = {
   DO_BIGIQ_USERNAME: 'admin',
   DO_BIGIQ_PASSWORD: 'admin',
   DO_BIGIQ_POOL: 'mykeypool',
+  ASG_HOST: '127.0.0.1',
+  ASG_PORT: `${RestApplicationPort.ASG}`,
 };
 
 export async function setupApplication(): Promise<AppWithClient> {

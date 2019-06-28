@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {post, requestBody, param, get, del} from '@loopback/rest';
+import {post, requestBody, param, get, del, put} from '@loopback/rest';
 import {StubResponses} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
 
@@ -32,9 +32,14 @@ export class MockASGController extends MockBaseController {
     return ResponseWith['GET:/mgmt/shared/TrustedDevices/{deviceId}'](s);
   }
 
-  @post('/mgmt/shared/TrustedDevices')
-  async trustDevice(@requestBody() body: object): Promise<object> {
-    return ResponseWith['POST:/mgmt/shared/TrustedDevices']();
+  @put('/mgmt/shared/TrustedDevices')
+  async putTrustDevice(@requestBody() body: object): Promise<object> {
+    return ResponseWith['PUT:/mgmt/shared/TrustedDevices']();
+  }
+
+  @get('/mgmt/shared/TrustedDevices')
+  async getTrustDevices(@requestBody() body: object): Promise<object> {
+    return ResponseWith['GET:/mgmt/shared/TrustedDevices']();
   }
 
   @del('/mgmt/shared/TrustedDevices/{deviceId}')
@@ -71,8 +76,8 @@ export function ASGShouldResponseWith(spec: {[key: string]: Function}) {
     'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy200,
     'GET:/mgmt/shared/TrustedDevices/{deviceId}':
       StubResponses.trustDeviceStatusActive200,
-    'POST:/mgmt/shared/TrustedDevices':
-      StubResponses.trustDeviceStatusCreated200,
+    'PUT:/mgmt/shared/TrustedDevices': StubResponses.trustDeviceStatusActive200,
+    'GET:/mgmt/shared/TrustedDevices': StubResponses.trustDevices200,
     'DEL:/mgmt/shared/TrustedDevices/{deviceId}':
       StubResponses.untrustDevice200,
     'POST:/mgmt/shared/TrustedExtensions/{deviceId}':
