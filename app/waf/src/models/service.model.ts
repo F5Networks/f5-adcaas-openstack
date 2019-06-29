@@ -368,9 +368,12 @@ export class Service extends CommonEntity {
   })
   virtualPort: number;
 
+  // TODO: why not extends Service to keep 'defaultPool', 'policies'?
+  // Model should be the shadow of db schema, should be used as the database definition.
   defaultPool?: Pool;
-
   policies: Endpointpolicy[] = [];
+
+  // TODO: what's more, divide different types of Services into different model definition to avoid such long definition.
 
   //TODO: many-to-many relation to other objects
   // iRules
