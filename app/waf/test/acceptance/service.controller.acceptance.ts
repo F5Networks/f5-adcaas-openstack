@@ -29,6 +29,8 @@ import {
 import {
   givenEmptyDatabase,
   givenServiceData,
+  givenApplicationData,
+  givenPoolData,
 } from '../helpers/database.helpers';
 import {
   OSShouldResponseWith,
@@ -101,7 +103,12 @@ describe('ServiceController', () => {
   });
 
   it('post ' + prefix + '/services', async () => {
-    const request = deepcopy(defaultRequest);
+    const application = await givenApplicationData(wafapp);
+    const pool = await givenPoolData(wafapp);
+    const request = Object.assign(deepcopy(defaultRequest), {
+      applicationId: application.id,
+      defaultPoolId: pool.id,
+    });
 
     const response = await client
       .post(prefix + '/services')
@@ -114,6 +121,21 @@ describe('ServiceController', () => {
       .to.not.empty()
       .and.type('string');
     expect(response.body.service).to.containDeep(request);
+  });
+
+  it('post ' + prefix + '/services with incorrect application id', async () => {
+    const request = deepcopy(defaultRequest);
+
+    const response = await client
+      .post(prefix + '/services')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(request)
+      .expect(404);
+
+    expect(response.body.error.message).to.startWith(
+      'Entity not found: Application',
+    );
   });
 
   it('post ' + prefix + '/services without body', async () => {
@@ -143,7 +165,11 @@ describe('ServiceController', () => {
   });
 
   it('post ' + prefix + '/services with invalid property', async () => {
-    let request = Object.assign(deepcopy(defaultRequest), {abc: 'ABC'});
+    const application = await givenApplicationData(wafapp);
+    let request = Object.assign(deepcopy(defaultRequest), {
+      abc: 'ABC',
+      applicationId: application.id,
+    });
 
     const response = await client
       .post(prefix + '/services')
@@ -314,13 +340,16 @@ describe('ServiceController', () => {
   });
 
   it('patch' + prefix + '/services/{id}', async () => {
-    const service = await givenServiceData(wafapp, uuid(), {name: 'old name'});
+    const service = await givenServiceData(wafapp, uuid(), {
+      defaultPoolId: uuid(),
+    });
+    const pool = await givenPoolData(wafapp);
 
     await client
       .patch(prefix + '/services/' + service.id)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .send({name: 'new name'})
+      .send({defaultPoolId: pool.id})
       .expect(204);
 
     const response = await client
@@ -329,7 +358,7 @@ describe('ServiceController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.service.name).to.equal('new name');
+    expect(response.body.service.defaultPoolId).to.equal(pool.id);
   });
 
   it('patch' + prefix + '/services/{id} without body', async () => {
@@ -341,6 +370,30 @@ describe('ServiceController', () => {
       .expect(400);
 
     expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
+  });
+
+  it('patch' + prefix + '/services/{id} without body', async () => {
+    const response = await client
+      .patch(prefix + '/services/abcd')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send()
+      .expect(400);
+
+    expect(response.body.error.code).to.equal('MISSING_REQUIRED_PARAMETER');
+  });
+
+  it('patch' + prefix + '/services/{id} with incorrect pool id', async () => {
+    const service = await givenServiceData(wafapp, uuid(), {
+      defaultPoolId: uuid(),
+    });
+
+    await client
+      .patch(prefix + '/services/' + service.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({defaultPoolId: uuid()})
+      .expect(404);
   });
 
   it('delete' + prefix + '/services/{id}', async () => {
