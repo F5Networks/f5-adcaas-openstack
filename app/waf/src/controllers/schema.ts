@@ -55,16 +55,12 @@ export function buildProperties(entity: typeof Entity): SchemaProperties {
 
     if (schema) {
       if (schema.create) {
-        props.create[key] = {
-          type: meta.type,
-        };
+        props.create[key] = Object.assign({type: meta.type}, schema.openapi);
         props.createExample[key] = schema.example;
       }
 
       if (schema.update) {
-        props.update[key] = {
-          type: meta.type,
-        };
+        props.update[key] = Object.assign({type: meta.type}, schema.openapi);
         props.updateExample[key] = schema.example;
       }
 
