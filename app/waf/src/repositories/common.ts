@@ -74,13 +74,16 @@ export class CommonRepository<
     data: DataObject<T>,
     options?: Options,
   ): Promise<void> {
+    this.logger.debug('update resource ' + id);
     let entity = await this.findById(id, undefined, options);
-
-    this.logger.debug('update resource ' + entity.id);
-    Object.assign(data, {
+    Object.assign(entity, data, {
       updatedAt: new Date().toISOString(),
     });
-    return super.updateById(id, data, options);
+    let modelKeys = Object.keys(this.entityClass.definition.properties);
+    for (let key of Object.keys(entity)) {
+      if (!modelKeys.includes(key)) delete entity[key];
+    }
+    return super.replaceById(id, entity, options);
   }
 
   async deleteById(id: ID, options?: Options): Promise<void> {
