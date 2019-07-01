@@ -15,7 +15,7 @@
  */
 
 import {Entity, AnyObject} from '@loopback/repository';
-import {ParameterObject, ParameterLocation} from '@loopback/openapi-v3-types';
+import {ParameterObject, ParameterLocation} from 'openapi3-ts';
 import {MetadataInspector} from '@loopback/metadata';
 import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
 
