@@ -385,7 +385,8 @@
                           },
                           "external2": {
                             "type": "ext",
-                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                            "floatingIp": "10.250.14.160"
                           }
                         },
                         "compute": {
@@ -586,7 +587,8 @@
                           },
                           "external2": {
                             "type": "ext",
-                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                            "floatingIp": "10.250.14.160"
                           }
                         },
                         "compute": {
@@ -793,7 +795,8 @@
                             },
                             "external2": {
                               "type": "ext",
-                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                              "floatingIp": "10.250.14.160"
                             }
                           },
                           "compute": {
@@ -9149,7 +9152,8 @@
                           },
                           "external2": {
                             "type": "ext",
-                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                            "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                            "floatingIp": "10.250.14.160"
                           }
                         },
                         "compute": {
@@ -9340,7 +9344,8 @@
                             },
                             "external2": {
                               "type": "ext",
-                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd"
+                              "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                              "floatingIp": "10.250.14.160"
                             }
                           },
                           "compute": {
