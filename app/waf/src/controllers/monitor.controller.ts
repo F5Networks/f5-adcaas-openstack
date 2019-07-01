@@ -112,7 +112,7 @@ export class MonitorController extends BaseController {
   async updateById(
     @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
     id: string,
-    @requestBody(Schema.createRequest(Monitor, updateDesc))
+    @requestBody(Schema.updateRequest(Monitor, updateDesc))
     monitor: Monitor,
   ): Promise<void> {
     await this.monitorRepository.updateById(id, monitor, {

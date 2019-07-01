@@ -133,22 +133,20 @@ describe('ActionController', () => {
 
   it('patch ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {
     const rule = await givenRuleData(wafapp);
-    const memberInDb = await givenActionData(wafapp, {
+    const actionInDb = await givenActionData(wafapp, {
       id: uuid(),
       ruleId: rule.id,
     });
     const action = createActionObject({
-      id: memberInDb.id,
       type: 'httpUri',
       location: 'http://1.2.2.3/index.html',
     });
 
-    const response = await client
-      .patch(prefix + `/rules/${rule.id}/actions/${action.id}`)
+    await client
+      .patch(prefix + `/rules/${rule.id}/actions/${actionInDb.id}`)
       .send(action)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .expect(200);
-    expect(response.body.count).to.eql(1);
+      .expect(204);
   });
 });

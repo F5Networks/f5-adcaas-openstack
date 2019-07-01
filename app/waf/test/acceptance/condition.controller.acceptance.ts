@@ -151,17 +151,15 @@ describe('ConditionController', () => {
       });
 
       const condition = createConditionObject({
-        id: conditionInDb.id,
         type: 'request',
       });
-      const response = await client
-        .patch(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
+
+      await client
+        .patch(prefix + `/rules/${rule.id}/conditions/${conditionInDb.id}`)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send(condition)
-        .expect(200);
-
-      expect(response.body.count).to.eql(1);
+        .expect(204);
     },
   );
 });
