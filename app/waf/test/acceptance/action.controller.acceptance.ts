@@ -137,6 +137,7 @@ describe('ActionController', () => {
       id: uuid(),
       ruleId: rule.id,
     });
+
     const action = createActionObject({
       type: 'httpUri',
       location: 'http://1.2.2.3/index.html',

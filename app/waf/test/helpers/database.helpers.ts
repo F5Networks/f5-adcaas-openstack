@@ -105,7 +105,6 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
     {
       name: 'test waf policy',
       url: 'http://unknown',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -115,7 +114,6 @@ export function createEndpointpolicyObject(data?: Partial<Endpointpolicy>) {
   return Object.assign(
     {
       name: 'E1',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -124,7 +122,6 @@ export function createRuleObject(data?: Partial<Rule>) {
   return Object.assign(
     {
       name: 'test',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -135,7 +132,6 @@ export function createConditionObject(data?: Partial<Condition>) {
     {
       type: 'httpUri',
       path: {operand: 'contains', values: ['/test1/']},
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -144,7 +140,6 @@ export function createActionObject(data?: Partial<Action>) {
   return Object.assign(
     {
       type: 'waf',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -156,9 +151,9 @@ export async function givenEndpointpolicyData(
   const endpointpolicyrepo = await wafapp.getRepository(
     EndpointpolicyRepository,
   );
-  const obj = createEndpointpolicyObject(data);
-  obj.id = uuid();
-
+  const obj = createEndpointpolicyObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
   return await endpointpolicyrepo.create(obj);
 }
 
@@ -167,8 +162,9 @@ export async function givenRuleData(
   data?: Partial<Rule>,
 ) {
   const rulerepo = await wafapp.getRepository(RuleRepository);
-  const obj = createRuleObject(data);
-  obj.id = uuid();
+  const obj = createRuleObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
 
   if (isNullOrUndefined(obj.endpointpolicyId)) {
     obj.endpointpolicyId = uuid();
@@ -184,6 +180,7 @@ export async function givenConditionData(
   const conditionrepo = await wafapp.getRepository(ConditionRepository);
   const obj = createConditionObject(data);
   obj.id = uuid();
+  obj.tenantId = ExpectedData.tenantId;
   return await conditionrepo.create(obj);
 }
 
@@ -192,7 +189,10 @@ export async function givenActionData(
   data?: Partial<Action>,
 ) {
   const repo = await wafapp.getRepository(ActionRepository);
-  return await repo.create(createActionObject(data));
+  let obj = createActionObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await repo.create(obj);
 }
 
 export async function givenWafpolicyData(
@@ -200,7 +200,9 @@ export async function givenWafpolicyData(
   data?: Partial<Wafpolicy>,
 ) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
-  const obj = createWafpolicyObject(data);
+  const obj = createWafpolicyObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
   return await wafpolicyrepo.create(obj);
 }
 
@@ -210,7 +212,6 @@ export function createApplicationObject(data?: Partial<Application>) {
       name: 'test application',
       description: 'application test data',
       status: 'Done',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -221,8 +222,9 @@ export async function givenApplicationData(
   data?: Partial<Application>,
 ) {
   const apprepo = await wafapp.getRepository(ApplicationRepository);
-  const obj = createApplicationObject(data);
-  obj.id = uuid();
+  const obj = createApplicationObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
   return await apprepo.create(obj);
 }
 
@@ -291,7 +293,6 @@ export function createAdcObject(data?: object) {
         },
         vmId: ExpectedData.vmId,
       },
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -349,7 +350,9 @@ export function createDeclarationObject(data?: Partial<Declaration>) {
 
 export async function givenAdcData(wafapp: WafApplication, data?: object) {
   const adcpepo = await wafapp.getRepository(AdcRepository);
-  const obj = createAdcObject(data);
+  const obj = createAdcObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
   return await adcpepo.create(obj);
 }
 
@@ -358,7 +361,10 @@ export async function givenAdcTenantAssociationData(
   data?: Partial<AdcTenantAssociation>,
 ) {
   const repo = await wafapp.getRepository(AdcTenantAssociationRepository);
-  return await repo.create(createAdcTenantAssociationObject(data));
+  const obj = createAdcTenantAssociationObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await repo.create(obj);
 }
 
 export function createAdcTenantAssociationObject(
@@ -379,17 +385,17 @@ export async function givenServiceData(
   data?: Partial<Service>,
 ) {
   const appRepo = await wafapp.getRepository(ApplicationRepository);
-  const obj = createServiceObject(data);
+  const obj = createServiceObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
   return await appRepo.services(appId).create(obj);
 }
 
 export function createServiceObject(data?: Partial<Service>) {
   return Object.assign(
     {
-      id: uuid(),
       type: 'HTTP',
       virtualAddresses: ['10.0.1.11'],
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -422,14 +428,16 @@ export async function givenPoolData(
   data?: Partial<Pool>,
 ) {
   const repo = await wafapp.getRepository(PoolRepository);
-  return await repo.create(createPoolObject(data));
+  const obj = createPoolObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await repo.create(obj);
 }
 
 export function createPoolObject(data?: Partial<Pool>) {
   return Object.assign(
     {
       loadBalancingMode: 'round-robin',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -440,7 +448,10 @@ export async function givenMemberData(
   data?: Partial<Member>,
 ) {
   const repo = await wafapp.getRepository(MemberRepository);
-  return await repo.create(createMemberObject(data));
+  const obj = createMemberObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await repo.create(obj);
 }
 
 export function createMemberObject(data?: Partial<Member>) {
@@ -448,7 +459,6 @@ export function createMemberObject(data?: Partial<Member>) {
     {
       address: '192.0.1.23',
       port: 80,
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );
@@ -459,7 +469,10 @@ export async function givenMonitorData(
   data?: Partial<Monitor>,
 ) {
   const repo = await wafapp.getRepository(MonitorRepository);
-  return await repo.create(createMonitorObject(data));
+  const obj = createMonitorObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await repo.create(obj);
 }
 
 export function createMonitorObject(data?: Partial<Monitor>) {
@@ -468,7 +481,6 @@ export function createMonitorObject(data?: Partial<Monitor>) {
       targetAddress: '192.0.1.23',
       targetPort: 80,
       monitorType: 'http',
-      tenantId: ExpectedData.tenantId,
     },
     data,
   );

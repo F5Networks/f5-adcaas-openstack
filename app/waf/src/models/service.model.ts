@@ -24,6 +24,7 @@ export class Service extends CommonEntity {
     required: true,
     schema: {
       create: true,
+      update: false,
       response: true,
       required: true,
       example: 'HTTP',
@@ -40,6 +41,7 @@ export class Service extends CommonEntity {
     required: true,
     schema: {
       create: true,
+      update: false,
       required: true,
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
@@ -54,18 +56,30 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: true,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   addressStatus: boolean;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   clientTLS?: string;
 
   @property({
     type: 'object',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   clonePools?: object;
 
@@ -73,24 +87,40 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: true,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   enable: boolean;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   fallbackPersistenceMethod?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   lastHop?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   layer4?: string;
 
@@ -98,12 +128,20 @@ export class Service extends CommonEntity {
     type: 'number',
     required: false,
     default: 0,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   maxConnections: number;
 
   @property({
     type: 'object',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   metadata: object;
 
@@ -117,30 +155,50 @@ export class Service extends CommonEntity {
     type: 'array',
     itemType: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   persistenceMethods?: string[];
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   policyFirewallEnforced?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   policyFirewallStaged?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   policyIAM?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   policyNAT?: string;
 
@@ -163,126 +221,209 @@ export class Service extends CommonEntity {
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+    },
   })
   profileAnalytics?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileClassification?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileDiameterEndpoint?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileDNS?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileDOS?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileEnforcement?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileFIX?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileFTP?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileHTTP?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileHTTPAcceleration?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileHTTPCompression?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileIPOther?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileMultiplex?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileL4?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileRADIUS?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileRewrite?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileSIP?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileSubscriberManagement?: string;
 
   @property({
     type: 'object',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileTCP?: object;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileTrafficLog?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   profileUDP?: string;
 
@@ -290,18 +431,30 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: true,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   redirect80?: boolean;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   serverTLS?: string;
 
   @property({
     type: 'string',
     required: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   snat?: string;
 
@@ -309,6 +462,10 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: false,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   translateClientPort: boolean;
 
@@ -316,6 +473,10 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: true,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   translateServerAddress: boolean;
 
@@ -323,6 +484,10 @@ export class Service extends CommonEntity {
     type: 'boolean',
     required: false,
     default: true,
+    schema: {
+      create: false,
+      update: false,
+    },
   })
   translateServerPort: boolean;
 
@@ -332,7 +497,7 @@ export class Service extends CommonEntity {
     required: true,
     schema: {
       create: true,
-      update: true,
+      update: false,
       required: true,
       response: true,
       example: ['10.100.0.1'],
@@ -355,7 +520,7 @@ export class Service extends CommonEntity {
     default: 80,
     schema: {
       create: true,
-      update: true,
+      update: false,
       response: true,
       example: '80',
       openapi: {

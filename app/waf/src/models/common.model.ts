@@ -27,6 +27,8 @@ export abstract class CommonEntity extends Entity {
     id: true,
     required: true,
     schema: {
+      create: false,
+      update: false,
       response: true,
       example: '11111111-2222-3333-4444-555555555555',
     },
@@ -74,6 +76,8 @@ export abstract class CommonEntity extends Entity {
     //TODO: Need to remove this default value, after we can get it from keystone.
     default: 'default',
     schema: {
+      create: false,
+      update: false,
       response: true,
     },
   })
@@ -83,6 +87,8 @@ export abstract class CommonEntity extends Entity {
     type: 'date',
     required: false,
     schema: {
+      create: false,
+      update: false,
       response: true,
       example: '2019-03-05T08:40:25.000Z',
     },
@@ -93,6 +99,8 @@ export abstract class CommonEntity extends Entity {
     type: 'date',
     required: false,
     schema: {
+      create: false,
+      update: false,
       response: true,
       example: '2019-03-05T08:40:25.100Z',
     },
