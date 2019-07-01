@@ -720,7 +720,11 @@ export class AdcController extends BaseController {
         );
         if (adc.management.vmId) {
           await computeMgr
-            .deleteServer(addon.userToken, adc.management.vmId!, addon.tenantId)
+            .deleteServer(
+              addon.userToken!,
+              adc.management.vmId!,
+              addon.tenantId,
+            )
             .then(() => {
               this.logger.debug(`Deleted the vm ${adc.management.vmId!}`);
               delete adc.management.vmId;

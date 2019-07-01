@@ -19,6 +19,7 @@ export * from './base.controller';
 export * from './ping.controller';
 export * from './application.controller';
 export * from './declaration.controller';
+export * from './declarationv2.controller';
 export * from './tenantassoc.controller';
 export * from './adc.controller';
 export * from './service.controller';

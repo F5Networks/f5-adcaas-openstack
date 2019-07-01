@@ -20,7 +20,12 @@ import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import {RepositoryMixin} from '@loopback/repository';
+import {
+  RepositoryMixin,
+  Constructor,
+  Repository,
+  Entity,
+} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
@@ -70,5 +75,25 @@ export class WafApplication extends BootMixin(
         nested: true,
       },
     };
+  }
+}
+
+export class RepositoryManager {
+  static repoRepo: {[key: string]: Repository<Entity>} = {};
+
+  static async get<T>(
+    wafapp: WafApplication,
+    repo: Constructor<T>,
+  ): Promise<T> {
+    return wafapp.get<T>(`repositories.${repo.name}`);
+  }
+
+  static async resolveRepository<T>(
+    wafapp: WafApplication,
+    ctor: Constructor<T>,
+  ): Promise<T> {
+    if (this.repoRepo[ctor.name]) return <T>this.repoRepo[ctor.name];
+    this.repoRepo[ctor.name] = this.get<T>(wafapp, ctor);
+    return <T>this.repoRepo[ctor.name];
   }
 }

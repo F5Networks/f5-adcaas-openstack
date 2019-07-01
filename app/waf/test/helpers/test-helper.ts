@@ -74,6 +74,7 @@ export async function setupApplication(): Promise<AppWithClient> {
   stubLogger();
   app.bind(WafBindingKeys.KeyDbConfig).to(testdb_config);
 
+  //await app.initAll();
   await app.boot();
   await app.start();
 
@@ -136,8 +137,8 @@ export async function setupRestAppAndClient(
   return {restApp: restApp, client: client};
 }
 
-export function teardownRestAppAndClient(app: TestingApplication) {
-  app.stop();
+export async function teardownRestAppAndClient(app: TestingApplication) {
+  await app.stop();
 }
 
 export interface RestAppAndClient {
