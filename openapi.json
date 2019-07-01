@@ -283,6 +283,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -292,7 +293,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -680,6 +684,7 @@
                   "compute"
                 ],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -690,6 +695,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "type": {
                     "type": "string"
                   },
@@ -1189,6 +1197,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -1199,6 +1208,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "adcId": {
                     "type": "string"
                   },
@@ -1514,6 +1526,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -1523,7 +1536,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -1769,6 +1785,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -1779,6 +1796,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "adcId": {
                     "type": "string"
                   },
@@ -2101,6 +2121,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -2111,6 +2132,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "adcId": {
                     "type": "string"
                   }
@@ -2388,6 +2412,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -2397,7 +2422,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -2667,6 +2695,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -2676,7 +2705,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -3015,6 +3047,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -3024,7 +3057,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -3315,6 +3351,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -3324,7 +3361,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -4275,6 +4315,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -4285,6 +4326,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "interval": {
                     "type": "number"
                   },
@@ -4637,6 +4681,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -4647,6 +4692,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "interval": {
                     "type": "number"
                   },
@@ -5041,6 +5089,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -5051,6 +5100,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "address": {
                     "type": "string"
                   },
@@ -5344,6 +5396,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -5354,6 +5407,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "address": {
                     "type": "string"
                   },
@@ -5806,6 +5862,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -5816,6 +5873,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "loadBalancingMode": {
                     "type": "string"
                   },
@@ -6178,6 +6238,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -6188,6 +6249,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "loadBalancingMode": {
                     "type": "string"
                   },
@@ -6506,6 +6570,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -6516,6 +6581,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "insert": {
                     "type": "object"
                   },
@@ -6832,6 +6900,7 @@
                   "type"
                 ],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -6842,6 +6911,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "event": {
                     "type": "string"
                   },
@@ -7014,6 +7086,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -7024,6 +7097,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "index": {
                     "type": "number"
                   }
@@ -7321,6 +7397,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -7331,6 +7408,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "event": {
                     "type": "string"
                   },
@@ -7504,6 +7584,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -7513,7 +7594,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -7812,6 +7896,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -7821,7 +7906,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
-                  }
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false
                 },
                 "example": {
                   "name": "My name",
@@ -8305,6 +8393,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -8315,32 +8404,61 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "type": false,
+                  "applicationId": false,
+                  "addressStatus": false,
+                  "clientTLS": false,
+                  "clonePools": false,
+                  "enable": false,
+                  "fallbackPersistenceMethod": false,
+                  "lastHop": false,
+                  "layer4": false,
+                  "maxConnections": false,
+                  "metadata": false,
+                  "persistenceMethods": false,
+                  "policyFirewallEnforced": false,
+                  "policyFirewallStaged": false,
+                  "policyIAM": false,
+                  "policyNAT": false,
                   "defaultPoolId": {
                     "type": "string"
                   },
-                  "virtualAddresses": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "ipv4"
-                    },
-                    "minItems": 1,
-                    "maxItems": 1
-                  },
-                  "virtualPort": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maxmium": 65535
-                  }
+                  "profileClassification": false,
+                  "profileDiameterEndpoint": false,
+                  "profileDNS": false,
+                  "profileDOS": false,
+                  "profileEnforcement": false,
+                  "profileFIX": false,
+                  "profileFTP": false,
+                  "profileHTTP": false,
+                  "profileHTTPAcceleration": false,
+                  "profileHTTPCompression": false,
+                  "profileIPOther": false,
+                  "profileMultiplex": false,
+                  "profileL4": false,
+                  "profileRADIUS": false,
+                  "profileRewrite": false,
+                  "profileSIP": false,
+                  "profileSubscriberManagement": false,
+                  "profileTCP": false,
+                  "profileTrafficLog": false,
+                  "profileUDP": false,
+                  "redirect80": false,
+                  "serverTLS": false,
+                  "snat": false,
+                  "translateClientPort": false,
+                  "translateServerAddress": false,
+                  "translateServerPort": false,
+                  "virtualAddresses": false,
+                  "virtualPort": false
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "defaultPoolId": "11111111-2222-3333-4444-555555555555",
-                  "virtualAddresses": [
-                    "10.100.0.1"
-                  ],
-                  "virtualPort": "80"
+                  "defaultPoolId": "11111111-2222-3333-4444-555555555555"
                 }
               }
             }
@@ -8675,6 +8793,7 @@
                   "virtualAddresses"
                 ],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -8685,6 +8804,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "type": {
                     "type": "string",
                     "enum": [
@@ -8696,9 +8818,50 @@
                     "type": "string",
                     "format": "uuid"
                   },
+                  "addressStatus": false,
+                  "clientTLS": false,
+                  "clonePools": false,
+                  "enable": false,
+                  "fallbackPersistenceMethod": false,
+                  "lastHop": false,
+                  "layer4": false,
+                  "maxConnections": false,
+                  "metadata": false,
+                  "persistenceMethods": false,
+                  "policyFirewallEnforced": false,
+                  "policyFirewallStaged": false,
+                  "policyIAM": false,
+                  "policyNAT": false,
                   "defaultPoolId": {
                     "type": "string"
                   },
+                  "profileAnalytics": false,
+                  "profileClassification": false,
+                  "profileDiameterEndpoint": false,
+                  "profileDNS": false,
+                  "profileDOS": false,
+                  "profileEnforcement": false,
+                  "profileFIX": false,
+                  "profileFTP": false,
+                  "profileHTTP": false,
+                  "profileHTTPAcceleration": false,
+                  "profileHTTPCompression": false,
+                  "profileIPOther": false,
+                  "profileMultiplex": false,
+                  "profileL4": false,
+                  "profileRADIUS": false,
+                  "profileRewrite": false,
+                  "profileSIP": false,
+                  "profileSubscriberManagement": false,
+                  "profileTCP": false,
+                  "profileTrafficLog": false,
+                  "profileUDP": false,
+                  "redirect80": false,
+                  "serverTLS": false,
+                  "snat": false,
+                  "translateClientPort": false,
+                  "translateServerAddress": false,
+                  "translateServerPort": false,
                   "virtualAddresses": {
                     "type": "array",
                     "items": {
@@ -9680,6 +9843,7 @@
                 "type": "object",
                 "required": [],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -9690,6 +9854,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "url": {
                     "type": "string"
                   },
@@ -10011,6 +10178,7 @@
                   "url"
                 ],
                 "properties": {
+                  "id": false,
                   "name": {
                     "type": "string",
                     "minLength": 1,
@@ -10021,6 +10189,9 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
                   "url": {
                     "type": "string"
                   },
