@@ -284,10 +284,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -675,10 +679,14 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "type": {
                     "type": "string"
@@ -1179,10 +1187,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "adcId": {
                     "type": "string"
@@ -1500,10 +1512,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -1751,10 +1767,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "adcId": {
                     "type": "string"
@@ -2079,10 +2099,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "adcId": {
                     "type": "string"
@@ -2362,10 +2386,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -2637,10 +2665,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -2981,10 +3013,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -3277,10 +3313,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -4233,10 +4273,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "interval": {
                     "type": "number"
@@ -4591,10 +4635,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "interval": {
                     "type": "number"
@@ -4991,10 +5039,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "address": {
                     "type": "string"
@@ -5290,10 +5342,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "address": {
                     "type": "string"
@@ -5748,10 +5804,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "loadBalancingMode": {
                     "type": "string"
@@ -6116,10 +6176,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "loadBalancingMode": {
                     "type": "string"
@@ -6437,39 +6501,29 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "type"
-                ],
+                "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
-                  },
-                  "event": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "insert": {
                     "type": "object"
                   },
-                  "location": {
-                    "type": "string"
-                  },
                   "policy": {
-                    "type": "string"
-                  },
-                  "type": {
                     "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "event": "request",
-                  "location": "http://1.2.3.4/index.html",
-                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
-                  "type": "httpUri"
+                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191"
                 }
               }
             }
@@ -6776,10 +6830,14 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "event": {
                     "type": "string"
@@ -6954,27 +7012,23 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
-                  },
-                  "event": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "index": {
                     "type": "number"
-                  },
-                  "type": {
-                    "type": "string"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "event": "request",
-                  "index": 1,
-                  "type": "httpUri"
+                  "index": 1
                 }
               }
             }
@@ -7265,10 +7319,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "event": {
                     "type": "string"
@@ -7444,10 +7502,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -7748,10 +7810,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "example": {
@@ -8237,19 +8303,31 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "defaultPoolId": {
                     "type": "string"
                   },
                   "virtualAddresses": {
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "ipv4"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1
                   },
                   "virtualPort": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maxmium": 65535
                   }
                 },
                 "example": {
@@ -8595,25 +8673,42 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "HTTP",
+                      "HTTPS"
+                    ]
                   },
                   "applicationId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "defaultPoolId": {
                     "type": "string"
                   },
                   "virtualAddresses": {
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "ipv4"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1
                   },
                   "virtualPort": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maxmium": 65535
                   }
                 },
                 "example": {
@@ -9581,10 +9676,14 @@
                 "required": [],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "url": {
                     "type": "string"
@@ -9908,10 +10007,14 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   },
                   "url": {
                     "type": "string"
