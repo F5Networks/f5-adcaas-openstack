@@ -53,6 +53,7 @@ let envs: {[key: string]: string} = {
   OS_DOMAIN_NAME: 'Default',
   OS_REGION_NAME: 'RegionOne',
   OS_AVAILABLE_ZONE: 'nova',
+  OS_FLOATINGIP_NETWORK_ID: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
   DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
   DO_BIGIQ_HOST: '10.250.15.105',
   DO_BIGIQ_USERNAME: 'admin',

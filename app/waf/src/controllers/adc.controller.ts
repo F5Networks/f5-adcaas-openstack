@@ -602,9 +602,41 @@ export class AdcController extends BaseController {
                 macAddr: port.macAddr,
                 portId: port.id,
               };
-
-              await this.serialize(adc);
             });
+
+          if (net.floatingIp) {
+            let rcd = adc.management.networks[k];
+            let fips = await networkHelper.getFloatingIps(
+              addon.userToken,
+              net.floatingIp,
+            );
+            if (fips.length === 1) {
+              let fip = fips[0];
+              if (fip.status !== 'DOWN')
+                throw new Error('The floating ip is already in use.');
+              await networkHelper.bindFloatingIpToPort(
+                addon.userToken,
+                fip.id,
+                rcd.portId!,
+              );
+              rcd.floatingIpCreated = false;
+              rcd.floatingIpId = fip.id;
+              rcd.floatingIp = net.floatingIp;
+            } else {
+              // fips.length must be 0.
+              let fip = await networkHelper.createFloatingIp(
+                addon.userToken,
+                addon.tenantId,
+                net.floatingIp,
+                rcd.portId,
+              );
+              rcd.floatingIpId = fip.id;
+              rcd.floatingIpCreated = true;
+              rcd.floatingIp = net.floatingIp;
+            }
+          }
+
+          await this.serialize(adc);
         }
       });
   }
@@ -661,10 +693,21 @@ export class AdcController extends BaseController {
 
           try {
             let portId = adc.management.networks[network].portId!;
-            await networkMgr.deletePort(addon.userToken, portId).then(() => {
-              this.logger.debug(`Deleted port ${portId}`);
-              delete adc.management.networks[network];
-            });
+            await networkMgr
+              .deletePort(addon.userToken, portId)
+              .then(async () => {
+                this.logger.debug(`Deleted port ${portId}`);
+                let rcd = adc.management.networks[network];
+                if (rcd.floatingIpCreated)
+                  await networkMgr
+                    .deleteFloatingIp(addon.userToken, rcd.floatingIpId!)
+                    .then(() => {
+                      delete rcd.floatingIpId;
+                      delete rcd.floatingIpCreated;
+                      delete rcd.floatingIp;
+                    });
+                delete adc.management.networks[network];
+              });
           } catch (error) {
             this.logger.error(`delete port for ${network}: ${error.message}`);
           }

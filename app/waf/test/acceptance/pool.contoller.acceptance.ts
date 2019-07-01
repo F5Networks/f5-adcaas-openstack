@@ -32,7 +32,7 @@ import {
   createPoolObject,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -54,7 +54,7 @@ describe('PoolController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
 

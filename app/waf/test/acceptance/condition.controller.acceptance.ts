@@ -34,7 +34,7 @@ import {
 } from '../helpers/database.helpers';
 
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -56,7 +56,7 @@ describe('ConditionController', () => {
       return restApp;
     })();
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
   beforeEach('Empty database', async () => {

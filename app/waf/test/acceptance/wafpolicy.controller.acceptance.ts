@@ -38,7 +38,7 @@ import {
   givenAdcData,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -70,7 +70,7 @@ describe('WafpolicyController', () => {
       'controllers.WafpolicyController',
     );
 
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
 

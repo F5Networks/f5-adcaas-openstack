@@ -31,7 +31,7 @@ import {
   givenServiceData,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -63,7 +63,7 @@ describe('ServiceController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
 

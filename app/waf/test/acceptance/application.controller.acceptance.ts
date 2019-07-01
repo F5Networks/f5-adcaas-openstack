@@ -38,7 +38,7 @@ import {
   createApplicationObject,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -80,7 +80,7 @@ describe('ApplicationController', () => {
 
     asg = await new ASGServiceProvider().value();
 
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     ASGShouldResponseWith({});
     setupEnvs();
   });

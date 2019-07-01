@@ -33,7 +33,7 @@ import {
   givePoolMonitorAssociationData,
 } from '../helpers/database.helpers';
 import {
-  ShouldResponseWith,
+  OSShouldResponseWith,
   MockKeyStoneController,
   ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
@@ -56,7 +56,7 @@ describe('PoolMonitorAssociationController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    ShouldResponseWith({});
+    OSShouldResponseWith({});
     setupEnvs();
   });
 

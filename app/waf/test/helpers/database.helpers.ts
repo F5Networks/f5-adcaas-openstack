@@ -252,6 +252,7 @@ export function createAdcObject(data?: object) {
           type: 'ext',
           networkId: '1c19251d-7e97-411a-8816-6f7a72403707',
           fixedIp: '192.168.5.3',
+          floatingIp: '10.250.14.160',
         },
       },
       compute: {
@@ -275,8 +276,11 @@ export function createAdcObject(data?: object) {
             fixedIp: '192.168.4.3',
           },
           external2: {
-            macAddr: 'fa:16:3e:fd:0f:ce',
-            fixedIp: '192.168.5.3',
+            macAddr: ExpectedData.ExtNetwork.MacAddr,
+            fixedIp: ExpectedData.ExtNetwork.IpAddr,
+            floatingIp: '10.250.14.160',
+            floatingIpId: '10b2f45b-2837-4f90-a8d8-eae33f48d2cd',
+            floatingIpCreated: true,
           },
         },
         connection: {
@@ -285,6 +289,7 @@ export function createAdcObject(data?: object) {
           username: BigipBuiltInProperties.admin,
           password: 'admin',
         },
+        vmId: ExpectedData.vmId,
       },
       tenantId: ExpectedData.tenantId,
     },

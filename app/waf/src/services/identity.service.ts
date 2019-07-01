@@ -464,6 +464,10 @@ export class AuthedToken {
     return this.epNetwork() + '/v2.0/subnets';
   }
 
+  public epFloatingIps(): string {
+    return this.epNetwork() + '/v2.0/floatingips';
+  }
+
   // TODO: Use user token's catalog instead of that of admin's.
   public epServers(tenantId: string) {
     let url = this.epCompute();
