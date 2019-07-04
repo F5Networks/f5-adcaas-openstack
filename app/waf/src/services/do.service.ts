@@ -80,6 +80,7 @@ export class OnboardingManager {
       'DO_BIGIQ_USERNAME',
       'DO_BIGIQ_PASSWORD',
       'DO_BIGIQ_POOL',
+      'DO_ENDPOINT',
     ]) {
       if (!process.env[n] || process.env[n] === '') {
         expectedEmpty.push(n);
@@ -91,7 +92,7 @@ export class OnboardingManager {
       );
 
     this.config = {
-      endpoint: process.env.DO_ENDPOINT || 'https://localhost:9443',
+      endpoint: process.env.DO_ENDPOINT!,
       async: true,
       timeout: 900, // from onboarding prompt: should be <= 900
       licPool: {
@@ -426,7 +427,7 @@ export class OnboardingManager {
     return rltObj;
   }
 
-  async onboarding(givenDoBody: TypeDOClassDO): Promise<string> {
+  async onboard(givenDoBody: TypeDOClassDO): Promise<string> {
     // TODO: base64 coding for admin:admin. Modify it later if needed
     let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
 
