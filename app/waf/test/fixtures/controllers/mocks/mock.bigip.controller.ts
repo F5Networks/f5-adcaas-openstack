@@ -15,7 +15,7 @@
  */
 
 import {MockBaseController} from './mock.base.controller';
-import {get, param} from '@loopback/rest';
+import {get, param, post} from '@loopback/rest';
 import {StubResponses} from '../../datasources/testrest.datasource';
 
 export class MockBigipController extends MockBaseController {
@@ -58,6 +58,29 @@ export class MockBigipController extends MockBaseController {
     return await ResponseWith['/mgmt/shared/appsvcs/info']();
   }
 
+  @get('/mgmt/shared/declarative-onboarding/info')
+  async doInfo(): Promise<object> {
+    let s = statusDOReady.shift();
+    return await ResponseWith['/mgmt/shared/declarative-onboarding/info'](s);
+  }
+
+  @post('/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm')
+  async doUpload(): Promise<object> {
+    return await ResponseWith[
+      '/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm'
+    ]();
+  }
+
+  @post('/mgmt/shared/iapp/package-management-tasks')
+  async doInstall(): Promise<object> {
+    return await ResponseWith['/mgmt/shared/iapp/package-management-tasks']();
+  }
+  @get('/mgmt/shared/iapp/package-management-tasks/{taskid}')
+  async doInstallStatus(): Promise<object> {
+    return await ResponseWith[
+      '/mgmt/shared/iapp/package-management-tasks/{taskid}'
+    ]();
+  }
   @get('/mgmt/tm/sys/folder/~{partition}')
   async partitionInfo(
     @param.path.string('partition') partition: string,
@@ -67,7 +90,21 @@ export class MockBigipController extends MockBaseController {
 }
 
 let ResponseWith: {[key: string]: Function} = {};
-
+let statusDOReady = [
+  'FAILED',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+  'OK',
+];
 //TODO combine it with the one in openstack.
 export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
   ResponseWith = {
@@ -80,6 +117,13 @@ export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
     '/mgmt/tm/cm/device': StubResponses.bigipCmDevice200,
     '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info200,
     '/mgmt/tm/sys/folder/~{partition}': StubResponses.bigipPartition200,
+    '/mgmt/shared/declarative-onboarding/info': StubResponses.bigipDOInfo200,
+    '/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm':
+      StubResponses.bigipDOUpload200,
+    '/mgmt/shared/iapp/package-management-tasks':
+      StubResponses.bigipDOInstall200,
+    '/mgmt/shared/iapp/package-management-tasks/{taskid}':
+      StubResponses.bigipDOInstallstatus200,
   };
   Object.assign(ResponseWith, spec);
 }

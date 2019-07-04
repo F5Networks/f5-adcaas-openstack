@@ -1018,6 +1018,88 @@ export const StubResponses = {
     };
   },
 
+  bigipDOInfo200: (state: string = 'OK') => {
+    return [
+      {
+        id: 0,
+        selfLink: 'https://localhost/mgmt/shared/declarative-onboarding/info',
+        result: {
+          class: 'Result',
+          code: 200,
+          status: state,
+          message: '',
+          errors: [],
+        },
+      },
+    ];
+  },
+
+  bigipDOUpload200: () => {
+    return {
+      remainingByteCount: 0,
+      usedChunks: {
+        0: 1536121,
+      },
+      totalByteCount: 1536121,
+      localFilePath: '/var/config/rest/downloads/abc.rpm',
+      temporaryFilePath: '/var/config/rest/downloads/tmp/abc.rpm',
+      generation: 0,
+      lastUpdateMicros: 1562732357892691,
+    };
+  },
+
+  bigipDOInstall200: () => {
+    return {
+      packageFilePath: '/var/config/rest/downloads/abc.rpm',
+      operation: 'INSTALL',
+      id: 'f3a521d0-b344-44b8-a8c8-757b743a2c12',
+      status: 'CREATED',
+      userReference: {
+        link: 'https://localhost/mgmt/shared/authz/users/admin',
+      },
+      identityReferences: [
+        {
+          link: 'https://localhost/mgmt/shared/authz/users/admin',
+        },
+      ],
+      ownerMachineId: 'f2176dec-24d9-4202-8803-83f8473392b1',
+      generation: 1,
+      lastUpdateMicros: 1562732534678459,
+      kind:
+        'shared:iapp:package-management-tasks:iapppackagemanagementtaskstate',
+      selfLink:
+        'https://localhost/mgmt/shared/iapp/package-management-tasks/f3a521d0-b344-44b8-a8c8-757b743a2c12',
+    };
+  },
+  bigipDOInstallstatus200: () => {
+    return {
+      packageFilePath: '/var/config/rest/downloads/abc.rpm',
+      packageName: 'f5-declarative-onboarding-1.5.0-11.noarch',
+      operation: 'INSTALL',
+      packageManifest: {
+        tags: ['PLUGIN'],
+      },
+      id: 'f3a521d0-b344-44b8-a8c8-757b743a2c12',
+      status: 'FINISHED',
+      startTime: '2019-07-09T21:22:14.685-0700',
+      endTime: '2019-07-09T21:22:15.503-0700',
+      userReference: {
+        link: 'https://localhost/mgmt/shared/authz/users/admin',
+      },
+      identityReferences: [
+        {
+          link: 'https://localhost/mgmt/shared/authz/users/admin',
+        },
+      ],
+      ownerMachineId: 'f2176dec-24d9-4202-8803-83f8473392b1',
+      generation: 3,
+      lastUpdateMicros: 1562732535510091,
+      kind:
+        'shared:iapp:package-management-tasks:iapppackagemanagementtaskstate',
+      selfLink:
+        'https://localhost/mgmt/shared/iapp/package-management-tasks/f3a521d0-b344-44b8-a8c8-757b743a2c12',
+    };
+  },
   bigipGlobalSettings200: () => {
     return {
       awsApiMaxConcurrency: 1,

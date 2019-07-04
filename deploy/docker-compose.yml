@@ -53,6 +53,7 @@ services:
       - 8080:80
     volumes:
       - /var/tmp/ASGExtensions:/root/lx
+      - /var/tmp/DO:/tmp/do
     depends_on:
       - FLUENTD
     logging:

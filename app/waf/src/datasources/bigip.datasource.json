@@ -25,6 +25,53 @@
           "cred64en"
         ]
       }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "timout": 2000,
+        "url": "{url}",
+        "body": "{body}",
+        "headers": {
+          "Authorization": "{cred64en}",
+          "Content-Type": "application/octet-stream",
+          "Content-Range":"0-{end}/{length}",
+          "Connection":"keep-alive"
+        },
+        "responsePath": "$",
+        "responseHeaders": true
+      },
+      "functions": {
+        "uploadDO": [
+          "url",
+          "cred64en",
+          "end",
+          "length",
+          "body"
+        ]
+      }
     }
+    ,
+    {
+      "template": {
+        "method": "POST",
+        "timout": 2000,
+        "url": "{url}",
+        "body":"{body}",
+        "headers": {
+          "Authorization": "{cred64en}"
+        },
+        "responsePath": "$",
+        "responseHeaders": true
+      },
+      "functions": {
+        "installDO": [
+          "url",
+          "cred64en",
+          "body"
+        ]
+      }
+    }
+
   ]
 }
