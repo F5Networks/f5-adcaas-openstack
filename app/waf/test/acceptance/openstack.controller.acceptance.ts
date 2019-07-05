@@ -571,11 +571,15 @@ describe('openstack.identity.test', () => {
           OS_REGION_NAME: 'RegionOne',
           OS_AVAILABLE_ZONE: 'nova',
         },
-        param: {},
+        param: {
+          networkId: ExpectedData.networks.management.networkId,
+        },
       })
       .expect(200);
 
-    expect(response.body).containDeep({id: ExpectedData.portId});
+    expect(response.body).containDeep({
+      id: ExpectedData.networks.management.portId,
+    });
   });
 
   it('create a port: 400', async () => {

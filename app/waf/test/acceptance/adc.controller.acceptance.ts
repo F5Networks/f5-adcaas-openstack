@@ -192,7 +192,7 @@ describe('AdcController test', () => {
       type: 'HW',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -207,7 +207,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -217,7 +217,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -227,7 +227,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -276,7 +276,7 @@ describe('AdcController test', () => {
       type: 'VE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -305,7 +305,7 @@ describe('AdcController test', () => {
       type: 'VE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -400,7 +400,7 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -412,7 +412,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -422,7 +422,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ERROR',
           },
         ],
@@ -457,7 +457,7 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -470,7 +470,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -514,7 +514,7 @@ describe('AdcController test', () => {
       type: 'HW',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -529,7 +529,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -539,7 +539,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -577,7 +577,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -592,7 +592,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -602,7 +602,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -648,7 +648,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -663,7 +663,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -673,7 +673,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -683,7 +683,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -735,7 +735,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
 
             username: 'admin',
@@ -751,7 +751,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -761,7 +761,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -815,7 +815,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -830,7 +830,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -840,7 +840,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -1248,7 +1248,7 @@ describe('AdcController test', () => {
       status: 'ONBOARDED',
     });
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-    ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
+    ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
 
     BigipShouldResponseWith({
       '/mgmt/shared/declarative-onboarding/info':
@@ -1322,13 +1322,47 @@ describe('AdcController test', () => {
       license: 'my-fake-license',
       management: {},
     });
+    // =======
+    //   it(
+    //     'post ' + prefix + '/adcs/{adcId}/action: setup done with license key',
+    //     async () => {
+    //       let adc = await givenAdcData(wafapp, {
+    //         status: 'POWERON',
+    //         license: 'my-fake-license',
+    //       });
+    //       ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+    //       ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
+
+    //       let trustDeviceId = uuid();
+    //       trustStub.returns({
+    //         devices: [
+    //           {
+    //             targetUUID: trustDeviceId,
+    //             targetHost: adc.management.connection!.ipAddress,
+    //             state: 'CREATED',
+    //           },
+    //         ],
+    //       });
+
+    //       queryStub.returns({
+    //         devices: [
+    //           {
+    //             targetUUID: trustDeviceId,
+    //             targetHost: adc.management.connection!.ipAddress,
+    //             state: 'ACTIVE',
+    //           },
+    //         ],
+    //       });
+
+    //       queryExtensionsStub.onCall(0).returns([]);
+    // >>>>>>> Refactor network acceptance test: network subnet port.
 
     let trustDeviceId = uuid();
     trustStub.returns({
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -1338,7 +1372,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],

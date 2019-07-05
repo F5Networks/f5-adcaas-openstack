@@ -460,13 +460,13 @@ describe('DeclarationController', () => {
       applicationId: application.id,
       id: ExpectedData.declarationId,
     });
-    ExpectedData.virtualAddress = '1.2.3.4';
+    ExpectedData.networks.external.virtualAddress = '1.2.3.4';
 
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -500,7 +500,7 @@ describe('DeclarationController', () => {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -535,7 +535,7 @@ describe('DeclarationController', () => {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -568,7 +568,7 @@ describe('DeclarationController', () => {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',

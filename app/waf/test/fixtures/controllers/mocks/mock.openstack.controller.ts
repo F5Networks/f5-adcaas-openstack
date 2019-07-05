@@ -101,7 +101,8 @@ export class MockNovaController extends MockBaseController {
 export class MockNeutronController extends MockBaseController {
   @post('/v2.0/ports')
   async v2CreatePort(@requestBody() reqBody: RequestBody): Promise<object> {
-    return ResponseWith['/v2.0/ports']();
+    //@ts-ignore requestBody containes port object.
+    return ResponseWith['/v2.0/ports'](reqBody.port.network_id);
   }
 
   @del('/v2.0/ports/{portId}')
@@ -124,8 +125,10 @@ export class MockNeutronController extends MockBaseController {
   }
 
   @get('/v2.0/subnets')
-  async v2GetSubnets(): Promise<object> {
-    return ResponseWith['/v2.0/subnets']();
+  async v2GetSubnets(
+    @param.query.string('network_id') networkId: string,
+  ): Promise<object> {
+    return ResponseWith['/v2.0/subnets'](networkId);
   }
 
   @post('/v2.0/floatingips')
