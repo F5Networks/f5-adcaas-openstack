@@ -21,7 +21,7 @@ services:
     logging:
       driver: fluentd
       options:
-        fluentd-address: '0.0.0.0:24224'
+        fluentd-address: "0.0.0.0:24224"
         tag: f5-wafaas
 
   postgres:
@@ -40,7 +40,7 @@ services:
     logging:
       driver: fluentd
       options:
-        fluentd-address: '0.0.0.0:24224'
+        fluentd-address: "0.0.0.0:24224"
         tag: postgres
 
   ASG:
@@ -58,11 +58,11 @@ services:
     logging:
       driver: fluentd
       options:
-        fluentd-address: '0.0.0.0:24224'
+        fluentd-address: "0.0.0.0:24224"
         tag: f5-asg
 
   DO:
-    image: f5devcentral/f5-do-container:1.4.0-1
+    image: f5devcentral/f5-do-container:1.5.0
     container_name: DO
     ports:
       - 9443:443
@@ -72,7 +72,7 @@ services:
     logging:
       driver: fluentd
       options:
-        fluentd-address: '0.0.0.0:24224'
+        fluentd-address: "0.0.0.0:24224"
         tag: f5-do
 
   FLUENTD:
@@ -84,7 +84,6 @@ services:
       - ./fluentd.conf:/fluentd/etc/test.conf
     environment:
       - FLUENTD_CONF=test.conf
-
 # networks:
 #   app_net:
 #     driver: bridge

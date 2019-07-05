@@ -3,6 +3,13 @@
   "connector": "rest",
   "baseURL": "",
   "crud": true,
+  "options": {
+    "headers": {
+      "accept": "application/json",
+      "content-type": "application/json"
+    },
+    "strictSSL": false
+  },
   "operations": [
     {
       "template": {
