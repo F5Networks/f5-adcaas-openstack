@@ -47,6 +47,7 @@ export type ConfigTypes = {
     imageRef: string;
     flavorRef: string;
     userData?: string;
+    sshKey?: string;
   };
   //floatingNetworkId?: string;
   securityGroup?: [string];
