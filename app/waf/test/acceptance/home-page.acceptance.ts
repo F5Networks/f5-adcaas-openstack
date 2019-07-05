@@ -26,15 +26,15 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   teardownEnvs,
   setupEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
+  RestApplicationPort,
   ExpectedData,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('HomePage', () => {
   let wafapp: WafApplication;

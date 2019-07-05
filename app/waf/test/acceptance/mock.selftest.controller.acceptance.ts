@@ -20,9 +20,9 @@ import {
   RestAppAndClient,
   teardownRestAppAndClient,
   TestingApplication,
-  RestApplicationPort,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {MockSelfTestController} from '../fixtures/controllers/mocks/mock.selftest.controller';
+import {RestApplicationPort} from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack integration acceptance test', () => {
   let restAppAndClient: RestAppAndClient;

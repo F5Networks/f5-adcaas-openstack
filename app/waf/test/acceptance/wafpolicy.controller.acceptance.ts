@@ -26,11 +26,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenWafpolicyData,
@@ -40,11 +39,14 @@ import {
 import {
   OSShouldResponseWith,
   MockKeyStoneController,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 import uuid = require('uuid');
 import {WafpolicyController} from '../../src/controllers';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('WafpolicyController', () => {
   let wafapp: WafApplication;

@@ -27,11 +27,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenAdcData,
@@ -44,7 +43,6 @@ import {
   MockNovaController,
   MockNeutronController,
   OSShouldResponseWith,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   MockBigipController,
@@ -61,6 +59,10 @@ import {
   ASGShouldResponseWith,
   MockASGController,
 } from '../fixtures/controllers/mocks/mock.asg.controller';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('AdcController test', () => {
   let wafapp: WafApplication;

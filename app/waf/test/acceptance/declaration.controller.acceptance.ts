@@ -21,11 +21,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
@@ -47,7 +46,6 @@ import {
 import {
   OSShouldResponseWith,
   MockKeyStoneController,
-  ExpectedData,
   MockNeutronController,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
@@ -56,6 +54,10 @@ import {
 } from '../fixtures/controllers/mocks/mock.asg.controller';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('DeclarationController', () => {
   let wafapp: WafApplication;

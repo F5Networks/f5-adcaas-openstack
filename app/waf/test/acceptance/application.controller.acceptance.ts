@@ -26,11 +26,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
@@ -40,7 +39,6 @@ import {
 import {
   OSShouldResponseWith,
   MockKeyStoneController,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 import {
@@ -48,6 +46,10 @@ import {
   ASGShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.asg.controller';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('ApplicationController', () => {
   let wafapp: WafApplication;

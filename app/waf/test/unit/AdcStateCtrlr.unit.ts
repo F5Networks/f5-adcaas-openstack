@@ -1,16 +1,14 @@
 import {
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   setupEnvs,
   teardownRestAppAndClient,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   MockKeyStoneController,
   MockNovaController,
   MockNeutronController,
   OSShouldResponseWith,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   MockBigipController,
@@ -31,7 +29,11 @@ import {expect} from '@loopback/testlab';
 import {AdcStateCtrlr, AddonReqValues} from '../../src/controllers';
 import {Adc} from '../../src/models';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+import {
+  StubResponses,
+  ExpectedData,
+  RestApplicationPort,
+} from '../fixtures/datasources/testrest.datasource';
 
 type CheckEntry = {
   src: string;

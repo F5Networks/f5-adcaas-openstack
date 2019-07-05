@@ -21,11 +21,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenPoolData,
@@ -34,8 +33,11 @@ import {
 import {
   OSShouldResponseWith,
   MockKeyStoneController,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('PoolController', () => {
   let wafapp: WafApplication;

@@ -26,21 +26,21 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   setupEnvs,
   teardownRestAppAndClient,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenAdcData,
   givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
-  MockKeyStoneController,
+  RestApplicationPort,
   ExpectedData,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('TenantAssociationController', () => {
   let wafapp: WafApplication;

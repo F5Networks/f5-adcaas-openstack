@@ -21,11 +21,10 @@ import {
   teardownApplication,
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenServiceData,
@@ -35,9 +34,12 @@ import {
 import {
   OSShouldResponseWith,
   MockKeyStoneController,
-  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {deepcopy} from '../../src/utils';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 import uuid = require('uuid');
 

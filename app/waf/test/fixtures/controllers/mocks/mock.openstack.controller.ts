@@ -25,10 +25,12 @@ import {
   put,
 } from '@loopback/rest';
 import {RequestBody} from '../openstack.controller';
-import {StubResponses} from '../../datasources/testrest.datasource';
+import {
+  StubResponses,
+  ExpectedData,
+} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
 import {inject} from '@loopback/core';
-import {RestApplicationPort} from '../../../helpers/test-helper';
 
 export class MockKeyStoneController extends MockBaseController {
   constructor(
@@ -176,31 +178,3 @@ export function OSShouldResponseWith(spec: {[key: string]: Function}) {
   };
   Object.assign(ResponseWith, spec);
 }
-
-export const ExpectedData = {
-  adcId: '3efa393d-eb7a-4ae8-8222-e4b99f14adcf',
-  userToken: '8cf3d2447253455385c36254192cc4fe',
-  userId: '2d26c96aa0f345eaafc3f5b50d2bbd8e',
-  serverId: 'fef1e40c-ed9d-4e10-b10c-d60d3af70623',
-  portId: 'fcc768fd-1439-48f2-b2df-6d7e867c86a7',
-  vmId: 'f250c956-bdd7-41cd-b3d5-03a79c7d90f8',
-  tenantId: 'fdac59f5b20046829ea58720702a74af',
-  bigipMgmt: {
-    hostname: 'test-asm.example1234.openstack.com',
-    macAddr: 'fa:16:3e:a2:25:bc',
-    ipAddr: '127.0.0.1',
-    tcpPort: RestApplicationPort.SSLCustom,
-    ipPoolCIDR: '127.0.0.1/24',
-    networkId: '0e51e68c-08f7-4e32-af54-328d29b93467',
-  },
-  doTaskId: 'fe96c41e-6850-4210-bf3b-1902ad27dff4',
-  declarationId: '3cc12f17-a6c7-4884-a119-98b456fe2020',
-  memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
-  applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
-  trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
-  virtualAddress: '10.0.0.23',
-  ExtNetwork: {
-    MacAddr: 'f2:16:4e:c4:65:b8',
-    IpAddr: '10.1.1.3',
-  },
-};

@@ -53,9 +53,9 @@ import {
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {isNullOrUndefined} from 'util';
-import {ExpectedData} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {BigipBuiltInProperties} from '../../src/services';
 import {merge} from '../../src/utils';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);

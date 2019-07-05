@@ -17,13 +17,11 @@
 import {
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
-} from '../helpers/test-helper';
+} from '../helpers/testsetup-helper';
 import {Client, expect} from '@loopback/testlab';
 import {
   MockKeyStoneController,
-  ExpectedData,
   OSShouldResponseWith,
   MockNovaController,
   MockNeutronController,
@@ -32,6 +30,10 @@ import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {OpenstackController} from '../fixtures/controllers/openstack.controller';
 import {OpenStackComponent} from '../../src/components';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack.identity.test', () => {
   let mockKeystoneApp: TestingApplication;
