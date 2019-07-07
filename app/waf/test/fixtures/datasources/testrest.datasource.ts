@@ -728,40 +728,6 @@ export const StubResponses = {
         },
       };
     }
-    // return {
-    //   port: {
-    //     status: 'DOWN',
-    //     'binding:host_id': '',
-    //     description: '',
-    //     allowed_address_pairs: [],
-    //     tags: [],
-    //     extra_dhcp_opts: [],
-    //     updated_at: '2019-03-14T03:16:34Z',
-    //     device_owner: '',
-    //     revision_number: 4,
-    //     'binding:profile': {},
-    //     fixed_ips: [
-    //       {
-    //         subnet_id: '86f9f11b-0895-4af7-b3cf-71acda85f1db',
-    //         ip_address: ExpectedData.bigipMgmt.ipAddr,
-    //       },
-    //     ],
-    //     id: ExpectedData.portId,
-    //     security_groups: ['24989b80-aacd-4c74-aabd-dcb1f55e5012'],
-    //     device_id: '',
-    //     name: 'port-port-name-729171',
-    //     admin_state_up: true,
-    //     network_id: '89449ba4-34f8-404d-93f6-fd1fd8a8296e',
-    //     tenant_id: 'ef9fd3e3df664e558f043bd24c1fca21',
-    //     'binding:vif_details': {},
-    //     'binding:vnic_type': 'normal',
-    //     'binding:vif_type': 'unbound',
-    //     mac_address: ExpectedData.bigipMgmt.macAddr,
-    //     project_id: 'ef9fd3e3df664e558f043bd24c1fca21',
-    //     created_at: '2019-03-14T03:16:34Z',
-    //     port_security_enabled: false,
-    //   },
-    // };
   },
 
   neutronUpdatePort200: () => {
@@ -1228,6 +1194,22 @@ export const StubResponses = {
   },
 
   bigipDOChange2OK200: (state: string = 'OK') => {
+    return [
+      {
+        id: 0,
+        selfLink: 'https://localhost/mgmt/shared/declarative-onboarding/info',
+        result: {
+          class: 'Result',
+          code: 200,
+          status: state,
+          message: '',
+          errors: [],
+        },
+      },
+    ];
+  },
+
+  bigipDOInfo200: (state: string = 'OK') => {
     return [
       {
         id: 0,

@@ -24,38 +24,26 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   teardownEnvs,
   setupEnvs,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
-import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {
-  RestApplicationPort,
-  ExpectedData,
-} from '../fixtures/datasources/testrest.datasource';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 describe('HomePage', () => {
   let wafapp: WafApplication;
   let client: Client;
-  let mockKeystoneApp: TestingApplication;
 
   before('setupApplication', async () => {
     ({wafapp, client} = await setupApplication());
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
+    await setupDepApps();
     setupEnvs();
   });
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 

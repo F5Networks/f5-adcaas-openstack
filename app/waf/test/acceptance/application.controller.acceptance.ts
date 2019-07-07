@@ -24,11 +24,10 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
@@ -36,12 +35,9 @@ import {
   givenAdcData,
   createApplicationObject,
 } from '../helpers/database.helpers';
-import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
-import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
 import {
-  RestApplicationPort,
   ExpectedData,
   LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
@@ -50,29 +46,12 @@ describe('ApplicationController', () => {
   let wafapp: WafApplication;
   let client: Client;
   let deployStub: sinon.SinonStub;
-  let mockKeystoneApp: TestingApplication;
-  let mockASGApp: TestingApplication;
   let asg: ASGService;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-    mockASGApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     asg = await new ASGServiceProvider().value();
@@ -88,9 +67,8 @@ describe('ApplicationController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
-    teardownRestAppAndClient(mockASGApp);
   });
 
   afterEach(async () => {

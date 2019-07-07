@@ -19,11 +19,10 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
@@ -44,57 +43,22 @@ import {
   givenAdcData,
 } from '../helpers/database.helpers';
 import {
-  MockKeyStoneController,
-  MockNeutronController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
-import {
   StubResponses,
   LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
-import {
-  RestApplicationPort,
-  ExpectedData,
-} from '../fixtures/datasources/testrest.datasource';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 describe('DeclarationController', () => {
   let wafapp: WafApplication;
   let client: Client;
   let deployStub: sinon.SinonStub;
-  let mockKeystoneApp: TestingApplication;
-  let mockASG: TestingApplication;
-  let mockNeutronApp: TestingApplication;
   let asg: ASGService;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockASG = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     asg = await new ASGServiceProvider().value();
@@ -110,9 +74,7 @@ describe('DeclarationController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockASG);
-    teardownRestAppAndClient(mockNeutronApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 

@@ -24,11 +24,10 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
@@ -36,12 +35,10 @@ import {
   createWafpolicyObject,
   givenAdcData,
 } from '../helpers/database.helpers';
-import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 import uuid = require('uuid');
 import {WafpolicyController} from '../../src/controllers';
 import {
-  RestApplicationPort,
   ExpectedData,
   LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
@@ -49,7 +46,6 @@ import {
 describe('WafpolicyController', () => {
   let wafapp: WafApplication;
   let client: Client;
-  let mockKeystoneApp: TestingApplication;
   let controller: WafpolicyController;
   let uploadWafpolicyStub: sinon.SinonStub;
   let checkWafpolicyStub: sinon.SinonStub;
@@ -57,13 +53,7 @@ describe('WafpolicyController', () => {
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<WafpolicyController>(
@@ -94,7 +84,7 @@ describe('WafpolicyController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 

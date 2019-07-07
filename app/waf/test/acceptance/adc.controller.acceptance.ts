@@ -25,11 +25,10 @@ import {AdcController} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
+  teardownDepApps,
+  setupDepApps,
 } from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
@@ -38,22 +37,12 @@ import {
   createAdcObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
-import {
-  MockKeyStoneController,
-  MockNovaController,
-  MockNeutronController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {MockBigipController} from '../fixtures/controllers/mocks/mock.bigip.controller';
-import {MockDOController} from '../fixtures/controllers/mocks/mock.do.controller';
 import {checkAndWait, setDefaultInterval, sleep} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
 import {
   StubResponses,
-  LetResponseWith,
-} from '../fixtures/datasources/testrest.datasource';
-import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
-import {
   RestApplicationPort,
+  LetResponseWith,
   ExpectedData,
 } from '../fixtures/datasources/testrest.datasource';
 
@@ -67,66 +56,10 @@ describe('AdcController test', () => {
   let installStub: sinon.SinonStub;
   let queryExtensionsStub: sinon.SinonStub;
 
-  let mockKeystoneApp: TestingApplication;
-  let mockNovaApp: TestingApplication;
-  let mockNeutronApp: TestingApplication;
-  let mockBigip: TestingApplication;
-  let mockDO: TestingApplication;
-  let mockASG: TestingApplication;
-
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockNovaApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Nova,
-        MockNovaController,
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
-    mockBigip = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.SSLCustom,
-        MockBigipController,
-        'https',
-      );
-      return restApp;
-    })();
-
-    mockDO = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Onboarding,
-        MockDOController,
-      );
-      return restApp;
-    })();
-
-    mockASG = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<AdcController>('controllers.AdcController');
@@ -164,12 +97,7 @@ describe('AdcController test', () => {
     let fs = require('fs');
     fs.unlinkSync(process.env.DO_RPM_PACKAGE!);
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockDO);
-    teardownRestAppAndClient(mockBigip);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockNovaApp);
-    teardownRestAppAndClient(mockNeutronApp);
-    teardownRestAppAndClient(mockASG);
+    await teardownDepApps();
     await teardownEnvs();
   });
 
@@ -1122,8 +1050,8 @@ describe('AdcController test', () => {
       management: {},
     });
 
-    BigipShouldResponseWith({
-      '/mgmt/shared/declarative-onboarding/info':
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
     });
     let response = await client
@@ -1241,8 +1169,8 @@ describe('AdcController test', () => {
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
 
-    BigipShouldResponseWith({
-      '/mgmt/shared/declarative-onboarding/info':
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
     });
 

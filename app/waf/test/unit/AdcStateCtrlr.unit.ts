@@ -1,27 +1,8 @@
 import {
-  TestingApplication,
-  setupRestAppAndClient,
   setupEnvs,
-  teardownRestAppAndClient,
+  teardownDepApps,
+  setupDepApps,
 } from '../helpers/testsetup-helper';
-import {
-  MockKeyStoneController,
-  MockNovaController,
-  MockNeutronController,
-  OSShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {
-  MockBigipController,
-  BigipShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.bigip.controller';
-import {
-  MockDOController,
-  DOShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.do.controller';
-import {
-  MockASGController,
-  ASGShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
 import {BigipBuiltInProperties, AuthedToken} from '../../src/services';
 import {setDefaultInterval} from '../../src/utils';
 import {createAdcObject} from '../helpers/database.helpers';
@@ -33,6 +14,7 @@ import {
   StubResponses,
   ExpectedData,
   RestApplicationPort,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 type CheckEntry = {
@@ -42,65 +24,10 @@ type CheckEntry = {
 };
 
 describe('test AdcStateCtrlr', () => {
-  let mockKeystoneApp: TestingApplication;
-  let mockNovaApp: TestingApplication;
-  let mockNeutronApp: TestingApplication;
-  let mockBigip: TestingApplication;
-  let mockDO: TestingApplication;
-  let mockASG: TestingApplication;
-
   let addonReq: AddonReqValues;
 
   before(async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockNovaApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Nova,
-        MockNovaController,
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
-    mockBigip = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.SSLCustom,
-        MockBigipController,
-        'https',
-      );
-      return restApp;
-    })();
-
-    mockDO = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Onboarding,
-        MockDOController,
-      );
-      return restApp;
-    })();
-
-    mockASG = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
+    await setupDepApps();
 
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     setDefaultInterval(1);
@@ -114,20 +41,12 @@ describe('test AdcStateCtrlr', () => {
     stubLogger();
   });
   beforeEach(() => {
-    OSShouldResponseWith({});
-    DOShouldResponseWith({});
-    BigipShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith();
   });
   afterEach(() => {});
   after(async () => {
     restoreLogger();
-    teardownRestAppAndClient(mockDO);
-    teardownRestAppAndClient(mockBigip);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockNovaApp);
-    teardownRestAppAndClient(mockNeutronApp);
-    teardownRestAppAndClient(mockASG);
+    await teardownDepApps();
   });
 
   let buildCheck = function(s: string): CheckEntry {
@@ -160,7 +79,7 @@ describe('test AdcStateCtrlr', () => {
   myit('POWERON -> DOINSTALLED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -171,7 +90,7 @@ describe('test AdcStateCtrlr', () => {
   myit('DOINSTALLED -> ONBOARDED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -185,7 +104,7 @@ describe('test AdcStateCtrlr', () => {
       id: ExpectedData.adcId,
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: BigipBuiltInProperties.admin,
           password: 'admin',
@@ -200,7 +119,7 @@ describe('test AdcStateCtrlr', () => {
   myit('TRUSTED -> INSTALLED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -212,7 +131,7 @@ describe('test AdcStateCtrlr', () => {
   myit('INSTALLED -> PARTITIONED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -225,7 +144,7 @@ describe('test AdcStateCtrlr', () => {
     tenantId: ExpectedData.tenantId,
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -248,7 +167,7 @@ describe('test AdcStateCtrlr', () => {
   myit('ONBOARDERROR -> ONBOARDED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -259,7 +178,7 @@ describe('test AdcStateCtrlr', () => {
   myit('ONBOARDERROR -> RECLAIMED ✓', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -279,7 +198,7 @@ describe('test AdcStateCtrlr', () => {
   myit('TRUSTED -> INSTALLED x : missing trustedDeviceId', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -291,7 +210,7 @@ describe('test AdcStateCtrlr', () => {
   myit('PARTITIONED -> ACTIVE x : missing tenantId', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -302,7 +221,7 @@ describe('test AdcStateCtrlr', () => {
   myit('RECLAIMED -> POWERON x : existing connection.', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -335,9 +254,9 @@ describe('test AdcStateCtrlr', () => {
       vmId: null,
       networks: {
         mgmt1: {
-          fixedIp: ExpectedData.bigipMgmt.ipAddr,
-          macAddr: ExpectedData.bigipMgmt.macAddr,
-          portId: ExpectedData.portId,
+          fixedIp: ExpectedData.networks.management.ipAddr,
+          macAddr: ExpectedData.networks.management.macAddr,
+          portId: ExpectedData.networks.management.portId,
         },
       },
     },
@@ -355,7 +274,7 @@ describe('test AdcStateCtrlr', () => {
   myit('INSTALLED -> PARTITIONED x: missing trustedDeviceId', {
     management: {
       connection: {
-        ipAddress: ExpectedData.bigipMgmt.ipAddr,
+        ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
         username: BigipBuiltInProperties.admin,
         password: 'admin',
@@ -387,7 +306,7 @@ describe('test AdcStateCtrlr', () => {
     {
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: BigipBuiltInProperties.admin,
           password: 'admin',
@@ -396,8 +315,8 @@ describe('test AdcStateCtrlr', () => {
       },
     },
     () => {
-      BigipShouldResponseWith({
-        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      LetResponseWith({
+        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
       });
     },
   );

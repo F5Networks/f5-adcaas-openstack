@@ -34,6 +34,14 @@ import {
   RestApplicationPort,
   Environments,
 } from '../fixtures/datasources/testrest.datasource';
+import {
+  MockKeyStoneController,
+  MockNovaController,
+  MockNeutronController,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockBigipController} from '../fixtures/controllers/mocks/mock.bigip.controller';
+import {MockDOController} from '../fixtures/controllers/mocks/mock.do.controller';
+import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
@@ -108,8 +116,8 @@ export async function setupRestAppAndClient(
   return {restApp: restApp, client: client};
 }
 
-export function teardownRestAppAndClient(app: TestingApplication) {
-  app.stop();
+export async function teardownRestAppAndClient(app: TestingApplication) {
+  await app.stop();
 }
 
 export interface RestAppAndClient {
@@ -131,4 +139,47 @@ export async function teardownEnvs() {
   for (let k of Object.keys(Environments)) {
     delete process.env[k];
   }
+}
+
+let mockKeystoneApp: TestingApplication;
+let mockNovaApp: TestingApplication;
+let mockNeutronApp: TestingApplication;
+let mockBigipApp: TestingApplication;
+let mockDOApp: TestingApplication;
+let mockASGApp: TestingApplication;
+
+export async function setupDepApps() {
+  await Promise.all([
+    setupRestAppAndClient(
+      RestApplicationPort.IdentityAdmin,
+      MockKeyStoneController,
+    ),
+    setupRestAppAndClient(RestApplicationPort.Nova, MockNovaController),
+    setupRestAppAndClient(RestApplicationPort.Neutron, MockNeutronController),
+    setupRestAppAndClient(
+      RestApplicationPort.SSLCustom,
+      MockBigipController,
+      'https',
+    ),
+    setupRestAppAndClient(RestApplicationPort.Onboarding, MockDOController),
+    setupRestAppAndClient(RestApplicationPort.ASG, MockASGController, 'https'),
+  ]).then(([keystone, nova, neutron, bigip, doapp, asg]) => {
+    mockKeystoneApp = keystone.restApp;
+    mockNovaApp = nova.restApp;
+    mockNeutronApp = neutron.restApp;
+    mockBigipApp = bigip.restApp;
+    mockDOApp = doapp.restApp;
+    mockASGApp = asg.restApp;
+  });
+}
+
+export async function teardownDepApps() {
+  await Promise.all([
+    teardownRestAppAndClient(mockDOApp),
+    teardownRestAppAndClient(mockBigipApp),
+    teardownRestAppAndClient(mockKeystoneApp),
+    teardownRestAppAndClient(mockNovaApp),
+    teardownRestAppAndClient(mockNeutronApp),
+    teardownRestAppAndClient(mockASGApp),
+  ]);
 }

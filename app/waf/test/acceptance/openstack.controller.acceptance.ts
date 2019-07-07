@@ -18,13 +18,10 @@ import {
   TestingApplication,
   setupRestAppAndClient,
   teardownRestAppAndClient,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
 import {Client, expect} from '@loopback/testlab';
-import {
-  MockKeyStoneController,
-  MockNovaController,
-  MockNeutronController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {
   StubResponses,
@@ -38,38 +35,11 @@ import {
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack.identity.test', () => {
-  let mockKeystoneApp: TestingApplication;
-  let mockNovaApp: TestingApplication;
-  let mockNeutronApp: TestingApplication;
-
   let testApp: TestingApplication;
   let client: Client;
 
   before('setup', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockNovaApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Nova,
-        MockNovaController,
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     let restAppAndClient = await setupRestAppAndClient(
       RestApplicationPort.WafApp,
       OpenstackController,
@@ -84,9 +54,7 @@ describe('openstack.identity.test', () => {
   after('teardown', async () => {
     restoreLogger();
     teardownRestAppAndClient(testApp);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockNovaApp);
-    teardownRestAppAndClient(mockNeutronApp);
+    await teardownDepApps();
   });
 
   it('identity v2 auth admin token: 200', async () => {

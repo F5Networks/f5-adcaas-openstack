@@ -19,11 +19,10 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
+  setupDepApps,
+  teardownDepApps,
 } from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
@@ -31,10 +30,8 @@ import {
   givenApplicationData,
   givenPoolData,
 } from '../helpers/database.helpers';
-import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {deepcopy} from '../../src/utils';
 import {
-  RestApplicationPort,
   ExpectedData,
   LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
@@ -51,19 +48,11 @@ const defaultRequest = {
 describe('ServiceController', () => {
   let wafapp: WafApplication;
   let client: Client;
-  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
     LetResponseWith({});
     setupEnvs();
@@ -75,7 +64,7 @@ describe('ServiceController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 
