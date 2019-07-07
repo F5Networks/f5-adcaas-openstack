@@ -36,16 +36,14 @@ import {
   createWafpolicyObject,
   givenAdcData,
 } from '../helpers/database.helpers';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 
 import uuid = require('uuid');
 import {WafpolicyController} from '../../src/controllers';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('WafpolicyController', () => {
@@ -72,7 +70,7 @@ describe('WafpolicyController', () => {
       'controllers.WafpolicyController',
     );
 
-    OSShouldResponseWith({});
+    LetResponseWith({});
     setupEnvs();
   });
 

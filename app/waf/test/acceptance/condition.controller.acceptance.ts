@@ -32,14 +32,12 @@ import {
   createConditionObject,
 } from '../helpers/database.helpers';
 
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('ConditionController', () => {
@@ -58,7 +56,7 @@ describe('ConditionController', () => {
       return restApp;
     })();
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith();
     setupEnvs();
   });
   beforeEach('Empty database', async () => {

@@ -36,19 +36,14 @@ import {
   givenAdcData,
   createApplicationObject,
 } from '../helpers/database.helpers';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
-import {
-  MockASGController,
-  ASGShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
+import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('ApplicationController', () => {
@@ -82,8 +77,7 @@ describe('ApplicationController', () => {
 
     asg = await new ASGServiceProvider().value();
 
-    OSShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith({});
     setupEnvs();
   });
 

@@ -32,13 +32,11 @@ import {
   createMemberObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('MemberController', () => {
@@ -58,7 +56,7 @@ describe('MemberController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith();
     setupEnvs();
   });
 

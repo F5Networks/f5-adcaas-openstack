@@ -21,10 +21,7 @@ import {
   setupEnvs,
   teardownEnvs,
 } from '../helpers/testsetup-helper';
-import {
-  MockKeyStoneController,
-  OSShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {MockSelfTestController} from '../fixtures/controllers/mocks/mock.selftest.controller';
 import {Client, expect} from '@loopback/testlab';
 import {OpenStackComponent} from '../../src/components';
@@ -33,6 +30,7 @@ import {MySequence} from '../../src/sequence';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack.identity.test', () => {
@@ -61,7 +59,7 @@ describe('openstack.identity.test', () => {
 
     stubLogger();
 
-    OSShouldResponseWith({});
+    LetResponseWith({});
   });
 
   beforeEach('setup environs', async () => {

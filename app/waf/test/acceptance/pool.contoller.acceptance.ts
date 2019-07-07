@@ -30,13 +30,11 @@ import {
   givenPoolData,
   createPoolObject,
 } from '../helpers/database.helpers';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('PoolController', () => {
@@ -56,7 +54,7 @@ describe('PoolController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith();
     setupEnvs();
   });
 

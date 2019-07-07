@@ -42,23 +42,16 @@ import {
   MockKeyStoneController,
   MockNovaController,
   MockNeutronController,
-  OSShouldResponseWith,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {
-  MockBigipController,
-  BigipShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.bigip.controller';
-import {
-  MockDOController,
-  DOShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.do.controller';
+import {MockBigipController} from '../fixtures/controllers/mocks/mock.bigip.controller';
+import {MockDOController} from '../fixtures/controllers/mocks/mock.do.controller';
 import {checkAndWait, setDefaultInterval, sleep} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {
-  ASGShouldResponseWith,
-  MockASGController,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
+  StubResponses,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
+import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 import {
   RestApplicationPort,
   ExpectedData,
@@ -156,10 +149,7 @@ describe('AdcController test', () => {
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
 
-    OSShouldResponseWith({});
-    DOShouldResponseWith({});
-    BigipShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith();
   });
 
   afterEach(async () => {
@@ -502,8 +492,8 @@ describe('AdcController test', () => {
   );
 
   it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
-    ASGShouldResponseWith({
-      'GET:/mgmt/shared/TrustedDevices/{deviceId}':
+    LetResponseWith({
+      asg_get_mgmt_shared_trusteddevices_deviceId:
         StubResponses.trustDeviceStatusPending200,
     });
     await givenAdcData(wafapp, {
@@ -690,8 +680,8 @@ describe('AdcController test', () => {
       });
 
       queryExtensionsStub.returns([]);
-      BigipShouldResponseWith({
-        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      LetResponseWith({
+        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
       });
 
       let response = await client
@@ -768,8 +758,8 @@ describe('AdcController test', () => {
       });
 
       queryExtensionsStub.throws(new Error('query-not-working'));
-      BigipShouldResponseWith({
-        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      LetResponseWith({
+        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
       });
 
       let response = await client
@@ -1171,8 +1161,8 @@ describe('AdcController test', () => {
       management: {},
     });
 
-    OSShouldResponseWith({
-      'GET:/v2.0/floatingips':
+    LetResponseWith({
+      neutron_get_v2_0_floatingips:
         StubResponses.neutronGetFloatingIpsStateActive200,
     });
 
@@ -1210,8 +1200,9 @@ describe('AdcController test', () => {
         management: {},
       });
 
-      OSShouldResponseWith({
-        'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
+      LetResponseWith({
+        neutron_get_v2_0_floatingips:
+          StubResponses.neutronGetFloatingIpsEmpty200,
       });
 
       let response = await client
@@ -1322,40 +1313,6 @@ describe('AdcController test', () => {
       license: 'my-fake-license',
       management: {},
     });
-    // =======
-    //   it(
-    //     'post ' + prefix + '/adcs/{adcId}/action: setup done with license key',
-    //     async () => {
-    //       let adc = await givenAdcData(wafapp, {
-    //         status: 'POWERON',
-    //         license: 'my-fake-license',
-    //       });
-    //       ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-    //       ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
-
-    //       let trustDeviceId = uuid();
-    //       trustStub.returns({
-    //         devices: [
-    //           {
-    //             targetUUID: trustDeviceId,
-    //             targetHost: adc.management.connection!.ipAddress,
-    //             state: 'CREATED',
-    //           },
-    //         ],
-    //       });
-
-    //       queryStub.returns({
-    //         devices: [
-    //           {
-    //             targetUUID: trustDeviceId,
-    //             targetHost: adc.management.connection!.ipAddress,
-    //             state: 'ACTIVE',
-    //           },
-    //         ],
-    //       });
-
-    //       queryExtensionsStub.onCall(0).returns([]);
-    // >>>>>>> Refactor network acceptance test: network subnet port.
 
     let trustDeviceId = uuid();
     trustStub.returns({
@@ -1425,8 +1382,8 @@ describe('AdcController test', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}: delete done', async () => {
-    BigipShouldResponseWith({
-      '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
+    LetResponseWith({
+      bigip_get_mgmt_tm_sys_license: StubResponses.bigipNoLicense200,
     });
     let adc = await givenAdcData(wafapp, {
       type: 'VE',

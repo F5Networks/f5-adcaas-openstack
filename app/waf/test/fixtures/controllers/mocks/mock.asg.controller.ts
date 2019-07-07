@@ -15,13 +15,13 @@
  */
 
 import {post, requestBody, param, get, del, put} from '@loopback/rest';
-import {StubResponses} from '../../datasources/testrest.datasource';
+import {ResponseWith} from '../../datasources/testrest.datasource';
 import {MockBaseController} from './mock.base.controller';
 
 export class MockASGController extends MockBaseController {
   @post('/mgmt/shared/TrustedProxy')
   async trustedProxyPost(@requestBody() reqBody: object): Promise<object> {
-    return ResponseWith['POST:/mgmt/shared/TrustedProxy']();
+    return ResponseWith.asg_post_mgmt_shared_trustproxy!();
   }
 
   @get('/mgmt/shared/TrustedDevices/{deviceId}')
@@ -29,24 +29,24 @@ export class MockASGController extends MockBaseController {
     @param.path.string('deviceId') id: string,
   ): Promise<object> {
     let s = statusTrustDevice.shift();
-    return ResponseWith['GET:/mgmt/shared/TrustedDevices/{deviceId}'](s);
+    return ResponseWith.asg_get_mgmt_shared_trusteddevices_deviceId!(s);
   }
 
   @put('/mgmt/shared/TrustedDevices')
   async putTrustDevice(@requestBody() body: object): Promise<object> {
-    return ResponseWith['PUT:/mgmt/shared/TrustedDevices']();
+    return ResponseWith.asg_put_mgmt_shared_trusteddevices!();
   }
 
   @get('/mgmt/shared/TrustedDevices')
   async getTrustDevices(@requestBody() body: object): Promise<object> {
-    return ResponseWith['GET:/mgmt/shared/TrustedDevices']();
+    return ResponseWith.asg_get_mgmt_shared_trusteddevices!();
   }
 
   @del('/mgmt/shared/TrustedDevices/{deviceId}')
   async untrustDevice(
     @param.path.string('deviceId') id: string,
   ): Promise<object> {
-    return ResponseWith['DEL:/mgmt/shared/TrustedDevices/{deviceId}']();
+    return ResponseWith.asg_del_mgmt_shared_trusteddevices_deviceId!();
   }
 
   @post('/mgmt/shared/TrustedExtensions/{deviceId}')
@@ -54,7 +54,7 @@ export class MockASGController extends MockBaseController {
     @param.path.string('deviceId') id: string,
     @requestBody() body: object,
   ): Promise<object> {
-    return ResponseWith['POST:/mgmt/shared/TrustedExtensions/{deviceId}']();
+    return ResponseWith.asg_post_mgmt_shared_trustedextensions_deviceId!();
   }
 
   @get('/mgmt/shared/TrustedExtensions/{deviceId}')
@@ -62,28 +62,9 @@ export class MockASGController extends MockBaseController {
     @param.path.string('deviceId') id: string,
   ): Promise<object> {
     let s = statusTrustExtension.shift();
-    return ResponseWith['GET:/mgmt/shared/TrustedExtensions/{deviceId}'](s);
+    return ResponseWith.asg_get_mgmt_shared_trustedextensions_deviceId!(s);
   }
 }
 
 let statusTrustDevice = ['PENDING', 'PENDING', 'ACTIVE'];
 let statusTrustExtension = [undefined, 'UPLOADING', 'AVAILABLE'];
-let ResponseWith: {[key: string]: Function} = {};
-
-//TODO combine it with the one in openstack.
-export function ASGShouldResponseWith(spec: {[key: string]: Function}) {
-  ResponseWith = {
-    'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy200,
-    'GET:/mgmt/shared/TrustedDevices/{deviceId}':
-      StubResponses.trustDeviceStatusActive200,
-    'PUT:/mgmt/shared/TrustedDevices': StubResponses.trustDeviceStatusActive200,
-    'GET:/mgmt/shared/TrustedDevices': StubResponses.trustDevices200,
-    'DEL:/mgmt/shared/TrustedDevices/{deviceId}':
-      StubResponses.untrustDevice200,
-    'POST:/mgmt/shared/TrustedExtensions/{deviceId}':
-      StubResponses.installTrustedExtensions200,
-    'GET:/mgmt/shared/TrustedExtensions/{deviceId}':
-      StubResponses.queryTrustedExtensionsAvailable200,
-  };
-  Object.assign(ResponseWith, spec);
-}

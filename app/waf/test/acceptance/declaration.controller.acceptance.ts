@@ -44,15 +44,14 @@ import {
   givenAdcData,
 } from '../helpers/database.helpers';
 import {
-  OSShouldResponseWith,
   MockKeyStoneController,
   MockNeutronController,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 import {
-  ASGShouldResponseWith,
-  MockASGController,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+  StubResponses,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
 import {
   RestApplicationPort,
@@ -106,8 +105,7 @@ describe('DeclarationController', () => {
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
     deployStub = sinon.stub(asg, 'deploy');
-    OSShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith();
   });
 
   after(async () => {
@@ -493,8 +491,8 @@ describe('DeclarationController', () => {
       id: ExpectedData.declarationId,
     });
 
-    OSShouldResponseWith({
-      'PUT:/v2.0/ports/{portId}': StubResponses.response400,
+    LetResponseWith({
+      neutron_put_v2_0_ports_portId: StubResponses.response400,
     });
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
@@ -521,8 +519,8 @@ describe('DeclarationController', () => {
   });
 
   it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 422`, async () => {
-    ASGShouldResponseWith({
-      'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy422,
+    LetResponseWith({
+      asg_post_mgmt_shared_trustproxy: StubResponses.trustProxyDeploy422,
     });
 
     let application = await givenApplicationData(wafapp);
@@ -556,7 +554,7 @@ describe('DeclarationController', () => {
   });
 
   it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 404`, async () => {
-    ASGShouldResponseWith({});
+    LetResponseWith();
     let application = await givenApplicationData(wafapp);
     let declaration = await givenDeclarationData(wafapp, {
       applicationId: application.id,

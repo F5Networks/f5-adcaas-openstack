@@ -31,14 +31,12 @@ import {
   givenApplicationData,
   givenPoolData,
 } from '../helpers/database.helpers';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {deepcopy} from '../../src/utils';
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 import uuid = require('uuid');
@@ -67,7 +65,7 @@ describe('ServiceController', () => {
     })();
 
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith({});
     setupEnvs();
   });
 

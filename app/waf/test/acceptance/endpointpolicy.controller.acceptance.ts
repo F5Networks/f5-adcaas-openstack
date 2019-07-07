@@ -31,14 +31,12 @@ import {
   givenEndpointpolicyData,
 } from '../helpers/database.helpers';
 import {Endpointpolicy} from '../../src/models';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import uuid = require('uuid');
 import {
   RestApplicationPort,
   ExpectedData,
+  LetResponseWith,
 } from '../fixtures/datasources/testrest.datasource';
 
 describe('EndpointpolicyController', () => {
@@ -57,7 +55,7 @@ describe('EndpointpolicyController', () => {
       return restApp;
     })();
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith({});
     setupEnvs();
   });
   beforeEach('Empty database', async () => {

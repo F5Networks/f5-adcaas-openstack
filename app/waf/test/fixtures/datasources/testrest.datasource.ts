@@ -2186,3 +2186,114 @@ Reason:
 
   installTrustedExtensions200: () => {},
 };
+
+type TypeResponseWith = {
+  // OpenStack APIs
+  keystone_post_v2_0_tokens?: Function;
+  keystone_get_v2_0_tokens?: Function;
+  keystone_get_v2_0_tokens_tokenId?: Function;
+  keystone_post_v3_auth_tokens?: Function;
+  keystone_get_v3_auth_tokens?: Function;
+  neutron_post_v2_0_ports?: Function;
+  neutron_del_v2_0_ports_portId?: Function;
+  neutron_put_v2_0_ports_portId?: Function;
+  neutron_get_v2_0_ports_portId?: Function;
+  neutron_get_v2_0_subnets?: Function;
+  neutron_get_v2_0_floatingips?: Function;
+  neutron_post_v2_0_floatingips?: Function;
+  neutron_put_v2_0_floatingips_floatingipId?: Function;
+  neutron_del_v2_0_floatingips_floatingipId?: Function;
+  nova_post_v2_tenantId_servers?: Function;
+  nova_del_v2_tenantId_servers_serverId?: Function;
+  nova_get_v2_tenantId_servers_serverId?: Function;
+
+  // DO APIs
+  do_post_mgmt_shared_declaration_onboarding?: Function;
+  do_get_mgmt_shared_declaration_onboarding_task_taskId?: Function;
+
+  // BIG-IP APIs
+  bigip_get_mgmt_tm_sys?: Function;
+  bigip_get_mgmt_tm_net_interface?: Function;
+  bigip_get_mgmt_tm_net_self?: Function;
+  bigip_get_mgmt_tm_net_vlan?: Function;
+  bigip_get_mgmt_tm_sys_global_settings?: Function;
+  bigip_get_mgmt_tm_sys_license?: Function;
+  bigip_get_mgmt_tm_cm_device?: Function;
+  bigip_get_mgmt_shared_appsvcs_info?: Function;
+  bigip_get_mgmt_tm_sys_folder__partition?: Function;
+  bigip_get_mgmt_shared_declarative_onboarding_info?: Function;
+  bigip_post_mgmt_shared_file_transfer_uploads_filename?: Function;
+  bigip_post_mgmt_shared_iapp_package_management_tasks?: Function;
+  bigip_get_mgmt_shared_iapp_package_management_tasks_taskId?: Function;
+
+  // ASG APIs
+  asg_post_mgmt_shared_trustproxy?: Function;
+  asg_get_mgmt_shared_trusteddevices_deviceId?: Function;
+  asg_put_mgmt_shared_trusteddevices?: Function;
+  asg_get_mgmt_shared_trusteddevices?: Function;
+  asg_del_mgmt_shared_trusteddevices_deviceId?: Function;
+  asg_post_mgmt_shared_trustedextensions_deviceId?: Function;
+  asg_get_mgmt_shared_trustedextensions_deviceId?: Function;
+};
+
+export const DefaultResponseWith: TypeResponseWith = {
+  keystone_post_v2_0_tokens: StubResponses.v2AuthToken200,
+  keystone_get_v2_0_tokens: StubResponses.v2AuthToken200,
+  keystone_get_v2_0_tokens_tokenId: StubResponses.v2AuthToken200,
+  keystone_post_v3_auth_tokens: StubResponses.v3AuthToken200,
+  keystone_get_v3_auth_tokens: StubResponses.v3AuthToken200,
+  neutron_post_v2_0_ports: StubResponses.neutronCreatePort200,
+  neutron_del_v2_0_ports_portId: StubResponses.neutronDeletePort200,
+  neutron_put_v2_0_ports_portId: StubResponses.neutronUpdatePort200,
+  neutron_get_v2_0_ports_portId: StubResponses.neutronGetPort200,
+  neutron_get_v2_0_subnets: StubResponses.neutronGetSubnets200,
+  nova_post_v2_tenantId_servers: StubResponses.novaCreateVM200,
+  nova_del_v2_tenantId_servers_serverId: StubResponses.novaDeleteVM200,
+  nova_get_v2_tenantId_servers_serverId: StubResponses.novaGetVMDetail200,
+  neutron_get_v2_0_floatingips: StubResponses.neutronGetFloatingIps200,
+  neutron_post_v2_0_floatingips: StubResponses.neutronPostFloatingIp201,
+  neutron_put_v2_0_floatingips_floatingipId:
+    StubResponses.neutronPutFloatingIp200,
+  neutron_del_v2_0_floatingips_floatingipId:
+    StubResponses.neutronDeleteFloatingIp204,
+
+  do_post_mgmt_shared_declaration_onboarding:
+    StubResponses.onboardingSucceed202,
+  do_get_mgmt_shared_declaration_onboarding_task_taskId:
+    StubResponses.onboardingSucceed200,
+
+  bigip_get_mgmt_tm_sys: StubResponses.bigipMgmtSys200,
+  bigip_get_mgmt_tm_net_interface: StubResponses.bigipNetInterfaces200,
+  bigip_get_mgmt_tm_net_self: StubResponses.bigipnetSelfips200,
+  bigip_get_mgmt_tm_net_vlan: StubResponses.bigipNetVlans200,
+  bigip_get_mgmt_tm_sys_global_settings: StubResponses.bigipGlobalSettings200,
+  bigip_get_mgmt_tm_sys_license: StubResponses.bigipLiense200,
+  bigip_get_mgmt_tm_cm_device: StubResponses.bigipCmDevice200,
+  bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info200,
+  bigip_get_mgmt_tm_sys_folder__partition: StubResponses.bigipPartition200,
+  bigip_get_mgmt_shared_declarative_onboarding_info:
+    StubResponses.bigipDOInfo200,
+  bigip_post_mgmt_shared_file_transfer_uploads_filename:
+    StubResponses.bigipDOUpload200,
+  bigip_post_mgmt_shared_iapp_package_management_tasks:
+    StubResponses.bigipDOInstall200,
+  bigip_get_mgmt_shared_iapp_package_management_tasks_taskId:
+    StubResponses.bigipDOInstallstatus200,
+
+  asg_post_mgmt_shared_trustproxy: StubResponses.trustProxyDeploy200,
+  asg_get_mgmt_shared_trusteddevices_deviceId:
+    StubResponses.trustDeviceStatusActive200,
+  asg_put_mgmt_shared_trusteddevices: StubResponses.trustDeviceStatusActive200,
+  asg_get_mgmt_shared_trusteddevices: StubResponses.trustDevices200,
+  asg_del_mgmt_shared_trusteddevices_deviceId: StubResponses.untrustDevice200,
+  asg_post_mgmt_shared_trustedextensions_deviceId:
+    StubResponses.installTrustedExtensions200,
+  asg_get_mgmt_shared_trustedextensions_deviceId:
+    StubResponses.queryTrustedExtensionsAvailable200,
+};
+
+export const ResponseWith: TypeResponseWith = {};
+
+export function LetResponseWith(spec?: TypeResponseWith) {
+  Object.assign(ResponseWith, DefaultResponseWith, spec);
+}
