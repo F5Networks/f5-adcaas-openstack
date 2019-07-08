@@ -473,12 +473,6 @@ export class AdcController extends BaseController {
           'Not supported: ' + Object.keys(actionBody)[0],
         );
     }
-
-    let msg = `Cannot do '${Object.keys(actionBody)[0]}' on adc ${
-      adc.id
-    }, state: ${adc.status}, lasterr: ${adc.lastErr}`;
-    this.logger.error(msg);
-    throw new HttpErrors.UnprocessableEntity(msg);
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
