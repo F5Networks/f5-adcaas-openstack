@@ -407,8 +407,8 @@ export class OnboardingManager {
   }
 
   async onboarding(givenDoBody: TypeDOClassDO): Promise<string> {
-    // TODO: insert credential in headers if do gateway needs authorization.
-    let headers = {};
+    // TODO: base64 coding for admin:admin. Modify it later if needed
+    let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
 
     return await this.doService
       .doRest(
@@ -432,8 +432,8 @@ export class OnboardingManager {
   }
 
   async isDone(doId: string): Promise<boolean> {
-    // TODO: insert credential in headers if do gateway needs authorization.
-    let headers = {};
+    // TODO: base64 coding for admin:admin. Modify it later if needed
+    let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
 
     return await this.doService
       .doRest(
