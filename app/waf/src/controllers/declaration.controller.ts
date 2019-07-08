@@ -459,9 +459,14 @@ export class DeclarationController extends BaseController {
     };
 
     let addresses = findByKey(declaration, 'virtualAddresses');
+    let existingIp = findByKey(portParams.fixedIps!, 'ip_address');
     for (let addrs of addresses) {
       for (let addr of <string[]>addrs) {
+        if (existingIp.indexOf(addr) > -1) {
+          continue;
+        }
         portParams.fixedIps!.push({ip_address: addr});
+        existingIp.push(addr);
       }
     }
 
