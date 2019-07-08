@@ -163,10 +163,8 @@ export class PoolController extends BaseController {
 
   @get(prefix + '/pools/{poolId}/members/{memberId}', {
     responses: {
-      '200': Schema.collectionResponse(
-        Member,
-        'Successfully retrieve member resources',
-      ),
+      '200': Schema.response(Member, 'Successfully retrieve member resources'),
+      '404': Schema.notFound('Can not find this Member resource'),
     },
   })
   async getMemberByID(
@@ -174,12 +172,13 @@ export class PoolController extends BaseController {
     pool_id: string,
     @param(Schema.pathParameter('memberId', 'Member resource ID'))
     member_id: string,
-  ): Promise<CollectionResponse> {
+  ): Promise<Response> {
     const data = await this.poolRepository
       .members(pool_id)
       .find({where: {and: [{id: member_id}, {tenantId: await this.tenantId}]}});
 
-    return new CollectionResponse(Member, data);
+    // if data is empty, throw EntityNotFoundError
+    return new Response(Member, data[0]);
   }
 
   @get(prefix + '/pools/{poolId}/members', {
