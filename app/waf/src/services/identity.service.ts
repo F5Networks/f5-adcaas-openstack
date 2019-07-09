@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {getService} from '@loopback/service-proxy';
-import {inject, Provider} from '@loopback/core';
-import {OpenstackDataSource} from '../datasources';
-import {factory} from '../log4ts';
-import {RestApplication} from '@loopback/rest';
-import {WafBindingKeys} from '../keys';
+import { getService } from '@loopback/service-proxy';
+import { inject, Provider } from '@loopback/core';
+import { OpenstackDataSource } from '../datasources';
+import { factory } from '../log4ts';
+import { RestApplication } from '@loopback/rest';
+import { WafBindingKeys } from '../keys';
 
 export interface IdentityService {
   v2AuthToken(url: string, body: object): Promise<object>;
@@ -37,7 +37,7 @@ export class IdentityServiceProvider implements Provider<IdentityService> {
     // openstack must match the name property in the datasource json file
     @inject('datasources.openstack')
     protected dataSource: OpenstackDataSource = new OpenstackDataSource(),
-  ) {}
+  ) { }
 
   value(): Promise<IdentityService> {
     return getService(this.dataSource);
@@ -53,7 +53,7 @@ export abstract class AuthWithOSIdentity {
     protected authConfig: AuthConfig,
     protected application: RestApplication,
     protected identityService: IdentityService,
-  ) {}
+  ) { }
 
   abstract adminAuthToken(): Promise<AuthedToken>;
   abstract validateUserToken(
@@ -151,13 +151,13 @@ class AuthWithIdentityV3 extends AuthWithOSIdentity {
             user: {
               name: this.authConfig.osUsername,
               password: this.authConfig.osPassword,
-              domain: {name: <string>this.authConfig.osDomainName},
+              domain: { name: <string>this.authConfig.osDomainName },
             },
           },
         },
         scope: {
           project: {
-            domain: {name: <string>this.authConfig.osDomainName},
+            domain: { name: <string>this.authConfig.osDomainName },
             id: this.authConfig.osTenantId,
           },
         },
@@ -418,11 +418,11 @@ export class AuthedToken {
 
     throw new Error(
       inf +
-        ' endpoint for ' +
-        type +
-        ' in region: ' +
-        this.region +
-        ': not found in v2.0 authed token.',
+      ' endpoint for ' +
+      type +
+      ' in region: ' +
+      this.region +
+      ': not found in v2.0 authed token.',
     );
   }
 
@@ -441,11 +441,11 @@ export class AuthedToken {
 
     throw new Error(
       inf +
-        ' endpoint for ' +
-        type +
-        ' in region: ' +
-        this.region +
-        ': not found in v3 authed token.',
+      ' endpoint for ' +
+      type +
+      ' in region: ' +
+      this.region +
+      ': not found in v3 authed token.',
     );
   }
 
@@ -454,6 +454,10 @@ export class AuthedToken {
   }
   private epCompute(): string {
     return this.endpointOf(this.interface, 'compute');
+  }
+
+  private epBarbican(): string {
+    return this.endpointOf(this.interface, 'key-manager')
   }
 
   public epPorts(): string {
@@ -466,6 +470,10 @@ export class AuthedToken {
 
   public epFloatingIps(): string {
     return this.epNetwork() + '/v2.0/floatingips';
+  }
+
+  public epBarbicanSecret(keyId: string): string {
+    return this.epBarbican() + `/v1/secrets/${keyId}`;
   }
 
   // TODO: Use user token's catalog instead of that of admin's.

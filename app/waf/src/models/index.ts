@@ -34,3 +34,5 @@ export * from './monitor.model';
 export * from './membermonitor.model';
 export * from './poolmonitorassoc.model';
 export * from './wafpolicyondevice.model';
+export * from './certificate.model';
+export * from './tlsserver.model';

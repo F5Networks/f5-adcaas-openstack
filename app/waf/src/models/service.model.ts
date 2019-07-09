@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import {model, property} from '@loopback/repository';
-import {CommonEntity, AS3Declaration, Pool, Endpointpolicy} from '.';
+import { model, property } from '@loopback/repository';
+import { CommonEntity, AS3Declaration, Pool, Endpointpolicy } from '.';
+import { TLSServer } from './tlsserver.model';
 
 @model()
 export class Service extends CommonEntity {
@@ -446,7 +447,7 @@ export class Service extends CommonEntity {
       update: false,
     },
   })
-  serverTLS?: string;
+  serverTLSId?: string;
 
   @property({
     type: 'string',
@@ -537,6 +538,9 @@ export class Service extends CommonEntity {
   // Model should be the shadow of db schema, should be used as the database definition.
   defaultPool?: Pool;
   policies: Endpointpolicy[] = [];
+
+  // Do we really need to define a serverTLS here ?
+  serverTLS?: TLSServer
 
   // TODO: what's more, divide different types of Services into different model definition to avoid such long definition.
 
