@@ -1213,14 +1213,11 @@ describe('AdcController test', () => {
       },
     ]);
     let fs = require('fs');
-    if (!fs.existsSync('/tmp/do/')) {
-      fs.mkdirSync('/tmp/do', {recursive: true});
-    }
-    fs.writeFileSync('/tmp/do/F5_DO_RPM_PACKAGE.rpm', 'abcd', {
-      recursive: true,
-    });
     await setupEnvs()
       .then(async () => {
+        fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+          recursive: true,
+        });
         let response = await client
           .post(prefix + '/adcs/' + adc.id + '/action')
           .set('X-Auth-Token', ExpectedData.userToken)
@@ -1298,6 +1295,10 @@ describe('AdcController test', () => {
 
       await setupEnvs()
         .then(async () => {
+          let fs = require('fs');
+          fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+            recursive: true,
+          });
           let response = await client
             .post(prefix + '/adcs/' + adc.id + '/action')
             .set('X-Auth-Token', ExpectedData.userToken)

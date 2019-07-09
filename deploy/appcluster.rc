@@ -6,7 +6,6 @@ DATABASE_PASSWORD=postgres
 DATABASE_DB=postgres
 DATABASE_PORT=5432
 DATABASE_HOST=postgres-server
-DATABASE_DATA_DIRECTORY=../app/waf/data
 
 OS_AUTH_URL=http://10.250.13.69:5000/v3
 OS_USERNAME=admin
@@ -29,6 +28,7 @@ DO_BIGIQ_HOST=10.250.11.138
 DO_BIGIQ_USERNAME=admin
 DO_BIGIQ_PASSWORD=admin
 DO_BIGIQ_POOL=newman-pool
+DO_RPM_PACKAGE=/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm
 
 ASG_HOST=asg-server
 ASG_PORT=443

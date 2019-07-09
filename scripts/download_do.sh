@@ -1,15 +1,13 @@
 #!/bin/bash 
 
-# TODO: make /var/tmp/ASGExtensions and filelist configurable.
-filelist="https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.5.0/f5-declarative-onboarding-1.5.0-11.noarch.rpm"
-target="F5_DO_RPM_PACKAGE.rpm"
-mkdir -p /var/tmp/DO
+# TODO: make filelist configurable.
+dofile="https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.5.0/f5-declarative-onboarding-1.5.0-11.noarch.rpm"
 
+cdir=`cd $(dirname $0); pwd`
 (
-    cd /var/tmp/DO
-    if [ ! -f F5_DO_RPM_PACKAGE.rpm ]; then 
-	wget $filelist
-	mv `basename $filelist` $target
+    cd $cdir/../dependencies
+    if [ ! -f  `basename $dofile` ]; then 
+	    wget $dofile
    fi
 )
 

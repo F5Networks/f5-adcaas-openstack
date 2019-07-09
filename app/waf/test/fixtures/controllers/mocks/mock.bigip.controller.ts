@@ -64,10 +64,12 @@ export class MockBigipController extends MockBaseController {
     return await ResponseWith['/mgmt/shared/declarative-onboarding/info'](s);
   }
 
-  @post('/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm')
-  async doUpload(): Promise<object> {
+  @post('/mgmt/shared/file-transfer/uploads/{filename}')
+  async doUpload(
+    @param.path.string('filename') filename: string,
+  ): Promise<object> {
     return await ResponseWith[
-      '/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm'
+      '/mgmt/shared/file-transfer/uploads/{filename}'
     ]();
   }
 
@@ -118,7 +120,7 @@ export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
     '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info200,
     '/mgmt/tm/sys/folder/~{partition}': StubResponses.bigipPartition200,
     '/mgmt/shared/declarative-onboarding/info': StubResponses.bigipDOInfo200,
-    '/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm':
+    '/mgmt/shared/file-transfer/uploads/{filename}':
       StubResponses.bigipDOUpload200,
     '/mgmt/shared/iapp/package-management-tasks':
       StubResponses.bigipDOInstall200,
