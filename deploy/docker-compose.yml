@@ -56,7 +56,7 @@ services:
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
-      - /var/tmp/DO:/tmp/do
+      - ${ASG_DATA_DIRECTORY}:/var/config
     depends_on:
       - FLUENTD
     logging:
