@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import {Filter, repository} from '@loopback/repository';
+import {
+  Filter,
+  repository,
+  EntityNotFoundError,
+} from '@loopback/repository';
 import {
   post,
   param,
@@ -174,12 +178,18 @@ export class PoolController extends BaseController {
     pool_id: string,
     @param(Schema.pathParameter('memberId', 'Member resource ID'))
     member_id: string,
-  ): Promise<CollectionResponse> {
+  ): Promise<Response> {
     const data = await this.poolRepository
       .members(pool_id)
       .find({where: {and: [{id: member_id}, {tenantId: await this.tenantId}]}});
 
-    return new CollectionResponse(Member, data);
+      if(data.length===0)
+      {
+        throw new EntityNotFoundError(Member.name, member_id);
+      }else
+      {
+        return new Response(Member, data[0]);
+      }
   }
 
   @get(prefix + '/pools/{poolId}/members', {

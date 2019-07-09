@@ -20,6 +20,7 @@ import {
   Count,
   CountSchema,
   Where,
+  EntityNotFoundError,
 } from '@loopback/repository';
 import {
   post,
@@ -203,11 +204,15 @@ export class RuleController extends BaseController {
     ruleId: string,
     @param(Schema.pathParameter('conditionId', 'Condition resource ID'))
     conditionId: string,
-  ): Promise<CollectionResponse> {
+  ): Promise<Response> {
     const data = await this.ruleRepository
       .conditions(ruleId)
       .find({where: {id: conditionId}}, {tenantId: await this.tenantId});
-    return new CollectionResponse(Condition, data);
+      if(data.length===0){
+        throw new EntityNotFoundError(Condition.name,conditionId);
+      }else{
+        return new Response(Condition, data[0]);
+      }
   }
 
   @get(prefix + '/rules/{ruleId}/conditions', {
@@ -299,11 +304,15 @@ export class RuleController extends BaseController {
     ruleId: string,
     @param(Schema.pathParameter('actionId', 'Action resource ID'))
     actionId: string,
-  ): Promise<CollectionResponse> {
+  ): Promise<Response> {
     const data = await this.ruleRepository
       .actions(ruleId)
       .find({where: {id: actionId}}, {tenantId: await this.tenantId});
-    return new CollectionResponse(Action, data);
+      if(data.length===0){
+        throw new EntityNotFoundError(Action.name,actionId);
+      }else{
+        return new Response(Action, data[0]);
+      }
   }
 
   @get(prefix + '/rules/{ruleId}/actions', {
