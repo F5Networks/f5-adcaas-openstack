@@ -21,6 +21,7 @@ import {
   AuthedToken,
   ComputeManager,
   NetworkDriver,
+  BarbicanManager,
 } from './services';
 
 export interface LogFn {
@@ -44,6 +45,10 @@ export namespace WafBindingKeys {
 
   export const KeyComputeManager = BindingKey.create<ComputeManager>(
     'services.openstack.ComputeManager',
+  );
+
+  export const SecretManager = BindingKey.create<BarbicanManager>(
+    'services.openstack.BarbicanManager',
   );
 
   export const KeyNetworkDriver = BindingKey.create<NetworkDriver>(

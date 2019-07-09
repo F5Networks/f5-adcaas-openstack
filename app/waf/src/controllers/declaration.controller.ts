@@ -39,6 +39,8 @@ import {
   AS3DeployRequest,
   Adc,
   AS3Declaration,
+  TLSServerCertificate,
+  Certificate,
 } from '../models';
 import {inject, CoreBindings} from '@loopback/core';
 import {
@@ -54,6 +56,8 @@ import {
   RuleRepository,
   ActionRepository,
   AdcRepository,
+  TLSserverRepository,
+  CertificateRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {ASGManager, PortsUpdateParams} from '../services';
@@ -92,7 +96,10 @@ export class DeclarationController extends BaseController {
     public actionRepository: ActionRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
-    //Suppress get injection binding exeption by using {optional: true}
+    @repository(TLSserverRepository)
+    public tlsserverRepository: TLSserverRepository,
+    @repository(CertificateRepository)
+    public certificateRepository: CertificateRepository,
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
@@ -117,6 +124,15 @@ export class DeclarationController extends BaseController {
       await this.loadPool(service.defaultPool);
     }
 
+    if (service.serverTLS) {
+      service.serverTLSContent = await this.tlsserverRepository.findById(
+        service.serverTLS,
+      );
+      if (service.serverTLSContent.certificates) {
+        await this.loadCertificateIndex(service.serverTLSContent.certificates);
+      }
+    }
+
     let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
       where: {
         serviceId: service.id,
@@ -134,6 +150,67 @@ export class DeclarationController extends BaseController {
 
     for (let policy of service.policies) {
       await this.loadEndpointpolicy(policy);
+    }
+  }
+
+  private async loadCertificateIndex(
+    certificates: TLSServerCertificate[],
+  ): Promise<void> {
+    for (let cert of certificates) {
+      const certList = await this.certificateRepository.find({
+        where: {
+          id: cert.certificate,
+        },
+      });
+
+      if (certList.length === 0) {
+        throw new HttpErrors.NotFound(
+          `Cannot find certificate ${cert.certificate}`,
+        );
+      }
+      cert.certContent = certList[0];
+
+      await this.loadCertificateData(cert.certContent);
+    }
+  }
+
+  private async loadCertificateData(certificate: Certificate) {
+    let userToken = await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken);
+    let barbicanMgr = await this.wafapp.get(WafBindingKeys.SecretManager);
+
+    if (certificate.certificate) {
+      certificate.certificate = await barbicanMgr.getSecret(
+        userToken,
+        certificate.certificate,
+      );
+    }
+
+    if (certificate.chainCA) {
+      certificate.chainCA = await barbicanMgr.getSecret(
+        userToken,
+        certificate.chainCA,
+      );
+    }
+
+    if (certificate.pkcs12) {
+      certificate.pkcs12 = await barbicanMgr.getSecret(
+        userToken,
+        certificate.pkcs12,
+      );
+    }
+
+    if (certificate.passphrase) {
+      certificate.passphrase = await barbicanMgr.getSecret(
+        userToken,
+        certificate.passphrase,
+      );
+    }
+
+    if (certificate.privateKey) {
+      certificate.privateKey = await barbicanMgr.getSecret(
+        userToken,
+        certificate.privateKey,
+      );
     }
   }
 

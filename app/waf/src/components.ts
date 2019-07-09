@@ -21,6 +21,7 @@ import {
   ComputeManagerV2,
   IdentityServiceProvider,
   AuthWithOSIdentity,
+  BarbicanManagerV1,
 } from './services';
 import {NetworkDriver} from './services/network.service';
 import {WafBindingKeys} from './keys';
@@ -76,10 +77,19 @@ export class OpenStackComponent implements Component {
     return await new ComputeManagerV2(this.application).bindComputeService();
   });
 
+  bindingBarbican = Binding.bind(WafBindingKeys.SecretManager).toDynamicValue(
+    async () => {
+      return await new BarbicanManagerV1(
+        this.application,
+      ).bindBarbicanService();
+    },
+  );
+
   bindings = [
     this.bindingSolveAdminToken,
     this.bindingAuthMgr,
     this.bindingNetwork,
     this.bindingCompute,
+    this.bindingBarbican,
   ];
 }

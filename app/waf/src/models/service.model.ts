@@ -16,6 +16,7 @@
 
 import {model, property} from '@loopback/repository';
 import {CommonEntity, AS3Declaration, Pool, Endpointpolicy} from '.';
+import {TLSServer} from './tlsserver.model';
 
 @model()
 export class Service extends CommonEntity {
@@ -442,8 +443,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'name',
     },
   })
   serverTLS?: string;
@@ -538,6 +543,9 @@ export class Service extends CommonEntity {
   defaultPool?: Pool;
   policies: Endpointpolicy[] = [];
 
+  // Do we really need to define a serverTLS here ?
+  serverTLSContent?: TLSServer;
+
   // TODO: what's more, divide different types of Services into different model definition to avoid such long definition.
 
   //TODO: many-to-many relation to other objects
@@ -558,6 +566,12 @@ export class Service extends CommonEntity {
     let obj = super.getAS3Declaration();
 
     obj.policyEndpoint = this.policies.map(policy => policy.getAS3Name());
+
+    // change default HTTP type to HTTPS
+    if (this.serverTLS) {
+      obj.type = 'HTTPS';
+      obj.class = 'Service_HTTPS';
+    }
 
     return obj;
   }

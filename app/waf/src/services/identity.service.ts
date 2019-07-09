@@ -456,6 +456,10 @@ export class AuthedToken {
     return this.endpointOf(this.interface, 'compute');
   }
 
+  private epBarbican(): string {
+    return this.endpointOf(this.interface, 'key-manager');
+  }
+
   public epPorts(): string {
     return this.epNetwork() + '/v2.0/ports';
   }
@@ -466,6 +470,10 @@ export class AuthedToken {
 
   public epFloatingIps(): string {
     return this.epNetwork() + '/v2.0/floatingips';
+  }
+
+  public epBarbicanSecret(keyId: string): string {
+    return this.epBarbican() + `/v1/secrets/${keyId}`;
   }
 
   // TODO: Use user token's catalog instead of that of admin's.
