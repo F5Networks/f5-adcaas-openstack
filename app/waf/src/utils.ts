@@ -114,43 +114,34 @@ export async function sleep(milliSecs: number): Promise<void> {
 /**
  * Merge two objects incursively.
  *
- * @param target: target object or undefined:
- *    if target is an object, merge sources into target, and return target.
- *    if target is undefined, merge sources, return the merged object, target keeps undefined.
- *    if source is undefined, keep target and return target.
- *    if both target and sources are undefined, keep target sources undefined and return {}.
- *    if source[k]'s type is different with that of target[k], this function overwrites the target[k] with source[k].
+ * @param target: object
  * @param sources: multiple sources for merging.
+ *    if source is null, set target to undefined.
+ *    if source[k]'s type is different with that of target[k], this function overwrites the target[k] with source[k].
  */
-export function merge(
-  target: object | undefined,
-  ...sources: (object | undefined)[]
-): object {
-  if (!target || typeof target !== 'object') target = {};
+export function merge(target: object, source: object): object {
+  if (!target || !source)
+    throw new Error(`merging target or source cannot be undefined.`);
+  let sobj = JSON.parse(JSON.stringify(source));
   let tobj = JSON.parse(JSON.stringify(target));
+  for (let k of Object.keys(sobj)) {
+    if (sobj[k] === null) {
+      delete tobj[k];
+      continue;
+    }
+    if (!tobj[k]) {
+      tobj[k] = sobj[k];
+      continue;
+    }
 
-  for (let source of sources) {
-    if (typeof source === 'undefined') continue;
-
-    let sobj = JSON.parse(JSON.stringify(source));
-    for (let k of Object.keys(sobj)) {
-      if (
-        tobj[k] &&
-        typeof tobj[k] === 'object' &&
-        typeof sobj[k] === 'object'
-      ) {
-        tobj[k] = merge(tobj[k], sobj[k]);
-      } else {
-        tobj[k] = sobj[k];
-      }
+    if (typeof tobj[k] === 'object' && typeof sobj[k] === 'object') {
+      tobj[k] = merge(tobj[k], sobj[k]);
+    } else {
+      tobj[k] = sobj[k];
     }
   }
 
-  for (let t of Object.keys(tobj)) {
-    // @ts-ignore: it must be an object.
-    target[t] = tobj[t];
-  }
-  return target;
+  return tobj;
 }
 
 /**

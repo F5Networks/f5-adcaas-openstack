@@ -178,6 +178,7 @@ export function OSShouldResponseWith(spec: {[key: string]: Function}) {
 }
 
 export const ExpectedData = {
+  adcId: '3efa393d-eb7a-4ae8-8222-e4b99f14adcf',
   userToken: '8cf3d2447253455385c36254192cc4fe',
   userId: '2d26c96aa0f345eaafc3f5b50d2bbd8e',
   serverId: 'fef1e40c-ed9d-4e10-b10c-d60d3af70623',
