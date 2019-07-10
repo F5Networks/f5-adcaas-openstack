@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Filter,
-  repository,
-  EntityNotFoundError,
-} from '@loopback/repository';
+import {Filter, repository, EntityNotFoundError} from '@loopback/repository';
 import {
   post,
   param,
@@ -183,13 +179,11 @@ export class PoolController extends BaseController {
       .members(pool_id)
       .find({where: {and: [{id: member_id}, {tenantId: await this.tenantId}]}});
 
-      if(data.length===0)
-      {
-        throw new EntityNotFoundError(Member.name, member_id);
-      }else
-      {
-        return new Response(Member, data[0]);
-      }
+    if (data.length === 0) {
+      throw new EntityNotFoundError(Member.name, member_id);
+    } else {
+      return new Response(Member, data[0]);
+    }
   }
 
   @get(prefix + '/pools/{poolId}/members', {

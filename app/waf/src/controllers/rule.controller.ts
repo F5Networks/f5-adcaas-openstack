@@ -208,11 +208,11 @@ export class RuleController extends BaseController {
     const data = await this.ruleRepository
       .conditions(ruleId)
       .find({where: {id: conditionId}}, {tenantId: await this.tenantId});
-      if(data.length===0){
-        throw new EntityNotFoundError(Condition.name,conditionId);
-      }else{
-        return new Response(Condition, data[0]);
-      }
+    if (data.length === 0) {
+      throw new EntityNotFoundError(Condition.name, conditionId);
+    } else {
+      return new Response(Condition, data[0]);
+    }
   }
 
   @get(prefix + '/rules/{ruleId}/conditions', {
@@ -308,11 +308,11 @@ export class RuleController extends BaseController {
     const data = await this.ruleRepository
       .actions(ruleId)
       .find({where: {id: actionId}}, {tenantId: await this.tenantId});
-      if(data.length===0){
-        throw new EntityNotFoundError(Action.name,actionId);
-      }else{
-        return new Response(Action, data[0]);
-      }
+    if (data.length === 0) {
+      throw new EntityNotFoundError(Action.name, actionId);
+    } else {
+      return new Response(Action, data[0]);
+    }
   }
 
   @get(prefix + '/rules/{ruleId}/actions', {

@@ -248,11 +248,11 @@ export class EndpointpolicyController extends BaseController {
     const data = await this.endpointpolicyRepository
       .rules(endpointpolicyId)
       .find({where: {id: ruleId}}, {tenantId: await this.tenantId});
-     if(data.length===0){
-       throw new EntityNotFoundError(Rule.name, ruleId);
-     }else{
+    if (data.length === 0) {
+      throw new EntityNotFoundError(Rule.name, ruleId);
+    } else {
       return new Response(Rule, data[0]);
-     }
+    }
   }
 
   @del(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
