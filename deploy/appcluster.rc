@@ -24,7 +24,7 @@ OS_INTERFACE=public
 #OS_AVAILABLE_ZONE=nova
 
 # OnBoarding Parameters
-DO_ENDPOINT=http://do-server:80
+DO_ENDPOINT=https://do-server:443
 DO_BIGIQ_HOST=10.250.11.138
 DO_BIGIQ_USERNAME=admin
 DO_BIGIQ_PASSWORD=admin
