@@ -1212,7 +1212,13 @@ describe('AdcController test', () => {
         state: 'AVAILABLE',
       },
     ]);
-
+    let fs = require('fs');
+    if (!fs.existsSync('/tmp/do/')) {
+      fs.mkdirSync('/tmp/do', {recursive: true});
+    }
+    fs.writeFileSync('/tmp/do/F5_DO_RPM_PACKAGE.rpm', 'abcd', {
+      recursive: true,
+    });
     await setupEnvs()
       .then(async () => {
         let response = await client

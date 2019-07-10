@@ -28,6 +28,14 @@ export const BigipBuiltInProperties = {
 
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
+  uploadDO(
+    url: string,
+    cred64en: string,
+    end: number,
+    length: number,
+    body: object,
+  ): Promise<object>;
+  installDO(url: string, cred64en: string, body: object): Promise<object>;
 }
 
 export class BigipServiceProvider implements Provider<BigipService> {
@@ -205,6 +213,102 @@ export class BigIpManager {
     return resObj;
   }
 
+  async getDOStatus(): Promise<string> {
+    await this.mustBeReachable();
+
+    let url = `${this.baseUrl}/mgmt/shared/declarative-onboarding/info`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.stringify(response);
+    return resObj;
+  }
+
+  async uploadDO(): Promise<string> {
+    // if the local file doesn't exist, throw execption.
+    //read the file's contant into a buf and calculate its length
+    //call the bigipService.uploadDO to upload the RPM to Bigip
+    //possibly check  if the upload succeeds or not
+    //await this.mustBeReachable();
+    const filename = '/tmp/do/F5_DO_RPM_PACKAGE.rpm';
+    let fs = require('fs');
+    if (!fs.existsSync(filename)) {
+      console.log("DO RPM file doesn't exist.");
+      throw new Error("DO RPM file doesn't exist.");
+    }
+    let fstats = fs.statSync(filename);
+    try {
+      let url = `${this.baseUrl}/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm`;
+      let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
+      buffer.toString('utf8');
+      let response = await this.bigipService.uploadDO(
+        url,
+        this.cred64Encoded,
+        fstats.size - 1,
+        fstats.size,
+        buffer,
+      );
+      let resObj = JSON.stringify(response);
+      return resObj;
+    } catch (error) {
+      throw new Error(
+        `Upload DO RPM file error with error message ${error.message}`,
+      );
+    }
+  }
+
+  async installDO(): Promise<string> {
+    // create the body with following format.
+    // await this.mustBeReachable();
+    let body = {
+      operation: 'INSTALL',
+      packageFilePath: '/var/config/rest/downloads/F5_DO_RPM_PACKAGE.rpm',
+    };
+    // call the bigipService.installDO to install the RPM
+    //possibly check if the install succeeds or not.
+    try {
+      let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
+      let response = await this.bigipService.installDO(
+        url,
+        this.cred64Encoded,
+        body,
+      );
+      let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
+      let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
+      /*check and wait */
+
+      let impFunc = async () => {
+        let checkinfo = await this.bigipService.getInfo(
+          dourl,
+          this.cred64Encoded,
+        );
+        let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
+        this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+        return resObj;
+      };
+
+      let checkFunc = async () => {
+        return await impFunc().then(resObj => {
+          let status = resObj['status'];
+          if (status !== 'FAILED') return true;
+        });
+      };
+
+      return await checkAndWait(checkFunc, 60).then(
+        async () => {
+          return await impFunc().then(resObj => {
+            let status = resObj['status'];
+            return status;
+          });
+        },
+        () => {
+          throw new Error('Install DO failed.');
+        },
+      );
+    } catch (error) {
+      throw new Error(
+        `Install DO RPM file error with error message ${error.message}`,
+      );
+    }
+  }
   async getAS3Info(): Promise<object> {
     await this.mustBeReachable();
 

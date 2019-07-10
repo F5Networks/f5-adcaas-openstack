@@ -203,7 +203,6 @@ export class AdcController extends BaseController {
   async installAS3(adc: Adc): Promise<void> {
     // Install AS3 RPM on target device
     await this.serialize(adc, {status: AdcState.INSTALLING, lastErr: ''});
-
     try {
       await this.asgMgr.installAS3(adc.management.trustedDeviceId!);
 
@@ -450,7 +449,6 @@ export class AdcController extends BaseController {
           throw new HttpErrors.UnprocessableEntity(
             `Not ready for bigip VE to : ${AdcState.POWERON}`,
           );
-
       case 'delete':
         if (await this.adcStCtr.readyTo(AdcState.RECLAIMED)) {
           this.deleteOn(adc, addonReq);
@@ -461,7 +459,7 @@ export class AdcController extends BaseController {
           );
 
       case 'setup':
-        if (await this.adcStCtr.readyTo(AdcState.ONBOARDED)) {
+        if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED)) {
           this.setupOn(adc, addonReq);
           return {id: adc.id};
         } else
@@ -476,6 +474,10 @@ export class AdcController extends BaseController {
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+    // install DO
+    if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
+      await this.doInstalling(adc);
+
     // onboarding
     if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
       await this.onboarding(adc, addon);
@@ -745,6 +747,56 @@ export class AdcController extends BaseController {
     }
   }
 
+  private async isDOReady(adc: Adc): Promise<boolean> {
+    let cnct = adc.management.connection!;
+    let bigipMgr = await BigIpManager.instanlize({
+      username: cnct.username,
+      password: cnct.password,
+      ipAddr: cnct.ipAddress,
+      port: cnct.tcpPort,
+    });
+
+    try {
+      let resObj = await bigipMgr.getDOStatus();
+      let code = JSON.parse(resObj)['body'][0][0]['result']['status'];
+      return code === 'OK';
+    } catch {
+      console.log('DO URI has not been registered.');
+      return false;
+    }
+  }
+
+  private async doInstalling(adc: Adc): Promise<void> {
+    try {
+      this.logger.debug('start to install do');
+      //await this.serialize(adc, { status: AdcState.DOINSTALLING });
+      // check if do is already installed.
+      let cnct = adc.management.connection!;
+      let bigipMgr = await BigIpManager.instanlize({
+        username: cnct.username,
+        password: cnct.password,
+        ipAddr: cnct.ipAddress,
+        port: cnct.tcpPort,
+      });
+
+      if ((await this.isDOReady(adc)) === false) {
+        await bigipMgr.uploadDO();
+        await bigipMgr.installDO();
+      }
+
+      await checkAndWait(
+        () => this.adcStCtr.gotTo(AdcState.DOINSTALLED),
+        240,
+      ).then(() =>
+        this.serialize(adc, {status: AdcState.DOINSTALLED, lastErr: ''}),
+      );
+    } catch (error) {
+      await this.serialize(adc, {
+        status: AdcState.POWERON,
+        lastErr: `${AdcState.DOINSTALLERR}: ${error}`,
+      });
+    }
+  }
   private async onboarding(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
       this.logger.debug('start to do onbarding');
@@ -786,6 +838,12 @@ export class AdcStateCtrlr {
       failure: AdcState.POWERERR,
       state: AdcState.POWERON,
       check: this.accessible,
+      next: [AdcState.DOINSTALLED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.DOINSTALLERR,
+      state: AdcState.DOINSTALLED,
+      check: this.doInstalled,
       next: [AdcState.ONBOARDED, AdcState.RECLAIMED],
     },
     {
@@ -893,6 +951,13 @@ export class AdcStateCtrlr {
     );
   }
 
+  private async doInstalled(ctrl: AdcStateCtrlr): Promise<boolean> {
+    let bigipMgr = await ctrl.getBigipMgr();
+    let resObj = await bigipMgr.getDOStatus();
+    let code = JSON.parse(resObj)['body'][0][0]['result']['status'];
+    return code === 'OK';
+  }
+
   private async trusted(ctrl: AdcStateCtrlr): Promise<boolean> {
     if (!ctrl.adc.management.trustedDeviceId) return false;
 
@@ -967,6 +1032,10 @@ export enum AdcState {
   POWERON = 'POWERON',
   POWERING = 'POWERING',
   POWERERR = 'POWERERROR',
+
+  DOINSTALLED = 'DOINSTALLED',
+  DOINSTALLING = 'DOINSTALLING',
+  DOINSTALLERR = 'DOINSTALLERR',
 
   ONBOARDED = 'ONBOARDED',
   ONBOARDING = 'ONBOARDING',
