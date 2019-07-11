@@ -646,7 +646,6 @@ export class AdcController extends BaseController {
      - "echo \\"root:${rootPassword}\\" | chpasswd"
      - "echo \\"admin:${adminPassword}\\" | chpasswd"`;
 
-    this.logger.debug('userdata for create vm: ' + userData);
     const userDataB64Encoded = Buffer.from(userData).toString('base64');
 
     return userDataB64Encoded;
