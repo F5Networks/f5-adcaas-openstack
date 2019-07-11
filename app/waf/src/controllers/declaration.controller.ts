@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {repository} from '@loopback/repository';
+import { repository } from '@loopback/repository';
 import {
   post,
   param,
@@ -39,8 +39,10 @@ import {
   AS3DeployRequest,
   Adc,
   AS3Declaration,
+  TLSServerCertificate,
+  Certificate
 } from '../models';
-import {inject, CoreBindings} from '@loopback/core';
+import { inject, CoreBindings } from '@loopback/core';
 import {
   ApplicationRepository,
   DeclarationRepository,
@@ -54,13 +56,15 @@ import {
   RuleRepository,
   ActionRepository,
   AdcRepository,
+  TLSserverRepository,
+  CertificateRepository
 } from '../repositories';
-import {BaseController, Schema, Response, CollectionResponse} from '.';
-import {ASGManager, PortsUpdateParams} from '../services';
-import {factory} from '../log4ts';
-import {findByKey} from '../utils';
-import {WafApplication} from '../application';
-import {WafBindingKeys} from '../keys';
+import { BaseController, Schema, Response, CollectionResponse } from '.';
+import { ASGManager, PortsUpdateParams } from '../services';
+import { factory } from '../log4ts';
+import { findByKey } from '../utils';
+import { WafApplication } from '../application';
+import { WafBindingKeys } from '../keys';
 
 const prefix = '/adcaas/v1';
 
@@ -92,8 +96,12 @@ export class DeclarationController extends BaseController {
     public actionRepository: ActionRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
+    @repository(TLSserverRepository)
+    public tlsserverRepository: TLSserverRepository,
+    @repository(CertificateRepository)
+    public certificateRepository: CertificateRepository
     //Suppress get injection binding exeption by using {optional: true}
-    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    @inject(RestBindings.Http.CONTEXT, { optional: true })
     protected reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private wafapp: WafApplication,
@@ -117,13 +125,22 @@ export class DeclarationController extends BaseController {
       await this.loadPool(service.defaultPool);
     }
 
+    if (service.serverTLSId) {
+      service.serverTLS = await this.tlsserverRepository.findById(
+        service.serverTLSId,
+      );
+      if (service.serverTLS.certificates) {
+        await this.loadCertificateIndex(service.serverTLS.certificates)
+      }
+    }
+
     let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
       where: {
         serviceId: service.id,
       },
     });
 
-    let policyIds = assocs.map(({endpointpolicyId}) => endpointpolicyId);
+    let policyIds = assocs.map(({ endpointpolicyId }) => endpointpolicyId);
     service.policies = await this.endpointpolicyRepository.find({
       where: {
         id: {
@@ -134,6 +151,47 @@ export class DeclarationController extends BaseController {
 
     for (let policy of service.policies) {
       await this.loadEndpointpolicy(policy);
+    }
+  }
+
+  private async loadCertificateIndex(certificates: TLSServerCertificate[]): Promise<void> {
+    certificates.forEach(cert => {
+      const certList = await this.certificateRepository.find({
+        where: {
+          id: cert.certificateId
+        }
+      })
+
+      if (certList.length === 0) {
+        throw new HttpErrors.NotFound(`Cannot find certificate ${cert.certificateId}`);
+      }
+      cert.certContent = certList[0]
+
+      this.loadCertificateData(cert.certContent)
+    })
+  }
+
+  private async loadCertificateData(certificate: Certificate) {
+
+    let adminToken = await this.wafapp.get(
+      WafBindingKeys.KeySolvedAdminToken,
+    );
+    let barbicanMgr = await this.wafapp.get(WafBindingKeys.SecretManager);
+
+    if (certificate.certificate) {
+      certificate.certificate = await barbicanMgr.getSecret(adminToken.token, certificate.certificate)
+    }
+
+    if (certificate.chainCA) {
+      certificate.chainCA = await barbicanMgr.getSecret(adminToken.token, certificate.chainCA)
+    }
+
+    if (certificate.pkcs12) {
+      certificate.pkcs12 = await barbicanMgr.getSecret(adminToken.token, certificate.pkcs12)
+    }
+
+    if (certificate.privateKey) {
+      certificate.privateKey = await barbicanMgr.getSecret(adminToken.token, certificate.privateKey)
     }
   }
 
@@ -150,7 +208,7 @@ export class DeclarationController extends BaseController {
       },
     });
 
-    let monitorIds = assocs.map(({monitorId}) => monitorId);
+    let monitorIds = assocs.map(({ monitorId }) => monitorId);
     pool.monitors = await this.monitorRepository.find({
       where: {
         id: {
@@ -167,7 +225,7 @@ export class DeclarationController extends BaseController {
       },
     });
 
-    let monitorIds = assocs.map(({monitorId}) => monitorId);
+    let monitorIds = assocs.map(({ monitorId }) => monitorId);
     member.monitors = await this.monitorRepository.find({
       where: {
         id: {
@@ -345,7 +403,7 @@ export class DeclarationController extends BaseController {
     } else {
       await this.applicationRepository
         .declarations(applicationId)
-        .patch(declaration, {id: declarationId});
+        .patch(declaration, { id: declarationId });
     }
   }
 
@@ -363,12 +421,12 @@ export class DeclarationController extends BaseController {
   ) {
     await this.applicationRepository
       .declarations(applicationId)
-      .delete({and: [{id: declarationId}, {tenantId: await this.tenantId}]});
+      .delete({ and: [{ id: declarationId }, { tenantId: await this.tenantId }] });
   }
 
   @post(
     prefix +
-      '/applications/{applicationId}/declarations/{declarationId}/deploy',
+    '/applications/{applicationId}/declarations/{declarationId}/deploy',
     {
       responses: {
         '204': Schema.emptyResponse('Successfully deploy Declaration resource'),

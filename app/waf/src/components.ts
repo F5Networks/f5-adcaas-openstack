@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-import {Component, CoreBindings, inject, Binding} from '@loopback/core';
-import {RestApplication} from '@loopback/rest';
+import { Component, CoreBindings, inject, Binding } from '@loopback/core';
+import { RestApplication } from '@loopback/rest';
 import {
   AuthManager,
   ComputeManagerV2,
   IdentityServiceProvider,
   AuthWithOSIdentity,
+  BarbicanManagerV1,
 } from './services';
-import {NetworkDriver} from './services/network.service';
-import {WafBindingKeys} from './keys';
+import { NetworkDriver } from './services/network.service';
+import { WafBindingKeys } from './keys';
 
 export class OpenStackComponent implements Component {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: RestApplication,
-  ) {}
+  ) { }
 
   // TODO: make it work or find out the reason of not working.
   // providers = {
@@ -76,10 +77,19 @@ export class OpenStackComponent implements Component {
     return await new ComputeManagerV2(this.application).bindComputeService();
   });
 
+  bindingBarbican = Binding.bind(
+    WafBindingKeys.SecretManager
+  ).toDynamicValue(
+    async () => {
+      return await new BarbicanManagerV1(this.application).bindBarbicanService();
+    }
+  )
+
   bindings = [
     this.bindingSolveAdminToken,
     this.bindingAuthMgr,
     this.bindingNetwork,
     this.bindingCompute,
+    this.bindingBarbican
   ];
 }

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-export * from './asg.service';
-export * from './identity.service';
-export * from './compute.service';
-export * from './network.service';
-export * from './do.service';
-export * from './bigip.service';
-export * from './barbican.service';
+import {CommonRepository} from '.';
+import {TLSServer} from '../models';
+import {DbDataSource} from '../datasources';
+import {inject} from '@loopback/core';
+
+export class TLSserverRepository extends CommonRepository<
+  TLSServer,
+  typeof TLSServer.prototype.id
+> {
+  constructor(@inject('datasources.db') dataSource: DbDataSource) {
+    super(TLSServer, dataSource);
+  }
+}

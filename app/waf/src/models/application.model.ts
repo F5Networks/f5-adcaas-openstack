@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {CommonEntity, Declaration, AS3Declaration, Service} from '.';
-import {model, property, hasMany} from '@loopback/repository';
+import { CommonEntity, Declaration, AS3Declaration, Service } from '.';
+import { model, property, hasMany } from '@loopback/repository';
 
 @model()
 export class Application extends CommonEntity {
@@ -51,10 +51,10 @@ export class Application extends CommonEntity {
   })
   defaultDeclarationId?: string;
 
-  @hasMany(() => Service, {keyTo: 'applicationId'})
+  @hasMany(() => Service, { keyTo: 'applicationId' })
   services: Service[] = [];
 
-  @hasMany(() => Declaration, {keyTo: 'applicationId'})
+  @hasMany(() => Declaration, { keyTo: 'applicationId' })
   declarations?: Declaration[];
 
   constructor(data?: Partial<Application>) {
@@ -85,6 +85,16 @@ export class Application extends CommonEntity {
             obj[monitor.getAS3Name()] = monitor.getAS3Declaration();
           });
         });
+      }
+
+      if (service.serverTLS) {
+        obj[service.serverTLS.getAS3Name()] = service.serverTLS.getAS3Declaration();
+
+        service.serverTLS.certificates.forEach(certificate => {
+          if (certificate.certContent) {
+            obj[certificate.certificateId] = certificate.certContent.getAS3Declaration();
+          }
+        })
       }
 
       service.policies.forEach(policy => {

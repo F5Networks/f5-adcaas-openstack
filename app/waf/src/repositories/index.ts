@@ -31,3 +31,5 @@ export * from './action.repository';
 export * from './monitor.repository';
 export * from './membermonitorassoc.repository';
 export * from './poolmonitorassoc.repository';
+export * from './certificate.repository';
+export * from './tlsserver.repository'

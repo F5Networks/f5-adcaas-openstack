@@ -289,6 +289,25 @@
           "headers"
         ]
       }
+    },
+    {
+      "description": "get detail of a certificate.",
+      "template": {
+        "method": "GET",
+        "headers": {
+          "X-Auth-Token": "{userToken}",
+          "content-type": "application/json",
+          "Accept": "text/plain"
+        },
+        "url": "{url}",
+        "responsePath": "$"
+      },
+      "functions": {
+        "getSecretDetail": [
+          "userToken",
+          "url"
+        ]
+      }
     }
   ]
 }
