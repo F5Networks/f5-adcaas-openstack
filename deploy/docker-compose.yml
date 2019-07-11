@@ -17,7 +17,8 @@ services:
       - postgres:postgres-server
       - ASG:asg-server
       - DO:do-server
-
+    volumes:
+      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
     logging:
       driver: fluentd
       options:
@@ -52,7 +53,7 @@ services:
       - 8443:443
       - 8080:80
     volumes:
-      - /var/tmp/ASGExtensions:/root/lx
+      - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
       - /var/tmp/DO:/tmp/do
     depends_on:
       - FLUENTD

@@ -20,6 +20,7 @@ import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
 import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
+import path = require('path');
 
 export const BigipBuiltInProperties = {
   admin: 'admin',
@@ -228,17 +229,18 @@ export class BigIpManager {
     //call the bigipService.uploadDO to upload the RPM to Bigip
     //possibly check  if the upload succeeds or not
     //await this.mustBeReachable();
-    const filename = '/tmp/do/F5_DO_RPM_PACKAGE.rpm';
+    const filename = process.env.DO_RPM_PACKAGE!;
+
     let fs = require('fs');
-    if (!fs.existsSync(filename)) {
-      console.log("DO RPM file doesn't exist.");
-      throw new Error("DO RPM file doesn't exist.");
+    if (!filename || filename === '' || !fs.existsSync(filename)) {
+      throw new Error(`DO RPM file doesn't exist: '${filename}'`);
     }
     let fstats = fs.statSync(filename);
     try {
-      let url = `${this.baseUrl}/mgmt/shared/file-transfer/uploads/F5_DO_RPM_PACKAGE.rpm`;
+      let url = `${
+        this.baseUrl
+      }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
       let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
-      buffer.toString('utf8');
       let response = await this.bigipService.uploadDO(
         url,
         this.cred64Encoded,
@@ -260,7 +262,9 @@ export class BigIpManager {
     // await this.mustBeReachable();
     let body = {
       operation: 'INSTALL',
-      packageFilePath: '/var/config/rest/downloads/F5_DO_RPM_PACKAGE.rpm',
+      packageFilePath: `/var/config/rest/downloads/${path.basename(
+        process.env.DO_RPM_PACKAGE!,
+      )}`,
     };
     // call the bigipService.installDO to install the RPM
     //possibly check if the install succeeds or not.
