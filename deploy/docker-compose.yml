@@ -53,6 +53,7 @@ services:
       - 8443:443
       - 8080:80
     volumes:
+      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
       - /var/tmp/DO:/tmp/do
     depends_on:

@@ -6,6 +6,7 @@ cdir=`cd $(dirname $0); pwd`
     cd $cdir
     ./download_asg_dependencies.sh
     ./download_do.sh
+    ./download_as3.sh
 )
 
 (
