@@ -38,7 +38,12 @@ export class MockKeyStoneController extends MockBaseController {
     super();
   }
   @post('/v2.0/tokens')
-  async v2AuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
+  async v2PostAuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
+    return ResponseWith['/v2.0/tokens']();
+  }
+
+  @get('/v2.0/tokens')
+  async v2GetAuthToken(@requestBody() reqBody: RequestBody): Promise<object> {
     return ResponseWith['/v2.0/tokens']();
   }
 

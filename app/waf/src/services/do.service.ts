@@ -22,6 +22,7 @@ import {factory} from '../log4ts';
 import {BigIpManager} from './bigip.service';
 import {RestApplication} from '@loopback/rest';
 import {WafBindingKeys} from '../keys';
+import {AddonReqValues} from '../controllers';
 const ip = require('ip');
 
 export interface DOService {
@@ -327,7 +328,7 @@ export class OnboardingManager {
     },
   };
 
-  async assembleDo(obData: Adc, addon: object): Promise<TypeDOClassDO> {
+  async assembleDo(obData: Adc, addon: AddonReqValues): Promise<TypeDOClassDO> {
     let doBody: TypeDOClassDO = {
       class: 'DO',
       targetHost: obData.management.connection!.ipAddress,
@@ -347,7 +348,7 @@ export class OnboardingManager {
       },
     };
 
-    let addonInfo: {[key: string]: object} = {
+    let addonInfo: {[key: string]: object | boolean} = {
       // get bigip interfaces information: name.
       interfaces: await BigIpManager.instanlize({
         username: obData.management.connection!.username,
@@ -357,8 +358,8 @@ export class OnboardingManager {
       }).then(async bigipMgr => {
         return await bigipMgr.getInterfaces();
       }),
-      subnets: await this.subnetInfo(obData),
-      onboarding: JSON.parse(JSON.stringify(addon))['onboarding'],
+      subnets: await this.subnetInfo(obData, addon),
+      onboarding: addon.onboarding === true,
     };
 
     this.logger.debug(
@@ -375,18 +376,15 @@ export class OnboardingManager {
     return doBody;
   }
 
-  private async subnetInfo(adc: Adc): Promise<object> {
+  private async subnetInfo(adc: Adc, addon: AddonReqValues): Promise<object> {
     let rltObj = {};
 
     let netDriver = await this.application.get(WafBindingKeys.KeyNetworkDriver);
-    let adminToken = await this.application.get(
-      WafBindingKeys.KeySolvedAdminToken,
-    );
 
     for (let net of Object.keys(adc.networks)) {
       let macAddr = adc.management.networks[net].macAddr!;
       let subnetData = await netDriver.getSubnetInfo(
-        adminToken.token,
+        addon.userToken!,
         adc.networks[net].networkId,
       );
       for (let sub of subnetData) {

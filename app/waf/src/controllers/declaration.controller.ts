@@ -61,6 +61,7 @@ import {factory} from '../log4ts';
 import {findByKey} from '../utils';
 import {WafApplication} from '../application';
 import {WafBindingKeys} from '../keys';
+import {AddonReqValues} from './adc.controller';
 
 const prefix = '/adcaas/v1';
 
@@ -416,8 +417,13 @@ export class DeclarationController extends BaseController {
         try {
           let as3Request = new AS3DeployRequest(adc, application, declaration);
           let declBody = as3Request.declaration;
+          let addon = {
+            userToken: await this.reqCxt.get(
+              WafBindingKeys.Request.KeyUserToken,
+            ),
+          };
 
-          await this.TryBindVirtualAddressToExt(adc, declBody);
+          await this.TryBindVirtualAddressToExt(adc, declBody, addon);
           await proxyMgr.deploy(
             mgmt.connection!.ipAddress,
             mgmt.connection!.tcpPort,
@@ -437,6 +443,7 @@ export class DeclarationController extends BaseController {
   async TryBindVirtualAddressToExt(
     adc: Adc,
     declaration: AS3Declaration,
+    addon: AddonReqValues,
   ): Promise<void> {
     let portId = (() => {
       for (let netName of Object.keys(adc.networks)) {
@@ -448,11 +455,9 @@ export class DeclarationController extends BaseController {
 
     let netHelper = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
 
-    let userToken = await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken);
-
     // get port addresses, add one more, then update port.
     // TODO: use async-lock to make the operation automic.
-    let port = await netHelper.getPortInfo(userToken, portId!);
+    let port = await netHelper.getPortInfo(addon.userToken!, portId!);
     let portParams: PortsUpdateParams = {
       id: portId!,
       fixedIps: port.fixedIps,
@@ -470,6 +475,6 @@ export class DeclarationController extends BaseController {
       }
     }
 
-    await netHelper.updatePort(userToken, portParams);
+    await netHelper.updatePort(addon.userToken!, portParams);
   }
 }

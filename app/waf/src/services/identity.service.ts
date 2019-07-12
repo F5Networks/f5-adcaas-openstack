@@ -387,8 +387,7 @@ export class AuthedToken {
   private digExpired() {
     // Make the duration time a little shorter then that of actually
     // to avoid token expiring error caused by time leak.
-    let duration =
-      ((this.expiredAt.getTime() - this.issuedAt.getTime()) * 4) / 5;
+    let duration = this.expiredAt.getTime() - this.issuedAt.getTime();
     this.expiredAt.setTime(Date.now() + duration);
     return this;
   }
@@ -468,11 +467,7 @@ export class AuthedToken {
     return this.epNetwork() + '/v2.0/floatingips';
   }
 
-  // TODO: Use user token's catalog instead of that of admin's.
-  public epServers(tenantId: string) {
-    let url = this.epCompute();
-    if (url.endsWith('v2.0'))
-      return url.slice(0, url.lastIndexOf('/')) + '/' + tenantId + '/servers';
-    else return url.replace(process.env.OS_TENANT_ID!, tenantId) + '/servers';
+  public epServers() {
+    return this.epCompute() + '/servers';
   }
 }
