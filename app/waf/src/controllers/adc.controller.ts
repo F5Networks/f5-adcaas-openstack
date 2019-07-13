@@ -496,7 +496,7 @@ export class AdcController extends BaseController {
   }
 
   private async serialize(adc: Adc, data?: object) {
-    if (data) merge(adc, data);
+    merge(adc, data);
     await this.adcRepository.update(adc);
   }
 
