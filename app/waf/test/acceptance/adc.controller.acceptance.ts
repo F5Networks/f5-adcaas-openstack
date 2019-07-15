@@ -171,6 +171,7 @@ describe('AdcController test', () => {
     teardownRestAppAndClient(mockNovaApp);
     teardownRestAppAndClient(mockNeutronApp);
     teardownRestAppAndClient(mockASG);
+    await teardownEnvs();
   });
 
   it('post ' + prefix + '/adcs: create ADC HW', async function() {
@@ -1056,32 +1057,28 @@ describe('AdcController test', () => {
   it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
     let adc = await givenAdcData(wafapp);
 
-    await setupEnvs()
-      .then(async () => {
-        let response = await client
-          .post(prefix + '/adcs/' + adc.id + '/action')
-          .set('X-Auth-Token', ExpectedData.userToken)
-          .set('tenant-id', ExpectedData.tenantId)
-          .send({create: null})
-          .expect(200);
+    let response = await client
+      .post(prefix + '/adcs/' + adc.id + '/action')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({create: null})
+      .expect(200);
 
-        expect(response.body).containDeep({id: adc.id});
+    expect(response.body).containDeep({id: adc.id});
 
-        let checkStatus = async () => {
-          let resp = await client
-            .get(prefix + '/adcs/' + adc.id)
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .expect(200);
+    let checkStatus = async () => {
+      let resp = await client
+        .get(prefix + '/adcs/' + adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
 
-          return resp.body.adc.status === 'POWERON';
-        };
+      return resp.body.adc.status === 'POWERON';
+    };
 
-        await checkAndWait(checkStatus, 50, [], 5).then(() => {
-          expect(true).true();
-        });
-      })
-      .finally(teardownEnvs);
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {
+      expect(true).true();
+    });
   });
 
   it(
@@ -1096,32 +1093,28 @@ describe('AdcController test', () => {
           StubResponses.neutronGetFloatingIpsStateActive200,
       });
 
-      await setupEnvs()
-        .then(async () => {
-          let response = await client
-            .post(prefix + '/adcs/' + adc.id + '/action')
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .send({create: null})
-            .expect(200);
+      let response = await client
+        .post(prefix + '/adcs/' + adc.id + '/action')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({create: null})
+        .expect(200);
 
-          expect(response.body).containDeep({id: adc.id});
+      expect(response.body).containDeep({id: adc.id});
 
-          let checkStatus = async () => {
-            let resp = await client
-              .get(prefix + '/adcs/' + adc.id)
-              .set('X-Auth-Token', ExpectedData.userToken)
-              .set('tenant-id', ExpectedData.tenantId)
-              .expect(200);
+      let checkStatus = async () => {
+        let resp = await client
+          .get(prefix + '/adcs/' + adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
 
-            return resp.body.adc.status === 'POWERERROR';
-          };
+        return resp.body.adc.status === 'POWERERROR';
+      };
 
-          await checkAndWait(checkStatus, 5, [], 50).then(() => {
-            expect(true).true();
-          });
-        })
-        .finally(teardownEnvs);
+      await checkAndWait(checkStatus, 5, [], 50).then(() => {
+        expect(true).true();
+      });
     },
   );
 
@@ -1135,37 +1128,33 @@ describe('AdcController test', () => {
       OSShouldResponseWith({
         'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
       });
-      await setupEnvs()
-        .then(async () => {
-          let response = await client
-            .post(prefix + '/adcs/' + adc.id + '/action')
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .send({create: null})
-            .expect(200);
+      let response = await client
+        .post(prefix + '/adcs/' + adc.id + '/action')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({create: null})
+        .expect(200);
 
-          expect(response.body).containDeep({id: adc.id});
+      expect(response.body).containDeep({id: adc.id});
 
-          let checkStatus = async () => {
-            let resp = await client
-              .get(prefix + '/adcs/' + adc.id)
-              .set('X-Auth-Token', ExpectedData.userToken)
-              .set('tenant-id', ExpectedData.tenantId)
-              .expect(200);
+      let checkStatus = async () => {
+        let resp = await client
+          .get(prefix + '/adcs/' + adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
 
-            return resp.body.adc.status === 'POWERON';
-          };
+        return resp.body.adc.status === 'POWERON';
+      };
 
-          await checkAndWait(checkStatus, 5, [], 50).then(
-            () => {
-              expect(true).true();
-            },
-            () => {
-              expect(true).false();
-            },
-          );
-        })
-        .finally(teardownEnvs);
+      await checkAndWait(checkStatus, 5, [], 50).then(
+        () => {
+          expect(true).true();
+        },
+        () => {
+          expect(true).false();
+        },
+      );
     },
   );
 
@@ -1213,35 +1202,31 @@ describe('AdcController test', () => {
       },
     ]);
     let fs = require('fs');
-    await setupEnvs()
-      .then(async () => {
-        fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
-          recursive: true,
-        });
-        let response = await client
-          .post(prefix + '/adcs/' + adc.id + '/action')
-          .set('X-Auth-Token', ExpectedData.userToken)
-          .set('tenant-id', ExpectedData.tenantId)
-          .send({setup: null})
-          .expect(200);
+    fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+      recursive: true,
+    });
+    let response = await client
+      .post(prefix + '/adcs/' + adc.id + '/action')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({setup: null})
+      .expect(200);
 
-        expect(response.body).containDeep({id: adc.id});
+    expect(response.body).containDeep({id: adc.id});
 
-        let checkStatus = async () => {
-          let resp = await client
-            .get(prefix + '/adcs/' + adc.id)
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .expect(200);
-          return resp.body.adc.status === 'ACTIVE';
-        };
+    let checkStatus = async () => {
+      let resp = await client
+        .get(prefix + '/adcs/' + adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+      return resp.body.adc.status === 'ACTIVE';
+    };
 
-        //TODO: This test can not return comparing failure.
-        await checkAndWait(checkStatus, 50, [], 5).then(() => {
-          expect(true).true();
-        });
-      })
-      .finally(teardownEnvs);
+    //TODO: This test can not return comparing failure.
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {
+      expect(true).true();
+    });
   });
 
   it(
@@ -1293,36 +1278,32 @@ describe('AdcController test', () => {
         },
       ]);
 
-      await setupEnvs()
-        .then(async () => {
-          let fs = require('fs');
-          fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
-            recursive: true,
-          });
-          let response = await client
-            .post(prefix + '/adcs/' + adc.id + '/action')
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .send({setup: null})
-            .expect(200);
+      let fs = require('fs');
+      fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+        recursive: true,
+      });
+      let response = await client
+        .post(prefix + '/adcs/' + adc.id + '/action')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({setup: null})
+        .expect(200);
 
-          expect(response.body).containDeep({id: adc.id});
+      expect(response.body).containDeep({id: adc.id});
 
-          let checkStatus = async () => {
-            let resp = await client
-              .get(prefix + '/adcs/' + adc.id)
-              .set('X-Auth-Token', ExpectedData.userToken)
-              .set('tenant-id', ExpectedData.tenantId)
-              .expect(200);
-            return resp.body.adc.status === 'ACTIVE';
-          };
+      let checkStatus = async () => {
+        let resp = await client
+          .get(prefix + '/adcs/' + adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
+        return resp.body.adc.status === 'ACTIVE';
+      };
 
-          //TODO: This test can not return comparing failure.
-          await checkAndWait(checkStatus, 50, [], 5).then(() => {
-            expect(true).true();
-          });
-        })
-        .finally(teardownEnvs);
+      //TODO: This test can not return comparing failure.
+      await checkAndWait(checkStatus, 50, [], 5).then(() => {
+        expect(true).true();
+      });
     },
   );
 
@@ -1333,30 +1314,26 @@ describe('AdcController test', () => {
     let adc = await givenAdcData(wafapp, {status: 'ACTIVE'});
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
-    await setupEnvs()
-      .then(async () => {
-        let response = await client
-          .post(prefix + '/adcs/' + adc.id + '/action')
-          .set('X-Auth-Token', ExpectedData.userToken)
-          .set('tenant-id', ExpectedData.tenantId)
-          .send({delete: null})
-          .expect(200);
-        expect(response.body).containDeep({id: adc.id});
+    let response = await client
+      .post(prefix + '/adcs/' + adc.id + '/action')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send({delete: null})
+      .expect(200);
+    expect(response.body).containDeep({id: adc.id});
 
-        let checkStatus = async () => {
-          let resp = await client
-            .get(prefix + '/adcs/' + adc.id)
-            .set('X-Auth-Token', ExpectedData.userToken)
-            .set('tenant-id', ExpectedData.tenantId)
-            .expect(200);
-          return resp.body.adc.status === 'RECLAIMED';
-        };
+    let checkStatus = async () => {
+      let resp = await client
+        .get(prefix + '/adcs/' + adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+      return resp.body.adc.status === 'RECLAIMED';
+    };
 
-        await checkAndWait(checkStatus, 50, [], 5).then(() => {
-          expect(true).true();
-        });
-      })
-      .finally(teardownEnvs);
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {
+      expect(true).true();
+    });
   });
 
   //TODO: the timeout can only be tested through unit test?
