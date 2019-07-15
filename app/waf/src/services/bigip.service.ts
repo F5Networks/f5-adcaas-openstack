@@ -224,13 +224,8 @@ export class BigIpManager {
   }
 
   async uploadDO(): Promise<string> {
-    // if the local file doesn't exist, throw execption.
-    //read the file's contant into a buf and calculate its length
-    //call the bigipService.uploadDO to upload the RPM to Bigip
-    //possibly check  if the upload succeeds or not
-    //await this.mustBeReachable();
+    await this.mustBeReachable();
     const filename = process.env.DO_RPM_PACKAGE!;
-
     let fs = require('fs');
     if (!filename || filename === '' || !fs.existsSync(filename)) {
       throw new Error(`DO RPM file doesn't exist: '${filename}'`);
@@ -258,16 +253,13 @@ export class BigIpManager {
   }
 
   async installDO(): Promise<string> {
-    // create the body with following format.
-    // await this.mustBeReachable();
+    await this.mustBeReachable();
     let body = {
       operation: 'INSTALL',
       packageFilePath: `/var/config/rest/downloads/${path.basename(
         process.env.DO_RPM_PACKAGE!,
       )}`,
     };
-    // call the bigipService.installDO to install the RPM
-    //possibly check if the install succeeds or not.
     try {
       let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
       let response = await this.bigipService.installDO(
@@ -277,7 +269,6 @@ export class BigIpManager {
       );
       let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
       let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
-      /*check and wait */
 
       let impFunc = async () => {
         let checkinfo = await this.bigipService.getInfo(
@@ -292,7 +283,7 @@ export class BigIpManager {
       let checkFunc = async () => {
         return await impFunc().then(resObj => {
           let status = resObj['status'];
-          if (status !== 'FAILED') return true;
+          if (status === 'FINISHED') return true;
         });
       };
 

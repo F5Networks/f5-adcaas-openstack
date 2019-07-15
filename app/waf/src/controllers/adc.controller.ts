@@ -109,6 +109,11 @@ export class AdcController extends BaseController {
       throw new HttpErrors.UnprocessableEntity(e.message);
     }
 
+    let addonReq = {
+      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+      tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+    };
+    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
     if (adc.type === 'HW') {
       //TODO: Disable this path after VE path is stable.
       //TODO: Do this check in API validator
@@ -118,18 +123,24 @@ export class AdcController extends BaseController {
         );
       }
 
-      let addonReq = {
-        userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
-        tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
-      };
-      this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
-
       this.trustAdc(adc).then(() => {
         if (adc.status === AdcState.TRUSTED) {
           this.installAS3(adc);
         }
       });
+      return new Response(Adc, adc);
     }
+
+    this.adcStCtr
+      .readyTo(AdcState.POWERON)
+      .then(() => this.createOn(adc, addonReq))
+      .then(() => this.adcStCtr.readyTo(AdcState.DOINSTALLED))
+      .then(() => this.installDO(adc))
+      .then(() => this.adcStCtr.readyTo(AdcState.ONBOARDED))
+      .then(() => this.onboard(adc, addonReq))
+      .catch(() => {
+        this.logger.error(`Provisioning is failed for ${adc.id}.`);
+      });
 
     return new Response(Adc, adc);
   }
@@ -203,28 +214,31 @@ export class AdcController extends BaseController {
 
   async installAS3(adc: Adc): Promise<void> {
     // Install AS3 RPM on target device
-    await this.serialize(adc, {status: AdcState.INSTALLING, lastErr: ''});
+    await this.serialize(adc, {status: AdcState.AS3INSTALLING, lastErr: ''});
     try {
       await this.asgMgr.installAS3(adc.management.trustedDeviceId!);
 
       await checkAndWait(
-        () => this.adcStCtr.gotTo(AdcState.INSTALLED),
+        () => this.adcStCtr.gotTo(AdcState.AS3INSTALLED),
         60,
       ).then(
         async () => {
-          await this.serialize(adc, {status: AdcState.INSTALLED, lastErr: ''});
+          await this.serialize(adc, {
+            status: AdcState.AS3INSTALLED,
+            lastErr: '',
+          });
         },
         async err => {
           await this.serialize(adc, {
-            status: AdcState.INSTALLERR,
-            lastErr: `${AdcState.INSTALLERR}: Fail to install AS3`,
+            status: AdcState.AS3INSTALLERR,
+            lastErr: `${AdcState.AS3INSTALLERR}: Fail to install AS3`,
           });
         },
       );
     } catch (err) {
       await this.serialize(adc, {
-        status: AdcState.INSTALLERR,
-        lastErr: `${AdcState.INSTALLERR}: ${err.message}`,
+        status: AdcState.AS3INSTALLERR,
+        lastErr: `${AdcState.AS3INSTALLERR}: ${err.message}`,
       });
     }
   }
@@ -342,11 +356,27 @@ export class AdcController extends BaseController {
       tenantId: await this.tenantId,
     });
 
-    if (adc.type === 'HW' && !(await this.untrustAdc(adc))) {
-      throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
+    if (adc.type === 'HW') {
+      if (!(await this.untrustAdc(adc)))
+        throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
+      await this.adcRepository.deleteById(id);
+      return;
     }
 
-    await this.adcRepository.deleteById(id);
+    let addonReq = {
+      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
+      tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+    };
+    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
+
+    if (await this.adcStCtr.readyTo(AdcState.RECLAIMED)) {
+      this.deleteOn(adc, addonReq).then(() =>
+        this.adcRepository.deleteById(id),
+      );
+    } else
+      throw new HttpErrors.UnprocessableEntity(
+        `Not ready for bigip VE to : ${AdcState.RECLAIMED}`,
+      );
   }
 
   //TODO: multitenancy sharing model and api
@@ -442,25 +472,8 @@ export class AdcController extends BaseController {
       );
 
     switch (Object.keys(actionBody)[0]) {
-      case 'create':
-        if (await this.adcStCtr.readyTo(AdcState.POWERON)) {
-          this.createOn(adc, addonReq);
-          return {id: adc.id};
-        } else
-          throw new HttpErrors.UnprocessableEntity(
-            `Not ready for bigip VE to : ${AdcState.POWERON}`,
-          );
-      case 'delete':
-        if (await this.adcStCtr.readyTo(AdcState.RECLAIMED)) {
-          this.deleteOn(adc, addonReq);
-          return {id: adc.id};
-        } else
-          throw new HttpErrors.UnprocessableEntity(
-            `Not ready for bigip VE to : ${AdcState.RECLAIMED}`,
-          );
-
       case 'setup':
-        if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED)) {
+        if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) {
           this.setupOn(adc, addonReq);
           return {id: adc.id};
         } else
@@ -475,19 +488,11 @@ export class AdcController extends BaseController {
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
-    // install DO
-    if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
-      await this.doInstalling(adc);
-
-    // onboarding
-    if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
-      await this.onboarding(adc, addon);
-
     // trust
     if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) await this.trustAdc(adc);
 
     // install as3
-    if (await this.adcStCtr.readyTo(AdcState.INSTALLED))
+    if (await this.adcStCtr.readyTo(AdcState.AS3INSTALLED))
       await this.installAS3(adc);
 
     // create tenant
@@ -518,6 +523,7 @@ export class AdcController extends BaseController {
         status: AdcState.POWERERR,
         lastErr: `${AdcState.POWERERR}: ${error.message}`,
       });
+      return Promise.reject();
     }
   }
 
@@ -663,7 +669,7 @@ export class AdcController extends BaseController {
         this.logger.debug(
           'Json used for revoke license: ' + JSON.stringify(doBody),
         );
-        await doMgr.onboarding(doBody).then(async () => {
+        await doMgr.onboard(doBody).then(async () => {
           // TODO: create a unified bigipMgr
           let cnct = adc.management.connection!;
           let bigipMgr = await BigIpManager.instanlize({
@@ -773,9 +779,9 @@ export class AdcController extends BaseController {
     }
   }
 
-  private async doInstalling(adc: Adc): Promise<void> {
+  private async installDO(adc: Adc): Promise<void> {
     try {
-      this.logger.debug('start to install do');
+      this.logger.debug('start to install do rpm to bigip ' + adc.id);
       await this.serialize(adc, {status: AdcState.DOINSTALLING});
       // check if do is already installed.
       let cnct = adc.management.connection!;
@@ -799,12 +805,13 @@ export class AdcController extends BaseController {
       );
     } catch (error) {
       await this.serialize(adc, {
-        status: AdcState.POWERON,
+        status: AdcState.DOINSTALLERR,
         lastErr: `${AdcState.DOINSTALLERR}: ${error}`,
       });
     }
   }
-  private async onboarding(adc: Adc, addon: AddonReqValues): Promise<void> {
+
+  private async onboard(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
       this.logger.debug('start to do onbarding');
       await this.serialize(adc, {status: AdcState.ONBOARDING});
@@ -814,7 +821,7 @@ export class AdcController extends BaseController {
         adc,
         Object.assign(addon, {onboarding: true}),
       );
-      let doId = await doMgr.onboarding(doBody);
+      let doId = await doMgr.onboard(doBody);
 
       await checkAndWait(() => doMgr.isDone(doId), 240)
         .then(() =>
@@ -826,6 +833,7 @@ export class AdcController extends BaseController {
         status: AdcState.ONBOARDERR,
         lastErr: `${AdcState.ONBOARDERR}: ${error}`,
       });
+      return Promise.reject();
     }
   }
 }
@@ -866,11 +874,11 @@ export class AdcStateCtrlr {
       failure: AdcState.TRUSTERR,
       state: AdcState.TRUSTED,
       check: this.trusted,
-      next: [AdcState.INSTALLED, AdcState.RECLAIMED],
+      next: [AdcState.AS3INSTALLED, AdcState.RECLAIMED],
     },
     {
-      failure: AdcState.INSTALLERR,
-      state: AdcState.INSTALLED,
+      failure: AdcState.AS3INSTALLERR,
+      state: AdcState.AS3INSTALLED,
       check: this.installed,
       next: [AdcState.PARTITIONED, AdcState.RECLAIMED],
     },
@@ -1055,9 +1063,9 @@ export enum AdcState {
   TRUSTING = 'TRUSTING',
   TRUSTERR = 'TRUSTERROR',
 
-  INSTALLED = 'INSTALLED',
-  INSTALLING = 'INSTALLING',
-  INSTALLERR = 'INSTALLERROR',
+  AS3INSTALLED = 'INSTALLED',
+  AS3INSTALLING = 'INSTALLING',
+  AS3INSTALLERR = 'INSTALLERROR',
 
   PARTITIONED = 'PARTITIONED',
   PARTITIONING = 'PARTITIONING',

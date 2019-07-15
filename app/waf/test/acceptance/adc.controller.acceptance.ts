@@ -43,8 +43,8 @@ import {
   MockKeyStoneController,
   MockNovaController,
   MockNeutronController,
-  ExpectedData,
   OSShouldResponseWith,
+  ExpectedData,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {
   MockBigipController,
@@ -1109,26 +1109,68 @@ describe('AdcController test', () => {
     },
   );
 
-  it('post ' + prefix + '/adcs/{adcId}/action: create done', async () => {
-    let adc = await givenAdcData(wafapp);
+  it('post ' + prefix + '/adcs: create done', async () => {
+    let adc = createAdcObject({
+      type: 'VE',
+      management: {},
+    });
 
     let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
+      .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .send({create: null})
+      .send(adc)
       .expect(200);
 
-    expect(response.body).containDeep({id: adc.id});
+    expect(response.body.adc).hasOwnProperty('id');
+    let adcId = response.body.adc.id;
+    ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
 
     let checkStatus = async () => {
       let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
+        .get(prefix + '/adcs/' + adcId)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      return resp.body.adc.status === 'POWERON';
+      return resp.body.adc.status === 'ONBOARDED';
+    };
+
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {
+      expect(true).true();
+    });
+  });
+
+  it(`post ${prefix}/adcs: create failed with wrong floatingip state`, async () => {
+    let adc = createAdcObject({
+      type: 'VE',
+      management: {},
+    });
+
+    OSShouldResponseWith({
+      'GET:/v2.0/floatingips':
+        StubResponses.neutronGetFloatingIpsStateActive200,
+    });
+
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).hasOwnProperty('id');
+    let adcId = response.body.adc.id;
+    ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
+
+    let checkStatus = async () => {
+      let resp = await client
+        .get(prefix + '/adcs/' + adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      return resp.body.adc.status === 'POWERERROR';
     };
 
     await checkAndWait(checkStatus, 50, [], 5).then(() => {
@@ -1137,84 +1179,48 @@ describe('AdcController test', () => {
   });
 
   it(
-    'post ' +
-      prefix +
-      '/adcs/{adcId}/action: create failed with wrong floatingip state',
+    'post ' + prefix + '/adcs: create done with floatingIP created',
     async () => {
-      let adc = await givenAdcData(wafapp);
+      let adc = createAdcObject({
+        type: 'VE',
+        management: {},
+      });
 
       OSShouldResponseWith({
-        'GET:/v2.0/floatingips':
-          StubResponses.neutronGetFloatingIpsStateActive200,
+        'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
       });
 
       let response = await client
-        .post(prefix + '/adcs/' + adc.id + '/action')
+        .post(prefix + '/adcs')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .send({create: null})
+        .send(adc)
         .expect(200);
 
-      expect(response.body).containDeep({id: adc.id});
+      expect(response.body.adc).hasOwnProperty('id');
+      let adcId = response.body.adc.id;
+      ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
 
       let checkStatus = async () => {
         let resp = await client
-          .get(prefix + '/adcs/' + adc.id)
+          .get(prefix + '/adcs/' + adcId)
           .set('X-Auth-Token', ExpectedData.userToken)
           .set('tenant-id', ExpectedData.tenantId)
           .expect(200);
 
-        return resp.body.adc.status === 'POWERERROR';
+        return resp.body.adc.status === 'ONBOARDED';
       };
 
-      await checkAndWait(checkStatus, 5, [], 50).then(() => {
+      await checkAndWait(checkStatus, 50, [], 5).then(() => {
         expect(true).true();
       });
     },
   );
 
-  it(
-    'post ' +
-      prefix +
-      '/adcs/{adcId}/action: create done with floatingIP created',
-    async () => {
-      let adc = await givenAdcData(wafapp);
-
-      OSShouldResponseWith({
-        'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
-      });
-      let response = await client
-        .post(prefix + '/adcs/' + adc.id + '/action')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send({create: null})
-        .expect(200);
-
-      expect(response.body).containDeep({id: adc.id});
-
-      let checkStatus = async () => {
-        let resp = await client
-          .get(prefix + '/adcs/' + adc.id)
-          .set('X-Auth-Token', ExpectedData.userToken)
-          .set('tenant-id', ExpectedData.tenantId)
-          .expect(200);
-
-        return resp.body.adc.status === 'POWERON';
-      };
-
-      await checkAndWait(checkStatus, 5, [], 50).then(
-        () => {
-          expect(true).true();
-        },
-        () => {
-          expect(true).false();
-        },
-      );
-    },
-  );
-
   it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
-    let adc = await givenAdcData(wafapp, {status: 'POWERON'});
+    let adc = await givenAdcData(wafapp, {
+      status: 'ONBOARDED',
+    });
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
 
@@ -1284,106 +1290,108 @@ describe('AdcController test', () => {
     });
   });
 
-  it(
-    'post ' + prefix + '/adcs/{adcId}/action: setup done with license key',
-    async () => {
-      let adc = await givenAdcData(wafapp, {
-        status: 'POWERON',
-        license: 'my-fake-license',
-      });
-      ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-      ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
-
-      let trustDeviceId = uuid();
-      trustStub.returns({
-        devices: [
-          {
-            targetUUID: trustDeviceId,
-            targetHost: adc.management.connection!.ipAddress,
-            state: 'CREATED',
-          },
-        ],
-      });
-
-      queryStub.returns({
-        devices: [
-          {
-            targetUUID: trustDeviceId,
-            targetHost: adc.management.connection!.ipAddress,
-            state: 'ACTIVE',
-          },
-        ],
-      });
-
-      queryExtensionsStub.onCall(0).returns([]);
-
-      queryExtensionsStub.onCall(1).returns([
-        {
-          rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-          name: 'f5-appsvcs',
-          state: 'UPLOADING',
-        },
-      ]);
-
-      queryExtensionsStub.returns([
-        {
-          rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-          name: 'f5-appsvcs',
-          state: 'AVAILABLE',
-        },
-      ]);
-
-      let fs = require('fs');
-      fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
-        recursive: true,
-      });
-      let response = await client
-        .post(prefix + '/adcs/' + adc.id + '/action')
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send({setup: null})
-        .expect(200);
-
-      expect(response.body).containDeep({id: adc.id});
-
-      let checkStatus = async () => {
-        let resp = await client
-          .get(prefix + '/adcs/' + adc.id)
-          .set('X-Auth-Token', ExpectedData.userToken)
-          .set('tenant-id', ExpectedData.tenantId)
-          .expect(200);
-        return resp.body.adc.status === 'ACTIVE';
-      };
-
-      //TODO: This test can not return comparing failure.
-      await checkAndWait(checkStatus, 50, [], 5).then(() => {
-        expect(true).true();
-      });
-    },
-  );
-
-  it('post ' + prefix + '/adcs/{adcId}/action: delete done', async () => {
-    BigipShouldResponseWith({
-      '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
+  it('post ' + prefix + '/adcs: create done with license key', async () => {
+    let adc = createAdcObject({
+      type: 'VE',
+      license: 'my-fake-license',
+      management: {},
     });
-    let adc = await givenAdcData(wafapp, {status: 'ACTIVE'});
-    ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
 
+    let trustDeviceId = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          state: 'CREATED',
+        },
+      ],
+    });
+
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          state: 'ACTIVE',
+        },
+      ],
+    });
+
+    queryExtensionsStub.onCall(0).returns([]);
+
+    queryExtensionsStub.onCall(1).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'UPLOADING',
+      },
+    ]);
+
+    queryExtensionsStub.returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'AVAILABLE',
+      },
+    ]);
+
+    let fs = require('fs');
+    fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+      recursive: true,
+    });
     let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
+      .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .send({delete: null})
+      .send(adc)
       .expect(200);
-    expect(response.body).containDeep({id: adc.id});
+
+    expect(response.body.adc).hasOwnProperty('id');
+    let adcId = response.body.adc.id;
+    ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
+    //ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
+    expect(response.body.adc).containDeep({id: adcId});
 
     let checkStatus = async () => {
       let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
+        .get(prefix + '/adcs/' + adcId)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
-      return resp.body.adc.status === 'RECLAIMED';
+      return resp.body.adc.status === 'ONBOARDED';
+    };
+
+    //TODO: This test can not return comparing failure.
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {
+      expect(true).true();
+    });
+  });
+
+  it('post ' + prefix + '/adcs/{adcId}: delete done', async () => {
+    BigipShouldResponseWith({
+      '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
+    });
+    let adc = await givenAdcData(wafapp, {
+      type: 'VE',
+      status: 'ACTIVE',
+    });
+    ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+
+    await client
+      .del(prefix + '/adcs/' + adc.id)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(204);
+
+    let checkStatus = async () => {
+      await client
+        .get(prefix + '/adcs/' + adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
+
+      return true;
     };
 
     await checkAndWait(checkStatus, 50, [], 5).then(() => {
