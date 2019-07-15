@@ -262,6 +262,61 @@ describe('AdcController test', () => {
     expect(response.body.adc.management.trustedDeviceId).to.equal(id);
   });
 
+  it('post ' + prefix + '/adcs: create ADC with sshKey', async function() {
+    const adc = createAdcObject({
+      type: 'VE',
+      management: {
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
+        compute: {
+          sshKey:
+            'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCbm1UDaANxk2v7IU8X5pQQiHWt+zFL66qiwVNOwTcpZgOb5fUiKxckkSq2DmPsI9QQG19FTV8w//iZcu/P+H2rFzJUKPYaFKYt/wqBV6iyp06NYWR7hobyxSGo/bxXd/Q40FyZwKeYAezBAgKAceTHb1YGBPyySe7CRBU2olTqlWyfrcheA1BKh4CpMp1kmeuDcTnAwi5bCZXX3esopAzWRuHhOeaViWPe1BzqcJD+uN4TOdR63QpVYr4JYFTMN7XQ8UK9QYhLxy1Llk7rT1DT2MdEhHYtVfPnjtj0T5ehWjm7pug8E2GaS/cAWUwSOWnGkEI/zuuwevAA8/JPJIGf j@BEI-ML-00',
+        },
+      },
+    });
+
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).to.containDeep(toJSON(adc));
+  });
+
+  it('post ' + prefix + '/adcs: create ADC without sshKey', async function() {
+    const adc = createAdcObject({
+      type: 'VE',
+      management: {
+        connection: {
+          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          tcpPort: ExpectedData.bigipMgmt.tcpPort,
+          username: 'admin',
+          password: 'admin',
+          rootPass: 'default',
+        },
+        networks: {},
+        compute: {},
+      },
+    });
+
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).to.containDeep(toJSON(adc));
+  });
+
   it(
     'post ' + prefix + '/adcs: create ADC HW without management info',
     async () => {

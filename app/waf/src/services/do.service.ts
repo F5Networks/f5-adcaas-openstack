@@ -91,7 +91,7 @@ export class OnboardingManager {
       );
 
     this.config = {
-      endpoint: process.env.DO_ENDPOINT || 'http://localhost:8081',
+      endpoint: process.env.DO_ENDPOINT || 'https://localhost:9443',
       async: true,
       timeout: 900, // from onboarding prompt: should be <= 900
       licPool: {
@@ -326,6 +326,28 @@ export class OnboardingManager {
       }
       return target;
     },
+
+    users: (
+      target: TypeDOClassDeclaration['Common'],
+      obData: Adc,
+      additionalInfo?: object,
+    ): TypeDOClassDeclaration['Common'] => {
+      if (obData.compute.sshKey) {
+        let userInfo = {
+          class: 'User',
+          userType: 'root',
+          oldPassword: obData.management.connection!.rootPass,
+          newPassword: obData.management.connection!.rootPass,
+          keys: [obData.compute.sshKey!],
+        };
+
+        this.logger.debug('Add users part.');
+        return Object.assign(target, {root: userInfo});
+      } else {
+        this.logger.debug(`No provision found.`);
+        return target;
+      }
+    },
   };
 
   async assembleDo(obData: Adc, addon: AddonReqValues): Promise<TypeDOClassDO> {
@@ -337,7 +359,7 @@ export class OnboardingManager {
       targetPassphrase: obData.management.connection!.password,
       targetTimeout: this.config.timeout.toString(),
       declaration: {
-        schemaVersion: '1.3.0',
+        schemaVersion: '1.5.0',
         class: 'Device',
         async: this.config.async,
         label: 'Basic onboarding',
@@ -602,6 +624,7 @@ type TypeDOClassUserRoot = {
   userType: 'root';
   newPassword: string;
   oldPassword: string;
+  keys: string[];
 };
 
 type TypeODClassUserElse = {
