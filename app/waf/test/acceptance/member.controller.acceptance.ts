@@ -96,7 +96,7 @@ describe('MemberController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.members[0].id)
+    expect(response.body.member.id)
       .to.not.empty()
       .and.type('string');
   });
@@ -130,7 +130,7 @@ describe('MemberController', () => {
       .get(prefix + `/pools/${pool.id}/members/${member.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .expect(200);
+      .expect(404);
   });
 
   it('patch ' + prefix + '/pools/{pool_id}/members/{member_id}', async () => {

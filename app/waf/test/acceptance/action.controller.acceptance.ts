@@ -94,7 +94,7 @@ describe('ActionController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.actions[0].id)
+    expect(response.body.action.id)
       .to.not.empty()
       .and.type('string');
   });
@@ -128,7 +128,7 @@ describe('ActionController', () => {
       .get(prefix + `/rules/${rule.id}/actions/${action.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .expect(200);
+      .expect(404);
   });
 
   it('patch ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {

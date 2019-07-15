@@ -215,7 +215,7 @@ describe('RuleController', () => {
         .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        .expect(404);
     },
   );
 
@@ -272,7 +272,7 @@ describe('RuleController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      expect(response.body.rules[0].id)
+      expect(response.body.rule.id)
         .to.not.empty()
         .and.type('string');
     },

@@ -98,7 +98,7 @@ describe('ConditionController', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.conditions[0].id)
+    expect(response.body.condition.id)
       .to.not.empty()
       .and.type('string');
   });
@@ -137,7 +137,7 @@ describe('ConditionController', () => {
         .get(prefix + `/rules/${rule.id}/conditions/${condition.id}`)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+        .expect(404);
     },
   );
 

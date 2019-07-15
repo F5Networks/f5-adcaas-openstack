@@ -20,6 +20,7 @@ import {
   Filter,
   repository,
   Where,
+  EntityNotFoundError,
 } from '@loopback/repository';
 import {
   post,
@@ -243,11 +244,15 @@ export class EndpointpolicyController extends BaseController {
     endpointpolicyId: string,
     @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
     ruleId: string,
-  ): Promise<CollectionResponse> {
+  ): Promise<Response> {
     const data = await this.endpointpolicyRepository
       .rules(endpointpolicyId)
       .find({where: {id: ruleId}}, {tenantId: await this.tenantId});
-    return new CollectionResponse(Rule, data);
+    if (data.length === 0) {
+      throw new EntityNotFoundError(Rule.name, ruleId);
+    } else {
+      return new Response(Rule, data[0]);
+    }
   }
 
   @del(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
