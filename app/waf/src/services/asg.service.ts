@@ -23,7 +23,7 @@ const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
 const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
 const AS3_RPM_URL: string =
   process.env.AS3_RPM_URL ||
-  'https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.10.0/f5-appsvcs-3.10.0-5.noarch.rpm';
+  'file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm';
 
 type TrustedDeviceInfo = {
   targetHost: string;

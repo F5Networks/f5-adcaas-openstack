@@ -29,6 +29,7 @@ DO_BIGIQ_USERNAME=admin
 DO_BIGIQ_PASSWORD=admin
 DO_BIGIQ_POOL=newman-pool
 DO_RPM_PACKAGE=/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm
+AS3_RPM_URL=file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm
 
 ASG_HOST=asg-server
 ASG_PORT=443
