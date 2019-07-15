@@ -385,7 +385,6 @@ describe('AdcController test', () => {
     },
   );
 
-  /* TODO: Add it back after checkAndWait() support error terminating"
   it(
     'post ' + prefix + '/adcs: create ADC HW with error query response',
     async () => {
@@ -427,18 +426,21 @@ describe('AdcController test', () => {
         .send(adc)
         .expect(200);
 
-      response = await client
-        .get(prefix + '/adcs/' + response.body.adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+      let checkFunc = async () => {
+        response = await client
+          .get(prefix + '/adcs/' + response.body.adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
+        return response.body.adc.status === 'TRUSTERROR';
+      };
+      await checkAndWait(checkFunc, 50, [], 5).then(() => {
+        expect(true).eql(true);
+      });
     },
   );
-  */
 
-  /* TODO: Add it back after checkAndWait supports error terminating
   it(
     'post ' + prefix + '/adcs: create ADC HW with trust query exception',
     async () => {
@@ -473,16 +475,20 @@ describe('AdcController test', () => {
         .send(adc)
         .expect(200);
 
-      response = await client
-        .get(prefix + '/adcs/' + response.body.adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
+      let checkFunc = async () => {
+        response = await client
+          .get(prefix + '/adcs/' + response.body.adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId)
+          .expect(200);
 
-      expect(response.body.adc.status).to.equal(AdcState.TRUSTERR);
+        return response.body.adc.status === 'TRUSTERROR';
+      };
+      await checkAndWait(checkFunc, 50, [], 5).then(() => {
+        expect(true).eql(true);
+      });
     },
   );
-  */
 
   it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
     ASGShouldResponseWith({
