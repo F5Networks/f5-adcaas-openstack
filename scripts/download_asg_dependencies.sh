@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # TODO: make ../dependencies/ASGExtensions  and filelist configurable.
 filelist="
@@ -20,4 +20,3 @@ mkdir -p $cdir/../dependencies/ASGExtensions
         fi
     done
 )
-
