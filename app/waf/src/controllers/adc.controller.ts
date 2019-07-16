@@ -147,17 +147,19 @@ export class AdcController extends BaseController {
 
   async trustAdc(adc: Adc): Promise<void> {
     let isTrusted = async (deviceId: string): Promise<boolean> => {
-      return await this.asgMgr.getTrustState(deviceId).then(state => {
-        switch (state) {
-          case 'ACTIVE':
-            return true;
-          case 'PENDING':
-            return false;
-          default:
-            //TODO: throw error after checkAndWait() supports error terminating
-            return false;
-        }
-      });
+      return await this.asgMgr.getTrustState(deviceId).then(
+        state => {
+          switch (state) {
+            case 'ACTIVE':
+              return true;
+            case 'PENDING':
+              return false;
+            default:
+              return Promise.reject(true);
+          }
+        },
+        () => Promise.reject(true),
+      );
     };
 
     try {
