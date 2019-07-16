@@ -154,6 +154,8 @@ export class AdcController extends BaseController {
               return true;
             case 'PENDING':
               return false;
+            case 'CREATED':
+              return false;
             default:
               return Promise.reject(true);
           }
@@ -182,10 +184,11 @@ export class AdcController extends BaseController {
             lastErr: '',
           });
         },
-        async () => {
+        async e => {
+          let msg: string = e ? 'error' : 'timeout';
           await this.serialize(adc, {
             status: AdcState.TRUSTERR,
-            lastErr: `${AdcState.TRUSTERR}: Trusting timeout`,
+            lastErr: `${AdcState.TRUSTERR}: Trusting ${msg}`,
           });
         },
       );
@@ -681,6 +684,7 @@ export class AdcController extends BaseController {
             port: cnct.tcpPort,
           });
 
+          //TODO: support quiting immediately
           let noLicensed = async () => {
             if (adc.license) return true;
             return await bigipMgr.getLicense().then(license => {
@@ -918,6 +922,7 @@ export class AdcStateCtrlr {
     return stateEntry.next.includes(state) && (await stateEntry['check'](this));
   }
 
+  //TODO: support quiting immediately
   async gotTo(state: string): Promise<boolean> {
     return this.getStateEntry(state)['check'](this);
   }
