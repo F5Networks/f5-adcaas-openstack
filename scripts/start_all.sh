@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 cdir=`cd $(dirname $0); pwd`
 (
@@ -11,7 +11,12 @@ cdir=`cd $(dirname $0); pwd`
 
 (
     cd $cdir/../deploy
+
+    certsdir=$cdir/../data/certs
+    openssl req -newkey rsa:2048 -nodes -keyout $certsdir/domain.key -x509 -days 365 -out $certsdir/domain.crt -subj "/C=CN/ST=BJ/L=BJ/O=Example/OU=IT/CN=f5-adcaas.com/emailAddress=f5-adcaas@example.com"
+
     export DEPENDENCIES_DIRECTORY=`pwd`/../dependencies
+    export DATA_DIRECTORY=`pwd`/../data
     export ASG_EXTENSIONS_DIRECTORY=$DEPENDENCIES_DIRECTORY/ASGExtensions
     export DATABASE_DATA_DIRECTORY=`pwd`/../app/waf/data
     docker-compose -f docker-compose.yml up -d --force-recreate

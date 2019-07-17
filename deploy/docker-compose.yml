@@ -19,6 +19,7 @@ services:
       - DO:do-server
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
+      - ${DATA_DIRECTORY}:/var/data
     logging:
       driver: fluentd
       options:
