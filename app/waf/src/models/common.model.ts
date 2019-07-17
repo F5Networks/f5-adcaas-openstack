@@ -41,6 +41,7 @@ export abstract class CommonEntity extends Entity {
   @property({
     type: 'string',
     required: false,
+    default: 'NAME',
     schema: {
       create: true,
       update: true,
@@ -52,7 +53,7 @@ export abstract class CommonEntity extends Entity {
       },
     },
   })
-  name?: string;
+  name: string;
 
   @property({
     type: 'string',
