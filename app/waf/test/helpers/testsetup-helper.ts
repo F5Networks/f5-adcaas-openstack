@@ -130,7 +130,6 @@ export async function setupEnvs(addonEnvs: {[key: string]: string} = {}) {
     process.env[k] = Environments[k];
   }
   for (let k of Object.keys(addonEnvs)) {
-    Environments[k] = addonEnvs[k];
     process.env[k] = addonEnvs[k];
   }
 }
