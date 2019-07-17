@@ -31,5 +31,20 @@ DO_BIGIQ_POOL=newman-pool
 DO_RPM_PACKAGE=/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm
 AS3_RPM_URL=file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm
 
+# OnBoarding VE Parameters, for these two items, please use the common to seperate them.
+# for example, 8.8.8.8,7.7.7.7 openstack.local1,openstack.local2
+VE_DNS_SERVERS=8.8.8.8
+VE_DNS_SEARCH=openstack.local
+
+VE_NTP_SERVERS=0.pool.ntp.org,1.pool.ntp.org
+VE_NTP_TIMEZONE=UTC
+
+# There are four values for the ltm and asm provision levels 
+# 'dedicated' | 'nominal' | 'minimum' | 'none';
+VE_LTM_LEVEL=nominal
+VE_ASM_LEVEL=nominal
+
+
+
 ASG_HOST=asg-server
 ASG_PORT=443

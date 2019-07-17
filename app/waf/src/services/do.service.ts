@@ -60,6 +60,18 @@ export class OnboardingManager {
       password: string;
       poolName: string;
     };
+    veDNS: {
+      servers: string[];
+      search: string[];
+    };
+    veNTP: {
+      servers: string[];
+      timezone: string;
+    };
+    veProvisions: {
+      ltm: string;
+      asm: string;
+    };
   };
 
   static async instanlize(
@@ -73,6 +85,11 @@ export class OnboardingManager {
   constructor(doS: DOService, app: RestApplication, config: object) {
     this.doService = doS;
     this.application = app;
+    let dnssearch = process.env.VE_DNS_SEARCH! || 'openstack.local';
+    let ntpservers =
+      process.env.VE_NTP_SERVERS! ||
+      '0.pool.ntp.org,1.pool.ntp.org,2.pool.ntp.org';
+    let dnsservers = process.env.VE_DNS_SERVERS! || '8.8.8.8';
 
     let expectedEmpty = [];
     for (let n of [
@@ -100,6 +117,18 @@ export class OnboardingManager {
         username: process.env.DO_BIGIQ_USERNAME!,
         password: process.env.DO_BIGIQ_PASSWORD!,
         poolName: process.env.DO_BIGIQ_POOL!,
+      },
+      veDNS: {
+        servers: dnsservers.replace(/\ +/g, '').split(','),
+        search: dnssearch.replace(/\ +/g, '').split(','),
+      },
+      veNTP: {
+        servers: ntpservers.replace(/\ +/g, '').split(','),
+        timezone: process.env.VE_NTP_TIMEZONE! || 'UTC',
+      },
+      veProvisions: {
+        ltm: process.env.VE_LTM_LEVEL! || 'nominal',
+        asm: process.env.VE_ASM_LEVEL! || 'nominal',
       },
     };
     Object.assign(this.config, config);
@@ -155,8 +184,8 @@ export class OnboardingManager {
         // TODO: make it user defined(define it in adc.model)
         let provData = {
           class: 'Provision',
-          ltm: 'nominal',
-          asm: 'nominal',
+          ltm: this.config.veProvisions.ltm,
+          asm: this.config.veProvisions.asm,
         };
 
         this.logger.debug('Add new provision.');
@@ -176,8 +205,8 @@ export class OnboardingManager {
         // TODO: make it user defined(define it in adc.model)
         let dnsData = {
           class: 'DNS',
-          nameServers: ['8.8.8.8'],
-          search: ['openstack.local'],
+          nameServers: this.config.veDNS.servers,
+          search: this.config.veDNS.search,
         };
 
         this.logger.debug('Add new dns.');
@@ -196,8 +225,8 @@ export class OnboardingManager {
       try {
         let ntpData = {
           class: 'NTP',
-          servers: ['0.pool.ntp.org', '1.pool.ntp.org', '2.pool.ntp.org'],
-          timezone: 'UTC',
+          servers: this.config.veNTP.servers,
+          timezone: this.config.veNTP.timezone,
         };
         this.logger.debug('Add new ntp.');
         return Object.assign(target, {myNtp: ntpData});
