@@ -62,6 +62,7 @@ let envs: {[key: string]: string} = {
   DO_RPM_PACKAGE: '/tmp/f5-declarative-onboarding-1.5.0-11.noarch.rpm',
   ASG_HOST: '127.0.0.1',
   ASG_PORT: `${RestApplicationPort.ASG}`,
+  VE_RANDOM_PASS: 'true',
 };
 
 export async function setupApplication(): Promise<AppWithClient> {

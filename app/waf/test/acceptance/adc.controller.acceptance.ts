@@ -1135,21 +1135,25 @@ describe('AdcController test', () => {
     ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
 
     let checkStatus = async () => {
-      let resp = await client
+      response = await client
         .get(prefix + '/adcs/' + adcId)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
 
-      return resp.body.adc.status === 'ONBOARDED';
+      return response.body.adc.status === 'ONBOARDED';
     };
 
     await checkAndWait(checkStatus, 50, [], 5).then(() => {
       expect(true).true();
     });
+    expect(response.body.adc.management.connection.rootPass).not.eql('default');
   });
 
   it(`post ${prefix}/adcs: create failed with wrong floatingip state`, async () => {
+    setupEnvs({
+      VE_RANDOM_PASS: 'false',
+    });
     let adc = createAdcObject({
       type: 'VE',
       management: {},
@@ -1210,18 +1214,20 @@ describe('AdcController test', () => {
       ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
 
       let checkStatus = async () => {
-        let resp = await client
+        response = await client
           .get(prefix + '/adcs/' + adcId)
           .set('X-Auth-Token', ExpectedData.userToken)
           .set('tenant-id', ExpectedData.tenantId)
           .expect(200);
 
-        return resp.body.adc.status === 'ONBOARDED';
+        return response.body.adc.status === 'ONBOARDED';
       };
 
       await checkAndWait(checkStatus, 50, [], 5).then(() => {
         expect(true).true();
       });
+
+      expect(response.body.adc.management.connection.rootPass).eql('default');
     },
   );
 

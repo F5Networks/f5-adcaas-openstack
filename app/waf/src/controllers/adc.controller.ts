@@ -531,15 +531,24 @@ export class AdcController extends BaseController {
     await (await this.wafapp.get(WafBindingKeys.KeyComputeManager))
       .updateLogger(this.reqCxt.name)
       .then(async computeHelper => {
-        // TODO: uncomment me.
-        // let rootPass = Math.random()
-        //   .toString(36)
-        //   .slice(-8);
-        // let adminPass = Math.random()
-        //   .toString(36)
-        //   .slice(-8);
         let rootPass = 'default';
         let adminPass = 'admin';
+        if (process.env.VE_RANDOM_PASS === 'true') {
+          let strongPassFunc = () => {
+            let generator = require('generate-password');
+            return generator.generate({
+              length: 12,
+              numbers: true,
+              symbols: true,
+              uppercase: true,
+              exclude: '"\'` ',
+              strict: true,
+            });
+          };
+          rootPass = strongPassFunc();
+          adminPass = strongPassFunc();
+        }
+
         let userdata: string = await this.cUserdata(rootPass, adminPass);
 
         let serverParams: ServersParams = {
