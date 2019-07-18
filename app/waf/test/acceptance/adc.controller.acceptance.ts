@@ -438,6 +438,7 @@ describe('AdcController test', () => {
       await checkAndWait(checkFunc, 50, [], 5).then(() => {
         expect(true).eql(true);
       });
+      expect(response.body.adc.lastErr).eql(`TRUSTERROR: Trusting error`);
     },
   );
 
@@ -487,6 +488,7 @@ describe('AdcController test', () => {
       await checkAndWait(checkFunc, 50, [], 5).then(() => {
         expect(true).eql(true);
       });
+      expect(response.body.adc.lastErr).eql(`TRUSTERROR: Trusting error`);
     },
   );
 

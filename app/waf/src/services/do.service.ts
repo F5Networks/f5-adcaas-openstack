@@ -481,6 +481,7 @@ export class OnboardingManager {
       );
   }
 
+  //TODO: support quiting immediately
   async isDone(doId: string): Promise<boolean> {
     // TODO: base64 coding for admin:admin. Modify it later if needed
     let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
