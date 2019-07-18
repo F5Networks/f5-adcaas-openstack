@@ -549,7 +549,7 @@ export class AdcController extends BaseController {
 
         let serverParams: ServersParams = {
           userTenantId: addon.userToken!.tenantId,
-          vmName: adc.id,
+          vmName: `${adc.id}_${adc.name}`,
           imageRef: adc.compute.imageRef,
           flavorRef: adc.compute.flavorRef,
           securityGroupName: 'default', //TODO: remove the hardcode in the future.
