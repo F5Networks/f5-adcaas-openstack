@@ -57,7 +57,6 @@ export class WafpolicyController extends BaseController {
     public asgService: ASGService,
   ) {
     super(reqCxt);
-    this.asgMgr = new ASGManager(this.asgService);
   }
 
   @post(prefix + '/wafpolicies', {
@@ -176,7 +175,8 @@ export class WafpolicyController extends BaseController {
     // TODO: ADC and wafpolicy are many-to-many relationship,
     // relationship check need here in some day.
     try {
-      await this.asgMgr.wafpolicyUploadByUrl(
+      let asgMgr = await ASGManager.instanlize(adc.id, this.reqCxt.name);
+      await asgMgr.wafpolicyUploadByUrl(
         wafpolicy.url,
         adc.management.trustedDeviceId!,
         wafpolicy.id,
@@ -222,7 +222,8 @@ export class WafpolicyController extends BaseController {
     // relationship check need here in some day.
     let resp = undefined;
     try {
-      resp = await this.asgMgr.wafpolicyCheckByName(
+      let asgMgr = await ASGManager.instanlize(adc.id, this.reqCxt.name);
+      resp = await asgMgr.wafpolicyCheckByName(
         adc.management.trustedDeviceId!,
         wafpolicy.id,
       );

@@ -1,21 +1,40 @@
 version: "3"
 services:
+  # ngwaf:
+  #   image: nginx:1.17.1
+  #   container_name: NGWAF
+  #   ports:
+  #     - 3443:443
+  #   volumes:
+  #     - ${NGINX_CONF_DIRECTORY}/nginx.conf.d/ngw.conf:/etc/nginx/conf.d/ngw.conf
+  #     - ${NGINX_CONF_DIRECTORY}/nginx.conf:/etc/nginx/nginx.conf
+  #     - ${NGINX_CONF_DIRECTORY}/ca:/var/spool/ca
+  #     - ${NGINX_CONF_DIRECTORY}/htpasswd:/etc/nginx/htpasswd
+  #   depends_on:
+  #     - wafaas
+  #   links:
+  #     - wafaas:wafaas-server
+  #   logging:
+  #     driver: fluentd
+  #     options:
+  #       fluentd-address: "0.0.0.0:24224"
+  #       tag: f5-ngwaf
+
   wafaas:
     image: f5devcentral/f5-wafaas-openstack:latest
     container_name: WAFAAS
     env_file:
       - ./appcluster.rc
-
     ports:
       - ${WAF_APP_PORT:-3000}:3000
     depends_on:
       - postgres
-      - ASG
+      - ngasg
       - DO
       - FLUENTD
     links:
       - postgres:postgres-server
-      - ASG:asg-server
+      - ngasg:asg-server
       - DO:do-server
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
@@ -24,6 +43,29 @@ services:
       options:
         fluentd-address: "0.0.0.0:24224"
         tag: f5-wafaas
+
+  ngasg:
+    image: nginx:1.17.1
+    container_name: NGASG
+    ports:
+      - 8440:443
+    links:
+      - ASG1:asg1-server
+      - ASG2:asg2-server
+      - ASG3:asg3-server
+    volumes:
+      - ${NGINX_CONF_DIRECTORY}/nginx.conf.d:/etc/nginx/conf.d
+      - ${NGINX_CONF_DIRECTORY}/nginx.conf:/etc/nginx/nginx.conf
+      - ${NGINX_CONF_DIRECTORY}/ca:/var/spool/ca
+    depends_on:
+      - ASG1
+      - ASG2
+      - ASG3
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-ngasg
 
   postgres:
     image: postgres:11.1
@@ -44,26 +86,6 @@ services:
         fluentd-address: "0.0.0.0:24224"
         tag: postgres
 
-  ASG:
-    image: f5devcentral/f5-api-services-gateway:latest
-    container_name: ASG
-    environment:
-      - AUTH=DISABLE
-    ports:
-      - 8443:443
-      - 8080:80
-    volumes:
-      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
-      - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
-      - /var/tmp/DO:/tmp/do
-    depends_on:
-      - FLUENTD
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: f5-asg
-
   DO:
     image: f5devcentral/f5-do-container:1.5.0
     container_name: DO
@@ -72,6 +94,10 @@ services:
       - 8081:80
     depends_on:
       - FLUENTD
+    links:
+      - ASG1:asg1-server
+      - ASG2:asg2-server
+      - ASG3:asg3-server
     logging:
       driver: fluentd
       options:

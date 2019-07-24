@@ -217,7 +217,7 @@ export class ApplicationController extends BaseController {
     });
 
     let mgmt = adc.management;
-    let asgManager = await ASGManager.instanlize();
+    let asgManager = await ASGManager.instanlize(adc.id, this.reqCxt.name);
 
     let declaration = await this.declarationRepository.findById(
       application.defaultDeclarationId,
@@ -283,7 +283,7 @@ export class ApplicationController extends BaseController {
     });
 
     let mgmt = adc.management;
-    let asgManager = await ASGManager.instanlize();
+    let asgManager = await ASGManager.instanlize(adc.id, this.reqCxt.name);
 
     let operation = patchOP.Remove;
     let req = new AS3PatchReqeust(adc, application, operation);

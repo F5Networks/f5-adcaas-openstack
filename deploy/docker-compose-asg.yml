@@ -1,0 +1,59 @@
+version: "3"
+services:
+  ASG1:
+    image: f5devcentral/f5-api-services-gateway:1.0.10
+    container_name: ASG1
+    environment:
+      - AUTH=DISABLE
+    ports:
+      - 8441:443
+    volumes:
+      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
+      - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
+      - ${ASG_DATA_DIRECTORY}/1:/var/config
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-asg1
+
+  ASG2:
+    image: f5devcentral/f5-api-services-gateway:1.0.10
+    container_name: ASG2
+    environment:
+      - AUTH=DISABLE
+    ports:
+      - 8442:443
+    volumes:
+      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
+      - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
+      - ${ASG_DATA_DIRECTORY}/2:/var/config
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-asg2
+
+  ASG3:
+    image: f5devcentral/f5-api-services-gateway:1.0.10
+    container_name: ASG3
+    environment:
+      - AUTH=DISABLE
+    ports:
+      - 8443:443
+    volumes:
+      - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
+      - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
+      - ${ASG_DATA_DIRECTORY}/3:/var/config
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-asg3
+        

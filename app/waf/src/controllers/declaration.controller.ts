@@ -419,7 +419,7 @@ export class DeclarationController extends BaseController {
         // }
 
         let mgmt = adc.management;
-        let proxyMgr = await ASGManager.instanlize(this.reqCxt.name);
+        let proxyMgr = await ASGManager.instanlize(adc.id, this.reqCxt.name);
 
         try {
           let as3Request = new AS3DeployRequest(adc, application, declaration);

@@ -21,7 +21,7 @@ import {factory} from '../log4ts';
 import {Logger} from 'typescript-logging';
 
 const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
-const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
+const ASG_PORT: number = Number(process.env.ASG_PORT) || 8440;
 const AS3_RPM_URL: string =
   process.env.AS3_RPM_URL ||
   'file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm';
@@ -96,18 +96,21 @@ export interface ASGService {
     host: string,
     port: number,
     deviceId: string,
+    headers: object,
   ): Promise<TrustedDevices>;
 
   untrust(
     host: string,
     port: number,
     deviceId: string,
+    headers: object,
   ): Promise<TrustedDevices>;
 
   queryExtensions(
     host: string,
     port: number,
     deviceId: string,
+    headers: object,
   ): Promise<TrustedExtensions>;
 
   install(
@@ -115,12 +118,14 @@ export interface ASGService {
     port: number,
     deviceId: string,
     body: object,
+    headers: object,
   ): Promise<TrustedExtension>;
 
   uploadWafpolicyByUrl(
     host: string,
     port: number,
     body: object,
+    headers: object,
   ): Promise<WafpolicyResponse>;
 
   checkWafpolicyByName(
@@ -128,9 +133,10 @@ export interface ASGService {
     port: number,
     trustDeviceId: string,
     wafpolicyName: string,
+    headers: object,
   ): Promise<WafpolicyResponse>;
 
-  deploy(url: string, body: object): Promise<object>;
+  deploy(url: string, body: object, headers: object): Promise<object>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -147,15 +153,17 @@ export class ASGServiceProvider implements Provider<ASGService> {
 
 export class ASGManager {
   private service: ASGService;
+  private adcId: string;
   private logger: Logger;
 
-  static async instanlize(reqId = 'Unknown') {
+  static async instanlize(adcId: string, reqId = 'Unknown') {
     let svc = await new ASGServiceProvider().value();
-    return new ASGManager(svc, reqId);
+    return new ASGManager(svc, adcId, reqId);
   }
 
-  constructor(svc: ASGService, reqId = 'Unknown') {
+  constructor(svc: ASGService, adcId: string, reqId = 'Unknown') {
     this.service = svc;
+    this.adcId = adcId;
     this.logger = factory.getLogger(reqId + ': services.TrustedProxyManager');
   }
 
@@ -190,8 +198,13 @@ export class ASGManager {
   }
 
   async getTrustState(id: string): Promise<string> {
-    let devices = (await this.service.queryTrust(ASG_HOST, ASG_PORT, id))
-      .devices;
+    let headers = {'adc-id': this.adcId};
+    let devices = (await this.service.queryTrust(
+      ASG_HOST,
+      ASG_PORT,
+      id,
+      headers,
+    )).devices;
 
     if (devices.length === 1) {
       return devices[0].state;
@@ -201,7 +214,9 @@ export class ASGManager {
   }
 
   async untrust(id: string): Promise<void> {
-    let devices = (await this.service.untrust(ASG_HOST, ASG_PORT, id)).devices;
+    let headers = {'adc-id': this.adcId};
+    let devices = (await this.service.untrust(ASG_HOST, ASG_PORT, id, headers))
+      .devices;
 
     if (devices.length === 1 && devices[0].state === 'DELETING') {
       return;
@@ -214,12 +229,19 @@ export class ASGManager {
     let body = {
       url: AS3_RPM_URL,
     };
+    let headers = {'adc-id': this.adcId};
 
-    await this.service.install(ASG_HOST, ASG_PORT, id, body);
+    await this.service.install(ASG_HOST, ASG_PORT, id, body, headers);
   }
 
   async as3Exists(id: string): Promise<boolean> {
-    let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
+    let headers = {'adc-id': this.adcId};
+    let exts = await this.service.queryExtensions(
+      ASG_HOST,
+      ASG_PORT,
+      id,
+      headers,
+    );
 
     for (let ext of exts) {
       if (ext.name === 'f5-appsvcs' && ext.state === 'AVAILABLE') return true;
@@ -229,7 +251,13 @@ export class ASGManager {
   }
 
   async getAS3State(id: string): Promise<string> {
-    let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
+    let headers = {'adc-id': this.adcId};
+    let exts = await this.service.queryExtensions(
+      ASG_HOST,
+      ASG_PORT,
+      id,
+      headers,
+    );
 
     for (let ext of exts) {
       // if (ext.name === 'f5-appsvcs' || ext.rpmFile.startsWith('f5-appsvcs-')) {
@@ -251,19 +279,27 @@ export class ASGManager {
       targetUUID: targetUUID,
       targetPolicyName: targetPolicyName,
     };
+    let headers = {'adc-id': this.adcId};
 
-    return await this.service.uploadWafpolicyByUrl(ASG_HOST, ASG_PORT, body);
+    return await this.service.uploadWafpolicyByUrl(
+      ASG_HOST,
+      ASG_PORT,
+      body,
+      headers,
+    );
   }
 
   async wafpolicyCheckByName(
     trustDeviceId: string,
     wafpolicyName: string,
   ): Promise<WafpolicyResponse> {
+    let headers = {'adc-id': this.adcId};
     return await this.service.checkWafpolicyByName(
       ASG_HOST,
       ASG_PORT,
       trustDeviceId,
       wafpolicyName,
+      headers,
     );
   }
 
@@ -276,12 +312,15 @@ export class ASGManager {
     };
     this.logger.debug(`Json to deploy: ${JSON.stringify(deployBody)}`);
 
+    let deployHeaders = {'adc-id': this.adcId};
     try {
-      await this.service.deploy(deployUrl, deployBody).then(response => {
-        let resObj = JSON.parse(JSON.stringify(response));
-        if (resObj.results[0].code !== 200)
-          throw new Error(`Deployment is something wrong: ${response}`);
-      });
+      await this.service
+        .deploy(deployUrl, deployBody, deployHeaders)
+        .then(response => {
+          let resObj = JSON.parse(JSON.stringify(response));
+          if (resObj.results[0].code !== 200)
+            throw new Error(`Deployment is something wrong: ${response}`);
+        });
     } catch (error) {
       throw new Error(JSON.stringify(error));
     }

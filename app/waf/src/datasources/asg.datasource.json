@@ -11,6 +11,7 @@
     {
       "template": {
         "method": "PUT",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices",
         "body": "{body}"
       },
@@ -18,52 +19,60 @@
         "trust": [
           "host",
           "port",
-          "body"
+          "body",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "GET",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices/{deviceId}"
       },
       "functions": {
         "queryTrust": [
           "host",
           "port",
-          "deviceId"
+          "deviceId",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "DELETE",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedDevices/{deviceId}"
       },
       "functions": {
         "untrust": [
           "host",
           "port",
-          "deviceId"
+          "deviceId",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "GET",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}"
       },
       "functions": {
         "queryExtensions": [
           "host",
           "port",
-          "deviceId"
+          "deviceId",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "POST",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedASMPolicies",
         "body": "{body}"
       },
@@ -71,13 +80,15 @@
         "uploadWafpolicyByUrl": [
           "host",
           "port",
-          "body"
+          "body",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "POST",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedExtensions/{deviceId}",
         "body": "{body}"
       },
@@ -86,26 +97,30 @@
           "host",
           "port",
           "deviceId",
-          "body"
+          "body",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "POST",
+        "headers": "{headers}",
         "url": "{url}",
         "body": "{body}"
       },
       "functions": {
         "deploy": [
           "url",
-          "body"
+          "body",
+          "headers"
         ]
       }
     },
     {
       "template": {
         "method": "GET",
+        "headers": "{headers}",
         "url": "https://{host}:{port}/mgmt/shared/TrustedASMPolicies/{trustDeviceId}?policyName={wafpolicyName}"
       },
       "functions": {
@@ -113,7 +128,8 @@
           "host",
           "port",
           "trustDeviceId",
-          "wafpolicyName"
+          "wafpolicyName",
+          "headers"
         ]
       }
     }

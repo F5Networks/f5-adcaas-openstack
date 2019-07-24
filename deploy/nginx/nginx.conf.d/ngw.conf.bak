@@ -1,0 +1,25 @@
+server {
+    listen 443 ssl;
+    root /usr/share/nginx/html;
+    server_name localhost;
+    access_log /dev/stdout main;
+    error_log /dev/stdout notice;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
+    ssl_prefer_server_ciphers on;
+    ssl_certificate /var/spool/ca/server.crt;
+    ssl_certificate_key /var/spool/ca/server.key;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; ";
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+
+    auth_basic "restricted";
+    auth_basic_user_file /etc/nginx/htpasswd;
+
+    location /adcaas/v1 {
+        resolver 127.0.0.1;
+        proxy_pass http://wafaas-server:3000$request_uri;
+    }
+}

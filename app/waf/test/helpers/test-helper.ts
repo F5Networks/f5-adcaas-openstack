@@ -37,7 +37,7 @@ export enum RestApplicationPort {
   WafApp = 3000,
   IdentityUser = 5000,
   Onboarding = 8081,
-  ASG = 8443,
+  ASG = 8440,
   Nova = 8774,
   Neutron = 9696,
   SSLCustom = 10443,

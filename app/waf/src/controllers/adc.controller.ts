@@ -63,7 +63,6 @@ import {checkAndWait, merge} from '../utils';
 const prefix = '/adcaas/v1';
 
 export class AdcController extends BaseController {
-  asgMgr: ASGManager;
   private adcStCtr: AdcStateCtrlr;
   private logger = factory.getLogger('Unknown: controllers.adc');
 
@@ -81,8 +80,8 @@ export class AdcController extends BaseController {
     private wafapp: WafApplication,
   ) {
     super(reqCxt);
+
     if (reqCxt) {
-      this.asgMgr = new ASGManager(this.asgService, this.reqCxt.name);
       this.logger = factory.getLogger(this.reqCxt.name + ': controllers.adc');
     }
   }
@@ -149,7 +148,8 @@ export class AdcController extends BaseController {
 
   async trustAdc(adc: Adc): Promise<void> {
     let isTrusted = async (deviceId: string): Promise<boolean> => {
-      return await this.asgMgr.getTrustState(deviceId).then(
+      let asgMgr = await this.getASGMgr(adc.id, this.reqCxt.name);
+      return await asgMgr.getTrustState(deviceId).then(
         state => {
           switch (state) {
             case 'ACTIVE':
@@ -159,6 +159,7 @@ export class AdcController extends BaseController {
             case 'CREATED':
               return false;
             default:
+              this.logger.error('isTrusted function returns ' + state);
               return Promise.reject(true);
           }
         },
@@ -169,7 +170,8 @@ export class AdcController extends BaseController {
     try {
       await this.serialize(adc, {status: AdcState.TRUSTING, lastErr: ''});
       //TODO: Need away to input admin password of BIG-IP HW
-      let device = await this.asgMgr.trust(
+      let asgMgr = await this.getASGMgr(adc.id, this.reqCxt.name);
+      let device = await asgMgr.trust(
         adc.management.connection!.ipAddress,
         adc.management.connection!.tcpPort,
         adc.management.connection!.username,
@@ -208,7 +210,8 @@ export class AdcController extends BaseController {
     }
 
     try {
-      await this.asgMgr.untrust(adc.management.trustedDeviceId!);
+      let asgMgr = await this.getASGMgr(adc.id, this.reqCxt.name);
+      await asgMgr.untrust(adc.management.trustedDeviceId!);
     } catch (err) {
       await this.serialize(adc, {
         status: AdcState.TRUSTERR,
@@ -223,7 +226,8 @@ export class AdcController extends BaseController {
     // Install AS3 RPM on target device
     await this.serialize(adc, {status: AdcState.AS3INSTALLING, lastErr: ''});
     try {
-      await this.asgMgr.installAS3(adc.management.trustedDeviceId!);
+      let asgMgr = await this.getASGMgr(adc.id, this.reqCxt.name);
+      await asgMgr.installAS3(adc.management.trustedDeviceId!);
 
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.AS3INSTALLED),
@@ -256,8 +260,9 @@ export class AdcController extends BaseController {
     let cnct = adc.management.connection!;
     let paritionObj = new AS3PartitionRequest(adc);
     try {
+      let asgMgr = await this.getASGMgr(adc.id, this.reqCxt.name);
       await this.serialize(adc, {status: AdcState.PARTITIONING, lastErr: ''});
-      await this.asgMgr.deploy(cnct.ipAddress, cnct.tcpPort, paritionObj);
+      await asgMgr.deploy(cnct.ipAddress, cnct.tcpPort, paritionObj);
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.PARTITIONED),
         60,
@@ -478,7 +483,7 @@ export class AdcController extends BaseController {
         `Adc status is ' ${adc.status}. Cannot be operated on, please wait for its finish.`,
       );
 
-    if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) {
+    if (await this.adcStCtr.gotTo(AdcState.ONBOARDED)) {
       this.setupOn(adc, addonReq);
       return {id: adc.id};
     } else
@@ -489,7 +494,7 @@ export class AdcController extends BaseController {
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     // trust
-    if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) await this.trustAdc(adc);
+    if (await this.adcStCtr.gotTo(AdcState.ONBOARDED)) await this.trustAdc(adc);
 
     // install as3
     if (await this.adcStCtr.readyTo(AdcState.AS3INSTALLED))
@@ -856,6 +861,10 @@ export class AdcController extends BaseController {
       return Promise.reject();
     }
   }
+
+  async getASGMgr(adcId: string, reqId: string): Promise<ASGManager> {
+    return await ASGManager.instanlize(adcId, reqId);
+  }
 }
 
 export type AddonReqValues = {
@@ -970,8 +979,7 @@ export class AdcStateCtrlr {
   }
 
   private async getAsgMgr(): Promise<ASGManager> {
-    let svc = await new ASGServiceProvider().value();
-    return new ASGManager(svc, this.addon.reqId);
+    return ASGManager.instanlize(this.adc.id, this.addon.reqId);
   }
 
   // Notices:
