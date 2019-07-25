@@ -1225,7 +1225,7 @@ describe('AdcController test', () => {
     },
   );
 
-  it('post ' + prefix + '/adcs/{adcId}/action: setup done', async () => {
+  it('post ' + prefix + '/adcs/{adcId}/setup: setup done', async () => {
     let adc = await givenAdcData(wafapp, {
       status: 'ONBOARDED',
     });
@@ -1275,10 +1275,9 @@ describe('AdcController test', () => {
       recursive: true,
     });
     let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/action')
+      .post(prefix + '/adcs/' + adc.id + '/setup')
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .send({setup: null})
       .expect(200);
 
     expect(response.body).containDeep({id: adc.id});

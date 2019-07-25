@@ -17,20 +17,6 @@
 import {model, property, Entity} from '@loopback/repository';
 import {CommonEntity} from '.';
 
-export type ActionsBody = CreateBody & DeleteBody & SetupBody;
-
-type CreateBody = {
-  create: null;
-};
-
-type DeleteBody = {
-  delete: null;
-};
-
-type SetupBody = {
-  setup: undefined;
-};
-
 export type ConfigTypes = {
   type: string;
   //platformType: 'OpenStack';
@@ -189,16 +175,4 @@ export class ActionsResponse extends Entity {
     },
   })
   id: string;
-}
-
-export class ActionsRequest extends Entity {
-  @property({
-    type: 'string',
-    required: true,
-    schema: {
-      create: true,
-      example: 'null',
-    },
-  })
-  action: ActionsBody;
 }
