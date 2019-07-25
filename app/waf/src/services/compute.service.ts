@@ -50,7 +50,7 @@ export abstract class ComputeManager {
   protected computeService: ComputeService;
 
   protected logger = factory.getLogger(
-    'compute.process.ComputeManager.' + this.meta.version,
+    'Unknown: compute.process.ComputeManager.' + this.meta.version,
   );
 
   constructor(
@@ -90,6 +90,12 @@ export abstract class ComputeManager {
     });
 
     return Promise.resolve(this);
+  }
+  async updateLogger(reqId: string): Promise<ComputeManager> {
+    this.logger = factory.getLogger(
+      reqId + ': compute.process.ComputeManager.' + this.meta.version,
+    );
+    return this;
   }
 }
 

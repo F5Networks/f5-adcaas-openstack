@@ -66,7 +66,9 @@ import {AddonReqValues} from './adc.controller';
 const prefix = '/adcaas/v1';
 
 export class DeclarationController extends BaseController {
-  protected logger = factory.getLogger('controllers.DeclarationController');
+  protected logger = factory.getLogger(
+    'Unknown: controllers.DeclarationController',
+  );
 
   constructor(
     @repository(ApplicationRepository)
@@ -100,6 +102,11 @@ export class DeclarationController extends BaseController {
     private wafapp: WafApplication,
   ) {
     super(reqCxt);
+    if (reqCxt) {
+      this.logger = factory.getLogger(
+        this.reqCxt.name + ': controllers.DeclarationController',
+      );
+    }
   }
 
   private async loadApplication(app: Application): Promise<void> {
@@ -412,7 +419,7 @@ export class DeclarationController extends BaseController {
         // }
 
         let mgmt = adc.management;
-        let proxyMgr = await ASGManager.instanlize();
+        let proxyMgr = await ASGManager.instanlize(this.reqCxt.name);
 
         try {
           let as3Request = new AS3DeployRequest(adc, application, declaration);
@@ -453,7 +460,9 @@ export class DeclarationController extends BaseController {
       }
     })();
 
-    let netHelper = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
+    let netHelper = await (await this.wafapp.get(
+      WafBindingKeys.KeyNetworkDriver,
+    )).updateLogger(this.reqCxt.name);
 
     // get port addresses, add one more, then update port.
     // TODO: use async-lock to make the operation automic.

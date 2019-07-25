@@ -21,6 +21,7 @@ import {Rule} from '../models';
 import {inject, Getter} from '@loopback/core';
 import {RuleRepository} from './rule.repository';
 import {CommonRepository} from './common';
+import {RestBindings, RequestContext} from '@loopback/rest';
 
 export class EndpointpolicyRepository extends CommonRepository<
   Endpointpolicy,
@@ -31,12 +32,14 @@ export class EndpointpolicyRepository extends CommonRepository<
     typeof Endpointpolicy.prototype.id
   >;
   constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
     @inject('datasources.db')
     dataSource: DbDataSource,
     @repository.getter('RuleRepository')
     getRuleRepository: Getter<RuleRepository>,
   ) {
-    super(Endpointpolicy, dataSource);
+    super(Endpointpolicy, dataSource, reqCxt);
     this.rules = this.createHasManyRepositoryFactoryFor(
       'rules',
       getRuleRepository,

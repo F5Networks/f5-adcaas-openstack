@@ -20,6 +20,7 @@ import {DbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
 import {MemberRepository} from './member.repository';
 import {CommonRepository} from './common';
+import {RestBindings, RequestContext} from '@loopback/rest';
 
 export class PoolRepository extends CommonRepository<
   Pool,
@@ -30,12 +31,14 @@ export class PoolRepository extends CommonRepository<
     typeof Pool.prototype.id
   >;
   constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
     @inject('datasources.db')
     dataSource: DbDataSource,
     @repository.getter('MemberRepository')
     getMemberRepository: Getter<MemberRepository>,
   ) {
-    super(Pool, dataSource);
+    super(Pool, dataSource, reqCxt);
     this.members = this.createHasManyRepositoryFactoryFor(
       'members',
       getMemberRepository,

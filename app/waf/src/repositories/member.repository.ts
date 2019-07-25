@@ -18,12 +18,17 @@ import {Member} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 import {CommonRepository} from './common';
+import {RestBindings, RequestContext} from '@loopback/rest';
 
 export class MemberRepository extends CommonRepository<
   Member,
   typeof Member.prototype.id
 > {
-  constructor(@inject('datasources.db') dataSource: DbDataSource) {
-    super(Member, dataSource);
+  constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+    @inject('datasources.db') dataSource: DbDataSource,
+  ) {
+    super(Member, dataSource, reqCxt);
   }
 }

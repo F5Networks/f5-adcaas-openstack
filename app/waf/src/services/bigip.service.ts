@@ -21,6 +21,7 @@ import {factory} from '../log4ts';
 import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
 import path = require('path');
+import {Logger} from 'typescript-logging';
 
 export const BigipBuiltInProperties = {
   admin: 'admin',
@@ -54,9 +55,10 @@ export class BigIpManager {
   private bigipService: BigipService;
   private baseUrl: string;
   private cred64Encoded: string;
-  private logger = factory.getLogger('services.BigIpManager');
+  private logger: Logger;
 
-  constructor(private config: BigipConfig) {
+  constructor(private config: BigipConfig, private reqId: string) {
+    this.logger = factory.getLogger(reqId + ': services.BigIpManager');
     this.baseUrl = `https://${this.config.ipAddr}:${this.config.port}`;
     this.cred64Encoded =
       'Basic ' +
@@ -65,8 +67,11 @@ export class BigIpManager {
       );
   }
 
-  static async instanlize(config: BigipConfig): Promise<BigIpManager> {
-    let bigIpMgr = new BigIpManager(config);
+  static async instanlize(
+    config: BigipConfig,
+    reqId = 'Unknown',
+  ): Promise<BigIpManager> {
+    let bigIpMgr = new BigIpManager(config, reqId);
     bigIpMgr.bigipService = await new BigipServiceProvider().value();
     return bigIpMgr;
   }
@@ -87,7 +92,7 @@ export class BigIpManager {
     let impFunc = async () => {
       let response = await this.bigipService.getInfo(url, this.cred64Encoded);
       let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-      this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+      this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
       return resObj;
     };
 
@@ -134,7 +139,7 @@ export class BigIpManager {
 
     let response = await this.bigipService.getInfo(url, this.cred64Encoded);
     let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+    this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
 
     if (resObj.entries) {
       for (let entry of Object.keys(resObj.entries)) {
@@ -163,7 +168,7 @@ export class BigIpManager {
     let impFunc = async () => {
       let response = await this.bigipService.getInfo(url, this.cred64Encoded);
       let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-      this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+      this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
       return resObj;
     };
 
@@ -276,7 +281,7 @@ export class BigIpManager {
           this.cred64Encoded,
         );
         let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
-        this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+        this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
         return resObj;
       };
 
@@ -321,7 +326,7 @@ export class BigIpManager {
 
     let resObj = JSON.parse(JSON.stringify(response));
     this.logger.debug(
-      `get ${url} resposes: ${JSON.stringify(resObj['body'][0])}`,
+      `get ${url} responses: ${JSON.stringify(resObj['body'][0])}`,
     );
 
     return resObj['body'][0]['hostname'];
@@ -333,7 +338,7 @@ export class BigIpManager {
     let url = `${this.baseUrl}/mgmt/tm/net/vlan`;
     let response = await this.bigipService.getInfo(url, this.cred64Encoded);
     let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+    this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
 
     let vlans: BigipVlans = {};
     for (let vlan of resObj.items) {
@@ -351,7 +356,7 @@ export class BigIpManager {
     let url = `${this.baseUrl}/mgmt/tm/net/self`;
     let response = await this.bigipService.getInfo(url, this.cred64Encoded);
     let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-    this.logger.debug(`get ${url} resposes: ${JSON.stringify(resObj)}`);
+    this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
 
     let selfips: BigipSelfips = {};
     for (let self of resObj.items) {

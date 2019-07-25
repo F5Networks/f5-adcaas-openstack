@@ -23,6 +23,7 @@ import {BigIpManager} from './bigip.service';
 import {RestApplication} from '@loopback/rest';
 import {WafBindingKeys} from '../keys';
 import {AddonReqValues} from '../controllers';
+import {Logger} from 'typescript-logging';
 const ip = require('ip');
 
 export interface DOService {
@@ -48,7 +49,7 @@ export class DOServiceProvider implements Provider<DOService> {
 
 export class OnboardingManager {
   private doService: DOService;
-  private logger = factory.getLogger('services.onboarding.manager');
+  private logger: Logger;
   private application: RestApplication;
   public config: {
     endpoint: string;
@@ -77,12 +78,19 @@ export class OnboardingManager {
   static async instanlize(
     app: RestApplication,
     config: object = {},
+    reqId: string = 'Unknown',
   ): Promise<OnboardingManager> {
     let doS = await new DOServiceProvider().value();
-    return new OnboardingManager(doS, app, config);
+    return new OnboardingManager(doS, app, config, reqId);
   }
 
-  constructor(doS: DOService, app: RestApplication, config: object) {
+  constructor(
+    doS: DOService,
+    app: RestApplication,
+    config: object,
+    private reqId: string,
+  ) {
+    this.logger = factory.getLogger(reqId + ': services.onboarding.manager');
     this.doService = doS;
     this.application = app;
     let dnssearch = process.env.VE_DNS_SEARCH! || 'openstack.local';
@@ -402,12 +410,15 @@ export class OnboardingManager {
 
     let addonInfo: {[key: string]: object | boolean} = {
       // get bigip interfaces information: name.
-      interfaces: await BigIpManager.instanlize({
-        username: obData.management.connection!.username,
-        password: obData.management.connection!.password,
-        ipAddr: obData.management.connection!.ipAddress,
-        port: obData.management.connection!.tcpPort,
-      }).then(async bigipMgr => {
+      interfaces: await BigIpManager.instanlize(
+        {
+          username: obData.management.connection!.username,
+          password: obData.management.connection!.password,
+          ipAddr: obData.management.connection!.ipAddress,
+          port: obData.management.connection!.tcpPort,
+        },
+        this.reqId,
+      ).then(async bigipMgr => {
         return await bigipMgr.getInterfaces();
       }),
       subnets: await this.subnetInfo(obData, addon),
@@ -431,7 +442,9 @@ export class OnboardingManager {
   private async subnetInfo(adc: Adc, addon: AddonReqValues): Promise<object> {
     let rltObj = {};
 
-    let netDriver = await this.application.get(WafBindingKeys.KeyNetworkDriver);
+    let netDriver = await (await this.application.get(
+      WafBindingKeys.KeyNetworkDriver,
+    )).updateLogger(this.reqId);
 
     for (let net of Object.keys(adc.networks)) {
       let macAddr = adc.management.networks[net].macAddr!;

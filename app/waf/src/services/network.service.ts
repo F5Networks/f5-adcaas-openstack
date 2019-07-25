@@ -61,7 +61,7 @@ export class NetworkDriver {
 
   private floatingIpNetworkId: string | undefined;
   protected logger = factory.getLogger(
-    'compute.process.NetworkDriver.' + this.meta.version,
+    'Unknown: compute.process.NetworkDriver.' + this.meta.version,
   );
 
   constructor(
@@ -300,6 +300,12 @@ export class NetworkDriver {
     this.logger.debug(
       'access ' + url + ' response: ' + JSON.stringify(response),
     );
+  }
+  async updateLogger(reqId: string): Promise<NetworkDriver> {
+    this.logger = factory.getLogger(
+      reqId + ': compute.process.NetworkDriver.' + this.meta.version,
+    );
+    return this;
   }
 }
 

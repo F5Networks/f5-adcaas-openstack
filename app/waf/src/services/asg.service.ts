@@ -18,6 +18,7 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {ASGDataSource} from '../datasources';
 import {factory} from '../log4ts';
+import {Logger} from 'typescript-logging';
 
 const ASG_HOST: string = process.env.ASG_HOST || 'localhost';
 const ASG_PORT: number = Number(process.env.ASG_PORT) || 8443;
@@ -146,15 +147,16 @@ export class ASGServiceProvider implements Provider<ASGService> {
 
 export class ASGManager {
   private service: ASGService;
-  private logger = factory.getLogger('services.TrustedProxyManager');
+  private logger: Logger;
 
-  static async instanlize() {
+  static async instanlize(reqId = 'Unknown') {
     let svc = await new ASGServiceProvider().value();
-    return new ASGManager(svc);
+    return new ASGManager(svc, reqId);
   }
 
-  constructor(svc: ASGService) {
+  constructor(svc: ASGService, reqId = 'Unknown') {
     this.service = svc;
+    this.logger = factory.getLogger(reqId + ': services.TrustedProxyManager');
   }
 
   async trust(

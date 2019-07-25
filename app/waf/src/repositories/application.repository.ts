@@ -20,6 +20,7 @@ import {Application, Declaration, Service} from '../models';
 import {DeclarationRepository, ServiceRepository} from '.';
 import {DbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
+import {RestBindings, RequestContext} from '@loopback/rest';
 
 export class ApplicationRepository extends CommonRepository<
   Application,
@@ -36,6 +37,8 @@ export class ApplicationRepository extends CommonRepository<
   >;
 
   constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
     @inject('datasources.db')
     dataSource: DbDataSource,
     @repository.getter('DeclarationRepository')
@@ -43,7 +46,7 @@ export class ApplicationRepository extends CommonRepository<
     @repository.getter('ServiceRepository')
     getServiceRepository: Getter<ServiceRepository>,
   ) {
-    super(Application, dataSource);
+    super(Application, dataSource, reqCxt);
 
     this.declarations = this.createHasManyRepositoryFactoryFor(
       'declarations',

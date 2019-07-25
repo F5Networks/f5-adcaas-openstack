@@ -65,6 +65,7 @@ const prefix = '/adcaas/v1';
 export class AdcController extends BaseController {
   asgMgr: ASGManager;
   private adcStCtr: AdcStateCtrlr;
+  private logger = factory.getLogger('Unknown: controllers.adc');
 
   constructor(
     @repository(AdcRepository)
@@ -78,10 +79,12 @@ export class AdcController extends BaseController {
     protected reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private wafapp: WafApplication,
-    private logger = factory.getLogger('controllers.adc'),
   ) {
     super(reqCxt);
-    this.asgMgr = new ASGManager(this.asgService);
+    if (reqCxt) {
+      this.asgMgr = new ASGManager(this.asgService, this.reqCxt.name);
+      this.logger = factory.getLogger(this.reqCxt.name + ': controllers.adc');
+    }
   }
 
   @post(prefix + '/adcs', {
@@ -110,6 +113,7 @@ export class AdcController extends BaseController {
     let addonReq = {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+      reqId: this.reqCxt.name,
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
     if (adc.type === 'HW') {
@@ -369,6 +373,7 @@ export class AdcController extends BaseController {
     let addonReq = {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+      reqId: this.reqCxt.name,
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
 
@@ -464,6 +469,7 @@ export class AdcController extends BaseController {
     let addonReq = {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
+      reqId: this.reqCxt.name,
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
 
@@ -522,8 +528,8 @@ export class AdcController extends BaseController {
   }
 
   private async cSvr(adc: Adc, addon: AddonReqValues): Promise<void> {
-    await this.wafapp
-      .get(WafBindingKeys.KeyComputeManager)
+    await (await this.wafapp.get(WafBindingKeys.KeyComputeManager))
+      .updateLogger(this.reqCxt.name)
       .then(async computeHelper => {
         // TODO: uncomment me.
         // let rootPass = Math.random()
@@ -575,8 +581,8 @@ export class AdcController extends BaseController {
   }
 
   private async cNet(adc: Adc, addon: AddonReqValues): Promise<void> {
-    await this.wafapp
-      .get(WafBindingKeys.KeyNetworkDriver)
+    await (await this.wafapp.get(WafBindingKeys.KeyNetworkDriver))
+      .updateLogger(this.reqCxt.name)
       .then(async networkHelper => {
         Object.assign(adc, {management: merge(adc.management, {networks: {}})});
         for (let k of Object.keys(adc.networks)) {
@@ -655,7 +661,11 @@ export class AdcController extends BaseController {
   private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     let reclaimFuncs: {[key: string]: Function} = {
       license: async () => {
-        let doMgr = await OnboardingManager.instanlize(this.wafapp);
+        let doMgr = await OnboardingManager.instanlize(
+          this.wafapp,
+          {},
+          this.reqCxt.name,
+        );
         let doBody = await doMgr.assembleDo(
           adc,
           Object.assign(addon, {onboarding: false}),
@@ -666,12 +676,15 @@ export class AdcController extends BaseController {
         await doMgr.onboard(doBody).then(async () => {
           // TODO: create a unified bigipMgr
           let cnct = adc.management.connection!;
-          let bigipMgr = await BigIpManager.instanlize({
-            username: cnct.username,
-            password: cnct.password,
-            ipAddr: cnct.ipAddress,
-            port: cnct.tcpPort,
-          });
+          let bigipMgr = await BigIpManager.instanlize(
+            {
+              username: cnct.username,
+              password: cnct.password,
+              ipAddr: cnct.ipAddress,
+              port: cnct.tcpPort,
+            },
+            this.reqCxt.name,
+          );
 
           //TODO: support quiting immediately
           let noLicensed = async () => {
@@ -687,7 +700,9 @@ export class AdcController extends BaseController {
       },
 
       network: async () => {
-        let networkMgr = await this.wafapp.get(WafBindingKeys.KeyNetworkDriver);
+        let networkMgr = await (await this.wafapp.get(
+          WafBindingKeys.KeyNetworkDriver,
+        )).updateLogger(this.reqCxt.name);
         for (let network of Object.keys(adc.networks)) {
           if (!adc.management.networks[network]) continue;
 
@@ -715,9 +730,9 @@ export class AdcController extends BaseController {
       },
 
       vm: async () => {
-        let computeMgr = await this.wafapp.get(
+        let computeMgr = await (await this.wafapp.get(
           WafBindingKeys.KeyComputeManager,
-        );
+        )).updateLogger(this.reqCxt.name);
         if (adc.management.vmId) {
           await computeMgr
             .deleteServer(
@@ -757,12 +772,15 @@ export class AdcController extends BaseController {
 
   private async isDOReady(adc: Adc): Promise<boolean> {
     let cnct = adc.management.connection!;
-    let bigipMgr = await BigIpManager.instanlize({
-      username: cnct.username,
-      password: cnct.password,
-      ipAddr: cnct.ipAddress,
-      port: cnct.tcpPort,
-    });
+    let bigipMgr = await BigIpManager.instanlize(
+      {
+        username: cnct.username,
+        password: cnct.password,
+        ipAddr: cnct.ipAddress,
+        port: cnct.tcpPort,
+      },
+      this.reqCxt.name,
+    );
 
     try {
       let resObj = await bigipMgr.getDOStatus();
@@ -780,12 +798,15 @@ export class AdcController extends BaseController {
       await this.serialize(adc, {status: AdcState.DOINSTALLING});
       // check if do is already installed.
       let cnct = adc.management.connection!;
-      let bigipMgr = await BigIpManager.instanlize({
-        username: cnct.username,
-        password: cnct.password,
-        ipAddr: cnct.ipAddress,
-        port: cnct.tcpPort,
-      });
+      let bigipMgr = await BigIpManager.instanlize(
+        {
+          username: cnct.username,
+          password: cnct.password,
+          ipAddr: cnct.ipAddress,
+          port: cnct.tcpPort,
+        },
+        this.reqCxt.name,
+      );
 
       if ((await this.isDOReady(adc)) === false) {
         await bigipMgr.uploadDO();
@@ -811,7 +832,11 @@ export class AdcController extends BaseController {
       this.logger.debug('start to do onbarding');
       await this.serialize(adc, {status: AdcState.ONBOARDING});
 
-      let doMgr = await OnboardingManager.instanlize(this.wafapp);
+      let doMgr = await OnboardingManager.instanlize(
+        this.wafapp,
+        {},
+        this.reqCxt.name,
+      );
       let doBody = await doMgr.assembleDo(
         adc,
         Object.assign(addon, {onboarding: true}),
@@ -836,6 +861,7 @@ export class AdcController extends BaseController {
 export type AddonReqValues = {
   userToken?: AuthedToken;
   onboarding?: boolean;
+  reqId?: string;
 };
 
 export class AdcStateCtrlr {
@@ -898,7 +924,10 @@ export class AdcStateCtrlr {
     },
   ];
 
-  constructor(private adc: Adc, private addon: AddonReqValues) {}
+  constructor(
+    private adc: Adc,
+    private addon: AddonReqValues, //private reqId: string,
+  ) {}
 
   async readyTo(state: string): Promise<boolean> {
     let stateEntry = this.getStateEntry(this.adc.status);
@@ -929,17 +958,20 @@ export class AdcStateCtrlr {
       );
 
     let cnct = this.adc.management.connection;
-    return BigIpManager.instanlize({
-      username: cnct.username,
-      password: cnct.password,
-      ipAddr: cnct.ipAddress,
-      port: cnct.tcpPort,
-    });
+    return BigIpManager.instanlize(
+      {
+        username: cnct.username,
+        password: cnct.password,
+        ipAddr: cnct.ipAddress,
+        port: cnct.tcpPort,
+      },
+      this.addon.reqId,
+    );
   }
 
   private async getAsgMgr(): Promise<ASGManager> {
     let svc = await new ASGServiceProvider().value();
-    return new ASGManager(svc);
+    return new ASGManager(svc, this.addon.reqId);
   }
 
   // Notices:
