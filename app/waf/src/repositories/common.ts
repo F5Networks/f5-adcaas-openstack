@@ -22,15 +22,33 @@ import {
   EntityNotFoundError,
   WhereBuilder,
   Filter,
+  Entity,
 } from '@loopback/repository';
 import uuid = require('uuid');
 import {factory} from '../log4ts';
-
+import {juggler} from '@loopback/service-proxy';
+import {RequestContext} from '@loopback/rest';
 export class CommonRepository<
   T extends CommonEntity,
   ID
 > extends DefaultCrudRepository<T, ID> {
-  private logger = factory.getLogger('repository.common.CommonRepostory');
+  private logger = factory.getLogger(
+    'Unknown: repository.common.CommonRepository',
+  );
+  constructor(
+    entityClass: typeof Entity & {
+      prototype: T;
+    },
+    dataSource: juggler.DataSource,
+    protected reqCxt: RequestContext,
+  ) {
+    super(entityClass, dataSource);
+    if (reqCxt) {
+      this.logger = factory.getLogger(
+        reqCxt.name + ': repository.common.CommonRepository',
+      );
+    }
+  }
 
   create(data: DataObject<T>, options?: Options): Promise<T> {
     Object.assign(data, {

@@ -18,12 +18,17 @@ import {CommonRepository} from '.';
 import {Wafpolicy} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
+import {RestBindings, RequestContext} from '@loopback/rest';
 
 export class WafpolicyRepository extends CommonRepository<
   Wafpolicy,
   typeof Wafpolicy.prototype.id
 > {
-  constructor(@inject('datasources.db') dataSource: DbDataSource) {
-    super(Wafpolicy, dataSource);
+  constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+    @inject('datasources.db') dataSource: DbDataSource,
+  ) {
+    super(Wafpolicy, dataSource, reqCxt);
   }
 }

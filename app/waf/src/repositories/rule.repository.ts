@@ -21,6 +21,7 @@ import {inject, Getter} from '@loopback/core';
 import {ConditionRepository} from './condition.repository';
 import {ActionRepository} from './action.repository';
 import {CommonRepository} from './common';
+import {RestBindings, RequestContext} from '@loopback/rest';
 export class RuleRepository extends CommonRepository<
   Rule,
   typeof Rule.prototype.id
@@ -34,6 +35,8 @@ export class RuleRepository extends CommonRepository<
     typeof Rule.prototype.id
   >;
   constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
     @inject('datasources.db')
     dataSource: DbDataSource,
     @repository.getter('ConditionRepository')
@@ -41,7 +44,7 @@ export class RuleRepository extends CommonRepository<
     @repository.getter('ActionRepository')
     getActionRepository: Getter<ActionRepository>,
   ) {
-    super(Rule, dataSource);
+    super(Rule, dataSource, reqCxt);
     this.conditions = this.createHasManyRepositoryFactoryFor(
       'conditions',
       getConditionRepository,

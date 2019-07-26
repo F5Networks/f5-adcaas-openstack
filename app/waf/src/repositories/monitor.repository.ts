@@ -18,12 +18,17 @@ import {Monitor} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 import {CommonRepository} from './common';
+import {RequestContext, RestBindings} from '@loopback/rest';
 
 export class MonitorRepository extends CommonRepository<
   Monitor,
   typeof Monitor.prototype.id
 > {
-  constructor(@inject('datasources.db') dataSource: DbDataSource) {
-    super(Monitor, dataSource);
+  constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+    @inject('datasources.db') dataSource: DbDataSource,
+  ) {
+    super(Monitor, dataSource, reqCxt);
   }
 }

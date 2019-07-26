@@ -35,19 +35,22 @@ import {WafBindingKeys} from './keys';
 const SequenceActions = RestBindings.SequenceActions;
 
 export class MySequence implements SequenceHandler {
+  private logger = factory.getLogger('Unknown: api.call');
   constructor(
     @inject(SequenceActions.FIND_ROUTE) protected findRoute: FindRoute,
     @inject(SequenceActions.PARSE_PARAMS) protected parseParams: ParseParams,
     @inject(SequenceActions.INVOKE_METHOD) protected invoke: InvokeMethod,
     @inject(SequenceActions.SEND) public send: Send,
     @inject(SequenceActions.REJECT) public reject: Reject,
-    @inject('logger', {optional: true})
-    private logger = factory.getLogger('api.call'),
     @inject(WafBindingKeys.KeyAuthWithOSIdentity)
     private authWithOSIdentity: AuthWithOSIdentity,
     @inject(CoreBindings.APPLICATION_INSTANCE)
     private application: WafApplication,
-  ) {}
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+  ) {
+    this.logger = factory.getLogger(reqCxt.name + ': api.call');
+  }
 
   async handle(context: RequestContext) {
     await this.logRequest(context);
