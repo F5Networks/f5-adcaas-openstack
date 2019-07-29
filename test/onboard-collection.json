@@ -22,7 +22,26 @@
 									"pm.test('response is ok', function () {",
 									"    pm.response.to.have.status(201);",
 									"});",
-									""
+									"",
+									"let resp = pm.response.json();",
+									"",
+									"for (let service of resp.token.catalog) {",
+									"    for (let endpoint of service.endpoints) {",
+									"        if (endpoint.interface === 'public') {",
+									"            switch (service.name) {",
+									"                case 'nova':",
+									"                    pm.environment.set('NOVA_URL', endpoint.url);",
+									"                    break;",
+									"                case 'neutron':",
+									"                    pm.environment.set('NEUTRON_URL', endpoint.url);",
+									"                    break;",
+									"                case 'glance':",
+									"                    pm.environment.set('GLANCE_URL', endpoint.url);",
+									"                    break;",
+									"            }",
+									"        }",
+									"    }",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -65,130 +84,6 @@
 							"path": [
 								"auth",
 								"tokens"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get-services",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "db9946be-26b8-4473-8fa7-77c5003979e3",
-								"exec": [
-									"pm.test('response is ok', function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let resp = pm.response.json();",
-									"",
-									"",
-									"for (let service of resp.services) {",
-									"    switch (service.name) {",
-									"        case 'nova':",
-									"            pm.environment.set('NOVA_SERVICE_ID', service.id);",
-									"            break;",
-									"        case 'neutron':",
-									"            pm.environment.set('NEUTRON_SERVICE_ID', service.id);",
-									"            break;",
-									"        case 'glance':",
-									"            pm.environment.set('GLANCE_SERVICE_ID', service.id);",
-									"            break;",
-									"    }",
-									"}",
-									"",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "X-Auth-Token",
-								"type": "text",
-								"value": "{{TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OS_AUTH_URL}}/services",
-							"host": [
-								"{{OS_AUTH_URL}}"
-							],
-							"path": [
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get-endpoints",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a936c31a-da52-44c9-a84c-f741f9f01c8f",
-								"exec": [
-									"pm.test('response is ok', function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let resp = pm.response.json();",
-									"",
-									"let nova_service_id = pm.environment.get('NOVA_SERVICE_ID');",
-									"let neutron_service_id = pm.environment.get('NEUTRON_SERVICE_ID');",
-									"let glance_service_id = pm.environment.get('GLANCE_SERVICE_ID');",
-									"",
-									"for (let endpoint of resp.endpoints) {",
-									"    if (endpoint.interface === 'public') {",
-									"        switch (endpoint.service_id) {",
-									"            case nova_service_id:",
-									"                pm.environment.set('NOVA_URL', endpoint.url);",
-									"                break;",
-									"            case neutron_service_id:",
-									"                pm.environment.set('NEUTRON_URL', endpoint.url);",
-									"                break;",
-									"            case glance_service_id:",
-									"                pm.environment.set('GLANCE_URL', endpoint.url);",
-									"                break;",
-									"        }",
-									"    }",
-									"}",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "X-Auth-Token",
-								"type": "text",
-								"value": "{{TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OS_AUTH_URL}}/endpoints",
-							"host": [
-								"{{OS_AUTH_URL}}"
-							],
-							"path": [
-								"endpoints"
 							]
 						}
 					},
@@ -947,6 +842,144 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "wait-web-server-poweron",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "423a76f3-fd2d-42a0-ad50-0802a33e0834",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"",
+									"console.log(resp.server.status);",
+									"",
+									"let retry = Number(pm.environment.get('POWERON_RETRY'));",
+									"if (retry === 0) {",
+									"    pm.test('Web server powering timeout', function () {",
+									"        pm.expect(false).to.be.true;",
+									"    });",
+									"}",
+									"pm.environment.set('POWERON_RETRY', --retry);",
+									"",
+									"pm.test('Web server state is not ERROR', function () {",
+									"    pm.expect(resp.server.status).to.not.have.string('ERROR');",
+									"});",
+									"",
+									"if (resp.server.status !== 'ACTIVE') {",
+									"    postman.setNextRequest('wait-web-server-poweron');",
+									"    setTimeout(function(){}, 10000)",
+									"} else {",
+									"    let internal_net = pm.environment.get('INT_NET');",
+									"",
+									"    pm.test('web server has internal network address', function() {",
+									"        pm.expect(resp.server.addresses[internal_net]).to.be.an('array');",
+									"        pm.expect(resp.server.addresses[internal_net].length).to.be.above(0);",
+									"    });",
+									"",
+									"    pm.environment.set('MEMBER_IP', resp.server.addresses[internal_net][0].addr);",
+									"}",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NOVA_URL}}/servers/{{WEB_SERVER_ID}}",
+							"host": [
+								"{{NOVA_URL}}"
+							],
+							"path": [
+								"servers",
+								"{{WEB_SERVER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-vip-port",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a936c31a-da52-44c9-a84c-f741f9f01c8f",
+								"exec": [
+									"pm.test('response is ok', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"",
+									"pm.environment.set('VIP_PORT_ID', resp.port.id);",
+									"",
+									"pm.environment.set('VIP', resp.port.fixed_ips[0].ip_address);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9348ae76-634d-4c3a-9447-051983a2972e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"port\": {\n        \"name\": \"newman-test-port\",\n        \"network_id\": \"{{EXT_NET_ID}}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{NEUTRON_URL}}/v2.0/ports",
+							"host": [
+								"{{NEUTRON_URL}}"
+							],
+							"path": [
+								"v2.0",
+								"ports"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1068,61 +1101,7 @@
 					"response": []
 				},
 				{
-					"name": "provision-adc",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a74039e7-2ba8-4d57-8d82-c6336ad0095a",
-								"exec": [
-									"pm.test('response code is 200', function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "X-Auth-Token",
-								"value": "{{TOKEN}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Tenant-Id",
-								"value": "{{OS_PROJECT_ID}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"create\": null\n}"
-						},
-						"url": {
-							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}/action",
-							"host": [
-								"{{ADCAAS_URL}}"
-							],
-							"path": [
-								"adcs",
-								"{{ADC_ID}}",
-								"action"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "wait-adc-poweron",
+					"name": "wait-adc-onboard",
 					"event": [
 						{
 							"listen": "test",
@@ -1137,20 +1116,20 @@
 									"",
 									"console.log(resp.adc.status);",
 									"",
-									"let retry = Number(pm.environment.get('POWERON_RETRY'));",
+									"let retry = Number(pm.environment.get('ONBOARD_RETRY'));",
 									"if (retry === 0) {",
-									"    pm.test('ADC Powering Timeout', function () {",
-									"      pm.expect(false).to.be.true;",
+									"    pm.test('ADC onboarding timeout', function () {",
+									"        pm.expect(false).to.be.true;",
 									"    });",
 									"}",
-									"pm.environment.set('POWERON_RETRY', --retry);",
+									"pm.environment.set('ONBOARD_RETRY', --retry);",
 									"",
 									"pm.test('ADC state is not ERROR', function () {",
 									"    pm.expect(resp.adc.status).to.not.have.string('ERROR');",
 									"});",
 									"",
-									"if (resp.adc.status !== 'POWERON') {",
-									"    postman.setNextRequest('wait-adc-poweron');",
+									"if (resp.adc.status !== 'ONBOARDED') {",
+									"    postman.setNextRequest('wait-adc-onboard');",
 									"    setTimeout(function(){}, 10000)",
 									"}",
 									"",
@@ -1192,7 +1171,7 @@
 					"response": []
 				},
 				{
-					"name": "onboard-adc",
+					"name": "\bsetup-adc",
 					"event": [
 						{
 							"listen": "test",
@@ -1263,8 +1242,8 @@
 									"",
 									"let retry = Number(pm.environment.get('ACTIVE_RETRY'));",
 									"if (retry === 0) {",
-									"    pm.test('ADC Onboarding Timeout', function () {",
-									"      pm.expect(false).to.be.true;",
+									"    pm.test('ADC setup timeout', function () {",
+									"        pm.expect(false).to.be.true;",
 									"    });",
 									"}",
 									"pm.environment.set('ACTIVE_RETRY', --retry);",
@@ -1592,7 +1571,7 @@
 					"response": []
 				},
 				{
-					"name": "associate-monitor-icmp-to-pool",
+					"name": "associate-monitor-http-to-pool",
 					"event": [
 						{
 							"listen": "test",
@@ -1622,8 +1601,8 @@
 							},
 							{
 								"key": "Tenant-Id",
-								"value": "{{OS_PROJECT_ID}}",
-								"type": "text"
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
 							}
 						],
 						"body": {
@@ -1631,7 +1610,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/pools/{{POOL_ID}}/monitors/{{MONITOR_ICMP_ID}}",
+							"raw": "{{ADCAAS_URL}}/pools/{{POOL_ID}}/monitors/{{MONITOR_HTTP_ID}}",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
@@ -1639,14 +1618,14 @@
 								"pools",
 								"{{POOL_ID}}",
 								"monitors",
-								"{{MONITOR_ICMP_ID}}"
+								"{{MONITOR_HTTP_ID}}"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "associate-monitor-http-to-member",
+					"name": "associate-monitor-icmp-to-member",
 					"event": [
 						{
 							"listen": "test",
@@ -1685,7 +1664,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/members/{{MEMBER_ID}}/monitors/{{MONITOR_HTTP_ID}}",
+							"raw": "{{ADCAAS_URL}}/members/{{MEMBER_ID}}/monitors/{{MONITOR_ICMP_ID}}",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
@@ -1693,7 +1672,7 @@
 								"members",
 								"{{MEMBER_ID}}",
 								"monitors",
-								"{{MONITOR_HTTP_ID}}"
+								"{{MONITOR_ICMP_ID}}"
 							]
 						}
 					},
@@ -1972,6 +1951,129 @@
 					"response": []
 				},
 				{
+					"name": "upload-wafpolicy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Tenant-Id",
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/wafpolicies/{{WAF_ID}}/adcs/{{ADC_ID}}",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"wafpolicies",
+								"{{WAF_ID}}",
+								"adcs",
+								"{{ADC_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait-wafpolicy-upload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"",
+									"console.log(resp.wafpolicyondevice.state);",
+									"",
+									"let retry = Number(pm.environment.get('UPLOAD_RETRY'));",
+									"if (retry === 0) {",
+									"    pm.test('Upload WAF policy timeout', function () {",
+									"      pm.expect(false).to.be.true;",
+									"    });",
+									"}",
+									"pm.environment.set('UPLOAD_RETRY', --retry);",
+									"",
+									"pm.test('WAF policy state is not ERROR', function () {",
+									"    pm.expect(resp.wafpolicyondevice.state).to.not.have.string('ERROR');",
+									"});",
+									"",
+									"if (resp.wafpolicyondevice.state !== 'AVAILABLE') {",
+									"    postman.setNextRequest('wait-wafpolicy-upload');",
+									"    setTimeout(function(){}, 10000)",
+									"}",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Tenant-Id",
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/wafpolicies/{{WAF_ID}}/adcs/{{ADC_ID}}",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"wafpolicies",
+								"{{WAF_ID}}",
+								"adcs",
+								"{{ADC_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "create-waf-action",
 					"event": [
 						{
@@ -2189,6 +2291,60 @@
 					"response": []
 				},
 				{
+					"name": "delete-vip-port",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a936c31a-da52-44c9-a84c-f741f9f01c8f",
+								"exec": [
+									"pm.test('response is ok', function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9348ae76-634d-4c3a-9447-051983a2972e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NEUTRON_URL}}/v2.0/ports/{{VIP_PORT_ID}}",
+							"host": [
+								"{{NEUTRON_URL}}"
+							],
+							"path": [
+								"v2.0",
+								"ports",
+								"{{VIP_PORT_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "deploy-declaration",
 					"event": [
 						{
@@ -2242,22 +2398,103 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "cleanup",
-			"item": [
+				},
 				{
-					"name": "reclaim-adc",
+					"name": "access-vip",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "9adb3a7a-64ea-48cd-9fd8-512229d69201",
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
 								"exec": [
 									"pm.test('response code is 200', function () {",
 									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.text();",
+									"",
+									"let addr = pm.environment.get('MEMBER_IP');",
+									"",
+									"pm.test('response inlcudes pool member address', function () {",
+									"    pm.expect(resp).to.include(addr);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{VIP}}",
+							"protocol": "http",
+							"host": [
+								"{{VIP}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "access-vip-but-block-by-waf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.text();",
+									"",
+									"pm.test('request is blocked by ADC', function () {",
+									"    pm.expect(resp).to.include('Request Rejected');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "asm_demo",
+								"value": "asm_demo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{VIP}}",
+							"protocol": "http",
+							"host": [
+								"{{VIP}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cleanup-application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2269,87 +2506,13 @@
 						"header": [
 							{
 								"key": "X-Auth-Token",
-								"value": "{{TOKEN}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Tenant-Id",
-								"value": "{{OS_PROJECT_ID}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"delete\": null\n}"
-						},
-						"url": {
-							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}/action",
-							"host": [
-								"{{ADCAAS_URL}}"
-							],
-							"path": [
-								"adcs",
-								"{{ADC_ID}}",
-								"action"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "wait-adc-reclaimed",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "423a76f3-fd2d-42a0-ad50-0802a33e0834",
-								"exec": [
-									"pm.test('response code is 200', function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let resp = pm.response.json();",
-									"",
-									"console.log(resp.adc.status);",
-									"",
-									"let retry = Number(pm.environment.get('RECLAIM_RETRY'));",
-									"if (retry === 0) {",
-									"    pm.test('ADC Reclaiming Timeout', function () {",
-									"      pm.expect(false).to.be.true;",
-									"    });",
-									"}",
-									"pm.environment.set('RECLAIM_RETRY', --retry);",
-									"",
-									"pm.test('ADC state is not ERROR', function () {",
-									"    pm.expect(resp.adc.status).to.not.have.string('ERROR');",
-									"});",
-									"",
-									"if (resp.adc.status !== 'RECLAIMED') {",
-									"    postman.setNextRequest('wait-adc-reclaimed');",
-									"    setTimeout(function(){}, 10000)",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "X-Auth-Token",
 								"type": "text",
 								"value": "{{TOKEN}}"
 							},
 							{
 								"key": "Tenant-Id",
-								"value": "{{OS_PROJECT_ID}}",
-								"type": "text"
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
 							}
 						],
 						"body": {
@@ -2357,18 +2520,24 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}",
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}/cleanup",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
 							"path": [
-								"adcs",
-								"{{ADC_ID}}"
+								"applications",
+								"{{APPLICATION_ID}}",
+								"cleanup"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "cleanup",
+			"item": [
 				{
 					"name": "delete-adc",
 					"event": [
@@ -2397,6 +2566,67 @@
 								"key": "Tenant-Id",
 								"value": "{{OS_PROJECT_ID}}",
 								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"adcs",
+								"{{ADC_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait-adc-deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "423a76f3-fd2d-42a0-ad50-0802a33e0834",
+								"exec": [
+									"pm.test('response is 200 or 404', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+									"});",
+									"",
+									"let retry = Number(pm.environment.get('DELETE_RETRY'));",
+									"if (retry === 0) {",
+									"    pm.test('ADC delete timeout', function () {",
+									"        pm.expect(false).to.be.true;",
+									"    });",
+									"}",
+									"pm.environment.set('DELETE_RETRY', --retry);",
+									"",
+									"if (pm.response.code !== 404) {",
+									"    postman.setNextRequest('wait-adc-deleted');",
+									"    setTimeout(function(){}, 10000)",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Tenant-Id",
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
 							}
 						],
 						"body": {
