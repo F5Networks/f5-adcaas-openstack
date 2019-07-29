@@ -35,7 +35,7 @@ services:
     ports:
       - ${DATABASE_PORT:-5432}:5432
     volumes:
-      - ${DATABASE_DATA_DIRECTORY:?"DATABASE_DATA_DIRECTORY must not be empty"}:/var/lib/postgresql/data
+      - ${DATABASE_DATA_DIRECTORY}:/var/lib/postgresql/data
     depends_on:
       - FLUENTD
     logging:
