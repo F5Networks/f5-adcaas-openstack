@@ -34,7 +34,7 @@ export async function main(options: ApplicationConfig = {}) {
       1000,
     );
   };
-  await checkAndWait(dbReady, 3).then(async () => {
+  await checkAndWait(dbReady, 60).then(async () => {
     await app.migrateSchema();
   });
 
