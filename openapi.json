@@ -43,7 +43,7 @@
         "operationId": "AdcController.count"
       }
     },
-    "/adcaas/v1/adcs/{adcId}/action": {
+    "/adcaas/v1/adcs/{adcId}/setup": {
       "post": {
         "x-controller-name": "AdcController",
         "x-operation-name": "provision",
@@ -87,27 +87,6 @@
             }
           }
         ],
-        "requestBody": {
-          "description": "actions request",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [],
-                "properties": {
-                  "action": {
-                    "type": "string"
-                  }
-                },
-                "example": {
-                  "action": "null"
-                }
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
         "operationId": "AdcController.provision"
       }
     },
@@ -828,6 +807,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -894,8 +874,7 @@
                     "type": "string"
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -2222,6 +2201,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -2316,8 +2296,7 @@
                     }
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -3436,6 +3415,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -3521,8 +3501,7 @@
                     }
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -4806,6 +4785,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -4989,8 +4969,7 @@
                     "type": "string"
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -6371,6 +6350,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -6474,8 +6454,7 @@
                     }
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -7985,6 +7964,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -8073,8 +8053,7 @@
                     }
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -8973,6 +8952,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -9159,8 +9139,7 @@
                     "type": "string"
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
@@ -10281,6 +10260,7 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
+              "type": "object",
               "properties": {
                 "where": {
                   "type": "object"
@@ -10338,8 +10318,7 @@
                     "type": "string"
                   }
                 }
-              },
-              "type": "object"
+              }
             }
           }
         ],
