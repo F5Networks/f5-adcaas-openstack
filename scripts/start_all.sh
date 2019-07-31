@@ -13,6 +13,7 @@ cdir=`cd $(dirname $0); pwd`
     cd $cdir/../deploy
 
     certsdir=$cdir/../data/certs
+    mkdir $certsdir
     openssl req -newkey rsa:2048 -nodes -keyout $certsdir/domain.key -x509 -days 365 -out $certsdir/domain.crt -subj "/C=CN/ST=BJ/L=BJ/O=Example/OU=IT/CN=f5-adcaas.com/emailAddress=f5-adcaas@example.com"
 
     export DEPENDENCIES_DIRECTORY=`pwd`/../dependencies
