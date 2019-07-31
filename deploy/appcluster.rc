@@ -48,3 +48,7 @@ VE_ASM_LEVEL=nominal
 
 ASG_HOST=asg-server
 ASG_PORT=443
+
+WAF_CERT_KEY=/var/data/certs/domain.key
+WAF_CERT_CRT=/var/data/certs/domain.crt
+WAF_ENABLE_HTTPS=false
