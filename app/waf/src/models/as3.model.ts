@@ -60,10 +60,6 @@ export class AS3PatchOp {
 export class AS3PatchReqeust {
   readonly class: string = 'AS3';
   readonly action: string = 'patch';
-  targetHost: string;
-  targetPort: number;
-  targetUsername: string;
-  targetPassphrase: string;
   patchBody: AS3PatchOp[];
 
   constructor(
@@ -72,13 +68,6 @@ export class AS3PatchReqeust {
     operation: patchOP,
     declaration?: Declaration,
   ) {
-    if (adc.management) {
-      this.targetHost = adc.management.connection!.ipAddress;
-      this.targetPort = adc.management.connection!.tcpPort;
-    }
-    //TODO: remove admin/pass after implement trusted connection
-    this.targetUsername = 'admin';
-    this.targetPassphrase = 'admin';
     this.patchBody = new Array<AS3PatchOp>();
     this.patchBody.push(new AS3PatchOp(application, operation, declaration));
   }
@@ -87,18 +76,9 @@ export class AS3PatchReqeust {
 export class AS3DeployRequest {
   readonly class: string = 'AS3';
   readonly action: 'deploy';
-  targetHost: string;
-  targetPort: number;
-  targetUsername: string;
-  targetPassphrase: string;
   declaration: AS3Declaration;
 
   constructor(adc: Adc, application: Application, declaration?: Declaration) {
-    this.targetHost = adc.management.connection!.ipAddress;
-    this.targetPort = adc.management.connection!.tcpPort;
-    //TODO: remove admin/pass after implement trusted connection
-    this.targetUsername = 'admin';
-    this.targetPassphrase = 'admin';
     this.declaration = {
       class: 'ADC',
       schemaVersion: '3.0.0',
@@ -122,18 +102,9 @@ export class AS3DeployRequest {
 export class AS3PartitionRequest {
   readonly class: string = 'AS3';
   readonly action: 'deploy';
-  targetHost: string;
-  targetPort: number;
-  targetUsername: string;
-  targetPassphrase: string;
   declaration: AS3Declaration;
 
   constructor(adc: Adc) {
-    this.targetHost = adc.management.connection!.ipAddress;
-    this.targetPort = adc.management.connection!.tcpPort;
-    //TODO: remove admin/pass after implement trusted connection
-    this.targetUsername = 'admin';
-    this.targetPassphrase = 'admin';
     this.declaration = {
       class: 'ADC',
       schemaVersion: '3.0.0',
