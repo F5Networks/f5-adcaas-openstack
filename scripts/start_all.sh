@@ -4,17 +4,15 @@ cdir=`cd $(dirname $0); pwd`
 (
     set -e
     cd $cdir
+    chmod +x *.sh
     ./download_asg_dependencies.sh
     ./download_do.sh
     ./download_as3.sh
+    ./generate_certs.sh
 )
 
 (
     cd $cdir/../deploy
-
-    certsdir=$cdir/../data/certs
-    mkdir $certsdir
-    openssl req -newkey rsa:2048 -nodes -keyout $certsdir/domain.key -x509 -days 365 -out $certsdir/domain.crt -subj "/C=CN/ST=BJ/L=BJ/O=Example/OU=IT/CN=f5-adcaas.com/emailAddress=f5-adcaas@example.com"
 
     export DEPENDENCIES_DIRECTORY=`pwd`/../dependencies
     export DATA_DIRECTORY=`pwd`/../data

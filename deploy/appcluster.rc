@@ -44,8 +44,6 @@ VE_NTP_TIMEZONE=UTC
 VE_LTM_LEVEL=nominal
 VE_ASM_LEVEL=nominal
 
-
-
 ASG_HOST=asg-server
 ASG_PORT=443
 
