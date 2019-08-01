@@ -1191,10 +1191,12 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "adcId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "defaultDeclarationId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "example": {
@@ -1779,10 +1781,12 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "adcId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "defaultDeclarationId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "example": {
@@ -2115,7 +2119,8 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "adcId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "example": {
@@ -6894,7 +6899,9 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "event": {
-                    "type": "string"
+                    "type": "string",
+                    "minlength": 1,
+                    "maxLength": 50
                   },
                   "insert": {
                     "type": "object"
