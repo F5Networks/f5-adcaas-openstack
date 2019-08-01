@@ -25,13 +25,11 @@ import {AdcController} from '../../src/controllers';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  RestApplicationPort,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+  teardownDepApps,
+  setupDepApps,
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenAdcData,
@@ -39,28 +37,14 @@ import {
   createAdcObject,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
-import {
-  MockKeyStoneController,
-  MockNovaController,
-  MockNeutronController,
-  OSShouldResponseWith,
-  ExpectedData,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {
-  MockBigipController,
-  BigipShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.bigip.controller';
-import {
-  MockDOController,
-  DOShouldResponseWith,
-} from '../fixtures/controllers/mocks/mock.do.controller';
 import {checkAndWait, setDefaultInterval, sleep} from '../../src/utils';
 import {BigipBuiltInProperties} from '../../src/services';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
 import {
-  ASGShouldResponseWith,
-  MockASGController,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
+  StubResponses,
+  RestApplicationPort,
+  LetResponseWith,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('AdcController test', () => {
   let wafapp: WafApplication;
@@ -72,66 +56,10 @@ describe('AdcController test', () => {
   let installStub: sinon.SinonStub;
   let queryExtensionsStub: sinon.SinonStub;
 
-  let mockKeystoneApp: TestingApplication;
-  let mockNovaApp: TestingApplication;
-  let mockNeutronApp: TestingApplication;
-  let mockBigip: TestingApplication;
-  let mockDO: TestingApplication;
-  let mockASG: TestingApplication;
-
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockNovaApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Nova,
-        MockNovaController,
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
-    mockBigip = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.SSLCustom,
-        MockBigipController,
-        'https',
-      );
-      return restApp;
-    })();
-
-    mockDO = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Onboarding,
-        MockDOController,
-      );
-      return restApp;
-    })();
-
-    mockASG = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     controller = await wafapp.get<AdcController>('controllers.AdcController');
@@ -154,10 +82,7 @@ describe('AdcController test', () => {
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
 
-    OSShouldResponseWith({});
-    DOShouldResponseWith({});
-    BigipShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith();
   });
 
   afterEach(async () => {
@@ -172,12 +97,7 @@ describe('AdcController test', () => {
     let fs = require('fs');
     fs.unlinkSync(process.env.DO_RPM_PACKAGE!);
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockDO);
-    teardownRestAppAndClient(mockBigip);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockNovaApp);
-    teardownRestAppAndClient(mockNeutronApp);
-    teardownRestAppAndClient(mockASG);
+    await teardownDepApps();
     await teardownEnvs();
   });
 
@@ -190,7 +110,7 @@ describe('AdcController test', () => {
       type: 'HW',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -205,7 +125,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -215,7 +135,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -225,7 +145,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -274,7 +194,7 @@ describe('AdcController test', () => {
       type: 'VE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -303,7 +223,7 @@ describe('AdcController test', () => {
       type: 'VE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -398,7 +318,7 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -410,7 +330,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -420,7 +340,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: uuid(),
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ERROR',
           },
         ],
@@ -455,7 +375,7 @@ describe('AdcController test', () => {
       const adc = createAdcObject({
         type: 'HW',
         management: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -468,7 +388,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -500,8 +420,8 @@ describe('AdcController test', () => {
   );
 
   it('post ' + prefix + '/adcs: create ADC HW with trust timeout', async () => {
-    ASGShouldResponseWith({
-      'GET:/mgmt/shared/TrustedDevices/{deviceId}':
+    LetResponseWith({
+      asg_get_mgmt_shared_trusteddevices_deviceId:
         StubResponses.trustDeviceStatusPending200,
     });
     await givenAdcData(wafapp, {
@@ -512,7 +432,7 @@ describe('AdcController test', () => {
       type: 'HW',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
           username: 'admin',
           password: 'admin',
@@ -527,7 +447,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -537,7 +457,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: id,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -575,7 +495,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -590,7 +510,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -600,7 +520,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -646,7 +566,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -661,7 +581,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -671,7 +591,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'PENDING',
           },
         ],
@@ -681,15 +601,15 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
       });
 
       queryExtensionsStub.returns([]);
-      BigipShouldResponseWith({
-        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      LetResponseWith({
+        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
       });
 
       let response = await client
@@ -733,7 +653,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
 
             username: 'admin',
@@ -749,7 +669,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -759,15 +679,15 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
       });
 
       queryExtensionsStub.throws(new Error('query-not-working'));
-      BigipShouldResponseWith({
-        '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info404,
+      LetResponseWith({
+        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
       });
 
       let response = await client
@@ -813,7 +733,7 @@ describe('AdcController test', () => {
         type: 'HW',
         management: {
           connection: {
-            ipAddress: ExpectedData.bigipMgmt.ipAddr,
+            ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
             username: 'admin',
             password: 'admin',
@@ -828,7 +748,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'CREATED',
           },
         ],
@@ -838,7 +758,7 @@ describe('AdcController test', () => {
         devices: [
           {
             targetUUID: id,
-            targetHost: ExpectedData.bigipMgmt.ipAddr,
+            targetHost: ExpectedData.networks.management.ipAddr,
             state: 'ACTIVE',
           },
         ],
@@ -1130,8 +1050,8 @@ describe('AdcController test', () => {
       management: {},
     });
 
-    BigipShouldResponseWith({
-      '/mgmt/shared/declarative-onboarding/info':
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
     });
     let response = await client
@@ -1169,8 +1089,8 @@ describe('AdcController test', () => {
       management: {},
     });
 
-    OSShouldResponseWith({
-      'GET:/v2.0/floatingips':
+    LetResponseWith({
+      neutron_get_v2_0_floatingips:
         StubResponses.neutronGetFloatingIpsStateActive200,
     });
 
@@ -1208,8 +1128,9 @@ describe('AdcController test', () => {
         management: {},
       });
 
-      OSShouldResponseWith({
-        'GET:/v2.0/floatingips': StubResponses.neutronGetFloatingIpsEmpty200,
+      LetResponseWith({
+        neutron_get_v2_0_floatingips:
+          StubResponses.neutronGetFloatingIpsEmpty200,
       });
 
       let response = await client
@@ -1246,10 +1167,10 @@ describe('AdcController test', () => {
       status: 'ONBOARDED',
     });
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-    ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
+    ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
 
-    BigipShouldResponseWith({
-      '/mgmt/shared/declarative-onboarding/info':
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
     });
 
@@ -1326,7 +1247,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -1336,7 +1257,7 @@ describe('AdcController test', () => {
       devices: [
         {
           targetUUID: trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -1389,8 +1310,8 @@ describe('AdcController test', () => {
   });
 
   it('post ' + prefix + '/adcs/{adcId}: delete done', async () => {
-    BigipShouldResponseWith({
-      '/mgmt/tm/sys/license': StubResponses.bigipNoLicense200,
+    LetResponseWith({
+      bigip_get_mgmt_tm_sys_license: StubResponses.bigipNoLicense200,
     });
     let adc = await givenAdcData(wafapp, {
       type: 'VE',

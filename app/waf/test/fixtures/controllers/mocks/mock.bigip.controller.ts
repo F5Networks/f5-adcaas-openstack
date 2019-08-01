@@ -16,82 +16,79 @@
 
 import {MockBaseController} from './mock.base.controller';
 import {get, param, post} from '@loopback/rest';
-import {StubResponses} from '../../datasources/testrest.datasource';
+import {ResponseWith} from '../../datasources/testrest.datasource';
 
 export class MockBigipController extends MockBaseController {
   @get('/mgmt/tm/sys')
   async sysInfo(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/sys']();
+    return await ResponseWith.bigip_get_mgmt_tm_sys!();
   }
 
   @get('/mgmt/tm/net/interface')
   async netInterfaces(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/net/interface']();
+    return await ResponseWith.bigip_get_mgmt_tm_net_interface!();
   }
 
   @get('/mgmt/tm/net/vlan')
   async netVlans(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/net/vlan']();
+    return await ResponseWith.bigip_get_mgmt_tm_net_vlan!();
   }
   @get('/mgmt/tm/net/self')
   async netSelfs(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/net/self']();
+    return await ResponseWith.bigip_get_mgmt_tm_net_self!();
   }
 
   @get('/mgmt/tm/sys/global-settings')
   async globalSettings(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/sys/global-settings']();
+    return await ResponseWith.bigip_get_mgmt_tm_sys_global_settings!();
   }
 
   @get('/mgmt/tm/sys/license')
   async license(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/sys/license']();
+    return await ResponseWith.bigip_get_mgmt_tm_sys_license!();
   }
 
   @get('/mgmt/tm/cm/device')
   async cmDevice(): Promise<object> {
-    return await ResponseWith['/mgmt/tm/cm/device']();
+    return await ResponseWith.bigip_get_mgmt_tm_cm_device!();
   }
 
   @get('/mgmt/shared/appsvcs/info')
   async as3Info(): Promise<object> {
-    return await ResponseWith['/mgmt/shared/appsvcs/info']();
+    return await ResponseWith.bigip_get_mgmt_shared_appsvcs_info!();
   }
 
   @get('/mgmt/shared/declarative-onboarding/info')
   async doInfo(): Promise<object> {
     let s = statusDOReady.shift();
-    return await ResponseWith['/mgmt/shared/declarative-onboarding/info'](s);
+    return await ResponseWith.bigip_get_mgmt_shared_declarative_onboarding_info!(
+      s,
+    );
   }
 
   @post('/mgmt/shared/file-transfer/uploads/{filename}')
   async doUpload(
     @param.path.string('filename') filename: string,
   ): Promise<object> {
-    return await ResponseWith[
-      '/mgmt/shared/file-transfer/uploads/{filename}'
-    ]();
+    return await ResponseWith.bigip_post_mgmt_shared_file_transfer_uploads_filename!();
   }
 
   @post('/mgmt/shared/iapp/package-management-tasks')
   async doInstall(): Promise<object> {
-    return await ResponseWith['/mgmt/shared/iapp/package-management-tasks']();
+    return await ResponseWith.bigip_post_mgmt_shared_iapp_package_management_tasks!();
   }
   @get('/mgmt/shared/iapp/package-management-tasks/{taskid}')
   async doInstallStatus(): Promise<object> {
-    return await ResponseWith[
-      '/mgmt/shared/iapp/package-management-tasks/{taskid}'
-    ]();
+    return await ResponseWith.bigip_get_mgmt_shared_iapp_package_management_tasks_taskId!();
   }
   @get('/mgmt/tm/sys/folder/~{partition}')
   async partitionInfo(
     @param.path.string('partition') partition: string,
   ): Promise<object> {
-    return await ResponseWith['/mgmt/tm/sys/folder/~{partition}']();
+    return await ResponseWith.bigip_get_mgmt_tm_sys_folder__partition!();
   }
 }
 
-let ResponseWith: {[key: string]: Function} = {};
 let statusDOReady = [
   'FAILED',
   'OK',
@@ -107,25 +104,3 @@ let statusDOReady = [
   'OK',
   'OK',
 ];
-//TODO combine it with the one in openstack.
-export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
-  ResponseWith = {
-    '/mgmt/tm/sys': StubResponses.bigipMgmtSys200,
-    '/mgmt/tm/net/interface': StubResponses.bigipNetInterfaces200,
-    '/mgmt/tm/net/self': StubResponses.bigipnetSelfips200,
-    '/mgmt/tm/net/vlan': StubResponses.bigipNetVlans200,
-    '/mgmt/tm/sys/global-settings': StubResponses.bigipGlobalSettings200,
-    '/mgmt/tm/sys/license': StubResponses.bigipLiense200,
-    '/mgmt/tm/cm/device': StubResponses.bigipCmDevice200,
-    '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info200,
-    '/mgmt/tm/sys/folder/~{partition}': StubResponses.bigipPartition200,
-    '/mgmt/shared/declarative-onboarding/info': StubResponses.bigipDOInfoOK200,
-    '/mgmt/shared/file-transfer/uploads/{filename}':
-      StubResponses.bigipDOUpload200,
-    '/mgmt/shared/iapp/package-management-tasks':
-      StubResponses.bigipDOInstall200,
-    '/mgmt/shared/iapp/package-management-tasks/{taskid}':
-      StubResponses.bigipDOInstallstatus200,
-  };
-  Object.assign(ResponseWith, spec);
-}

@@ -19,44 +19,33 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  RestApplicationPort,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+  setupDepApps,
+  teardownDepApps,
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   createEndpointpolicyObject,
   givenEndpointpolicyData,
 } from '../helpers/database.helpers';
 import {Endpointpolicy} from '../../src/models';
-import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-  ExpectedData,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-
 import uuid = require('uuid');
+import {
+  ExpectedData,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('EndpointpolicyController', () => {
   let wafapp: WafApplication;
   let client: Client;
-  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
-    OSShouldResponseWith({});
+    LetResponseWith({});
     setupEnvs();
   });
   beforeEach('Empty database', async () => {
@@ -65,7 +54,7 @@ describe('EndpointpolicyController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 

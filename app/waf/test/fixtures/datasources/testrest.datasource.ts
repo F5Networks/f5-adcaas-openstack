@@ -15,7 +15,90 @@
  */
 
 import {HttpErrors} from '@loopback/rest';
-import {ExpectedData} from '../controllers/mocks/mock.openstack.controller';
+
+export enum RestApplicationPort {
+  // in order, please.
+  SSLDefault = 443,
+  RestSelfTest = 2000,
+  WafApp = 3000,
+  IdentityUser = 5000,
+  Onboarding = 8081,
+  ASG = 8443,
+  Nova = 8774,
+  Neutron = 9696,
+  SSLCustom = 10443,
+  IdentityAdmin = 35357,
+}
+
+export const Environments: {[key: string]: string} = {
+  OS_AUTH_URL: 'http://localhost:35357/v2.0',
+  OS_USERNAME: 'wafaas',
+  OS_PASSWORD: '91153c85b8dd4147',
+  OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
+  OS_DOMAIN_NAME: 'Default',
+  OS_REGION_NAME: 'RegionOne',
+  OS_AVAILABLE_ZONE: 'nova',
+  OS_FLOATINGIP_NETWORK_ID: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
+  DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
+  DO_BIGIQ_HOST: '10.250.15.105',
+  DO_BIGIQ_USERNAME: 'admin',
+  DO_BIGIQ_PASSWORD: 'admin',
+  DO_BIGIQ_POOL: 'mykeypool',
+  DO_RPM_PACKAGE: '/tmp/f5-declarative-onboarding-1.5.0-11.noarch.rpm',
+  ASG_HOST: '127.0.0.1',
+  ASG_PORT: `${RestApplicationPort.ASG}`,
+  VE_RANDOM_PASS: 'true',
+};
+
+export const ExpectedData = {
+  adcId: '3efa393d-eb7a-4ae8-8222-e4b99f14adcf',
+  userToken: '8cf3d2447253455385c36254192cc4fe',
+  userId: '2d26c96aa0f345eaafc3f5b50d2bbd8e',
+  serverId: 'fef1e40c-ed9d-4e10-b10c-d60d3af70623',
+  vmId: 'f250c956-bdd7-41cd-b3d5-03a79c7d90f8',
+  tenantId: 'fdac59f5b20046829ea58720702a74af',
+  bigipMgmt: {
+    hostname: 'test-asm.example1234.openstack.com',
+    tcpPort: RestApplicationPort.SSLCustom,
+  },
+  networks: {
+    management: {
+      macAddr: 'fa:16:3e:96:da:69',
+      ipAddr: '127.0.0.1',
+      ipPoolCIDR: '127.0.0.1/24',
+      networkId: '798b1b24-1bd5-481f-bda9-ec1e65cb4ab9',
+      portId: 'c5b94732-fea2-405f-9c93-812510582360',
+    },
+
+    internal: {
+      macAddr: 'fa:16:3e:57:41:05',
+      ipAddr: '192.168.20.53',
+      ipPoolCIDR: '192.168.20.1/24',
+      networkId: '9859d600-b493-4d1f-bdff-2ec962ef2201',
+      portId: '829f4795-109e-41ef-a987-09a470524e35',
+    },
+    ha: {
+      macAddr: 'fa:16:3e:bf:91:b1',
+      ipAddr: '192.168.30.52',
+      ipPoolCIDR: '192.168.30.1/24',
+      networkId: 'da3f7dbc-8bbf-4392-acc3-8b8544c2327c',
+      portId: '34f9c718-eb02-4f38-a555-897ee4cab4cf',
+    },
+    external: {
+      macAddr: 'fa:16:3e:13:c7:46',
+      ipAddr: '192.168.10.21',
+      ipPoolCIDR: '192.168.10.1/24',
+      networkId: 'f82e85a4-79f6-4756-a25e-81f4e0506796',
+      portId: 'a5a518a5-e4f1-4d53-9e4f-a91a9676273b',
+      virtualAddress: '192.168.10.200',
+    },
+  },
+  doTaskId: 'fe96c41e-6850-4210-bf3b-1902ad27dff4',
+  declarationId: '3cc12f17-a6c7-4884-a119-98b456fe2020',
+  memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
+  applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
+  trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
+};
 
 export const StubResponses = {
   response400: () => {
@@ -503,41 +586,148 @@ export const StubResponses = {
     };
   },
 
-  neutronCreatePort200: () => {
-    return {
-      port: {
-        status: 'DOWN',
-        'binding:host_id': '',
-        description: '',
-        allowed_address_pairs: [],
-        tags: [],
-        extra_dhcp_opts: [],
-        updated_at: '2019-03-14T03:16:34Z',
-        device_owner: '',
-        revision_number: 4,
-        'binding:profile': {},
-        fixed_ips: [
-          {
-            subnet_id: '86f9f11b-0895-4af7-b3cf-71acda85f1db',
-            ip_address: ExpectedData.bigipMgmt.ipAddr,
-          },
-        ],
-        id: ExpectedData.portId,
-        security_groups: ['24989b80-aacd-4c74-aabd-dcb1f55e5012'],
-        device_id: '',
-        name: 'port-port-name-729171',
-        admin_state_up: true,
-        network_id: '89449ba4-34f8-404d-93f6-fd1fd8a8296e',
-        tenant_id: 'ef9fd3e3df664e558f043bd24c1fca21',
-        'binding:vif_details': {},
-        'binding:vnic_type': 'normal',
-        'binding:vif_type': 'unbound',
-        mac_address: ExpectedData.bigipMgmt.macAddr,
-        project_id: 'ef9fd3e3df664e558f043bd24c1fca21',
-        created_at: '2019-03-14T03:16:34Z',
-        port_security_enabled: false,
-      },
-    };
+  neutronCreatePort200: (networkId: string) => {
+    if (networkId === ExpectedData.networks.management.networkId) {
+      return {
+        port: {
+          allowed_address_pairs: [],
+          extra_dhcp_opts: [],
+          updated_at: '2019-07-05T14:54:27Z',
+          device_owner: '',
+          revision_number: 6,
+          'binding:profile': {},
+          port_security_enabled: true,
+          fixed_ips: [
+            {
+              subnet_id: '23863fb0-9709-4808-87b5-0d3411d63a9a',
+              ip_address: ExpectedData.networks.management.ipAddr,
+            },
+          ],
+          id: ExpectedData.networks.management.portId,
+          security_groups: ['0c2a32a5-2472-46c8-93b0-2e7d84e83afd'],
+          'binding:vif_details': {},
+          'binding:vif_type': 'unbound',
+          mac_address: ExpectedData.networks.management.macAddr,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          status: 'DOWN',
+          'binding:host_id': '',
+          description: '',
+          tags: [],
+          device_id: '',
+          name: 'port-name-8547144',
+          admin_state_up: true,
+          network_id: ExpectedData.networks.management.networkId,
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-07-05T14:54:27Z',
+          'binding:vnic_type': 'normal',
+        },
+      };
+    } else if (networkId === ExpectedData.networks.internal.networkId) {
+      return {
+        port: {
+          allowed_address_pairs: [],
+          extra_dhcp_opts: [],
+          updated_at: '2019-07-05T15:02:47Z',
+          device_owner: '',
+          revision_number: 6,
+          'binding:profile': {},
+          port_security_enabled: true,
+          fixed_ips: [
+            {
+              subnet_id: 'b3755d06-6e24-4d9b-aa05-918e53d3a6d1',
+              ip_address: ExpectedData.networks.internal.ipAddr,
+            },
+          ],
+          id: ExpectedData.networks.internal.portId,
+          security_groups: ['0c2a32a5-2472-46c8-93b0-2e7d84e83afd'],
+          'binding:vif_details': {},
+          'binding:vif_type': 'unbound',
+          mac_address: ExpectedData.networks.internal.macAddr,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          status: 'DOWN',
+          'binding:host_id': '',
+          description: '',
+          tags: [],
+          device_id: '',
+          name: '',
+          admin_state_up: true,
+          network_id: ExpectedData.networks.internal.networkId,
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-07-05T15:02:47Z',
+          'binding:vnic_type': 'normal',
+        },
+      };
+    } else if (networkId === ExpectedData.networks.ha.networkId) {
+      return {
+        port: {
+          allowed_address_pairs: [],
+          extra_dhcp_opts: [],
+          updated_at: '2019-07-05T15:01:59Z',
+          device_owner: '',
+          revision_number: 6,
+          'binding:profile': {},
+          port_security_enabled: true,
+          fixed_ips: [
+            {
+              subnet_id: '0b8eccd9-edb6-4e58-aa48-bbbd94e47616',
+              ip_address: ExpectedData.networks.ha.ipAddr,
+            },
+          ],
+          id: ExpectedData.networks.ha.portId,
+          security_groups: ['0c2a32a5-2472-46c8-93b0-2e7d84e83afd'],
+          'binding:vif_details': {},
+          'binding:vif_type': 'unbound',
+          mac_address: ExpectedData.networks.ha.macAddr,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          status: 'DOWN',
+          'binding:host_id': '',
+          description: '',
+          tags: [],
+          device_id: '',
+          name: '',
+          admin_state_up: true,
+          network_id: ExpectedData.networks.ha.networkId,
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-07-05T15:01:58Z',
+          'binding:vnic_type': 'normal',
+        },
+      };
+    } else if (networkId === ExpectedData.networks.external.networkId) {
+      return {
+        port: {
+          allowed_address_pairs: [],
+          extra_dhcp_opts: [],
+          updated_at: '2019-07-05T15:01:20Z',
+          device_owner: '',
+          revision_number: 6,
+          'binding:profile': {},
+          port_security_enabled: true,
+          fixed_ips: [
+            {
+              subnet_id: '7be5c927-0df8-433b-b5f3-f0ad159c0413',
+              ip_address: ExpectedData.networks.external.ipAddr,
+            },
+          ],
+          id: ExpectedData.networks.external.portId,
+          security_groups: ['0c2a32a5-2472-46c8-93b0-2e7d84e83afd'],
+          'binding:vif_details': {},
+          'binding:vif_type': 'unbound',
+          mac_address: ExpectedData.networks.external.macAddr,
+          project_id: '610be7617fff469c88b71301cffd4c06',
+          status: 'DOWN',
+          'binding:host_id': '',
+          description: '',
+          tags: [],
+          device_id: '',
+          name: '',
+          admin_state_up: true,
+          network_id: ExpectedData.networks.external.networkId,
+          tenant_id: '610be7617fff469c88b71301cffd4c06',
+          created_at: '2019-07-05T15:01:20Z',
+          'binding:vnic_type': 'normal',
+        },
+      };
+    }
   },
 
   neutronUpdatePort200: () => {
@@ -634,155 +824,140 @@ export const StubResponses = {
 
   neutronDeletePort200: () => {},
 
-  neutronGetSubnets200: () => {
-    return {
-      subnets: [
-        {
-          description: '',
-          enable_dhcp: true,
-          network_id: '68d40e08-c825-4a56-8321-f1c171303b9d',
-          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
-          created_at: '2018-08-30T06:05:41',
-          dns_nameservers: [],
-          updated_at: '2018-10-22T08:09:32',
-          gateway_ip: '10.0.0.1',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '10.0.0.2',
-              end: '10.0.0.254',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: '10.0.0.0/24',
-          id: '1f02e13a-1c1e-497c-acb4-6bcb733341b7',
-          subnetpool_id: null,
-          name: 'f5_test_subnet',
-        },
-        {
-          description: '',
-          enable_dhcp: true,
-          network_id: ExpectedData.bigipMgmt.networkId,
-          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
-          created_at: '2019-03-08T16:54:37',
-          dns_nameservers: [],
-          updated_at: '2019-03-08T16:54:37',
-          gateway_ip: '10.1.1.1',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '10.1.1.2',
-              end: '10.1.1.254',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: ExpectedData.bigipMgmt.ipPoolCIDR,
-          id: '7d3b71b8-932c-4c23-9635-17316e2b29aa',
-          subnetpool_id: null,
-          name: 'another',
-        },
-        {
-          description: '',
-          enable_dhcp: false,
-          network_id: '7088474a-9fa2-48d9-a97f-a967dc1f7487',
-          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
-          created_at: '2018-08-29T08:38:18',
-          dns_nameservers: [],
-          updated_at: '2018-08-29T08:38:18',
-          gateway_ip: '172.24.4.225',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '172.24.4.226',
-              end: '172.24.4.238',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: '172.24.4.224/28',
-          id: '3db5044f-4a5d-44b1-a7c5-00095b06e6c4',
-          subnetpool_id: null,
-          name: 'public_subnet',
-        },
-        {
-          description: '',
-          enable_dhcp: true,
-          network_id: '0e51e68c-08f7-4e32-af54-328d29b93467',
-          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
-          created_at: '2019-03-04T06:17:29',
-          dns_nameservers: [],
-          updated_at: '2019-03-04T06:17:29',
-          gateway_ip: '192.168.3.1',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '192.168.3.2',
-              end: '192.168.3.254',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: '192.168.3.0/24',
-          id: 'e45b1350-bfa3-41b4-a14f-cadd8a059277',
-          subnetpool_id: null,
-          name: 'test-subnet',
-        },
-        {
-          description: '',
-          enable_dhcp: true,
-          network_id: '3eb161f5-4d60-4a9d-8908-46c05f1f93ca',
-          tenant_id: 'fde45211da0a44ecbf38cb0b644ab30d',
-          created_at: '2019-04-09T09:26:59',
-          dns_nameservers: [],
-          updated_at: '2019-04-09T09:26:59',
-          gateway_ip: '172.16.11.1',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '172.16.11.2',
-              end: '172.16.11.254',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: '172.16.11.0/24',
-          id: '664b189f-4d74-4b2c-9b27-fab8d3ecd1ce',
-          subnetpool_id: null,
-          name: 'f5_test_mgmt_sub',
-        },
-        {
-          description: '',
-          enable_dhcp: true,
-          network_id: 'bb3d76a8-d24b-487e-b4b5-a82b03ddd446',
-          tenant_id: '0dfc2e39eb83466a805983426f8d8e9b',
-          created_at: '2018-08-29T08:38:29',
-          dns_nameservers: [],
-          updated_at: '2018-08-29T08:38:29',
-          gateway_ip: '10.0.0.1',
-          ipv6_ra_mode: null,
-          allocation_pools: [
-            {
-              start: '10.0.0.2',
-              end: '10.0.0.254',
-            },
-          ],
-          host_routes: [],
-          ip_version: 4,
-          ipv6_address_mode: null,
-          cidr: '10.0.0.0/24',
-          id: '76084ccf-a3a7-4b69-aad6-fd881e5d3715',
-          subnetpool_id: null,
-          name: 'private_subnet',
-        },
-      ],
-    };
+  neutronGetSubnets200: (networkId: string) => {
+    if (networkId === ExpectedData.networks.management.networkId) {
+      return {
+        subnets: [
+          {
+            service_types: [],
+            description: '',
+            enable_dhcp: true,
+            tags: [],
+            network_id: ExpectedData.networks.management.networkId,
+            tenant_id: '610be7617fff469c88b71301cffd4c06',
+            created_at: '2019-06-20T07:37:13Z',
+            dns_nameservers: ['8.8.8.8'],
+            updated_at: '2019-06-20T08:47:56Z',
+            ipv6_ra_mode: null,
+            allocation_pools: [
+              {
+                start: '127.0.0.1',
+                end: '127.0.0.255',
+              },
+            ],
+            gateway_ip: '127.0.0.2',
+            revision_number: 1,
+            ipv6_address_mode: null,
+            ip_version: 4,
+            host_routes: [],
+            cidr: ExpectedData.networks.management.ipPoolCIDR,
+            project_id: '610be7617fff469c88b71301cffd4c06',
+            id: '23863fb0-9709-4808-87b5-0d3411d63a9a',
+            subnetpool_id: null,
+            name: '127.0.0.1/24',
+          },
+        ],
+      };
+    } else if (networkId === ExpectedData.networks.internal.networkId) {
+      return {
+        subnets: [
+          {
+            service_types: [],
+            description: '',
+            enable_dhcp: true,
+            tags: [],
+            network_id: ExpectedData.networks.internal.networkId,
+            tenant_id: '610be7617fff469c88b71301cffd4c06',
+            created_at: '2019-06-24T01:22:08Z',
+            dns_nameservers: [],
+            updated_at: '2019-06-24T01:22:08Z',
+            ipv6_ra_mode: null,
+            allocation_pools: [
+              {
+                start: '192.168.20.2',
+                end: '192.168.20.254',
+              },
+            ],
+            gateway_ip: '192.168.20.1',
+            revision_number: 0,
+            ipv6_address_mode: null,
+            ip_version: 4,
+            host_routes: [],
+            cidr: ExpectedData.networks.internal.ipPoolCIDR,
+            project_id: '610be7617fff469c88b71301cffd4c06',
+            id: 'b3755d06-6e24-4d9b-aa05-918e53d3a6d1',
+            subnetpool_id: null,
+            name: 'f5-int-sub',
+          },
+        ],
+      };
+    } else if (networkId === ExpectedData.networks.ha.networkId) {
+      return {
+        subnets: [
+          {
+            service_types: [],
+            description: '',
+            enable_dhcp: true,
+            tags: [],
+            network_id: ExpectedData.networks.ha.networkId,
+            tenant_id: '610be7617fff469c88b71301cffd4c06',
+            created_at: '2019-06-24T01:22:29Z',
+            dns_nameservers: [],
+            updated_at: '2019-06-24T01:22:29Z',
+            ipv6_ra_mode: null,
+            allocation_pools: [
+              {
+                start: '192.168.30.2',
+                end: '192.168.30.254',
+              },
+            ],
+            gateway_ip: '192.168.30.1',
+            revision_number: 0,
+            ipv6_address_mode: null,
+            ip_version: 4,
+            host_routes: [],
+            cidr: ExpectedData.networks.ha.ipPoolCIDR,
+            project_id: '610be7617fff469c88b71301cffd4c06',
+            id: '0b8eccd9-edb6-4e58-aa48-bbbd94e47616',
+            subnetpool_id: null,
+            name: 'f5-ha-sub',
+          },
+        ],
+      };
+    } else if (networkId === ExpectedData.networks.external.networkId) {
+      return {
+        subnets: [
+          {
+            service_types: [],
+            description: '',
+            enable_dhcp: true,
+            tags: [],
+            network_id: ExpectedData.networks.external.networkId,
+            tenant_id: '610be7617fff469c88b71301cffd4c06',
+            created_at: '2019-06-24T01:21:44Z',
+            dns_nameservers: [],
+            updated_at: '2019-06-24T01:21:44Z',
+            ipv6_ra_mode: null,
+            allocation_pools: [
+              {
+                start: '192.168.10.2',
+                end: '192.168.10.254',
+              },
+            ],
+            gateway_ip: '192.168.10.1',
+            revision_number: 0,
+            ipv6_address_mode: null,
+            ip_version: 4,
+            host_routes: [],
+            cidr: ExpectedData.networks.external.ipPoolCIDR,
+            project_id: '610be7617fff469c88b71301cffd4c06',
+            id: '7be5c927-0df8-433b-b5f3-f0ad159c0413',
+            subnetpool_id: null,
+            name: 'f5-ex-subnet',
+          },
+        ],
+      };
+    }
   },
 
   neutronIpAddressAlreadyAllocated409: () => {
@@ -990,7 +1165,7 @@ export const StubResponses = {
     return {
       items: [
         {
-          managementIp: ExpectedData.bigipMgmt.ipAddr,
+          managementIp: ExpectedData.networks.management.ipAddr,
           configsyncIp: '1.2.3.4',
         },
       ],
@@ -1019,6 +1194,22 @@ export const StubResponses = {
   },
 
   bigipDOChange2OK200: (state: string = 'OK') => {
+    return [
+      {
+        id: 0,
+        selfLink: 'https://localhost/mgmt/shared/declarative-onboarding/info',
+        result: {
+          class: 'Result',
+          code: 200,
+          status: state,
+          message: '',
+          errors: [],
+        },
+      },
+    ];
+  },
+
+  bigipDOInfo200: (state: string = 'OK') => {
     return [
       {
         id: 0,
@@ -1362,7 +1553,7 @@ export const StubResponses = {
           kind: 'tm:net:interface:interfacestate',
           lldpAdmin: 'txonly',
           lldpTlvmap: 130943,
-          macAddress: ExpectedData.ExtNetwork.MacAddr,
+          macAddress: ExpectedData.networks.external.macAddr,
           mediaActive: 'none',
           mediaFixed: '10000T-FD',
           mediaMax: 'auto',
@@ -1887,7 +2078,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -1899,7 +2090,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'PENDING',
         },
       ],
@@ -1911,7 +2102,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'CREATED',
         },
       ],
@@ -1923,7 +2114,7 @@ Reason:
       devices: [
         {
           targetUUID: ExpectedData.trustDeviceId,
-          targetHost: ExpectedData.bigipMgmt.ipAddr,
+          targetHost: ExpectedData.networks.management.ipAddr,
           state: 'ACTIVE',
         },
       ],
@@ -1977,3 +2168,114 @@ Reason:
 
   installTrustedExtensions200: () => {},
 };
+
+type TypeResponseWith = {
+  // OpenStack APIs
+  keystone_post_v2_0_tokens?: Function;
+  keystone_get_v2_0_tokens?: Function;
+  keystone_get_v2_0_tokens_tokenId?: Function;
+  keystone_post_v3_auth_tokens?: Function;
+  keystone_get_v3_auth_tokens?: Function;
+  neutron_post_v2_0_ports?: Function;
+  neutron_del_v2_0_ports_portId?: Function;
+  neutron_put_v2_0_ports_portId?: Function;
+  neutron_get_v2_0_ports_portId?: Function;
+  neutron_get_v2_0_subnets?: Function;
+  neutron_get_v2_0_floatingips?: Function;
+  neutron_post_v2_0_floatingips?: Function;
+  neutron_put_v2_0_floatingips_floatingipId?: Function;
+  neutron_del_v2_0_floatingips_floatingipId?: Function;
+  nova_post_v2_tenantId_servers?: Function;
+  nova_del_v2_tenantId_servers_serverId?: Function;
+  nova_get_v2_tenantId_servers_serverId?: Function;
+
+  // DO APIs
+  do_post_mgmt_shared_declaration_onboarding?: Function;
+  do_get_mgmt_shared_declaration_onboarding_task_taskId?: Function;
+
+  // BIG-IP APIs
+  bigip_get_mgmt_tm_sys?: Function;
+  bigip_get_mgmt_tm_net_interface?: Function;
+  bigip_get_mgmt_tm_net_self?: Function;
+  bigip_get_mgmt_tm_net_vlan?: Function;
+  bigip_get_mgmt_tm_sys_global_settings?: Function;
+  bigip_get_mgmt_tm_sys_license?: Function;
+  bigip_get_mgmt_tm_cm_device?: Function;
+  bigip_get_mgmt_shared_appsvcs_info?: Function;
+  bigip_get_mgmt_tm_sys_folder__partition?: Function;
+  bigip_get_mgmt_shared_declarative_onboarding_info?: Function;
+  bigip_post_mgmt_shared_file_transfer_uploads_filename?: Function;
+  bigip_post_mgmt_shared_iapp_package_management_tasks?: Function;
+  bigip_get_mgmt_shared_iapp_package_management_tasks_taskId?: Function;
+
+  // ASG APIs
+  asg_post_mgmt_shared_trustproxy?: Function;
+  asg_get_mgmt_shared_trusteddevices_deviceId?: Function;
+  asg_put_mgmt_shared_trusteddevices?: Function;
+  asg_get_mgmt_shared_trusteddevices?: Function;
+  asg_del_mgmt_shared_trusteddevices_deviceId?: Function;
+  asg_post_mgmt_shared_trustedextensions_deviceId?: Function;
+  asg_get_mgmt_shared_trustedextensions_deviceId?: Function;
+};
+
+export const DefaultResponseWith: TypeResponseWith = {
+  keystone_post_v2_0_tokens: StubResponses.v2AuthToken200,
+  keystone_get_v2_0_tokens: StubResponses.v2AuthToken200,
+  keystone_get_v2_0_tokens_tokenId: StubResponses.v2AuthToken200,
+  keystone_post_v3_auth_tokens: StubResponses.v3AuthToken200,
+  keystone_get_v3_auth_tokens: StubResponses.v3AuthToken200,
+  neutron_post_v2_0_ports: StubResponses.neutronCreatePort200,
+  neutron_del_v2_0_ports_portId: StubResponses.neutronDeletePort200,
+  neutron_put_v2_0_ports_portId: StubResponses.neutronUpdatePort200,
+  neutron_get_v2_0_ports_portId: StubResponses.neutronGetPort200,
+  neutron_get_v2_0_subnets: StubResponses.neutronGetSubnets200,
+  nova_post_v2_tenantId_servers: StubResponses.novaCreateVM200,
+  nova_del_v2_tenantId_servers_serverId: StubResponses.novaDeleteVM200,
+  nova_get_v2_tenantId_servers_serverId: StubResponses.novaGetVMDetail200,
+  neutron_get_v2_0_floatingips: StubResponses.neutronGetFloatingIps200,
+  neutron_post_v2_0_floatingips: StubResponses.neutronPostFloatingIp201,
+  neutron_put_v2_0_floatingips_floatingipId:
+    StubResponses.neutronPutFloatingIp200,
+  neutron_del_v2_0_floatingips_floatingipId:
+    StubResponses.neutronDeleteFloatingIp204,
+
+  do_post_mgmt_shared_declaration_onboarding:
+    StubResponses.onboardingSucceed202,
+  do_get_mgmt_shared_declaration_onboarding_task_taskId:
+    StubResponses.onboardingSucceed200,
+
+  bigip_get_mgmt_tm_sys: StubResponses.bigipMgmtSys200,
+  bigip_get_mgmt_tm_net_interface: StubResponses.bigipNetInterfaces200,
+  bigip_get_mgmt_tm_net_self: StubResponses.bigipnetSelfips200,
+  bigip_get_mgmt_tm_net_vlan: StubResponses.bigipNetVlans200,
+  bigip_get_mgmt_tm_sys_global_settings: StubResponses.bigipGlobalSettings200,
+  bigip_get_mgmt_tm_sys_license: StubResponses.bigipLiense200,
+  bigip_get_mgmt_tm_cm_device: StubResponses.bigipCmDevice200,
+  bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info200,
+  bigip_get_mgmt_tm_sys_folder__partition: StubResponses.bigipPartition200,
+  bigip_get_mgmt_shared_declarative_onboarding_info:
+    StubResponses.bigipDOInfo200,
+  bigip_post_mgmt_shared_file_transfer_uploads_filename:
+    StubResponses.bigipDOUpload200,
+  bigip_post_mgmt_shared_iapp_package_management_tasks:
+    StubResponses.bigipDOInstall200,
+  bigip_get_mgmt_shared_iapp_package_management_tasks_taskId:
+    StubResponses.bigipDOInstallstatus200,
+
+  asg_post_mgmt_shared_trustproxy: StubResponses.trustProxyDeploy200,
+  asg_get_mgmt_shared_trusteddevices_deviceId:
+    StubResponses.trustDeviceStatusActive200,
+  asg_put_mgmt_shared_trusteddevices: StubResponses.trustDeviceStatusActive200,
+  asg_get_mgmt_shared_trusteddevices: StubResponses.trustDevices200,
+  asg_del_mgmt_shared_trusteddevices_deviceId: StubResponses.untrustDevice200,
+  asg_post_mgmt_shared_trustedextensions_deviceId:
+    StubResponses.installTrustedExtensions200,
+  asg_get_mgmt_shared_trustedextensions_deviceId:
+    StubResponses.queryTrustedExtensionsAvailable200,
+};
+
+export const ResponseWith: TypeResponseWith = {};
+
+export function LetResponseWith(spec?: TypeResponseWith) {
+  Object.assign(ResponseWith, DefaultResponseWith, spec);
+}

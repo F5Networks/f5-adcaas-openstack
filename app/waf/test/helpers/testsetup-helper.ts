@@ -29,41 +29,19 @@ import {RestApplication} from '@loopback/rest';
 import {ApplicationConfig} from '@loopback/core';
 import {join} from 'path';
 import {MockBaseController} from '../fixtures/controllers/mocks/mock.base.controller';
-
-export enum RestApplicationPort {
-  // in order, please.
-  SSLDefault = 443,
-  RestSelfTest = 2000,
-  WafApp = 3000,
-  IdentityUser = 5000,
-  Onboarding = 8081,
-  ASG = 8443,
-  Nova = 8774,
-  Neutron = 9696,
-  SSLCustom = 10443,
-  IdentityAdmin = 35357,
-}
 import {stubLogger, restoreLogger} from './logging.helpers';
-
-let envs: {[key: string]: string} = {
-  OS_AUTH_URL: 'http://localhost:35357/v2.0',
-  OS_USERNAME: 'wafaas',
-  OS_PASSWORD: '91153c85b8dd4147',
-  OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
-  OS_DOMAIN_NAME: 'Default',
-  OS_REGION_NAME: 'RegionOne',
-  OS_AVAILABLE_ZONE: 'nova',
-  OS_FLOATINGIP_NETWORK_ID: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
-  DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
-  DO_BIGIQ_HOST: '10.250.15.105',
-  DO_BIGIQ_USERNAME: 'admin',
-  DO_BIGIQ_PASSWORD: 'admin',
-  DO_BIGIQ_POOL: 'mykeypool',
-  DO_RPM_PACKAGE: '/tmp/f5-declarative-onboarding-1.5.0-11.noarch.rpm',
-  ASG_HOST: '127.0.0.1',
-  ASG_PORT: `${RestApplicationPort.ASG}`,
-  VE_RANDOM_PASS: 'true',
-};
+import {
+  RestApplicationPort,
+  Environments,
+} from '../fixtures/datasources/testrest.datasource';
+import {
+  MockKeyStoneController,
+  MockNovaController,
+  MockNeutronController,
+} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {MockBigipController} from '../fixtures/controllers/mocks/mock.bigip.controller';
+import {MockDOController} from '../fixtures/controllers/mocks/mock.do.controller';
+import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const app = new WafApplication({
@@ -138,8 +116,8 @@ export async function setupRestAppAndClient(
   return {restApp: restApp, client: client};
 }
 
-export function teardownRestAppAndClient(app: TestingApplication) {
-  app.stop();
+export async function teardownRestAppAndClient(app: TestingApplication) {
+  await app.stop();
 }
 
 export interface RestAppAndClient {
@@ -148,17 +126,60 @@ export interface RestAppAndClient {
 }
 
 export async function setupEnvs(addonEnvs: {[key: string]: string} = {}) {
-  for (let k of Object.keys(envs)) {
-    process.env[k] = envs[k];
+  for (let k of Object.keys(Environments)) {
+    process.env[k] = Environments[k];
   }
   for (let k of Object.keys(addonEnvs)) {
-    envs[k] = addonEnvs[k];
+    Environments[k] = addonEnvs[k];
     process.env[k] = addonEnvs[k];
   }
 }
 
 export async function teardownEnvs() {
-  for (let k of Object.keys(envs)) {
+  for (let k of Object.keys(Environments)) {
     delete process.env[k];
   }
+}
+
+let mockKeystoneApp: TestingApplication;
+let mockNovaApp: TestingApplication;
+let mockNeutronApp: TestingApplication;
+let mockBigipApp: TestingApplication;
+let mockDOApp: TestingApplication;
+let mockASGApp: TestingApplication;
+
+export async function setupDepApps() {
+  await Promise.all([
+    setupRestAppAndClient(
+      RestApplicationPort.IdentityAdmin,
+      MockKeyStoneController,
+    ),
+    setupRestAppAndClient(RestApplicationPort.Nova, MockNovaController),
+    setupRestAppAndClient(RestApplicationPort.Neutron, MockNeutronController),
+    setupRestAppAndClient(
+      RestApplicationPort.SSLCustom,
+      MockBigipController,
+      'https',
+    ),
+    setupRestAppAndClient(RestApplicationPort.Onboarding, MockDOController),
+    setupRestAppAndClient(RestApplicationPort.ASG, MockASGController, 'https'),
+  ]).then(([keystone, nova, neutron, bigip, doapp, asg]) => {
+    mockKeystoneApp = keystone.restApp;
+    mockNovaApp = nova.restApp;
+    mockNeutronApp = neutron.restApp;
+    mockBigipApp = bigip.restApp;
+    mockDOApp = doapp.restApp;
+    mockASGApp = asg.restApp;
+  });
+}
+
+export async function teardownDepApps() {
+  await Promise.all([
+    teardownRestAppAndClient(mockDOApp),
+    teardownRestAppAndClient(mockBigipApp),
+    teardownRestAppAndClient(mockKeystoneApp),
+    teardownRestAppAndClient(mockNovaApp),
+    teardownRestAppAndClient(mockNeutronApp),
+    teardownRestAppAndClient(mockASGApp),
+  ]);
 }

@@ -19,13 +19,11 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  RestApplicationPort,
-  teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
+  setupDepApps,
+  teardownDepApps,
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenApplicationData,
@@ -45,55 +43,22 @@ import {
   givenAdcData,
 } from '../helpers/database.helpers';
 import {
-  OSShouldResponseWith,
-  MockKeyStoneController,
-  ExpectedData,
-  MockNeutronController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
-import {
-  ASGShouldResponseWith,
-  MockASGController,
-} from '../fixtures/controllers/mocks/mock.asg.controller';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+  StubResponses,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 describe('DeclarationController', () => {
   let wafapp: WafApplication;
   let client: Client;
   let deployStub: sinon.SinonStub;
-  let mockKeystoneApp: TestingApplication;
-  let mockASG: TestingApplication;
-  let mockNeutronApp: TestingApplication;
   let asg: ASGService;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockASG = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.ASG,
-        MockASGController,
-        'https',
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     ({wafapp, client} = await setupApplication());
 
     asg = await new ASGServiceProvider().value();
@@ -104,15 +69,12 @@ describe('DeclarationController', () => {
   beforeEach('Empty database', async () => {
     await givenEmptyDatabase(wafapp);
     deployStub = sinon.stub(asg, 'deploy');
-    OSShouldResponseWith({});
-    ASGShouldResponseWith({});
+    LetResponseWith();
   });
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockASG);
-    teardownRestAppAndClient(mockNeutronApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 
@@ -458,13 +420,13 @@ describe('DeclarationController', () => {
       applicationId: application.id,
       id: ExpectedData.declarationId,
     });
-    ExpectedData.virtualAddress = '1.2.3.4';
+    ExpectedData.networks.external.virtualAddress = '1.2.3.4';
 
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -491,14 +453,14 @@ describe('DeclarationController', () => {
       id: ExpectedData.declarationId,
     });
 
-    OSShouldResponseWith({
-      'PUT:/v2.0/ports/{portId}': StubResponses.response400,
+    LetResponseWith({
+      neutron_put_v2_0_ports_portId: StubResponses.response400,
     });
     let adc = await givenAdcData(wafapp, {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -519,8 +481,8 @@ describe('DeclarationController', () => {
   });
 
   it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 422`, async () => {
-    ASGShouldResponseWith({
-      'POST:/mgmt/shared/TrustedProxy': StubResponses.trustProxyDeploy422,
+    LetResponseWith({
+      asg_post_mgmt_shared_trustproxy: StubResponses.trustProxyDeploy422,
     });
 
     let application = await givenApplicationData(wafapp);
@@ -533,7 +495,7 @@ describe('DeclarationController', () => {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',
@@ -554,7 +516,7 @@ describe('DeclarationController', () => {
   });
 
   it(`deploy ${prefix}/applicaitons/{applicationId}/declarations/{declarationId}/deploy: deploy as3 json with trusted proxy: 404`, async () => {
-    ASGShouldResponseWith({});
+    LetResponseWith();
     let application = await givenApplicationData(wafapp);
     let declaration = await givenDeclarationData(wafapp, {
       applicationId: application.id,
@@ -566,7 +528,7 @@ describe('DeclarationController', () => {
       status: 'ACTIVE',
       management: {
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: 443,
           username: 'admin',
           password: 'admin',

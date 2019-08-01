@@ -53,9 +53,9 @@ import {
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
 import {isNullOrUndefined} from 'util';
-import {ExpectedData} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {BigipBuiltInProperties} from '../../src/services';
 import {merge} from '../../src/utils';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
   const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
@@ -238,23 +238,23 @@ export function createAdcObject(data?: object) {
       networks: {
         mgmt1: {
           type: 'mgmt',
-          networkId: ExpectedData.bigipMgmt.networkId,
-          fixedIp: ExpectedData.bigipMgmt.ipAddr,
+          networkId: ExpectedData.networks.management.networkId,
+          fixedIp: ExpectedData.networks.management.ipAddr,
         },
         failover1: {
           type: 'ha',
-          networkId: 'd7e8635f-2d3a-42aa-a40e-8fbb177464bf',
-          fixedIp: '192.168.3.3',
+          networkId: ExpectedData.networks.ha.networkId,
+          fixedIp: ExpectedData.networks.ha.ipAddr,
         },
         internal1: {
           type: 'int',
-          networkId: '6acb25ec-dc68-4e07-ba45-e1a11567f9ca',
-          fixedIp: '192.168.4.3',
+          networkId: ExpectedData.networks.internal.networkId,
+          fixedIp: ExpectedData.networks.internal.ipAddr,
         },
         external2: {
           type: 'ext',
-          networkId: '1c19251d-7e97-411a-8816-6f7a72403707',
-          fixedIp: '192.168.5.3',
+          networkId: ExpectedData.networks.external.networkId,
+          fixedIp: ExpectedData.networks.external.ipAddr,
           floatingIp: '10.250.14.160',
         },
       },
@@ -268,28 +268,28 @@ export function createAdcObject(data?: object) {
       management: {
         networks: {
           mgmt1: {
-            fixedIp: ExpectedData.bigipMgmt.ipAddr,
-            macAddr: ExpectedData.bigipMgmt.macAddr,
-            portId: ExpectedData.portId,
+            fixedIp: ExpectedData.networks.management.ipAddr,
+            macAddr: ExpectedData.networks.management.macAddr,
+            portId: ExpectedData.networks.management.portId,
           },
           failover1: {
-            macAddr: 'fa:16:3e:35:da:15',
-            fixedIp: '192.168.3.3',
+            macAddr: ExpectedData.networks.ha.macAddr,
+            fixedIp: ExpectedData.networks.ha.ipAddr,
           },
           internal1: {
-            macAddr: 'fa:16:3e:f3:1a:b2',
-            fixedIp: '192.168.4.3',
+            macAddr: ExpectedData.networks.internal.macAddr,
+            fixedIp: ExpectedData.networks.internal.ipAddr,
           },
           external2: {
-            macAddr: ExpectedData.ExtNetwork.MacAddr,
-            fixedIp: ExpectedData.ExtNetwork.IpAddr,
+            macAddr: ExpectedData.networks.external.macAddr,
+            fixedIp: ExpectedData.networks.external.ipAddr,
             floatingIp: '10.250.14.160',
             floatingIpId: '10b2f45b-2837-4f90-a8d8-eae33f48d2cd',
             floatingIpCreated: true,
           },
         },
         connection: {
-          ipAddress: ExpectedData.bigipMgmt.ipAddr,
+          ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: BigipBuiltInProperties.port,
           username: BigipBuiltInProperties.admin,
           password: 'admin',
@@ -330,7 +330,7 @@ export function createDeclarationObject(data?: Partial<Declaration>) {
             template: 'http',
             serviceMain: {
               class: 'Service_HTTP',
-              virtualAddresses: [ExpectedData.virtualAddress],
+              virtualAddresses: [ExpectedData.networks.external.virtualAddress],
               pool: 'web_pool',
             },
             web_pool: {

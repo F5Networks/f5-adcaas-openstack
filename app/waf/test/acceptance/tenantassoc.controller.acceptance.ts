@@ -24,40 +24,28 @@ import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
-  TestingApplication,
-  setupRestAppAndClient,
-  RestApplicationPort,
   setupEnvs,
-  teardownRestAppAndClient,
   teardownEnvs,
-} from '../helpers/test-helper';
+  setupDepApps,
+  teardownDepApps,
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
   givenAdcData,
   givenAdcTenantAssociationData,
 } from '../helpers/database.helpers';
 import uuid = require('uuid');
-import {
-  MockKeyStoneController,
-  ExpectedData,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 describe('TenantAssociationController', () => {
   let wafapp: WafApplication;
   let client: Client;
-  let mockKeystoneApp: TestingApplication;
 
   const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
     ({wafapp, client} = await setupApplication());
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
+    await setupDepApps();
     setupEnvs();
   });
 
@@ -67,7 +55,7 @@ describe('TenantAssociationController', () => {
 
   after(async () => {
     await teardownApplication(wafapp);
-    teardownRestAppAndClient(mockKeystoneApp);
+    await teardownDepApps();
     teardownEnvs();
   });
 

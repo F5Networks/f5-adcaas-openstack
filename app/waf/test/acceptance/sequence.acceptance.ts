@@ -17,21 +17,21 @@
 import {
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
   setupEnvs,
   teardownEnvs,
-} from '../helpers/test-helper';
-import {
-  MockKeyStoneController,
-  OSShouldResponseWith,
-  ExpectedData,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
+} from '../helpers/testsetup-helper';
+import {MockKeyStoneController} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {MockSelfTestController} from '../fixtures/controllers/mocks/mock.selftest.controller';
 import {Client, expect} from '@loopback/testlab';
 import {OpenStackComponent} from '../../src/components';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {MySequence} from '../../src/sequence';
+import {
+  RestApplicationPort,
+  ExpectedData,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack.identity.test', () => {
   let mockKeystoneApp: TestingApplication;
@@ -59,7 +59,7 @@ describe('openstack.identity.test', () => {
 
     stubLogger();
 
-    OSShouldResponseWith({});
+    LetResponseWith({});
   });
 
   beforeEach('setup environs', async () => {

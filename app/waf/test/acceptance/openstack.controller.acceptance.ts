@@ -17,55 +17,29 @@
 import {
   TestingApplication,
   setupRestAppAndClient,
-  RestApplicationPort,
   teardownRestAppAndClient,
-} from '../helpers/test-helper';
+  setupDepApps,
+  teardownDepApps,
+} from '../helpers/testsetup-helper';
 import {Client, expect} from '@loopback/testlab';
-import {
-  MockKeyStoneController,
-  ExpectedData,
-  OSShouldResponseWith,
-  MockNovaController,
-  MockNeutronController,
-} from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
-import {StubResponses} from '../fixtures/datasources/testrest.datasource';
+import {
+  StubResponses,
+  LetResponseWith,
+} from '../fixtures/datasources/testrest.datasource';
 import {OpenstackController} from '../fixtures/controllers/openstack.controller';
 import {OpenStackComponent} from '../../src/components';
+import {
+  RestApplicationPort,
+  ExpectedData,
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('openstack.identity.test', () => {
-  let mockKeystoneApp: TestingApplication;
-  let mockNovaApp: TestingApplication;
-  let mockNeutronApp: TestingApplication;
-
   let testApp: TestingApplication;
   let client: Client;
 
   before('setup', async () => {
-    mockKeystoneApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.IdentityAdmin,
-        MockKeyStoneController,
-      );
-      return restApp;
-    })();
-
-    mockNovaApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Nova,
-        MockNovaController,
-      );
-      return restApp;
-    })();
-
-    mockNeutronApp = await (async () => {
-      let {restApp} = await setupRestAppAndClient(
-        RestApplicationPort.Neutron,
-        MockNeutronController,
-      );
-      return restApp;
-    })();
-
+    await setupDepApps();
     let restAppAndClient = await setupRestAppAndClient(
       RestApplicationPort.WafApp,
       OpenstackController,
@@ -80,13 +54,11 @@ describe('openstack.identity.test', () => {
   after('teardown', async () => {
     restoreLogger();
     teardownRestAppAndClient(testApp);
-    teardownRestAppAndClient(mockKeystoneApp);
-    teardownRestAppAndClient(mockNovaApp);
-    teardownRestAppAndClient(mockNeutronApp);
+    await teardownDepApps();
   });
 
   it('identity v2 auth admin token: 200', async () => {
-    OSShouldResponseWith({'/v2.0/tokens': StubResponses.v2AuthToken200});
+    LetResponseWith({keystone_post_v2_0_tokens: StubResponses.v2AuthToken200});
 
     let response = await client
       .get('/openstack/adminAuthToken')
@@ -108,7 +80,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('identity v2 auth admin token: 400 ', async () => {
-    OSShouldResponseWith({'/v2.0/tokens': StubResponses.response400});
+    LetResponseWith({keystone_post_v2_0_tokens: StubResponses.response400});
     let response = await client
       .get('/openstack/adminAuthToken')
       .send({
@@ -129,7 +101,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('identity v2 auth admin token: 401', async () => {
-    OSShouldResponseWith({'/v2.0/tokens': StubResponses.response401});
+    LetResponseWith({keystone_post_v2_0_tokens: StubResponses.response401});
     let response = await client
       .get('/openstack/adminAuthToken')
       .send({
@@ -150,7 +122,9 @@ describe('openstack.identity.test', () => {
   });
 
   it('identity v3 auth admin token: 200', async () => {
-    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    LetResponseWith({
+      keystone_post_v3_auth_tokens: StubResponses.v3AuthToken200,
+    });
 
     let response = await client
       .get('/openstack/adminAuthToken')
@@ -173,7 +147,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('identity v3 auth admin token: 401', async () => {
-    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
+    LetResponseWith({keystone_post_v3_auth_tokens: StubResponses.response401});
 
     let response = await client
       .get('/openstack/adminAuthToken')
@@ -195,7 +169,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('identity v3 auth admin token: 400', async () => {
-    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.response400});
+    LetResponseWith({keystone_post_v3_auth_tokens: StubResponses.response400});
 
     let response = await client
       .get('/openstack/adminAuthToken')
@@ -217,7 +191,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v2: 200', async () => {
-    OSShouldResponseWith({'/v2.0/tokens': StubResponses.v2AuthToken200});
+    LetResponseWith({keystone_post_v2_0_tokens: StubResponses.v2AuthToken200});
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -242,7 +216,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v2: 401', async () => {
-    OSShouldResponseWith({'/v2.0/tokens': StubResponses.response401});
+    LetResponseWith({keystone_post_v2_0_tokens: StubResponses.response401});
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -267,7 +241,9 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v3: 200', async () => {
-    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.v3AuthToken200});
+    LetResponseWith({
+      keystone_post_v3_auth_tokens: StubResponses.v3AuthToken200,
+    });
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -292,7 +268,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token v3: 401', async () => {
-    OSShouldResponseWith({'/v3/auth/tokens': StubResponses.response401});
+    LetResponseWith({keystone_post_v3_auth_tokens: StubResponses.response401});
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -317,7 +293,6 @@ describe('openstack.identity.test', () => {
   });
 
   it('validate user token Unknown version: failed', async () => {
-    //OSShouldResponseWith({ '/v3/auth/tokens': StubResponses.response401 });
     let response = await client
       .get('/openstack/validateUserToken')
       .send({
@@ -342,8 +317,8 @@ describe('openstack.identity.test', () => {
   });
 
   it('create vm with network id: 200', async () => {
-    OSShouldResponseWith({
-      '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,
+    LetResponseWith({
+      nova_post_v2_tenantId_servers: StubResponses.novaCreateVM200,
     });
 
     let response = await client
@@ -375,7 +350,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('create vm with network id: 400', async () => {
-    OSShouldResponseWith({'/v2/{tenantId}/servers': StubResponses.response400});
+    LetResponseWith({nova_post_v2_tenantId_servers: StubResponses.response400});
 
     let response = await client
       .get('/openstack/createVirtualServer')
@@ -406,8 +381,8 @@ describe('openstack.identity.test', () => {
   });
 
   it('create vm with port id: 200', async () => {
-    OSShouldResponseWith({
-      '/v2/{tenantId}/servers': StubResponses.novaCreateVM200,
+    LetResponseWith({
+      nova_post_v2_tenantId_servers: StubResponses.novaCreateVM200,
     });
 
     let response = await client
@@ -438,7 +413,7 @@ describe('openstack.identity.test', () => {
   });
 
   it('create vm with port id: 401', async () => {
-    OSShouldResponseWith({'/v2/{tenantId}/servers': StubResponses.response401});
+    LetResponseWith({nova_post_v2_tenantId_servers: StubResponses.response401});
 
     let response = await client
       .get('/openstack/createVirtualServer')
@@ -468,8 +443,8 @@ describe('openstack.identity.test', () => {
   });
 
   it('get vm detail: 200', async () => {
-    OSShouldResponseWith({
-      '/v2/{tenantId}/servers/{serverId}': StubResponses.novaGetVMDetail200,
+    LetResponseWith({
+      nova_get_v2_tenantId_servers_serverId: StubResponses.novaGetVMDetail200,
     });
 
     let response = await client
@@ -497,8 +472,8 @@ describe('openstack.identity.test', () => {
   });
 
   it('get vm detail: 200 with v3 identity', async () => {
-    OSShouldResponseWith({
-      '/v2/{tenantId}/servers/{serverId}': StubResponses.novaGetVMDetail200,
+    LetResponseWith({
+      nova_get_v2_tenantId_servers_serverId: StubResponses.novaGetVMDetail200,
     });
 
     let response = await client
@@ -526,8 +501,8 @@ describe('openstack.identity.test', () => {
   });
 
   it('get vm detail: 400', async () => {
-    OSShouldResponseWith({
-      '/v2/{tenantId}/servers/{serverId}': StubResponses.response400,
+    LetResponseWith({
+      nova_get_v2_tenantId_servers_serverId: StubResponses.response400,
     });
 
     let response = await client
@@ -555,7 +530,9 @@ describe('openstack.identity.test', () => {
   });
 
   it('create a port: 200', async () => {
-    OSShouldResponseWith({'/v2.0/ports': StubResponses.neutronCreatePort200});
+    LetResponseWith({
+      neutron_post_v2_0_ports: StubResponses.neutronCreatePort200,
+    });
 
     let response = await client
       .get('/openstack/createPort')
@@ -569,15 +546,19 @@ describe('openstack.identity.test', () => {
           OS_REGION_NAME: 'RegionOne',
           OS_AVAILABLE_ZONE: 'nova',
         },
-        param: {},
+        param: {
+          networkId: ExpectedData.networks.management.networkId,
+        },
       })
       .expect(200);
 
-    expect(response.body).containDeep({id: ExpectedData.portId});
+    expect(response.body).containDeep({
+      id: ExpectedData.networks.management.portId,
+    });
   });
 
   it('create a port: 400', async () => {
-    OSShouldResponseWith({'/v2.0/ports': StubResponses.response400});
+    LetResponseWith({neutron_post_v2_0_ports: StubResponses.response400});
 
     let response = await client
       .get('/openstack/createPort')
