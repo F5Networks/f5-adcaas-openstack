@@ -85,15 +85,14 @@ export class ApplicationController extends BaseController {
     )
     application: Partial<Application>,
   ): Promise<Response> {
-    try {
-      application.tenantId = await this.tenantId;
-      return new Response(
-        Application,
-        await this.applicationRepository.create(application),
-      );
-    } catch (error) {
-      throw new HttpErrors.BadRequest(error.detail);
+    if (application.adcId) {
+      await this.adcRepository.findById(application.adcId);
     }
+    application.tenantId = await this.tenantId;
+    return new Response(
+      Application,
+      await this.applicationRepository.create(application),
+    );
   }
 
   @get(prefix + '/applications/count', {
@@ -169,6 +168,9 @@ export class ApplicationController extends BaseController {
     )
     application: Partial<Application>,
   ): Promise<void> {
+    if (application.adcId) {
+      await this.adcRepository.findById(application.adcId);
+    }
     await this.applicationRepository.updateById(id, application, {
       tenantId: await this.tenantId,
     });
