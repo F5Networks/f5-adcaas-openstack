@@ -229,6 +229,7 @@ export async function givenApplicationData(
 }
 
 export function createAdcObject(data?: object) {
+  if (!data) data = {};
   let obj = merge(
     {
       name: 'adc target',

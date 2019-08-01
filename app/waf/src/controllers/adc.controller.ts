@@ -133,16 +133,20 @@ export class AdcController extends BaseController {
       return new Response(Adc, adc);
     }
 
-    this.adcStCtr
-      .readyTo(AdcState.POWERON)
-      .then(() => this.createOn(adc, addonReq))
-      .then(() => this.adcStCtr.readyTo(AdcState.DOINSTALLED))
-      .then(() => this.installDO(adc))
-      .then(() => this.adcStCtr.readyTo(AdcState.ONBOARDED))
-      .then(() => this.onboard(adc, addonReq))
-      .catch(() => {
+    (async () => {
+      try {
+        if (await this.adcStCtr.readyTo(AdcState.POWERON))
+          await this.createOn(adc, addonReq);
+
+        if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
+          await this.installDO(adc);
+
+        if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
+          await this.onboard(adc, addonReq);
+      } catch (error) {
         this.logger.error(`Provisioning is failed for ${adc.id}.`);
-      });
+      }
+    })();
 
     return new Response(Adc, adc);
   }
@@ -501,7 +505,7 @@ export class AdcController extends BaseController {
   }
 
   private async serialize(adc: Adc, data?: object) {
-    merge(adc, data);
+    if (data) adc = Object.assign(adc, merge(adc, data));
     await this.adcRepository.update(adc);
   }
 
@@ -593,7 +597,11 @@ export class AdcController extends BaseController {
     await (await this.wafapp.get(WafBindingKeys.KeyNetworkDriver))
       .updateLogger(this.reqCxt.name)
       .then(async networkHelper => {
-        Object.assign(adc, {management: merge(adc.management, {networks: {}})});
+        Object.assign(adc, {
+          management: merge(adc.management ? adc.management : {}, {
+            networks: {},
+          }),
+        });
         for (let k of Object.keys(adc.networks)) {
           let net = adc.networks[k];
           if (adc.management.networks[k] && adc.management.networks[k].portId) {
@@ -874,6 +882,7 @@ export type AddonReqValues = {
 };
 
 export class AdcStateCtrlr {
+  private logger = factory.getLogger('logger.AdcStateCtrlr');
   private states: AdcStateEntry[] = [
     {
       state: AdcState.NEW,
@@ -939,19 +948,36 @@ export class AdcStateCtrlr {
   ) {}
 
   async readyTo(state: string): Promise<boolean> {
-    let stateEntry = this.getStateEntry(this.adc.status);
+    try {
+      let stateEntry = this.getStateEntry(this.adc.status);
 
-    if (this.adc.status.endsWith('ERROR')) {
-      if (state === stateEntry.state) return true;
-      else return false;
+      if (this.adc.status === stateEntry.failure!) {
+        if (state === stateEntry.state) return true;
+        else if (state === AdcState.RECLAIMED) return true;
+        else return false;
+      }
+
+      return (
+        stateEntry.next.includes(state) && (await stateEntry['check'](this))
+      );
+    } catch (error) {
+      this.logger.info(
+        `adc(${this.adc.id}, ${this.adc.status}) not ready to ${state}: ${error.message}`,
+      );
+      return false;
     }
-
-    return stateEntry.next.includes(state) && (await stateEntry['check'](this));
   }
 
   //TODO: support quiting immediately
   async gotTo(state: string): Promise<boolean> {
-    return this.getStateEntry(state)['check'](this);
+    try {
+      return await this.getStateEntry(state)['check'](this);
+    } catch (error) {
+      this.logger.info(
+        `adc(${this.adc.id}) not got to ${state} yet: ${error.message}`,
+      );
+      return false;
+    }
   }
 
   private getStateEntry(name: string): AdcStateEntry {
@@ -994,8 +1020,10 @@ export class AdcStateCtrlr {
       ((): boolean => {
         if (ctrl.adc.management.connection) return false;
         if (ctrl.adc.management.vmId) return false;
+        if (ctrl.adc.management.trustedDeviceId) return false;
         for (let net of Object.keys(ctrl.adc.networks)) {
           if (
+            ctrl.adc.management.networks &&
             ctrl.adc.management.networks[net] &&
             ctrl.adc.management.networks[net].portId
           )
@@ -1052,11 +1080,7 @@ export class AdcStateCtrlr {
 
   private async accessible(ctrl: AdcStateCtrlr): Promise<boolean> {
     let bigipMgr = await ctrl.getBigipMgr();
-
-    return bigipMgr
-      .getSys()
-      .then(() => Promise.resolve(true))
-      .catch(() => Promise.reject(false));
+    return await bigipMgr.getSys().then(() => true);
   }
 
   private async installed(ctrl: AdcStateCtrlr): Promise<boolean> {

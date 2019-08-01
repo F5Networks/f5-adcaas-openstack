@@ -119,7 +119,7 @@ export function BigipShouldResponseWith(spec: {[key: string]: Function}) {
     '/mgmt/tm/cm/device': StubResponses.bigipCmDevice200,
     '/mgmt/shared/appsvcs/info': StubResponses.bigipAS3Info200,
     '/mgmt/tm/sys/folder/~{partition}': StubResponses.bigipPartition200,
-    '/mgmt/shared/declarative-onboarding/info': StubResponses.bigipDOInfo200,
+    '/mgmt/shared/declarative-onboarding/info': StubResponses.bigipDOInfoOK200,
     '/mgmt/shared/file-transfer/uploads/{filename}':
       StubResponses.bigipDOUpload200,
     '/mgmt/shared/iapp/package-management-tasks':

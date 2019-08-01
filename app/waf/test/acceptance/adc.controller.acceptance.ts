@@ -139,6 +139,11 @@ describe('AdcController test', () => {
     BigipBuiltInProperties.port = RestApplicationPort.SSLCustom;
     setDefaultInterval(1);
     setupEnvs();
+
+    let fs = require('fs');
+    fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
+      recursive: true,
+    });
   });
 
   beforeEach('Empty database', async () => {
@@ -164,6 +169,8 @@ describe('AdcController test', () => {
   });
 
   after(async () => {
+    let fs = require('fs');
+    fs.unlinkSync(process.env.DO_RPM_PACKAGE!);
     await teardownApplication(wafapp);
     teardownRestAppAndClient(mockDO);
     teardownRestAppAndClient(mockBigip);
@@ -1123,6 +1130,10 @@ describe('AdcController test', () => {
       management: {},
     });
 
+    BigipShouldResponseWith({
+      '/mgmt/shared/declarative-onboarding/info':
+        StubResponses.bigipDOChange2OK200,
+    });
     let response = await client
       .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
@@ -1144,9 +1155,8 @@ describe('AdcController test', () => {
       return response.body.adc.status === 'ONBOARDED';
     };
 
-    await checkAndWait(checkStatus, 50, [], 5).then(() => {
-      expect(true).true();
-    });
+    await checkAndWait(checkStatus, 50, [], 5).then(() => {});
+    expect(response.body.adc.status).eql('ONBOARDED');
     expect(response.body.adc.management.connection.rootPass).not.eql('default');
   });
 
@@ -1238,6 +1248,11 @@ describe('AdcController test', () => {
     ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
     ExpectedData.bigipMgmt.ipAddr = adc.management.connection!.ipAddress;
 
+    BigipShouldResponseWith({
+      '/mgmt/shared/declarative-onboarding/info':
+        StubResponses.bigipDOChange2OK200,
+    });
+
     let trustDeviceId = uuid();
     trustStub.returns({
       devices: [
@@ -1276,10 +1291,6 @@ describe('AdcController test', () => {
         state: 'AVAILABLE',
       },
     ]);
-    let fs = require('fs');
-    fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
-      recursive: true,
-    });
     let response = await client
       .post(prefix + '/adcs/' + adc.id + '/setup')
       .set('X-Auth-Token', ExpectedData.userToken)
@@ -1349,10 +1360,6 @@ describe('AdcController test', () => {
       },
     ]);
 
-    let fs = require('fs');
-    fs.writeFileSync(process.env.DO_RPM_PACKAGE!, 'abcd', {
-      recursive: true,
-    });
     let response = await client
       .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)

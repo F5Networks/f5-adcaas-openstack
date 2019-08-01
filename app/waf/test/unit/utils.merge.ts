@@ -14,7 +14,6 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: {},
@@ -37,7 +36,6 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: {},
@@ -65,7 +63,6 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: {
@@ -73,58 +70,6 @@ describe('test merge function', () => {
         bb: 'bb',
         cc: 'cc',
       },
-      b: true,
-      c: 'string',
-      d: 23,
-    });
-  });
-
-  it('merge normal objects: multiple sources', () => {
-    let obj1 = {
-      a: {},
-      b: true,
-      c: 'string in obj1',
-    };
-    let obj2 = {
-      c: 'string in obj2',
-      d: 23,
-    };
-
-    let obj3 = {
-      d: {
-        dd: 23,
-      },
-    };
-
-    let t = merge(obj1, obj2, obj3);
-
-    expect(t).deepEqual(obj1);
-    expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
-    expect(t).deepEqual({
-      a: {},
-      b: true,
-      c: 'string in obj2',
-      d: {
-        dd: 23,
-      },
-    });
-  });
-
-  it('merge objects: target is undefined', () => {
-    let obj1 = undefined;
-    let obj2 = {
-      a: {},
-      b: true,
-      c: 'string',
-      d: 23,
-    };
-
-    let t = merge(obj1, obj2);
-
-    //expect(t).deepEqual(obj1); if obj1 is undefined, obj1 will be never changed.
-    expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
-    expect(t).deepEqual({
-      a: {},
       b: true,
       c: 'string',
       d: 23,
@@ -142,76 +87,12 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: {},
       b: true,
       c: 'string',
       d: 23,
-    });
-  });
-
-  it('merge objects: source is undefined', () => {
-    let obj1 = {
-      a: {},
-      b: true,
-      c: 'string',
-      d: 23,
-    };
-    let obj2 = undefined;
-
-    let t = merge(obj1, obj2);
-
-    expect(t).deepEqual(obj1);
-    expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
-    expect(t).deepEqual({
-      a: {},
-      b: true,
-      c: 'string',
-      d: 23,
-    });
-  });
-
-  it('merge objects: both target and source are undefined', () => {
-    let obj1 = undefined;
-    let obj2 = undefined;
-
-    let t = merge(obj1, obj2);
-
-    expect(t).deepEqual({});
-  });
-
-  it('merge objects: sources vary', () => {
-    let obj1 = {
-      a: {},
-      b: true,
-      c: 'string',
-      d: 23,
-    };
-    let obj2 = undefined;
-    let obj3 = {
-      b: false,
-      d: {
-        dd: 23,
-      },
-    };
-    let obj4 = undefined;
-    let obj5 = {
-      a: undefined,
-    };
-
-    let t = merge(obj1, obj2, obj3, obj4, obj5);
-
-    expect(t).deepEqual(obj1);
-    expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
-    expect(t).deepEqual({
-      a: {},
-      b: false,
-      c: 'string',
-      d: {
-        dd: 23,
-      },
     });
   });
 
@@ -227,7 +108,6 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: null,
@@ -250,7 +130,6 @@ describe('test merge function', () => {
 
     let t = merge(obj1, obj2);
 
-    expect(t).deepEqual(obj1);
     expect(Object.keys(t)).containDeep(['a', 'b', 'c', 'd']);
     expect(t).deepEqual({
       a: {},
@@ -258,5 +137,71 @@ describe('test merge function', () => {
       c: 'string',
       d: 23,
     });
+  });
+
+  it('merge objects: source contains null', () => {
+    let obj1 = {
+      a: {},
+    };
+    let obj2 = {
+      b: true,
+      c: null,
+      d: 23,
+    };
+
+    let t = merge(obj1, obj2);
+
+    expect(Object.keys(t)).containDeep(['a', 'b', 'd']);
+    expect(t).deepEqual({
+      a: {},
+      b: true,
+      d: 23,
+    });
+  });
+
+  it('merge objects: merge object to array', () => {
+    let obj1 = [1, 2, 3];
+    let obj2 = {
+      b: true,
+      c: null,
+      d: 23,
+    };
+
+    let t = merge(obj1, obj2);
+
+    expect(Object.keys(t)).containDeep(['0', '1', '2', 'b', 'd']);
+    // Array t ==== [ 1, 2, 3, b: true, d: 23 ], bad stuctured
+  });
+
+  it('merge objects: may passing in undefined', () => {
+    let obj = {
+      obj1: {},
+      obj2: {
+        b: true,
+        c: null,
+        d: 23,
+      },
+      obj3: [],
+      obj4: [],
+    };
+
+    delete obj.obj1;
+    delete obj.obj4;
+
+    try {
+      merge(obj.obj1, obj.obj2);
+    } catch (error) {
+      expect(error.message).eql(
+        'merging target or source cannot be undefined.',
+      );
+    }
+
+    try {
+      merge(obj.obj3, obj.obj4);
+    } catch (error) {
+      expect(error.message).eql(
+        'merging target or source cannot be undefined.',
+      );
+    }
   });
 });

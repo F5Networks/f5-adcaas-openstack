@@ -1018,7 +1018,7 @@ export const StubResponses = {
     };
   },
 
-  bigipDOInfo200: (state: string = 'OK') => {
+  bigipDOChange2OK200: (state: string = 'OK') => {
     return [
       {
         id: 0,
@@ -1027,6 +1027,22 @@ export const StubResponses = {
           class: 'Result',
           code: 200,
           status: state,
+          message: '',
+          errors: [],
+        },
+      },
+    ];
+  },
+
+  bigipDOInfoOK200: () => {
+    return [
+      {
+        id: 0,
+        selfLink: 'https://localhost/mgmt/shared/declarative-onboarding/info',
+        result: {
+          class: 'Result',
+          code: 200,
+          status: 'OK',
           message: '',
           errors: [],
         },
