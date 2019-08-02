@@ -382,7 +382,7 @@ export class OnboardingManager {
         this.logger.debug('Add users part.');
         return Object.assign(target, {root: userInfo});
       } else {
-        this.logger.debug(`No provision found.`);
+        this.logger.debug(`No user configuration found.`);
         return target;
       }
     },
@@ -473,7 +473,7 @@ export class OnboardingManager {
     // TODO: base64 coding for admin:admin. Modify it later if needed
     let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
 
-    return await this.doService
+    return this.doService
       .doRest(
         'POST',
         this.config.endpoint + '/mgmt/shared/declarative-onboarding',
@@ -514,7 +514,8 @@ export class OnboardingManager {
         },
         reason => {
           // if onboarding fails.
-          let mesg = 'Failed to onboarding device: ' + JSON.stringify(reason);
+          let mesg =
+            'Failed to query onboarding status: ' + JSON.stringify(reason);
           this.logger.error(mesg);
           throw new Error(mesg);
         },
