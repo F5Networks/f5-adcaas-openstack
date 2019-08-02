@@ -2073,6 +2073,12 @@ Reason:
     };
   },
 
+  trustDeviceStatusEmpty200: (state: string) => {
+    return {
+      devices: [],
+    };
+  },
+
   trustDeviceStatusActive200: (state: string) => {
     return {
       devices: [
@@ -2162,8 +2168,19 @@ Reason:
     ];
   },
 
+  queryTrustedExtensionsAS3NotFound200: (state: string | undefined) => {
+    //if (!state) return [];
+    return [
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'anyotherplugin',
+        state: 'AVAILABLE',
+      },
+    ];
+  },
+
   installTrustedExtensions400: () => {
-    throw new Error('install-not-working');
+    throw new HttpErrors.BadRequest('install-not-working');
   },
 
   installTrustedExtensions200: () => {},

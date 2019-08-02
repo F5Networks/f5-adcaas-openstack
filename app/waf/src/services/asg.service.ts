@@ -218,16 +218,6 @@ export class ASGManager {
     await this.service.install(ASG_HOST, ASG_PORT, id, body);
   }
 
-  async as3Exists(id: string): Promise<boolean> {
-    let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
-
-    for (let ext of exts) {
-      if (ext.name === 'f5-appsvcs' && ext.state === 'AVAILABLE') return true;
-    }
-
-    return false;
-  }
-
   async getAS3State(id: string): Promise<string> {
     let exts = await this.service.queryExtensions(ASG_HOST, ASG_PORT, id);
 
@@ -276,14 +266,11 @@ export class ASGManager {
     };
     this.logger.debug(`Json to deploy: ${JSON.stringify(deployBody)}`);
 
-    try {
-      await this.service.deploy(deployUrl, deployBody).then(response => {
-        let resObj = JSON.parse(JSON.stringify(response));
-        if (resObj.results[0].code !== 200)
-          throw new Error(`Deployment is something wrong: ${response}`);
-      });
-    } catch (error) {
-      throw new Error(JSON.stringify(error));
-    }
+    await this.service.deploy(deployUrl, deployBody).then(
+      response => undefined,
+      e => {
+        throw new Error(`Deployment is something wrong: ${e.message}`);
+      },
+    );
   }
 }
