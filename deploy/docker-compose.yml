@@ -1,11 +1,23 @@
 version: "3"
 services:
+  portal:
+    image: f5devcentral/f5-services-portal:latest
+    container_name: PORTAL
+    ports:
+      - 8245:80
+    depends_on:
+      - FLUENTD
+#    logging:
+#      driver: fluentd
+#      options:
+#        fluentd-address: "0.0.0.0:24224"
+#        tag: f5-portal
+
   wafaas:
     image: f5devcentral/f5-wafaas-openstack:latest
     container_name: WAFAAS
     env_file:
       - ./appcluster.rc
-
     ports:
       - ${WAF_APP_PORT:-3000}:3000
     depends_on:
@@ -81,31 +93,30 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
-    container_name: F5-ADCAAS-ELASTICSEARCH
+    container_name: ELASTICSEARCH
     ports:
       - 9200:9200
     environment:
       - discovery.type=single-node
 
   FLUENTD:
-    build: ./docker/fluent
-    image: f5-adcaas-fluent
+    image: f5devcentral/f5-es-fluentd:latest
     container_name: FLUENTD
     ports:
       - 24224:24224
       - 24224:24224/udp
       - 20001:20001/udp
     volumes:
-      - ./fluentd.conf:/fluentd/etc/test.conf
+      - ./fluentd.conf:/fluentd/etc/fluentd.conf
     depends_on:
       - elasticsearch
       - kibana
     environment:
-      - FLUENTD_CONF=test.conf
+      - FLUENTD_CONF=fluentd.conf
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.2.0
-    container_name: F5-ADCAAS-KIBANA
+    container_name: KIBANA
     depends_on:
       - elasticsearch
     ports:
