@@ -45,7 +45,7 @@ BIN_DIR = '/usr/bin'
 if ROOT_PATH not in sys.path:
     sys.path.append(ROOT_PATH)
 
-DEBUG = False
+DEBUG = True
 
 SITE_BRANDING = 'OpenStack Dashboard'
 

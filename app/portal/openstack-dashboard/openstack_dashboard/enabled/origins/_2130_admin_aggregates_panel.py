@@ -1,8 +1,9 @@
 # The slug of the panel to be added to HORIZON_CONFIG. Required.
-PANEL = 'instances'
+PANEL = 'aggregates'
 # The slug of the dashboard the PANEL associated with. Required.
-PANEL_DASHBOARD = 'project'
+PANEL_DASHBOARD = 'admin'
 # The slug of the panel group the PANEL is associated with.
 PANEL_GROUP = 'compute'
+
 # Python panel class of the PANEL to be added.
-ADD_PANEL = 'openstack_dashboard.dashboards.project.instances.panel.Instances'
+ADD_PANEL = 'openstack_dashboard.dashboards.admin.aggregates.panel.Aggregates'
