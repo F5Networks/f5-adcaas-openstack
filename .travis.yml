@@ -24,3 +24,11 @@ jobs:
         skip_cleanup: true
         script:
           - scripts/publish_api_ref.sh
+    - stage: fvt
+      before_script:
+        - pushd scripts
+        - ./vpn_install.sh
+        - ./vpn_connect.sh
+        - popd
+      script:
+        - echo "No test"
