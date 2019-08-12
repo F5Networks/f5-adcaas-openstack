@@ -7,12 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from openstack_dashboard.settings import HORIZON_CONFIG
 
-DEBUG = True
+DEBUG = False
 
 # This setting controls whether or not compression is enabled. Disabling
 # compression makes Horizon considerably slower, but makes it much easier
 # to debug JS and CSS changes
-#COMPRESS_ENABLED = not DEBUG
+COMPRESS_ENABLED = True
 
 # This setting controls whether compression happens on the fly, or offline
 # with `python manage.py compress`
@@ -187,8 +187,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #OPENSTACK_HOST = "127.0.0.1"
 #OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
-OPENSTACK_KEYSTONE_URL = "http://10.250.11.184:5000/v3"
-#OPENSTACK_KEYSTONE_URL = os.environ['OS_AUTH_URL']
+OPENSTACK_KEYSTONE_URL = os.environ['OS_AUTH_URL']
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
 
 # For setting the default service region on a per-endpoint basis. Note that the
@@ -495,9 +494,7 @@ TIME_ZONE = "UTC"
 # target installation.
 
 # Path to directory containing policy.json files
-#POLICY_FILES_PATH = '/etc/openstack-dashboard'
-this_dir = os.path.dirname(os.path.abspath(__file__))
-POLICY_FILES_PATH = os.path.join(this_dir, '../../etc-openstack-dashboard')
+POLICY_FILES_PATH = '/etc/openstack-dashboard'
 
 # Map of local copy of service policy files.
 # Please insure that your identity policy file matches the one being used on
