@@ -17,28 +17,91 @@
 import {model, property} from '@loopback/repository';
 import {CommonEntity, AS3Declaration} from '.';
 
+export type as3PolicyCompareString = {
+  caseSensitive?: boolean;
+  operand?: string;
+  values: string[];
+};
+
+export type as3PolicyCompareNumber = {
+  operand?: string;
+  values: string[];
+};
+
+const as3PolicyCompareStringProps = {
+  caseSensitive: {
+    type: 'boolean',
+  },
+  operand: {
+    enum: ['equals', 'starts-with', 'ends-with', 'contains'],
+  },
+  values: {
+    type: 'array',
+    minItems: 1,
+    maxItems: 100,
+    items: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 200,
+    },
+  },
+};
+
+const as3PolicyCompareStringShema = {
+  create: true,
+  update: true,
+  response: true,
+  example: {},
+  openapi: {
+    additionalProperties: false,
+    properties: as3PolicyCompareStringProps,
+  },
+};
+
+const as3PolicyCompareNumberProps = {
+  operand: {
+    enum: ['equals', 'less', 'greater', 'less-or-equal', 'greater-or-equal'],
+  },
+  values: {
+    type: 'array',
+    minItems: 1,
+    maxItems: 100,
+    items: {
+      type: 'integer',
+    },
+  },
+};
+
 @model()
 export class Condition extends CommonEntity {
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
     as3: {},
   })
-  all: object;
+  all: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  alpn: object;
+  alpn: as3PolicyCompareString;
 
   @property({
     type: 'string',
     required: false,
+    default: 'request',
     schema: {
       create: true,
+      update: true,
       response: true,
       example: 'request',
+      openapi: {
+        enum: ['request'],
+      },
     },
   })
   event: string;
@@ -46,14 +109,18 @@ export class Condition extends CommonEntity {
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  extension: object;
+  extension: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  host: object;
+  host: as3PolicyCompareString;
 
   @property({
     type: 'number',
@@ -63,7 +130,12 @@ export class Condition extends CommonEntity {
       update: true,
       response: true,
       example: 1,
+      openapi: {
+        type: 'integer',
+        minimum: 1,
+      },
     },
+    as3: {},
   })
   index: number;
 
@@ -71,56 +143,88 @@ export class Condition extends CommonEntity {
     type: 'boolean',
     required: false,
     default: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: false,
+    },
+    as3: {},
   })
   normalized: boolean;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  npn: object;
+  npn: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  path: object;
+  path: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  pathSegment: object;
+  pathSegment: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: {},
+      openapi: {
+        additionalProperties: false,
+        properties: as3PolicyCompareNumberProps,
+      },
+    },
+    as3: {},
   })
-  port: object;
+  port: as3PolicyCompareNumber;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  queryParameter: object;
+  queryParameter: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  queryString: object;
+  queryString: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  scheme: object;
+  scheme: as3PolicyCompareString;
 
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  serverName: object;
+  serverName: as3PolicyCompareString;
 
   @property({
     type: 'string',
@@ -129,6 +233,9 @@ export class Condition extends CommonEntity {
       create: true,
       response: true,
       example: 'httpUri',
+      openapi: {
+        enum: ['httpHeader', 'httpUri', 'httpCookie', 'sslExtension'],
+      },
     },
     as3: {},
   })
@@ -137,8 +244,10 @@ export class Condition extends CommonEntity {
   @property({
     type: 'object',
     required: false,
+    schema: as3PolicyCompareStringShema,
+    as3: {},
   })
-  unnamedQueryParameter: object;
+  unnamedQueryParameter: as3PolicyCompareString;
 
   @property({
     type: 'string',

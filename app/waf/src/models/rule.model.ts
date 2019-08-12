@@ -23,8 +23,14 @@ export class Rule extends CommonEntity {
     type: 'string',
     required: true,
     schema: {
+      create: true,
+      update: true,
+      required: true,
       response: true,
       example: '2d3h896a-4d82-40ee-8d08-55550db1234',
+      openapi: {
+        format: 'uuid',
+      },
     },
   })
   endpointpolicyId: string;

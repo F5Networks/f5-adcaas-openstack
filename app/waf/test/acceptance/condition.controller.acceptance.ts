@@ -74,6 +74,30 @@ describe('ConditionController', () => {
       .and.type('string');
   });
 
+  it(
+    'post ' + prefix + '/rules/{ruleId}/conditions with invalid compare string',
+    async () => {
+      const rule = await givenRuleData(wafapp);
+      const condition = {
+        type: 'httpUri',
+        path: {
+          abc: 123,
+        },
+      };
+
+      let response = await client
+        .post(prefix + `/rules/${rule.id}/conditions`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(condition)
+        .expect(422);
+
+      expect(response.body.error.details[0].code).to.equal(
+        'additionalProperties',
+      );
+    },
+  );
+
   it('get ' + prefix + '/rules/{ruleId}/conditions/{conditionId}', async () => {
     const rule = await givenRuleData(wafapp);
     const condition = await givenConditionData(wafapp, {
