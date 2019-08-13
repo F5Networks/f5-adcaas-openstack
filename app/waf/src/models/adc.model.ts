@@ -17,6 +17,110 @@
 import {model, property, Entity} from '@loopback/repository';
 import {CommonEntity} from '.';
 
+const adcComputeProps = {
+  imageRef: {
+    type: 'string',
+    format: 'uuid',
+  },
+  flavorRef: {
+    type: 'string',
+    // format: 'uuid',
+  },
+  sshKey: {
+    type: 'string',
+  },
+  userData: {
+    type: 'string',
+  },
+};
+
+const mgmt1Props = {
+  type: {
+    type: 'string',
+    enum: ['mgmt'],
+  },
+  networkId: {
+    type: 'string',
+    format: 'uuid',
+  },
+  fixedIp: {
+    type: 'string',
+    format: 'ipv4',
+  },
+};
+
+const failover1Props = {
+  type: {
+    type: 'string',
+    enum: ['ha'],
+  },
+  networkId: {
+    type: 'string',
+    format: 'uuid',
+  },
+  fixedIp: {
+    type: 'string',
+    format: 'ipv4',
+  },
+};
+
+const internal1Props = {
+  type: {
+    type: 'string',
+    enum: ['int'],
+  },
+  networkId: {
+    type: 'string',
+    format: 'uuid',
+  },
+  fixedIp: {
+    type: 'string',
+    format: 'ipv4',
+  },
+};
+
+const external2Props = {
+  type: {
+    type: 'string',
+    enum: ['ext'],
+  },
+  networkId: {
+    type: 'string',
+    format: 'uuid',
+  },
+  fixedIp: {
+    type: 'string',
+    format: 'ipv4',
+  },
+  floatingIp: {
+    type: 'string',
+    format: 'ipv4',
+  },
+};
+
+const adcNetworksProps = {
+  mgmt1: {
+    type: 'object',
+    properties: mgmt1Props,
+    additionalProperties: false,
+  },
+  failover1: {
+    type: 'object',
+    properties: failover1Props,
+    additionalProperties: false,
+  },
+  internal1: {
+    type: 'object',
+    properties: internal1Props,
+    additionalProperties: false,
+  },
+  external2: {
+    type: 'object',
+    properties: external2Props,
+    additionalProperties: false,
+  },
+};
+
 export type ConfigTypes = {
   type: string;
   //platformType: 'OpenStack';
@@ -75,6 +179,10 @@ export class Adc extends CommonEntity {
       response: true,
       required: true,
       example: 'VE',
+      openapi: {
+        // modify this list when deleting HW path
+        enum: ['VE', 'HW'],
+      },
     },
   })
   type: string;
@@ -83,9 +191,10 @@ export class Adc extends CommonEntity {
     type: 'object',
     required: true,
     schema: {
+      create: true,
       response: true,
       example: {
-        management: {
+        mgmt1: {
           type: 'mgmt',
           networkId: '80ccb4f0-5a9f-11e9-9721-3b33816a88bd',
           fixedIp: '172.16.11.100',
@@ -104,6 +213,12 @@ export class Adc extends CommonEntity {
           floatingIp: '10.250.14.160',
         },
       },
+      openapi: {
+        additionalProperties: false,
+        properties: adcNetworksProps,
+        minProperties: 4,
+        maxProperties: 4,
+      },
     },
   })
   networks: ConfigTypes['networks'];
@@ -119,6 +234,10 @@ export class Adc extends CommonEntity {
         imageRef: 'd4c52d70-5aa0-11e9-9721-3b33816a88bd',
         flavorRef: 'ff29d6b0-5aa0-11e9-9721-3b33816a88bd',
         userData: '#!/bin/bash \necho userData is optional \n',
+      },
+      openapi: {
+        additionalProperties: false,
+        properties: adcComputeProps,
       },
     },
   })

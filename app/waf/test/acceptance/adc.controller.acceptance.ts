@@ -116,7 +116,6 @@ describe('AdcController test', () => {
           password: 'admin',
           rootPass: 'default',
         },
-        networks: {},
       },
     });
 
@@ -257,6 +256,713 @@ describe('AdcController test', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .send(adc)
         .expect(400);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with invalid type value',
+    async function() {
+      const adc = createAdcObject({
+        name: 'ADC1',
+        type: 'whatever',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {},
+        },
+      });
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+      expect(response.body.error.details[0].code).to.equal('enum');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with invalid property in compute',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef23: '201906',
+            sshKey: 'abc',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with imageRef not being a uuid',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {
+            imageRef: '123456',
+            flavorRef: '201906',
+            sshKey: 'abc',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with flavorRef not being string',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: 201906,
+            sshKey: 'abc',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with sshKey not being string',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: 123,
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with userData not being string',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {},
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+            userData: 123,
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with property not being mgmt1',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1Not: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with more than 4 properties',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+            whatever: {
+              type: 'whatever',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with less than 4 properties',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with type of internal1 not int',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'whatever',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with networkId of external2 not uuid',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: 123,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with invalid property in mgmt1',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+              whatever: 'whatever',
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with fixedIp invalid',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: '123',
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with floatingIp invalid',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '123',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    },
+  );
+
+  it(
+    'post ' + prefix + '/adcs: create ADC with invalid property in failover1',
+    async function() {
+      const adc = {
+        name: 'ADC2',
+        type: 'VE',
+        management: {
+          connection: {
+            ipAddress: ExpectedData.networks.management.ipAddr,
+            tcpPort: ExpectedData.bigipMgmt.tcpPort,
+            username: 'admin',
+            password: 'admin',
+            rootPass: 'default',
+          },
+          networks: {
+            mgmt1: {
+              type: 'mgmt',
+              networkId: ExpectedData.networks.management.networkId,
+              fixedIp: ExpectedData.networks.management.ipAddr,
+            },
+            failover1: {
+              type: 'ha',
+              networkId: ExpectedData.networks.ha.networkId,
+              fixedIp: ExpectedData.networks.ha.ipAddr,
+              whatever: 'whatever',
+            },
+            internal1: {
+              type: 'int',
+              networkId: ExpectedData.networks.internal.networkId,
+              fixedIp: ExpectedData.networks.internal.ipAddr,
+            },
+            external2: {
+              type: 'ext',
+              networkId: ExpectedData.networks.external.networkId,
+              fixedIp: ExpectedData.networks.external.ipAddr,
+              floatingIp: '10.250.14.160',
+            },
+          },
+          compute: {
+            imageRef: '0c571ff7-00ff-4e27-9f78-37e8dd31ef6d',
+            flavorRef: '201906',
+            sshKey: '123',
+          },
+        },
+      };
+
+      let response = await client
+        .post(prefix + '/adcs')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(adc)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
     },
   );
 
