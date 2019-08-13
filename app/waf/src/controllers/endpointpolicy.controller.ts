@@ -20,7 +20,6 @@ import {
   Filter,
   repository,
   Where,
-  EntityNotFoundError,
 } from '@loopback/repository';
 import {
   post,
@@ -50,10 +49,6 @@ const prefix = '/adcaas/v1';
 const createDesc: string = 'Endpointpolicy resource that need to be created';
 const updateDesc: string =
   'Endpointpolicy resource properties that need to be updated';
-
-const createRuleDesc: string = 'Rule resource that need to be created';
-const updateRuleDesc: string =
-  'Rule resource properties that need to be updated';
 
 export class EndpointpolicyController extends BaseController {
   constructor(
@@ -188,27 +183,6 @@ export class EndpointpolicyController extends BaseController {
     });
   }
 
-  @post(prefix + '/endpointpolicies/{endpointpolicyId}/rules', {
-    responses: {
-      '200': Schema.response(Rule, 'Successfully create rule resource'),
-      '400': Schema.badRequest('Invalid Rule resource'),
-      '422': Schema.unprocessableEntity('Unprocessable Rule resource'),
-    },
-  })
-  async createEndpointpolicyRule(
-    @param(
-      Schema.pathParameter('endpointpolicyId', 'Endpointpolicy resource ID'),
-    )
-    endpointpolicyId: string,
-    @requestBody(Schema.createRequest(Endpointpolicy, createRuleDesc))
-    rule: Partial<Rule>,
-  ): Promise<Response> {
-    const data = await this.endpointpolicyRepository
-      .rules(endpointpolicyId)
-      .create(rule, {tenantId: await this.tenantId});
-    return new Response(Rule, data);
-  }
-
   @get(prefix + '/endpointpolicies/{endpointpolicyId}/rules', {
     responses: {
       '200': Schema.collectionResponse(
@@ -227,75 +201,6 @@ export class EndpointpolicyController extends BaseController {
       .rules(endpointpolicyId)
       .find(undefined, {tenantId: await this.tenantId});
     return new CollectionResponse(Rule, data);
-  }
-
-  @get(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
-    responses: {
-      '200': Schema.collectionResponse(
-        Rule,
-        'Successfully retrieve rule resources',
-      ),
-    },
-  })
-  async getRuleByID(
-    @param(
-      Schema.pathParameter('endpointpolicyId', 'Endpointpolicy resource ID'),
-    )
-    endpointpolicyId: string,
-    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
-    ruleId: string,
-  ): Promise<Response> {
-    const data = await this.endpointpolicyRepository
-      .rules(endpointpolicyId)
-      .find({where: {id: ruleId}}, {tenantId: await this.tenantId});
-    if (data.length === 0) {
-      throw new EntityNotFoundError(Rule.name, ruleId);
-    } else {
-      return new Response(Rule, data[0]);
-    }
-  }
-
-  @del(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
-    responses: {
-      '204': {
-        description: 'Rules DELETE success',
-      },
-    },
-  })
-  async deleteRuleByID(
-    @param(
-      Schema.pathParameter('endpointpolicyId', 'Endpointpolicy resource ID'),
-    )
-    endpointpolicyId: string,
-    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
-    ruleId: string,
-  ) {
-    await this.endpointpolicyRepository
-      .rules(endpointpolicyId)
-      .delete({id: ruleId}, {tenantId: await this.tenantId});
-  }
-
-  @patch(prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}', {
-    responses: {
-      '200': {
-        description: 'Rule model instance',
-        content: {'application/json': {schema: {'x-ts-type': Rule}}},
-      },
-    },
-  })
-  async updateRuleByID(
-    @param(
-      Schema.pathParameter('endpointpolicyId', 'Endpointpolicy resource ID'),
-    )
-    endpointpolicyId: string,
-    @param(Schema.pathParameter('ruleId', 'Rule resource ID'))
-    ruleId: string,
-    @requestBody(Schema.updateRequest(Rule, updateRuleDesc))
-    rule: Partial<Rule>,
-  ): Promise<void> {
-    await this.endpointpolicyRepository
-      .rules(endpointpolicyId)
-      .patch(rule, {id: ruleId}, {tenantId: await this.tenantId});
   }
 
   @get(prefix + '/endpointpolicies/{endpointpolicyId}/services', {

@@ -187,48 +187,6 @@ describe('RuleController', () => {
   });
 
   it(
-    'delete ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
-    async () => {
-      const epp = await givenEndpointpolicyData(wafapp);
-      const rule = await givenRuleData(wafapp, {
-        id: uuid(),
-        endpointpolicyId: epp.id,
-      });
-
-      await client
-        .del(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(204);
-
-      await client
-        .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(404);
-    },
-  );
-
-  it(
-    'post ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules',
-    async () => {
-      const epp = await givenEndpointpolicyData(wafapp);
-      const rule = createRuleObject();
-
-      const response = await client
-        .post(prefix + `/endpointpolicies/${epp.id}/rules`)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .send(rule)
-        .expect(200);
-
-      expect(response.body.rule.id)
-        .to.not.empty()
-        .and.type('string');
-    },
-  );
-
-  it(
     'get ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules',
     async () => {
       const epp = await givenEndpointpolicyData(wafapp);
@@ -244,46 +202,6 @@ describe('RuleController', () => {
       expect(response.body.rules)
         .be.instanceOf(Array)
         .and.have.length(2);
-    },
-  );
-
-  it(
-    'get ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
-    async () => {
-      const epp = await givenEndpointpolicyData(wafapp);
-      const rule = await givenRuleData(wafapp, {
-        id: uuid(),
-        endpointpolicyId: epp.id,
-      });
-
-      const response = await client
-        .get(prefix + `/endpointpolicies/${epp.id}/rules/${rule.id}`)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-
-      expect(response.body.rule.id)
-        .to.not.empty()
-        .and.type('string');
-    },
-  );
-
-  it(
-    'patch ' + prefix + '/endpointpolicies/{endpointpolicyId}/rules/{ruleId}',
-    async () => {
-      const epp = await givenEndpointpolicyData(wafapp);
-      const ruleInDb = await givenRuleData(wafapp, {
-        id: uuid(),
-        endpointpolicyId: epp.id,
-      });
-      const rule = {name: 'test'};
-
-      await client
-        .patch(prefix + `/endpointpolicies/${epp.id}/rules/${ruleInDb.id}`)
-        .send(rule)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(204);
     },
   );
 });
