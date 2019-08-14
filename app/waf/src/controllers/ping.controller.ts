@@ -43,8 +43,6 @@ const PING_RESPONSE: ResponseObject = {
   },
 };
 
-const prefix = '/adcaas/v1';
-
 /**
  * A simple controller to bounce back http requests
  */
@@ -52,7 +50,7 @@ export class PingController {
   constructor(@inject(RestBindings.Http.REQUEST) private req: Request) {}
 
   // Map to `GET /ping`
-  @get(prefix + '/ping', {
+  @get('/ping', {
     responses: {
       '200': PING_RESPONSE,
     },

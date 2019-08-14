@@ -24,9 +24,6 @@ import {
   setupDepApps,
   teardownDepApps,
 } from '../helpers/testsetup-helper';
-import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
-
-const prefix = '/adcaas/v1';
 
 describe('PingController', () => {
   let wafapp: WafApplication;
@@ -44,12 +41,8 @@ describe('PingController', () => {
     teardownEnvs();
   });
 
-  it('invokes GET ' + prefix + '/ping', async () => {
-    const res = await client
-      .get(prefix + '/ping')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .expect(200);
+  it('invokes GET /ping', async () => {
+    const res = await client.get('/ping').expect(200);
 
     expect(res.body).to.containEql({
       greeting: 'Hello from F5 ADCaaS for OpenStack',
