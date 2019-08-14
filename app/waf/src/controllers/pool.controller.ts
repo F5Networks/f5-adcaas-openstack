@@ -27,8 +27,14 @@ import {
   RequestContext,
   RestBindings,
 } from '@loopback/rest';
-import {Pool, Member} from '../models';
-import {PoolRepository, MemberRepository} from '../repositories';
+import {Pool, Member, Monitor} from '../models';
+import {
+  PoolRepository,
+  MemberRepository,
+  MonitorRepository,
+  PoolMonitorAssociationRepository,
+  MemberMonitorAssociationRepository,
+} from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
 import {BaseController} from './base.controller';
 import {inject} from '@loopback/core';
@@ -46,6 +52,12 @@ export class PoolController extends BaseController {
     public poolRepository: PoolRepository,
     @repository(MemberRepository)
     public memberRepository: MemberRepository,
+    @repository(MonitorRepository)
+    public monitorRepository: MonitorRepository,
+    @repository(PoolMonitorAssociationRepository)
+    public poolMonitorAssociationRepository: PoolMonitorAssociationRepository,
+    @repository(MemberMonitorAssociationRepository)
+    public memberMonitorAssociationRepository: MemberMonitorAssociationRepository,
     @inject(RestBindings.Http.CONTEXT)
     protected reqCxt: RequestContext,
   ) {
@@ -241,5 +253,139 @@ export class PoolController extends BaseController {
     await this.poolRepository
       .members(pool_id)
       .patch(member, {and: [{id: member_id}, {tenantId: await this.tenantId}]});
+  }
+
+  @get(prefix + '/pools/{poolId}/monitors', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Monitor,
+        'Successfully retrieve Monitor resources',
+      ),
+    },
+  })
+  async findMonitorsOfPool(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID')) id: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.poolMonitorAssociationRepository.find({
+      where: {
+        poolId: id,
+      },
+    });
+
+    let monitorIds = assocs.map(({monitorId}) => monitorId);
+    return new CollectionResponse(
+      Monitor,
+      await this.monitorRepository.find(
+        {
+          where: {
+            id: {
+              inq: monitorIds,
+            },
+          },
+        },
+        {tenantId: await this.tenantId},
+      ),
+    );
+  }
+
+  @get(prefix + '/pools/{poolId}/monitors/{monitorId}', {
+    responses: {
+      '200': Schema.response(Monitor, 'Successfully retrieve Monitor resource'),
+    },
+  })
+  async findMointorOfPool(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    poolId: string,
+    @param(Schema.pathParameter('monitorId', 'Pool resource ID'))
+    monitorId: string,
+  ): Promise<Response> {
+    let assocs = await this.poolMonitorAssociationRepository.find({
+      where: {
+        poolId: poolId,
+        monitorId: monitorId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      return new Response(
+        Monitor,
+        await this.monitorRepository.findById(assocs[0].monitorId, undefined, {
+          tenantId: await this.tenantId,
+        }),
+      );
+    }
+  }
+
+  @get(prefix + '/pools/{poolId}/members/{memberId}/monitors', {
+    responses: {
+      '200': Schema.collectionResponse(
+        Monitor,
+        'Successfully retrieve Monitor resources',
+      ),
+    },
+  })
+  async findMonitorsOfMember(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    poolId: string,
+    @param(Schema.pathParameter('memberId', 'Member resource ID'))
+    memberId: string,
+  ): Promise<CollectionResponse> {
+    let assocs = await this.memberMonitorAssociationRepository.find({
+      where: {
+        memberId: memberId,
+      },
+    });
+    let monitorIds = assocs.map(({monitorId}) => monitorId);
+    return new CollectionResponse(
+      Monitor,
+      await this.monitorRepository.find(
+        {
+          where: {
+            id: {
+              inq: monitorIds,
+            },
+          },
+        },
+        {tenantId: await this.tenantId},
+      ),
+    );
+  }
+
+  @get(prefix + '/pools/{poolId}/members/{memberId}/monitors/{monitorId}', {
+    responses: {
+      '200': Schema.response(
+        Monitor,
+        'Successfully retrieve  Monitor resources',
+      ),
+      '404': Schema.notFound('Cannot find assoociation or Monitor resource'),
+    },
+  })
+  async findMonitorOfMember(
+    @param(Schema.pathParameter('poolId', 'Pool resource ID'))
+    poolId: string,
+    @param(Schema.pathParameter('memberId', 'Member resource ID'))
+    memberId: string,
+    @param(Schema.pathParameter('monitorId', 'Monitor resource ID'))
+    monitorId: string,
+  ): Promise<Response> {
+    let assocs = await this.memberMonitorAssociationRepository.find({
+      where: {
+        memberId: memberId,
+        monitorId: monitorId,
+      },
+    });
+
+    if (assocs.length === 0) {
+      throw new HttpErrors.NotFound('Cannot find association.');
+    } else {
+      return new Response(
+        Monitor,
+        await this.monitorRepository.findById(assocs[0].monitorId, undefined, {
+          tenantId: await this.tenantId,
+        }),
+      );
+    }
   }
 }

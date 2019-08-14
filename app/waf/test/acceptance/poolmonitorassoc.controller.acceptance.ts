@@ -59,11 +59,11 @@ describe('PoolMonitorAssociationController', () => {
     teardownEnvs();
   });
 
-  it('post ' + prefix + '/pools/{poolId}/monitors/{monitorId}', async () => {
+  it('post ' + prefix + '/monitors/{monitorId}/pools/{poolId}', async () => {
     let pool = await givenPoolData(wafapp);
     let monitor = await givenMonitorData(wafapp);
     await client
-      .post(prefix + '/pools/' + pool.id + '/monitors/' + monitor.id)
+      .post(prefix + '/monitors/' + monitor.id + '/pools/' + pool.id)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .send()
@@ -73,10 +73,10 @@ describe('PoolMonitorAssociationController', () => {
   it(
     'post ' +
       prefix +
-      '/pools/{poolId}/monitors/{monitorId}: non-existing Pool',
+      '/monitors/{monitorId}/pools/{poolId}: non-existing Pool',
     async () => {
       await client
-        .post(prefix + '/pools/non-existing/monitors/any')
+        .post(prefix + '/monitors/any/pools/non-existing')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send()
@@ -257,7 +257,7 @@ describe('PoolMonitorAssociationController', () => {
   it(
     'delete ' +
       prefix +
-      '/pools/{poolId}/monitors/{monitorId}: deassociate Monitor from a Pool',
+      '/monitors/{monitorId}/pools/{poolId}: deassociate Monitor from a Pool',
     async () => {
       let pool = await givenPoolData(wafapp);
       let monitor = await givenMonitorData(wafapp);
@@ -273,7 +273,7 @@ describe('PoolMonitorAssociationController', () => {
         .expect(200);
 
       await client
-        .del(prefix + '/pools/' + assoc.poolId + '/monitors/' + assoc.monitorId)
+        .del(prefix + '/monitors/' + assoc.monitorId + '/pools/' + assoc.poolId)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(204);

@@ -45,7 +45,7 @@ import {
   ApplicationRepository,
   DeclarationRepository,
   PoolRepository,
-  PoolMonitorAssocRepository,
+  PoolMonitorAssociationRepository,
   MemberMonitorAssociationRepository,
   MonitorRepository,
   WafpolicyRepository,
@@ -79,8 +79,8 @@ export class DeclarationController extends BaseController {
     public poolRepository: PoolRepository,
     @repository(MonitorRepository)
     public monitorRepository: MonitorRepository,
-    @repository(PoolMonitorAssocRepository)
-    public poolMonitorAssociationRepository: PoolMonitorAssocRepository,
+    @repository(PoolMonitorAssociationRepository)
+    public poolMonitorAssociationRepository: PoolMonitorAssociationRepository,
     @repository(MemberMonitorAssociationRepository)
     public memberMonitorAssociationRepository: MemberMonitorAssociationRepository,
     @repository(WafpolicyRepository)

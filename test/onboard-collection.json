@@ -1596,15 +1596,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/pools/{{POOL_ID}}/monitors/{{MONITOR_HTTP_ID}}",
+							"raw": "{{ADCAAS_URL}}/monitors/{{MONITOR_HTTP_ID}}/pools/{{POOL_ID}}",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
 							"path": [
-								"pools",
-								"{{POOL_ID}}",
 								"monitors",
-								"{{MONITOR_HTTP_ID}}"
+								"{{MONITOR_HTTP_ID}}",
+								"pools",
+								"{{POOL_ID}}"
 							]
 						}
 					},
@@ -1650,15 +1650,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/members/{{MEMBER_ID}}/monitors/{{MONITOR_ICMP_ID}}",
+							"raw": "{{ADCAAS_URL}}/monitors/{{MONITOR_ICMP_ID}}/members/{{MEMBER_ID}}",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
 							"path": [
-								"members",
-								"{{MEMBER_ID}}",
 								"monitors",
-								"{{MONITOR_ICMP_ID}}"
+								"{{MONITOR_ICMP_ID}}",
+								"members",
+								"{{MEMBER_ID}}"
 							]
 						}
 					},

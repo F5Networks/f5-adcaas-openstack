@@ -30,7 +30,7 @@ import {
   ActionRepository,
   MonitorRepository,
   MemberMonitorAssociationRepository,
-  PoolMonitorAssocRepository,
+  PoolMonitorAssociationRepository,
 } from '../../src/repositories';
 
 import {
@@ -95,7 +95,7 @@ export async function givenEmptyDatabase(wafapp: WafApplication) {
   );
   await memberMonitorRepo.deleteAll();
   const poolmonitorRepo = await wafapp.getRepository(
-    PoolMonitorAssocRepository,
+    PoolMonitorAssociationRepository,
   );
   await poolmonitorRepo.deleteAll();
 }
@@ -526,7 +526,7 @@ export async function givePoolMonitorAssociationData(
   wafapp: WafApplication,
   data?: Partial<PoolMonitorAssociation>,
 ) {
-  const repo = await wafapp.getRepository(PoolMonitorAssocRepository);
+  const repo = await wafapp.getRepository(PoolMonitorAssociationRepository);
 
   return await repo.create(createPoolMonitorAssociationObject(data));
 }

@@ -62,10 +62,10 @@ describe('MemberMonitorAssociationController', () => {
   it(
     'post ' +
       prefix +
-      '/members/{memberId}/monitors/{monitorId}: non-existing Monitor',
+      '/monitors/{monitorId}/members/{memberId}: non-existing Monitor',
     async () => {
       await client
-        .post(prefix + '/members/1234/monitors/non-existing')
+        .post(prefix + '/monitors/non-existing/members/1234')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send()
@@ -74,12 +74,12 @@ describe('MemberMonitorAssociationController', () => {
   );
 
   it(
-    'post ' + prefix + '/members/{memberId}/montiors/{monitorId}',
+    'post ' + prefix + '/monitors/{monitorId}/members/{memberId}',
     async () => {
       let monitor = await givenMonitorData(wafapp);
       let member = await givenMemberData(wafapp, {poolId: uuid()});
       await client
-        .post(prefix + '/members/' + member.id + '/monitors/' + monitor.id)
+        .post(prefix + '/monitors/' + monitor.id + '/members/' + member.id)
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send()
@@ -90,7 +90,7 @@ describe('MemberMonitorAssociationController', () => {
   it(
     'get ' +
       prefix +
-      '/members/{id}/monitors: find Monitors associated with a Member',
+      '/pools/{poolId}/members/{memberId}/monitors: find Monitors associated with a Member',
     async () => {
       let monitor = await givenMonitorData(wafapp);
       let assoc = await giveMemberMonitorAssociationData(wafapp, {
@@ -98,7 +98,14 @@ describe('MemberMonitorAssociationController', () => {
       });
 
       let response = await client
-        .get(prefix + '/members/' + assoc.memberId + '/monitors')
+        .get(
+          prefix +
+            '/pools/' +
+            uuid() +
+            '/members/' +
+            assoc.memberId +
+            '/monitors',
+        )
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
@@ -109,10 +116,10 @@ describe('MemberMonitorAssociationController', () => {
   it(
     'get ' +
       prefix +
-      '/members/{id}/monitors: no Monitor associated with a Member',
+      '/pools/{poolId}/members/{memberId}/monitors: no Monitor associated with a Member',
     async () => {
       await client
-        .get(prefix + '/members/' + uuid() + '/monitors')
+        .get(prefix + '/pools/' + uuid() + '/members/' + uuid() + '/monitors')
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
@@ -175,10 +182,10 @@ describe('MemberMonitorAssociationController', () => {
   it(
     'delete' +
       prefix +
-      '/members/{memberId}/monitors/{monitorId}: deassociate non-existing association',
+      '/monitors/{monitorId}/members/{memberId}: deassociate non-existing association',
     async () => {
       await client
-        .del(prefix + '/members/' + uuid() + '/monitors/' + uuid())
+        .del(prefix + '/monitors/' + uuid() + '/members/' + uuid())
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(404);
@@ -188,7 +195,7 @@ describe('MemberMonitorAssociationController', () => {
   it(
     'delete ' +
       prefix +
-      '/members/{memberId}/monitors/{monitorId}: deassociate Monitor from a Member',
+      '/monitors/{monitorId}/members/{memberId}: deassociate Monitor from a Member',
     async () => {
       let member = await givenMemberData(wafapp, {poolId: uuid()});
       let monitor = await givenMonitorData(wafapp);
@@ -200,10 +207,10 @@ describe('MemberMonitorAssociationController', () => {
       await client
         .get(
           prefix +
-            '/members/' +
-            assoc.memberId +
             '/monitors/' +
-            assoc.monitorId,
+            assoc.monitorId +
+            '/members/' +
+            assoc.memberId,
         )
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
@@ -212,10 +219,10 @@ describe('MemberMonitorAssociationController', () => {
       await client
         .del(
           prefix +
-            '/members/' +
-            assoc.memberId +
             '/monitors/' +
-            assoc.monitorId,
+            assoc.monitorId +
+            '/members/' +
+            assoc.memberId,
         )
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
@@ -224,10 +231,10 @@ describe('MemberMonitorAssociationController', () => {
       await client
         .get(
           prefix +
-            '/members/' +
-            assoc.memberId +
             '/monitors/' +
-            assoc.monitorId,
+            assoc.monitorId +
+            '/members/' +
+            assoc.memberId,
         )
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
