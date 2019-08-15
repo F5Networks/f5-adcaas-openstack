@@ -1014,29 +1014,15 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "X-Auth-Token",
-								"value": "{{TOKEN}}",
-								"type": "text"
-							},
-							{
-								"key": "Tenant-Id",
-								"value": "{{OS_PROJECT_ID}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/ping",
+							"raw": "{{PING_URL}}",
 							"host": [
-								"{{ADCAAS_URL}}"
-							],
-							"path": [
-								"ping"
+								"{{PING_URL}}"
 							]
 						}
 					},
@@ -1208,17 +1194,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"setup\": null\n}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}/action",
+							"raw": "{{ADCAAS_URL}}/adcs/{{ADC_ID}}/setup",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
 							"path": [
 								"adcs",
 								"{{ADC_ID}}",
-								"action"
+								"setup"
 							]
 						}
 					},
