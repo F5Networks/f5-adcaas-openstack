@@ -68,10 +68,10 @@ The docker repository is owed by either users themselves or F5Networks.
 2. Run docker build command mentioned in *\<localrepo>/app/waf/Dockerfile*.
 
    ```
-   docker build . -t f5devcentral/f5-wafaas-openstack:latest
+   docker build . -t f5devcentral/f5-openstack-services:latest
    ```
 
-   Note that: Change *f5devcentral/f5-wafaas-openstack* to your own *[repo/tag:version]*.
+   Note that: Change *f5devcentral/f5-openstack-services* to your own *[repo/tag:version]*.
 
 ### Publish WAFaaS Image To Docker Repository
 

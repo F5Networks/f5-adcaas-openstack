@@ -1,15 +1,15 @@
 # build with:
-#   docker build . -t f5devcentral/f5-wafaas-openstack:latest
+#   docker build . -t f5devcentral/f5-openstack-services:latest
 
 # upload image with (authorized user only)
-#   docker push f5devcentral/f5-wafaas-openstack:latest
+#   docker push f5devcentral/f5-openstack-services:latest
 
 # run with:
 #    export <necessary envs> && \
-#    docker run -it --name f5-wafaas-openstack-server \
+#    docker run -it --name f5-openstack-services-api \
 #        -p 3000:3000 \
 #        --link postgres-server --link as3-server \
-#        waff5-wafaas-openstack:latest
+#        f5-openstack-services:latest
 
 FROM node:11-alpine
 
