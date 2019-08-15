@@ -104,7 +104,7 @@ export class MySequence implements SequenceHandler {
   async authRequest(context: RequestContext) {
     let {request} = context;
 
-    let ignoredAuthPaths = ['/openapi.json', '/explorer'];
+    let ignoredAuthPaths = ['/openapi.json', '/explorer', '/ping'];
     for (let u of ignoredAuthPaths) {
       if (request.path.startsWith(u)) return;
     }

@@ -21,8 +21,6 @@ import {checkAndWait} from './utils';
 
 export {WafApplication};
 
-const prefix = '/adcaas/v1';
-
 export async function main(options: ApplicationConfig = {}) {
   const app = new WafApplication(options);
   await app.boot();
@@ -42,7 +40,7 @@ export async function main(options: ApplicationConfig = {}) {
 
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
-  console.log(`Try ${url}${prefix}/ping`);
+  console.log(`Try ${url}/ping`);
 
   return app;
 }
