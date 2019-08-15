@@ -1731,35 +1731,37 @@ Reason:
   },
 
   onboardingServerError500: () => {
-    return {
-      code: 500,
-      status: 'ERROR',
-      message: 'invalid config - rolled back',
-      errors: [
-        "No offerings found for regkey pool license 'mykeypool-all' and the given search criteria (none)",
-      ],
-      declaration: {
-        schemaVersion: '1.3.0',
-        class: 'Device',
-        label: 'Basic onboarding',
-        async: false,
-        Common: {
-          class: 'Tenant',
-          hostname: ExpectedData.bigipMgmt.hostname,
-          myLicense: {
-            class: 'License',
-            licenseType: 'licensePool',
-            bigIqHost: '10.250.15.119',
-            bigIqUsername: 'admin',
-            licensePool: 'mykeypool-all',
-            reachable: true,
-            bigIpUsername: 'admin',
-            unitOfMeasure: 'monthly',
-            overwrite: false,
-          },
-        },
-      },
-    };
+    throw new HttpErrors.InternalServerError('invalid config - rolled back');
+    // keep the comments here to indicate the real 500 error looks like.
+    // return {
+    //   code: 500,
+    //   status: 'ERROR',
+    //   message: 'invalid config - rolled back',
+    //   errors: [
+    //     "No offerings found for regkey pool license 'mykeypool-all' and the given search criteria (none)",
+    //   ],
+    //   declaration: {
+    //     schemaVersion: '1.3.0',
+    //     class: 'Device',
+    //     label: 'Basic onboarding',
+    //     async: false,
+    //     Common: {
+    //       class: 'Tenant',
+    //       hostname: ExpectedData.bigipMgmt.hostname,
+    //       myLicense: {
+    //         class: 'License',
+    //         licenseType: 'licensePool',
+    //         bigIqHost: '10.250.15.119',
+    //         bigIqUsername: 'admin',
+    //         licensePool: 'mykeypool-all',
+    //         reachable: true,
+    //         bigIpUsername: 'admin',
+    //         unitOfMeasure: 'monthly',
+    //         overwrite: false,
+    //       },
+    //     },
+    //   },
+    // };
   },
 
   onboardingSucceed202: () => {
