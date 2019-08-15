@@ -11,10 +11,10 @@ import {AdcStateCtrlr, AddonReqValues} from '../../src/controllers';
 import {Adc} from '../../src/models';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
 import {
-  StubResponses,
-  ExpectedData,
   RestApplicationPort,
+  StubResponses,
   LetResponseWith,
+  ExpectedData,
 } from '../fixtures/datasources/testrest.datasource';
 
 type CheckEntry = {

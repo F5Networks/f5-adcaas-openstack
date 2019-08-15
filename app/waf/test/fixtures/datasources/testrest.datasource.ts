@@ -2256,7 +2256,7 @@ export const DefaultResponseWith: TypeResponseWith = {
   bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info200,
   bigip_get_mgmt_tm_sys_folder__partition: StubResponses.bigipPartition200,
   bigip_get_mgmt_shared_declarative_onboarding_info:
-    StubResponses.bigipDOInfo200,
+    StubResponses.bigipDOInfoOK200,
   bigip_post_mgmt_shared_file_transfer_uploads_filename:
     StubResponses.bigipDOUpload200,
   bigip_post_mgmt_shared_iapp_package_management_tasks:
