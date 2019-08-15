@@ -3,6 +3,8 @@ services:
   portal:
     image: f5devcentral/f5-services-portal:latest
     container_name: PORTAL
+    env_file:
+      - ./appcluster.rc
     ports:
       - 8245:80
     depends_on:
