@@ -37,6 +37,7 @@ export const Environments: {[key: string]: string} = {
   OS_TENANT_ID: '32b8bef6100e4cb0a984a7c1f9027802',
   OS_DOMAIN_NAME: 'Default',
   OS_REGION_NAME: 'RegionOne',
+  OS_INTERFACE: 'public',
   OS_AVAILABLE_ZONE: 'nova',
   OS_FLOATINGIP_NETWORK_ID: 'a33f84be-e058-482b-9efd-5cef248a6ca4',
   DO_ENDPOINT: 'http://localhost:' + RestApplicationPort.Onboarding,
