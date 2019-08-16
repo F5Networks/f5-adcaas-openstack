@@ -12,7 +12,7 @@ ADCaas is not concerned with the OS type (Windows, Mac OS, Linux), hypervisor la
 
 From the [``docker-compose.yml``](https://github.com/F5Networks/f5-adcaas-openstack/blob/master/deploy/docker-compose.yml), the ADCaaS runtime consists of the following containers:
 
-- **WAFAAS**
+- **ADCAAS**
   <br>
   The main application responsible for providing RESTful APIs for the following:
 
@@ -101,17 +101,17 @@ The following chart shows the container interactions:
 ## Environment variable setttings
 The configuration file for ADCaaS application is [`appcluster.rc`](https://github.com/F5Networks/f5-adcaas-openstack/blob/master/deploy/appcluster.rc). The following details the way the variables are categorized: 
 
-- WAFaaS configuration: 
+- ADCaaS configuration: 
   
-  `WAF_APP_PORT`: The port WAFaas listens on. Default: `3000`, http, or https.
+  `ADCAAS_APP_PORT`: The port WAFaas listens on. Default: `3000`, http, or https.
   
-  `WAF_APP_HOST`: Default: `0.0.0.0`.
+  `ADCAAS_APP_HOST`: Default: `0.0.0.0`.
   
-  `WAF_CERT_KEY`: Key file when using https. Default: `/var/data/certs/domain.key`.
+  `ADCAAS_CERT_KEY`: Key file when using https. Default: `/var/data/certs/domain.key`.
   
-  `WAF_CERT_CRT`: Cert file when using https. Default: `/var/data/certs/domain.crt`.
+  `ADCAAS_CERT_CRT`: Cert file when using https. Default: `/var/data/certs/domain.crt`.
   
-  `WAF_ENABLE_HTTPS`: Whether to use https. Default: `false`.
+  `ADCAAS_ENABLE_HTTPS`: Whether to use https. Default: `false`.
 
 - Postgres configuration: 
 

@@ -15,13 +15,13 @@ services:
 #        fluentd-address: "0.0.0.0:24224"
 #        tag: f5-portal
 
-  wafaas:
+  adcaas:
     image: f5devcentral/f5-openstack-services:adcaas-latest
-    container_name: WAFAAS
+    container_name: ADCAAS
     env_file:
       - ./appcluster.rc
     ports:
-      - ${WAF_APP_PORT:-3000}:3000
+      - ${ADCAAS_APP_PORT:-3000}:3000
     depends_on:
       - postgres
       - ASG
@@ -38,7 +38,7 @@ services:
       driver: fluentd
       options:
         fluentd-address: "0.0.0.0:24224"
-        tag: f5-wafaas
+        tag: f5-adcaas
 
   postgres:
     image: postgres:11.1
@@ -133,5 +133,5 @@ services:
 #     ipam:
 #       driver: default
 #       config:
-#       - subnet: ${WAF_APP_NETWORK-172.16.238.0/24}
+#       - subnet: ${ADCAAS_APP_NETWORK-172.16.238.0/24}
 

@@ -1,5 +1,5 @@
-WAF_APP_PORT=3000
-WAF_APP_HOST=0.0.0.0
+ADCAAS_APP_PORT=3000
+ADCAAS_APP_HOST=0.0.0.0
 
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
@@ -47,6 +47,6 @@ VE_ASM_LEVEL=nominal
 ASG_HOST=asg-server
 ASG_PORT=443
 
-WAF_CERT_KEY=/var/data/certs/domain.key
-WAF_CERT_CRT=/var/data/certs/domain.crt
-WAF_ENABLE_HTTPS=false
+ADCAAS_CERT_KEY=/var/data/certs/domain.key
+ADCAAS_CERT_CRT=/var/data/certs/domain.crt
+ADCAAS_ENABLE_HTTPS=false
