@@ -137,7 +137,7 @@ describe('test OnboardingManager', async () => {
       await doMgr.isDone(ExpectedData.doTaskId);
       expect('call').eql('should not happen.');
     } catch (error) {
-      expect(error.message).startWith('Failed to query onboarding status: ');
+      expect(error).startWith('Failed to query onboarding status: ');
     }
   });
 });

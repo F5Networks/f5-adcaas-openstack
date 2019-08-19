@@ -18,15 +18,18 @@ import {sinon} from '@loopback/testlab';
 import {AbstractLogger} from 'typescript-logging';
 
 let consoleLog: sinon.SinonStub;
+let consoleError: sinon.SinonStub;
 let loggerFuncs: {[key: string]: sinon.SinonStub} = {};
 
 export function stubConsoleLog(): void {
   consoleLog = sinon.stub(console, 'log');
+  consoleError = sinon.stub(console, 'error');
   consoleLog.callsFake(() => {});
 }
 
 export function restoreConsoleLog(): void {
   consoleLog.restore();
+  consoleError.restore();
 }
 
 export function stubLogger() {

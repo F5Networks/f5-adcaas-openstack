@@ -38,9 +38,10 @@ export function deepcopy<T>(obj: T): T {
  * Check and wait until some condition is fulfilled or timeout.
  *
  * @param checkFunc: a function which
- *   resolves true if condition is satisfied;
- *   rejects true if condition failed and we quit waiting for it.
- *   Otherwise attempt to check the condition again after designated sleep interval.
+ *   resolves true if condition is satisfied and need to quit;
+ *   resolves false if condition is not satisfied and need to check again;
+ *   rejects reason, which is a string, if condition failed and we quit waiting for it.
+ *   Otherwise ... quit.
  * @param tryTimes: times for wait.
  * @param funcArgs: array of any.
  * @param intervalInMSecs: interval in milli-seconds for sleeping between 2 tries.
@@ -62,42 +63,41 @@ export async function checkAndWait(
   );
   if (tryTimes <= 0) {
     utilsLogger.error(`'${funcName}' timeout.`);
-    return Promise.reject(false);
+    return Promise.reject('timeout');
   }
 
-  let hdlr = async (b: boolean | Error): Promise<boolean> => {
-    utilsLogger.debug(
-      `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
-    );
-    if (typeof b === 'boolean' && b) return Promise.resolve(true);
-    else throw new Error();
-  };
-
-  let errHdlr = async (b: boolean | Error): Promise<boolean> => {
-    utilsLogger.debug(
-      `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
-    );
-    if (typeof b === 'boolean' && b)
-      throw new Error('checkAndWait error terminate');
-    else throw new Error();
-  };
-
-  try {
-    return await checkFunc(...funcArgs).then(hdlr, errHdlr);
-    //await checkFunc(...funcArgs);
-  } catch (error) {
-    if (error.message === 'checkAndWait error terminate') {
-      utilsLogger.error(`'${funcName}' failure quit.`);
-      return Promise.reject(true);
+  let hdlr = async (b: boolean): Promise<boolean> => {
+    if (b) {
+      utilsLogger.debug(
+        `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
+      );
+      return true;
+    } else {
+      utilsLogger.debug(
+        `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
+      );
+      await sleep(intervalInMSecs);
+      return await checkAndWait(
+        checkFunc,
+        tryTimes - 1,
+        funcArgs,
+        intervalInMSecs,
+      );
     }
-    await sleep(intervalInMSecs);
-    return await checkAndWait(
-      checkFunc,
-      tryTimes - 1,
-      funcArgs,
-      intervalInMSecs,
-    );
-  }
+  };
+
+  let errHdlr = async (reason: string | Error): Promise<boolean> => {
+    utilsLogger.error(`'${funcName}' failure quit.`);
+    if (typeof reason === 'string') {
+      return Promise.reject(reason);
+    } else if (reason instanceof Error) {
+      return Promise.reject(reason.message);
+    } else {
+      return Promise.reject('checkAndWait terminates due to unknown error');
+    }
+  };
+
+  return await checkFunc(...funcArgs).then(hdlr, errHdlr);
 }
 
 /**
