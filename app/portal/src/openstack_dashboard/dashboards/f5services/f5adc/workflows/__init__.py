@@ -1,5 +1,3 @@
-# Copyright 2012 Nebula, Inc.
-#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -12,15 +10,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.utils.translation import ugettext_lazy as _
+from openstack_dashboard.dashboards.f5services.f5adc.workflows.\
+    create_instance import LaunchInstance
+from openstack_dashboard.dashboards.f5services.f5adc.workflows.\
+    resize_instance import ResizeInstance
+from openstack_dashboard.dashboards.f5services.f5adc.workflows.\
+    update_instance import UpdateInstance
 
-import horizon
-from openstack_dashboard.dashboards.f5services import dashboard
-
-class F5adc(horizon.Panel):
-    name = _("ADC")
-    slug = 'f5adc'
-    permissions = ('openstack.services.compute',)
-
-
-dashboard.F5services.register(F5adc)
+__all__ = [
+    'LaunchInstance',
+    'ResizeInstance',
+    'UpdateInstance',
+]
