@@ -17,110 +17,6 @@
 import {model, property, Entity} from '@loopback/repository';
 import {CommonEntity} from '.';
 
-const adcComputeProps = {
-  imageRef: {
-    type: 'string',
-    format: 'uuid',
-  },
-  flavorRef: {
-    type: 'string',
-    // format: 'uuid',
-  },
-  sshKey: {
-    type: 'string',
-  },
-  userData: {
-    type: 'string',
-  },
-};
-
-const mgmt1Props = {
-  type: {
-    type: 'string',
-    enum: ['mgmt'],
-  },
-  networkId: {
-    type: 'string',
-    format: 'uuid',
-  },
-  fixedIp: {
-    type: 'string',
-    format: 'ipv4',
-  },
-};
-
-const failover1Props = {
-  type: {
-    type: 'string',
-    enum: ['ha'],
-  },
-  networkId: {
-    type: 'string',
-    format: 'uuid',
-  },
-  fixedIp: {
-    type: 'string',
-    format: 'ipv4',
-  },
-};
-
-const internal1Props = {
-  type: {
-    type: 'string',
-    enum: ['int'],
-  },
-  networkId: {
-    type: 'string',
-    format: 'uuid',
-  },
-  fixedIp: {
-    type: 'string',
-    format: 'ipv4',
-  },
-};
-
-const external2Props = {
-  type: {
-    type: 'string',
-    enum: ['ext'],
-  },
-  networkId: {
-    type: 'string',
-    format: 'uuid',
-  },
-  fixedIp: {
-    type: 'string',
-    format: 'ipv4',
-  },
-  floatingIp: {
-    type: 'string',
-    format: 'ipv4',
-  },
-};
-
-const adcNetworksProps = {
-  mgmt1: {
-    type: 'object',
-    properties: mgmt1Props,
-    additionalProperties: false,
-  },
-  failover1: {
-    type: 'object',
-    properties: failover1Props,
-    additionalProperties: false,
-  },
-  internal1: {
-    type: 'object',
-    properties: internal1Props,
-    additionalProperties: false,
-  },
-  external2: {
-    type: 'object',
-    properties: external2Props,
-    additionalProperties: false,
-  },
-};
-
 export type ConfigTypes = {
   type: string;
   //platformType: 'OpenStack';
@@ -214,10 +110,31 @@ export class Adc extends CommonEntity {
         },
       },
       openapi: {
-        additionalProperties: false,
-        properties: adcNetworksProps,
+        additionalProperties: {
+          type: 'object',
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['mgmt', 'ha', 'int', 'ext'],
+            },
+            networkId: {
+              type: 'string',
+              format: 'uuid',
+            },
+            fixedIp: {
+              type: 'string',
+              format: 'ipv4',
+            },
+            floatingIp: {
+              type: 'string',
+              format: 'ipv4',
+            },
+          },
+          required: ['type', 'networkId'],
+          additionalProperties: false,
+        },
         minProperties: 4,
-        maxProperties: 4,
+        maxProperties: 100,
       },
     },
   })
@@ -236,8 +153,29 @@ export class Adc extends CommonEntity {
         userData: '#!/bin/bash \necho userData is optional \n',
       },
       openapi: {
+        properties: {
+          imageRef: {
+            type: 'string',
+            format: 'uuid',
+          },
+          flavorRef: {
+            type: 'string',
+            // format: 'uuid',
+            minLength: 1,
+            maxLength: 100,
+          },
+          sshKey: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 10000,
+          },
+          userData: {
+            type: 'string',
+            minLength: 1,
+          },
+        },
         additionalProperties: false,
-        properties: adcComputeProps,
+        required: ['imageRef', 'flavorRef'],
       },
     },
   })
