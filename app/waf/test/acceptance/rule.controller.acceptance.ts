@@ -58,8 +58,9 @@ describe('RuleController', () => {
     teardownEnvs();
   });
 
-  it('post ' + prefix + '/rules: with no id', async () => {
-    const rule = createRuleObject({endpointpolicyId: uuid()});
+  it('post ' + prefix + '/rules', async () => {
+    const policy = await givenEndpointpolicyData(wafapp);
+    const rule = createRuleObject({endpointpolicyId: policy.id});
 
     const response = await client
       .post(prefix + '/rules')
@@ -73,20 +74,15 @@ describe('RuleController', () => {
     expect(response.body.rule).to.containDeep(toJSON(rule));
   });
 
-  it('post ' + prefix + '/rules: no rule assocated', async () => {
-    const rule = createRuleObject({endpointpolicyId: uuid()});
+  it('post ' + prefix + '/rules: no policy associated', async () => {
+    const rule = createRuleObject();
 
-    const response = await client
+    await client
       .post(prefix + '/rules')
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .send(rule)
-      .expect(200);
-
-    expect(response.body.rule.id)
-      .to.not.empty()
-      .and.type('string');
-    expect(response.body.rule).to.containDeep(toJSON(rule));
+      .expect(422);
   });
 
   it('get ' + prefix + '/rules: of all', async () => {

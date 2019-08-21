@@ -17,6 +17,25 @@
 import {model, property} from '@loopback/repository';
 import {CommonEntity, AS3Declaration, Wafpolicy} from '.';
 
+export type as3PolicyActionInsert = {
+  name?: string;
+  value?: string;
+};
+
+export type as3PolicyActionRemove = {
+  name?: string;
+};
+
+export type as3PolicyActionReplace = {
+  name?: string;
+  value?: string;
+};
+
+export type as3PolicyActionForwardSelect = {
+  pool?: string;
+  service?: string;
+};
+
 @model()
 export class Action extends CommonEntity {
   @property({
@@ -32,11 +51,17 @@ export class Action extends CommonEntity {
     default: 'request',
     schema: {
       create: true,
+      update: true,
       response: true,
       example: 'request',
       openapi: {
-        minlength: 1,
-        maxLength: 50,
+        enum: [
+          'client-accepted',
+          'proxy-request',
+          'request',
+          'response',
+          'server-connected',
+        ],
       },
     },
   })
@@ -49,22 +74,43 @@ export class Action extends CommonEntity {
       create: true,
       update: true,
       response: true,
+      example: {
+        name: 'abc',
+        value: 'xyz',
+      },
+      openapi: {
+        additionalProperties: false,
+        properties: {
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 100,
+          },
+          value: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 100,
+          },
+        },
+      },
     },
     as3: {},
   })
-  insert?: object;
+  insert?: as3PolicyActionInsert;
 
   @property({
     type: 'string',
     required: false,
     schema: {
       create: true,
+      update: true,
       response: true,
       example: 'http://1.2.3.4/index.html',
     },
     openapi: {
       minLength: 1,
       maxLength: 200,
+      format: 'uri',
     },
   })
   location?: string;
@@ -79,8 +125,7 @@ export class Action extends CommonEntity {
       example: '2d3h896a-2312-40ee-8d08-55550dbc191',
     },
     openapi: {
-      minLength: 1,
-      maxLength: 200,
+      format: 'uuid',
     },
     as3: {
       type: 'bigip',
@@ -93,21 +138,88 @@ export class Action extends CommonEntity {
   @property({
     type: 'object',
     required: false,
-  })
-  remove?: object;
-
-  @property({
-    type: 'object',
-    required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: {
+        name: 'abc',
+      },
+      openapi: {
+        additionalProperties: false,
+        properties: {
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 100,
+          },
+        },
+      },
+    },
     as3: {},
   })
-  replace?: object;
+  remove?: as3PolicyActionRemove;
 
   @property({
     type: 'object',
     required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: {
+        name: 'abc',
+        value: 'xyz',
+      },
+      openapi: {
+        additionalProperties: false,
+        properties: {
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 100,
+          },
+          value: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 100,
+          },
+        },
+      },
+    },
+    as3: {},
   })
-  select?: object;
+  replace?: as3PolicyActionReplace;
+
+  @property({
+    type: 'object',
+    required: false,
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: {
+        pool: '2d3h896a-2312-40ee-8d08-55550dbc191',
+      },
+      openapi: {
+        additionalProperties: false,
+        properties: {
+          pool: {
+            type: 'string',
+            format: 'uuid',
+          },
+          service: {
+            type: 'string',
+            format: 'uuid',
+          },
+        },
+      },
+    },
+    as3: {
+      type: 'use',
+    },
+  })
+  select?: as3PolicyActionForwardSelect;
 
   @property({
     type: 'string',
@@ -119,8 +231,18 @@ export class Action extends CommonEntity {
       example: 'httpUri',
     },
     openapi: {
-      minLength: 1,
-      maxLength: 50,
+      enum: [
+        'http',
+        'httpCookie',
+        'httpHeader',
+        'httpRedirect',
+        'httpUri',
+        'waf',
+        'forward',
+        'drop',
+        'clientSsl',
+        'persist',
+      ],
     },
     as3: {},
   })
@@ -132,10 +254,6 @@ export class Action extends CommonEntity {
     schema: {
       response: true,
       example: '2d3h896a-2312-40ee-8d08-55550dbc191',
-    },
-    openapi: {
-      minLength: 1,
-      maxLength: 200,
     },
   })
   ruleId: string;

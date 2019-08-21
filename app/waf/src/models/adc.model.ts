@@ -75,6 +75,10 @@ export class Adc extends CommonEntity {
       response: true,
       required: true,
       example: 'VE',
+      openapi: {
+        // modify this list when deleting HW path
+        enum: ['VE', 'HW'],
+      },
     },
   })
   type: string;
@@ -83,9 +87,10 @@ export class Adc extends CommonEntity {
     type: 'object',
     required: true,
     schema: {
+      create: true,
       response: true,
       example: {
-        management: {
+        mgmt1: {
           type: 'mgmt',
           networkId: '80ccb4f0-5a9f-11e9-9721-3b33816a88bd',
           fixedIp: '172.16.11.100',
@@ -104,6 +109,33 @@ export class Adc extends CommonEntity {
           floatingIp: '10.250.14.160',
         },
       },
+      openapi: {
+        additionalProperties: {
+          type: 'object',
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['mgmt', 'ha', 'int', 'ext'],
+            },
+            networkId: {
+              type: 'string',
+              format: 'uuid',
+            },
+            fixedIp: {
+              type: 'string',
+              format: 'ipv4',
+            },
+            floatingIp: {
+              type: 'string',
+              format: 'ipv4',
+            },
+          },
+          required: ['type', 'networkId'],
+          additionalProperties: false,
+        },
+        minProperties: 4,
+        maxProperties: 100,
+      },
     },
   })
   networks: ConfigTypes['networks'];
@@ -119,6 +151,31 @@ export class Adc extends CommonEntity {
         imageRef: 'd4c52d70-5aa0-11e9-9721-3b33816a88bd',
         flavorRef: 'ff29d6b0-5aa0-11e9-9721-3b33816a88bd',
         userData: '#!/bin/bash \necho userData is optional \n',
+      },
+      openapi: {
+        properties: {
+          imageRef: {
+            type: 'string',
+            format: 'uuid',
+          },
+          flavorRef: {
+            type: 'string',
+            // format: 'uuid',
+            minLength: 1,
+            maxLength: 100,
+          },
+          sshKey: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 10000,
+          },
+          userData: {
+            type: 'string',
+            minLength: 1,
+          },
+        },
+        additionalProperties: false,
+        required: ['imageRef', 'flavorRef'],
       },
     },
   })
