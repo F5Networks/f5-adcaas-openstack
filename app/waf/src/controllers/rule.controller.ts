@@ -40,6 +40,9 @@ import {
   RuleRepository,
   ConditionRepository,
   ActionRepository,
+  PoolRepository,
+  ServiceRepository,
+  EndpointpolicyRepository,
 } from '../repositories';
 import {Schema, Response, CollectionResponse} from '.';
 import {BaseController} from './base.controller';
@@ -66,6 +69,12 @@ export class RuleController extends BaseController {
     public conditionRepository: ConditionRepository,
     @repository(ActionRepository)
     public actionRepository: ActionRepository,
+    @repository(PoolRepository)
+    public poolRepository: PoolRepository,
+    @repository(ServiceRepository)
+    public serviceRepository: ServiceRepository,
+    @repository(EndpointpolicyRepository)
+    public endpointpolicyRepository: EndpointpolicyRepository,
     @inject(RestBindings.Http.CONTEXT)
     protected reqCxt: RequestContext,
   ) {
@@ -81,15 +90,13 @@ export class RuleController extends BaseController {
   })
   async create(
     @requestBody(Schema.createRequest(Rule, createDesc))
-    reqBody: Partial<Rule>,
+    rule: Partial<Rule>,
   ): Promise<Response> {
-    try {
-      reqBody.tenantId = await this.tenantId;
-      const data = await this.ruleRepository.create(reqBody);
-      return new Response(Rule, data);
-    } catch (error) {
-      throw new HttpErrors.BadRequest(error.message);
+    if (rule.endpointpolicyId) {
+      await this.endpointpolicyRepository.findById(rule.endpointpolicyId);
     }
+    rule.tenantId = await this.tenantId;
+    return new Response(Rule, await this.ruleRepository.create(rule));
   }
 
   @get(prefix + '/rules', {
@@ -285,6 +292,21 @@ export class RuleController extends BaseController {
     @requestBody(Schema.createRequest(Action, createActionDesc))
     action: Partial<Action>,
   ): Promise<Response> {
+    if (action.select) {
+      //Forward to pool or service
+      if (action.select.pool && action.select.service) {
+        throw new HttpErrors.UnprocessableEntity(
+          'Cannot input pool and service both',
+        );
+      }
+      if (action.select.pool) {
+        await this.poolRepository.findById(action.select.pool);
+      }
+      if (action.select.service) {
+        await this.serviceRepository.findById(action.select.service);
+      }
+    }
+
     const data = await this.ruleRepository
       .actions(ruleId)
       .create(action, {tenantId: await this.tenantId});

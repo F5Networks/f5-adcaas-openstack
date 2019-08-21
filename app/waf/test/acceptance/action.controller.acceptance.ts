@@ -74,6 +74,69 @@ describe('ActionController', () => {
       .and.type('string');
   });
 
+  it(
+    'post ' + prefix + '/rules/{ruleId}/actions with invalid select',
+    async () => {
+      const rule = await givenRuleData(wafapp);
+      const action = {
+        type: 'forward',
+        select: {
+          abc: 123,
+        },
+      };
+
+      let response = await client
+        .post(prefix + `/rules/${rule.id}/actions`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(action)
+        .expect(422);
+
+      expect(response.body.error.details[0].code).to.equal(
+        'additionalProperties',
+      );
+    },
+  );
+
+  it(
+    'post ' + prefix + '/rules/{ruleId}/actions with pool and service',
+    async () => {
+      const rule = await givenRuleData(wafapp);
+      const action = createActionObject({
+        select: {
+          pool: uuid(),
+          service: uuid(),
+        },
+      });
+
+      await client
+        .post(prefix + `/rules/${rule.id}/actions`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(action)
+        .expect(422);
+    },
+  );
+
+  it(
+    'post ' + prefix + '/rules/{ruleId}/actions with non-existing pool',
+    async () => {
+      const rule = await givenRuleData(wafapp);
+      const action = createActionObject({
+        select: {
+          pool: uuid(),
+        },
+      });
+
+      await client
+        .post(prefix + `/rules/${rule.id}/actions`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(action)
+        .expect(404);
+    },
+  );
+
   it('get ' + prefix + '/rules/{ruleId}/actions/{actionId}', async () => {
     const rule = await givenRuleData(wafapp);
     const action = await givenActionData(wafapp, {id: uuid(), ruleId: rule.id});

@@ -23,6 +23,8 @@ export class Wafpolicy extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
+      create: false,
+      update: false,
       response: true,
       example: '/Common/my_waf',
     },
@@ -34,6 +36,11 @@ export class Wafpolicy extends CommonEntity {
     type: 'boolean',
     required: false,
     default: false,
+    schema: {
+      create: false,
+      update: false,
+      response: false,
+    },
   })
   ignoreChanges: boolean;
 
@@ -42,10 +49,13 @@ export class Wafpolicy extends CommonEntity {
     required: true,
     schema: {
       create: true,
-      update: true,
+      update: false,
       response: true,
       required: true,
       example: 'https://raw.githubusercontent.com/wafrepo/master/my_waf.xml',
+      openapi: {
+        format: 'uri',
+      },
     },
     as3: {},
   })
@@ -53,13 +63,14 @@ export class Wafpolicy extends CommonEntity {
 
   @property({
     type: 'boolean',
+    required: true,
+    default: false,
     schema: {
       create: true,
-      update: true,
+      update: false,
       response: true,
+      example: true,
     },
-    required: false,
-    default: false,
   })
   public: boolean;
 
