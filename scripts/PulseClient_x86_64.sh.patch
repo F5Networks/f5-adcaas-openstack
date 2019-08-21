@@ -1,0 +1,9 @@
+@@ -173,7 +173,7 @@
+     echo $i
+     if [ $? -eq 0 ]; then 
+         echo "sudo password : "
+-        sudo apt-get install $i 
++        sudo apt-get -y install $i 
+         if [ $? -ne 0 ]; then
+             echo "Failed to install dependencies.Please execute following command manually."
+             echo " apt-get install $i"
