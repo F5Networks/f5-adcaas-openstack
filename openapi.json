@@ -353,7 +353,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
                         "networks": {
-                          "management": {
+                          "mgmt1": {
                             "type": "mgmt",
                             "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
                             "fixedIp": "172.16.11.100"
@@ -555,7 +555,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
                         "networks": {
-                          "management": {
+                          "mgmt1": {
                             "type": "mgmt",
                             "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
                             "fixedIp": "172.16.11.100"
@@ -678,16 +678,101 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "VE",
+                      "HW"
+                    ]
+                  },
+                  "networks": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "mgmt",
+                            "ha",
+                            "int",
+                            "ext"
+                          ]
+                        },
+                        "networkId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "fixedIp": {
+                          "type": "string",
+                          "format": "ipv4"
+                        },
+                        "floatingIp": {
+                          "type": "string",
+                          "format": "ipv4"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "networkId"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minProperties": 4,
+                    "maxProperties": 100
                   },
                   "compute": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "imageRef": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "flavorRef": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "sshKey": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 10000
+                      },
+                      "userData": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "imageRef",
+                      "flavorRef"
+                    ]
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
                   "type": "VE",
+                  "networks": {
+                    "mgmt1": {
+                      "type": "mgmt",
+                      "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
+                      "fixedIp": "172.16.11.100"
+                    },
+                    "failover1": {
+                      "type": "ha",
+                      "networkId": "b1d0a920-5aa0-11e9-9721-3b33816a88bd"
+                    },
+                    "internal1": {
+                      "type": "int",
+                      "networkId": "ba6e2a80-5aa0-11e9-9721-3b33816a88bd"
+                    },
+                    "external2": {
+                      "type": "ext",
+                      "networkId": "c25eca10-5aa0-11e9-9721-3b33816a88bd",
+                      "floatingIp": "10.250.14.160"
+                    }
+                  },
                   "compute": {
                     "imageRef": "d4c52d70-5aa0-11e9-9721-3b33816a88bd",
                     "flavorRef": "ff29d6b0-5aa0-11e9-9721-3b33816a88bd",
@@ -767,7 +852,7 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "VE",
                           "networks": {
-                            "management": {
+                            "mgmt1": {
                               "type": "mgmt",
                               "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
                               "fixedIp": "172.16.11.100"
@@ -2409,11 +2494,16 @@
                   },
                   "tenantId": false,
                   "createdAt": false,
-                  "updatedAt": false
+                  "updatedAt": false,
+                  "endpointpolicyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description"
+                  "description": "My description",
+                  "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
                 }
               }
             }
@@ -4981,48 +5071,6 @@
         "operationId": "MonitorController.find"
       }
     },
-    "/adcaas/v1/ping": {
-      "get": {
-        "x-controller-name": "PingController",
-        "x-operation-name": "ping",
-        "tags": [
-          "PingController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Ping Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "greeting": {
-                      "type": "string"
-                    },
-                    "date": {
-                      "type": "string"
-                    },
-                    "url": {
-                      "type": "string"
-                    },
-                    "headers": {
-                      "type": "object",
-                      "properties": {
-                        "Content-Type": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "PingController.ping"
-      }
-    },
     "/adcaas/v1/pools/{poolId}/members/{memberId}": {
       "patch": {
         "x-controller-name": "PoolController",
@@ -6568,17 +6616,100 @@
                   "tenantId": false,
                   "createdAt": false,
                   "updatedAt": false,
+                  "event": {
+                    "type": "string",
+                    "enum": [
+                      "client-accepted",
+                      "proxy-request",
+                      "request",
+                      "response",
+                      "server-connected"
+                    ]
+                  },
                   "insert": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
+                  },
+                  "location": {
+                    "type": "string"
                   },
                   "policy": {
                     "type": "string"
+                  },
+                  "remove": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
+                  },
+                  "replace": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
+                  },
+                  "select": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "pool": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "service": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                  "event": "request",
+                  "insert": {
+                    "name": "abc",
+                    "value": "xyz"
+                  },
+                  "location": "http://1.2.3.4/index.html",
+                  "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
+                  "remove": {
+                    "name": "abc"
+                  },
+                  "replace": {
+                    "name": "abc",
+                    "value": "xyz"
+                  },
+                  "select": {
+                    "pool": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                  }
                 }
               }
             }
@@ -6636,6 +6767,15 @@
                           "policy": {
                             "type": "string"
                           },
+                          "remove": {
+                            "type": "object"
+                          },
+                          "replace": {
+                            "type": "object"
+                          },
+                          "select": {
+                            "type": "object"
+                          },
                           "type": {
                             "type": "string"
                           },
@@ -6650,8 +6790,22 @@
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
+                          "insert": {
+                            "name": "abc",
+                            "value": "xyz"
+                          },
                           "location": "http://1.2.3.4/index.html",
                           "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
+                          "remove": {
+                            "name": "abc"
+                          },
+                          "replace": {
+                            "name": "abc",
+                            "value": "xyz"
+                          },
+                          "select": {
+                            "pool": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                          },
                           "type": "httpUri",
                           "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                         }
@@ -6771,6 +6925,15 @@
                         "policy": {
                           "type": "string"
                         },
+                        "remove": {
+                          "type": "object"
+                        },
+                        "replace": {
+                          "type": "object"
+                        },
+                        "select": {
+                          "type": "object"
+                        },
                         "type": {
                           "type": "string"
                         },
@@ -6785,8 +6948,22 @@
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "event": "request",
+                        "insert": {
+                          "name": "abc",
+                          "value": "xyz"
+                        },
                         "location": "http://1.2.3.4/index.html",
                         "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
+                        "remove": {
+                          "name": "abc"
+                        },
+                        "replace": {
+                          "name": "abc",
+                          "value": "xyz"
+                        },
+                        "select": {
+                          "pool": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                        },
                         "type": "httpUri",
                         "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                       }
@@ -6900,17 +7077,76 @@
                   "updatedAt": false,
                   "event": {
                     "type": "string",
-                    "minlength": 1,
-                    "maxLength": 50
+                    "enum": [
+                      "client-accepted",
+                      "proxy-request",
+                      "request",
+                      "response",
+                      "server-connected"
+                    ]
                   },
                   "insert": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
                   },
                   "location": {
                     "type": "string"
                   },
                   "policy": {
                     "type": "string"
+                  },
+                  "remove": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
+                  },
+                  "replace": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      }
+                    }
+                  },
+                  "select": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "pool": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "service": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
                   },
                   "type": {
                     "type": "string"
@@ -6920,8 +7156,22 @@
                   "name": "My name",
                   "description": "My description",
                   "event": "request",
+                  "insert": {
+                    "name": "abc",
+                    "value": "xyz"
+                  },
                   "location": "http://1.2.3.4/index.html",
                   "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
+                  "remove": {
+                    "name": "abc"
+                  },
+                  "replace": {
+                    "name": "abc",
+                    "value": "xyz"
+                  },
+                  "select": {
+                    "pool": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                  },
                   "type": "httpUri"
                 }
               }
@@ -6980,6 +7230,15 @@
                           "policy": {
                             "type": "string"
                           },
+                          "remove": {
+                            "type": "object"
+                          },
+                          "replace": {
+                            "type": "object"
+                          },
+                          "select": {
+                            "type": "object"
+                          },
                           "type": {
                             "type": "string"
                           },
@@ -6994,8 +7253,22 @@
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "event": "request",
+                          "insert": {
+                            "name": "abc",
+                            "value": "xyz"
+                          },
                           "location": "http://1.2.3.4/index.html",
                           "policy": "2d3h896a-2312-40ee-8d08-55550dbc191",
+                          "remove": {
+                            "name": "abc"
+                          },
+                          "replace": {
+                            "name": "abc",
+                            "value": "xyz"
+                          },
+                          "select": {
+                            "pool": "2d3h896a-2312-40ee-8d08-55550dbc191"
+                          },
                           "type": "httpUri",
                           "ruleId": "2d3h896a-2312-40ee-8d08-55550dbc191"
                         }
@@ -7086,14 +7359,386 @@
                   "tenantId": false,
                   "createdAt": false,
                   "updatedAt": false,
+                  "all": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "alpn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "event": {
+                    "type": "string",
+                    "enum": [
+                      "request"
+                    ]
+                  },
+                  "extension": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "host": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
                   "index": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "normalized": {
+                    "type": "boolean"
+                  },
+                  "npn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "path": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "pathSegment": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "port": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "less",
+                          "greater",
+                          "less-or-equal",
+                          "greater-or-equal"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "queryParameter": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "queryString": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "scheme": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "serverName": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "unnamedQueryParameter": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "index": 1
+                  "all": {},
+                  "alpn": {},
+                  "event": "request",
+                  "extension": {},
+                  "host": {},
+                  "index": 1,
+                  "normalized": false,
+                  "npn": {},
+                  "path": {},
+                  "pathSegment": {},
+                  "port": {},
+                  "queryParameter": {},
+                  "queryString": {},
+                  "scheme": {},
+                  "serverName": {},
+                  "unnamedQueryParameter": {}
                 }
               }
             }
@@ -7139,14 +7784,56 @@
                           "updatedAt": {
                             "type": "date"
                           },
+                          "all": {
+                            "type": "object"
+                          },
+                          "alpn": {
+                            "type": "object"
+                          },
                           "event": {
                             "type": "string"
+                          },
+                          "extension": {
+                            "type": "object"
+                          },
+                          "host": {
+                            "type": "object"
                           },
                           "index": {
                             "type": "number"
                           },
+                          "normalized": {
+                            "type": "boolean"
+                          },
+                          "npn": {
+                            "type": "object"
+                          },
+                          "path": {
+                            "type": "object"
+                          },
+                          "pathSegment": {
+                            "type": "object"
+                          },
+                          "port": {
+                            "type": "object"
+                          },
+                          "queryParameter": {
+                            "type": "object"
+                          },
+                          "queryString": {
+                            "type": "object"
+                          },
+                          "scheme": {
+                            "type": "object"
+                          },
+                          "serverName": {
+                            "type": "object"
+                          },
                           "type": {
                             "type": "string"
+                          },
+                          "unnamedQueryParameter": {
+                            "type": "object"
                           },
                           "ruleId": {
                             "type": "string"
@@ -7158,9 +7845,23 @@
                           "description": "My description",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "all": {},
+                          "alpn": {},
                           "event": "request",
+                          "extension": {},
+                          "host": {},
                           "index": 1,
+                          "normalized": false,
+                          "npn": {},
+                          "path": {},
+                          "pathSegment": {},
+                          "port": {},
+                          "queryParameter": {},
+                          "queryString": {},
+                          "scheme": {},
+                          "serverName": {},
                           "type": "httpUri",
+                          "unnamedQueryParameter": {},
                           "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
                         }
                       }
@@ -7267,14 +7968,56 @@
                         "updatedAt": {
                           "type": "date"
                         },
+                        "all": {
+                          "type": "object"
+                        },
+                        "alpn": {
+                          "type": "object"
+                        },
                         "event": {
                           "type": "string"
+                        },
+                        "extension": {
+                          "type": "object"
+                        },
+                        "host": {
+                          "type": "object"
                         },
                         "index": {
                           "type": "number"
                         },
+                        "normalized": {
+                          "type": "boolean"
+                        },
+                        "npn": {
+                          "type": "object"
+                        },
+                        "path": {
+                          "type": "object"
+                        },
+                        "pathSegment": {
+                          "type": "object"
+                        },
+                        "port": {
+                          "type": "object"
+                        },
+                        "queryParameter": {
+                          "type": "object"
+                        },
+                        "queryString": {
+                          "type": "object"
+                        },
+                        "scheme": {
+                          "type": "object"
+                        },
+                        "serverName": {
+                          "type": "object"
+                        },
                         "type": {
                           "type": "string"
+                        },
+                        "unnamedQueryParameter": {
+                          "type": "object"
                         },
                         "ruleId": {
                           "type": "string"
@@ -7286,9 +8029,23 @@
                         "description": "My description",
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "all": {},
+                        "alpn": {},
                         "event": "request",
+                        "extension": {},
+                        "host": {},
                         "index": 1,
+                        "normalized": false,
+                        "npn": {},
+                        "path": {},
+                        "pathSegment": {},
+                        "port": {},
+                        "queryParameter": {},
+                        "queryString": {},
+                        "scheme": {},
+                        "serverName": {},
                         "type": "httpUri",
+                        "unnamedQueryParameter": {},
                         "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
                       }
                     }
@@ -7397,22 +8154,396 @@
                   "tenantId": false,
                   "createdAt": false,
                   "updatedAt": false,
+                  "all": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "alpn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
                   "event": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "request"
+                    ]
+                  },
+                  "extension": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "host": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
                   },
                   "index": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "normalized": {
+                    "type": "boolean"
+                  },
+                  "npn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "path": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "pathSegment": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "port": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "less",
+                          "greater",
+                          "less-or-equal",
+                          "greater-or-equal"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "queryParameter": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "queryString": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "scheme": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
+                  },
+                  "serverName": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
                   },
                   "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "httpHeader",
+                      "httpUri",
+                      "httpCookie",
+                      "sslExtension"
+                    ]
+                  },
+                  "unnamedQueryParameter": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "caseSensitive": {
+                        "type": "boolean"
+                      },
+                      "operand": {
+                        "enum": [
+                          "equals",
+                          "starts-with",
+                          "ends-with",
+                          "contains"
+                        ]
+                      },
+                      "values": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
+                  "all": {},
+                  "alpn": {},
                   "event": "request",
+                  "extension": {},
+                  "host": {},
                   "index": 1,
-                  "type": "httpUri"
+                  "normalized": false,
+                  "npn": {},
+                  "path": {},
+                  "pathSegment": {},
+                  "port": {},
+                  "queryParameter": {},
+                  "queryString": {},
+                  "scheme": {},
+                  "serverName": {},
+                  "type": "httpUri",
+                  "unnamedQueryParameter": {}
                 }
               }
             }
@@ -7458,14 +8589,56 @@
                           "updatedAt": {
                             "type": "date"
                           },
+                          "all": {
+                            "type": "object"
+                          },
+                          "alpn": {
+                            "type": "object"
+                          },
                           "event": {
                             "type": "string"
+                          },
+                          "extension": {
+                            "type": "object"
+                          },
+                          "host": {
+                            "type": "object"
                           },
                           "index": {
                             "type": "number"
                           },
+                          "normalized": {
+                            "type": "boolean"
+                          },
+                          "npn": {
+                            "type": "object"
+                          },
+                          "path": {
+                            "type": "object"
+                          },
+                          "pathSegment": {
+                            "type": "object"
+                          },
+                          "port": {
+                            "type": "object"
+                          },
+                          "queryParameter": {
+                            "type": "object"
+                          },
+                          "queryString": {
+                            "type": "object"
+                          },
+                          "scheme": {
+                            "type": "object"
+                          },
+                          "serverName": {
+                            "type": "object"
+                          },
                           "type": {
                             "type": "string"
+                          },
+                          "unnamedQueryParameter": {
+                            "type": "object"
                           },
                           "ruleId": {
                             "type": "string"
@@ -7477,9 +8650,23 @@
                           "description": "My description",
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "all": {},
+                          "alpn": {},
                           "event": "request",
+                          "extension": {},
+                          "host": {},
                           "index": 1,
+                          "normalized": false,
+                          "npn": {},
+                          "path": {},
+                          "pathSegment": {},
+                          "port": {},
+                          "queryParameter": {},
+                          "queryString": {},
+                          "scheme": {},
+                          "serverName": {},
                           "type": "httpUri",
+                          "unnamedQueryParameter": {},
                           "ruleId": "2d3h896a-4d82-4234-8d08-55550dbc191"
                         }
                       }
@@ -7583,11 +8770,16 @@
                   },
                   "tenantId": false,
                   "createdAt": false,
-                  "updatedAt": false
+                  "updatedAt": false,
+                  "endpointpolicyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description"
+                  "description": "My description",
+                  "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
                 }
               }
             }
@@ -7880,7 +9072,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [],
+                "required": [
+                  "endpointpolicyId"
+                ],
                 "properties": {
                   "id": false,
                   "name": {
@@ -7895,11 +9089,16 @@
                   },
                   "tenantId": false,
                   "createdAt": false,
-                  "updatedAt": false
+                  "updatedAt": false,
+                  "endpointpolicyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description"
+                  "description": "My description",
+                  "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
                 }
               }
             }
@@ -9286,7 +10485,7 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "VE",
                         "networks": {
-                          "management": {
+                          "mgmt1": {
                             "type": "mgmt",
                             "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
                             "fixedIp": "172.16.11.100"
@@ -9478,7 +10677,7 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "VE",
                           "networks": {
-                            "management": {
+                            "mgmt1": {
                               "type": "mgmt",
                               "networkId": "80ccb4f0-5a9f-11e9-9721-3b33816a88bd",
                               "fixedIp": "172.16.11.100"
@@ -9843,17 +11042,14 @@
                   "tenantId": false,
                   "createdAt": false,
                   "updatedAt": false,
-                  "url": {
-                    "type": "string"
-                  },
-                  "public": {
-                    "type": "boolean"
-                  }
+                  "file": false,
+                  "ignoreChanges": false,
+                  "url": false,
+                  "public": false
                 },
                 "example": {
                   "name": "My name",
-                  "description": "My description",
-                  "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                  "description": "My description"
                 }
               }
             }
@@ -9914,7 +11110,8 @@
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "file": "/Common/my_waf",
-                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml",
+                        "public": true
                       }
                     }
                   }
@@ -10080,7 +11277,8 @@
                         "createdAt": "2019-03-05T08:40:25.000Z",
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "file": "/Common/my_waf",
-                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                        "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml",
+                        "public": true
                       }
                     }
                   }
@@ -10178,8 +11376,11 @@
                   "tenantId": false,
                   "createdAt": false,
                   "updatedAt": false,
+                  "file": false,
+                  "ignoreChanges": false,
                   "url": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uri"
                   },
                   "public": {
                     "type": "boolean"
@@ -10188,7 +11389,8 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
-                  "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                  "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml",
+                  "public": true
                 }
               }
             }
@@ -10250,7 +11452,8 @@
                           "createdAt": "2019-03-05T08:40:25.000Z",
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "file": "/Common/my_waf",
-                          "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml"
+                          "url": "https://raw.githubusercontent.com/wafrepo/master/my_waf.xml",
+                          "public": true
                         }
                       }
                     }
@@ -10330,6 +11533,48 @@
           }
         ],
         "operationId": "WafpolicyController.find"
+      }
+    },
+    "/ping": {
+      "get": {
+        "x-controller-name": "PingController",
+        "x-operation-name": "ping",
+        "tags": [
+          "PingController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ping Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "greeting": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "properties": {
+                        "Content-Type": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "PingController.ping"
       }
     }
   },
