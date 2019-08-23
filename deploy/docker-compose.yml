@@ -102,7 +102,7 @@ services:
       - discovery.type=single-node
 
   FLUENTD:
-    image: f5devcentral/f5-es-fluentd:latest
+    image: f5devcentral/f5-openstack-services:fluentd-v1.3.2
     container_name: FLUENTD
     ports:
       - 24224:24224
