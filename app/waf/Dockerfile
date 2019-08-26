@@ -1,15 +1,15 @@
 # build with:
-#   docker build . -t f5devcentral/f5-openstack-services:latest
+#   docker build . -t f5devcentral/f5-openstack-services:adcaas-latest
 
 # upload image with (authorized user only)
-#   docker push f5devcentral/f5-openstack-services:latest
+#   docker push f5devcentral/f5-openstack-services:adcaas-latest
 
 # run with:
 #    export <necessary envs> && \
-#    docker run -it --name f5-openstack-services-api \
+#    docker run -it --name f5-openstack-services-adcaas \
 #        -p 3000:3000 \
 #        --link postgres-server --link as3-server \
-#        f5-openstack-services:latest
+#        f5-openstack-services:adcaas-latest
 
 FROM node:11-alpine
 
