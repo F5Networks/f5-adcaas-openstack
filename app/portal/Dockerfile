@@ -1,9 +1,10 @@
 # build with:
-#   docker build . -t f5devcentral/f5-services-portal:latest
+#   docker build . -t f5devcentral/f5-openstack-services:portal-latest
 
+# TODO: can we run kolla horizon image?
 # TODO: run it with nginx instead of centos:7, too large..
 # See: https://developer.rackspace.com/blog/keystone_horizon_nginx/
-FROM centos:7
+FROM centos:7.6.1810
 
 RUN yum update -y
 RUN yum install -y epel-release
@@ -25,4 +26,3 @@ RUN chmod -R +x /root/load_scripts/*
 RUN /root/load_scripts/load.sh /root/src /root/horizon
 
 ENTRYPOINT python /root/horizon/manage.py runserver 0:80
-
