@@ -16,7 +16,7 @@ services:
 #        tag: f5-portal
 
   wafaas:
-    image: f5devcentral/f5-openstack-services:latest
+    image: f5devcentral/f5-openstack-services:adcaas-latest
     container_name: WAFAAS
     env_file:
       - ./appcluster.rc
