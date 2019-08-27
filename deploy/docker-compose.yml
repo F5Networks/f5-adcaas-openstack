@@ -1,7 +1,7 @@
 version: "3"
 services:
   portal:
-    image: f5devcentral/f5-services-portal:latest
+    image: f5devcentral/f5-openstack-services:portal-latest
     container_name: PORTAL
     env_file:
       - ./appcluster.rc
