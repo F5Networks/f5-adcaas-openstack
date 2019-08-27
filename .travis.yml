@@ -32,7 +32,7 @@ jobs:
         - popd
       script:
         - echo "No test"
-    - stage: publish-docs
+    - stage: publish-image-and-docs
       language: python
       sudo: required
       before_install:
@@ -40,11 +40,17 @@ jobs:
       install:
         - pip install awscli --upgrade
       script:
+        # Rebuild document
         - pushd docs
         - ./docker-docs.sh ./test-docs.sh
         - popd
       deploy:
-      # DEPLOY TO STAGING
+      # Deploy image to Docker Hub
+      - provider: script
+        script: scripts/publish_image.sh
+        on:
+          tags: true
+      # DEPLOY DOCS TO STAGING
       - provider: s3
         skip_cleanup: true
         access_key_id: $AWS_ACCESS_KEY_ID
@@ -55,7 +61,7 @@ jobs:
         on:
           branch: master
           repo: F5Networks/f5-adcaas-openstack
-      # DEPLOY TO PRODUCTION
+      # DEPLOY DOCS TO PRODUCTION
       - provider: s3
         skip_cleanup: true
         access_key_id: $AWS_ACCESS_KEY_ID
