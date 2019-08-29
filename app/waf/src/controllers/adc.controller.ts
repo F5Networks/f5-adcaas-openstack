@@ -564,9 +564,12 @@ export class AdcController extends BaseController {
           userData: userdata,
           ports: (() => {
             let ports = [];
-            for (let n of Object.keys(adc.networks)) {
-              if (adc.management.networks[n])
-                ports.push(<string>adc.management.networks[n].portId);
+            // ports order is sensitive.
+            for (let m of ['mgmt', 'ext', 'int', 'ha']) {
+              for (let n of Object.keys(adc.networks)) {
+                if (adc.management.networks[n] && adc.networks[n].type === m)
+                  ports.push(<string>adc.management.networks[n].portId);
+              }
             }
             return ports;
           })(),
