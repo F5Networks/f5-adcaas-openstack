@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 unset PRODUCT_RELEASE
-unset WAF_APP_PORT
+unset ADCAAS_APP_PORT
 
 unset DATABASE_USER
 unset DATABASE_PASSWORD

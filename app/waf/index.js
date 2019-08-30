@@ -23,8 +23,8 @@ if (require.main === module) {
   // Run the application
   let config = {
     rest: {
-      port: +process.env.WAF_APP_PORT || 3000,
-      host: process.env.WAF_APP_HOST || '0.0.0.0',
+      port: +process.env.ADCAAS_APP_PORT || 3000,
+      host: process.env.ADCAAS_APP_HOST || '0.0.0.0',
       protocol: 'http',
       openApiSpec: {
         // useful when used with OASGraph to locate your application
@@ -33,22 +33,22 @@ if (require.main === module) {
     },
   };
 
-  if (process.env.WAF_ENABLE_HTTPS === 'true') {
+  if (process.env.ADCAAS_ENABLE_HTTPS === 'true') {
     config.rest['protocol'] = 'https';
 
-    if (!process.env.WAF_CERT_KEY) {
-      console.error('WAF_CERT_KEY is not configred');
+    if (!process.env.ADCAAS_CERT_KEY) {
+      console.error('ADCAAS_CERT_KEY is not configred');
       process.exit(1);
     }
 
-    config.rest['key'] = fs.readFileSync(process.env.WAF_CERT_KEY);
+    config.rest['key'] = fs.readFileSync(process.env.ADCAAS_CERT_KEY);
 
-    if (!process.env.WAF_CERT_CRT) {
-      console.error('WAF_CERT_CRT is not configred');
+    if (!process.env.ADCAAS_CERT_CRT) {
+      console.error('ADCAAS_CERT_CRT is not configred');
       process.exit(1);
     }
 
-    config.rest['cert'] = fs.readFileSync(process.env.WAF_CERT_CRT);
+    config.rest['cert'] = fs.readFileSync(process.env.ADCAAS_CERT_CRT);
   }
 
   application.main(config).catch(err => {

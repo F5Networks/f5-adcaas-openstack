@@ -5,7 +5,7 @@
 
 ## Overview
 
-This documentation houses the end-user documentation for F5 Networks' ADCaaS for OpenStack. The documentation is published at https://clouddocs.f5networks.net/cloud/openstack/v1/wafaas/.
+This documentation houses the end-user documentation for F5 Networks' ADCaaS for OpenStack. The documentation is published at https://clouddocs.f5networks.net/cloud/openstack/v1/adcaas/.
 
 ## Contributing
 

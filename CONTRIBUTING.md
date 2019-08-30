@@ -4,7 +4,7 @@ If you find this, it means you want to help us out. Thanks in advance for lendin
 
 ## Getting the code and development environment setup
 
-See [Introduction to WAFaaS Development, Test and Production](deploy/README.md).
+See [Introduction to ADCaaS Development, Test and Production](deploy/README.md).
 
 ## Pull requests
 
