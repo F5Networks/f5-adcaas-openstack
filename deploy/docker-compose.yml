@@ -9,11 +9,13 @@ services:
       - 8245:80
     depends_on:
       - FLUENTD
-#    logging:
-#      driver: fluentd
-#      options:
-#        fluentd-address: "0.0.0.0:24224"
-#        tag: f5-portal
+    links:
+      - adcaas:adcaas-server
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-portal
 
   adcaas:
     image: f5devcentral/f5-openstack-services:adcaas-latest
