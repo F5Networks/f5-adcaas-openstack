@@ -60,7 +60,7 @@ services:
         tag: postgres
 
   ASG:
-    image: f5devcentral/f5-api-services-gateway:latest
+    image: f5devcentral/f5-api-services-gateway:1.0.12
     container_name: ASG
     environment:
       - AUTH=DISABLE
