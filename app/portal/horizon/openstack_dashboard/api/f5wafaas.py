@@ -2,10 +2,12 @@ import requests
 import json
 import os
 
+from django.conf import settings
+
 from openstack_dashboard.api import base
 from openstack_dashboard.contrib.developer.profiler import api as profiler
 
-WAFAAS_URL = os.environ['F5_WAFAAS_URL']
+ADCAAS_ENDPOINT = getattr(settings, 'ADCAAS_ENDPOINT')
 
 class ADCInstance(base.APIResourceWrapper):
     """Wrapper for the "console" dictionary.

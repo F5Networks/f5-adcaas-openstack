@@ -1,0 +1,6 @@
+export PYTHONDONTWRITEBYTECODE=1
+#export OS_AUTH_URL=http://10.250.11.184:5000/v3
+#export ADCAAS_ENDPOINT=http://10.250.11.24:3000
+
+export OS_AUTH_URL=http://10.250.13.69:5000/v3
+export ADCAAS_ENDPOINT=http://localhost:3000

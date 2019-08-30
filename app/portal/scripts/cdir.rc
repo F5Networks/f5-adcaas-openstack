@@ -1,0 +1,3 @@
+#!/bin/bash 
+
+cdir=`cd $(dirname $0); pwd`
