@@ -23,7 +23,8 @@
   launchInstanceService.$inject = [
     '$q',
     'horizon.app.core.images.non_bootable_image_types',
-    'horizon.dashboard.project.workflow.launch-instance.modal.service',
+    'horizon.dashboard.f5services.workflow.launch-instance.modal.service',
+    //'horizon.dashboard.project.workflow.launch-instance.modal.service',
     'horizon.framework.util.q.extensions'
   ];
 

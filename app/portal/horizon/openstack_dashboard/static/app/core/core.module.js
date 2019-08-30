@@ -45,7 +45,8 @@
       'horizon.framework.conf',
       'horizon.framework.util',
       'horizon.framework.widgets',
-      'horizon.dashboard.project.workflow'
+      //'horizon.dashboard.project.workflow',
+      'horizon.dashboard.f5services.workflow',
     ], config)
     // NOTE: this will move into the correct module as that resource type
     // becomes available.  For now there is no volumes module.

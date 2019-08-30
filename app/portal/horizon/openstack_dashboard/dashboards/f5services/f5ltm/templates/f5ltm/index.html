@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Local Traffic Management" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Local Traffic Management") %}
+{% endblock page_header %}
+
+{% block main %}
+
+<pre>
+
+                                 [ Deploy ]   [ Create ]  [ Other Patch Actions ]
+
++=====================+==========================+==============+===============+
+|    Application ID   |   Application Details +  |   ADC ID     |     Status    |
++=====================+==========================+==============+===============+
+|       123456        |   {xxx...x... }          |   abcdef     |    Deployed   |
++---------------------+--------------------------+--------------+---------------+
+|       654321        |   {yyy...y... }          |   abcdef     |   Configured  |
++---------------------+--------------------------+--------------+---------------+
+
+
+</pre>
+
+<img src="http://10.250.11.185/configure_lb-modal.png" width="700px"></img>
+{% endblock %}
+
+

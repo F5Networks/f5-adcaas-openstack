@@ -70,6 +70,7 @@ class IndexView(tables.DataTableView):
         else:
             msg = _("Insufficient privilege level to view group information.")
             messages.info(self.request, msg)
+            
         return groups
 
 

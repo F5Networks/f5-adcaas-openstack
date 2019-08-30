@@ -944,6 +944,9 @@ def keystone_can_edit_role():
     backend_settings = getattr(settings, "OPENSTACK_KEYSTONE_BACKEND", {})
     return backend_settings.get('can_edit_role', True)
 
+def keystone_can_edit_adc():
+    backend_settings = getattr(settings, "OPENSTACK_KEYSTONE_BACKEND", {})
+    return backend_settings.get('can_edit_adc', True)
 
 def keystone_backend_name():
     if hasattr(settings, "OPENSTACK_KEYSTONE_BACKEND"):

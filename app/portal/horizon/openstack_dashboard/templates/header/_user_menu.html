@@ -12,12 +12,6 @@
       <span class="fa fa-caret-down"></span>
     </a>
     <ul id="editor_list" class="dropdown-menu dropdown-menu-right selection-menu">
-      <li>
-        <a href="{% url 'horizon:settings:user:index' %}" target="_self">
-          <span class="fa fa-cog"></span>
-          {% trans "Settings" %}
-        </a>
-      </li>
       {% if HORIZON_CONFIG.bug_url %}
         <li>
           <a href="{{ HORIZON_CONFIG.bug_url }}" target="_blank">
