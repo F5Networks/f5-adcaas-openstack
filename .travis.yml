@@ -26,7 +26,7 @@ jobs:
           - scripts/publish_api_ref.sh
     - stage: fvt
       before_script:
-        - pushd scripts
+        - pushd test/vpn
         - ./vpn_install.sh
         - ./vpn_connect.sh
         - popd
