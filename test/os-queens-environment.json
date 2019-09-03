@@ -98,7 +98,7 @@
 		},
 		{
 			"key": "ADC_IMAGE",
-			"value": "13.1.1",
+			"value": "BIGIP-13.1.1",
 			"description": "",
 			"enabled": true
 		},
