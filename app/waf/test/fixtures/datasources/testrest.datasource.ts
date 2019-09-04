@@ -2210,8 +2210,8 @@ type TypeResponseWith = {
   nova_get_v2_tenantId_servers_serverId?: Function;
 
   // DO APIs
-  do_post_mgmt_shared_declaration_onboarding?: Function;
-  do_get_mgmt_shared_declaration_onboarding_task_taskId?: Function;
+  bigip_post_mgmt_shared_declaration_onboarding?: Function;
+  bigip_get_mgmt_shared_declaration_onboarding_task_taskId?: Function;
 
   // BIG-IP APIs
   bigip_get_mgmt_tm_sys?: Function;
@@ -2259,9 +2259,9 @@ export const DefaultResponseWith: TypeResponseWith = {
   neutron_del_v2_0_floatingips_floatingipId:
     StubResponses.neutronDeleteFloatingIp204,
 
-  do_post_mgmt_shared_declaration_onboarding:
+  bigip_post_mgmt_shared_declaration_onboarding:
     StubResponses.onboardingSucceed202,
-  do_get_mgmt_shared_declaration_onboarding_task_taskId:
+  bigip_get_mgmt_shared_declaration_onboarding_task_taskId:
     StubResponses.onboardingSucceed200,
 
   bigip_get_mgmt_tm_sys: StubResponses.bigipMgmtSys200,

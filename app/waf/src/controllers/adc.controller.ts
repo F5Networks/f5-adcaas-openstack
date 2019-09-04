@@ -185,7 +185,7 @@ export class AdcController extends BaseController {
       LicenseManager,
       this.wafapp,
       undefined,
-      [settings, this.reqCxt.name],
+      [settings, this.reqCxt.name, adc.getDoEndpoint(), adc.getBasicAuth()],
     );
     return licMgr
       .license()
@@ -772,7 +772,7 @@ export class AdcController extends BaseController {
           LicenseManager,
           this.wafapp,
           undefined,
-          [settings, this.reqCxt.name],
+          [settings, this.reqCxt.name, adc.getDoEndpoint(), adc.getBasicAuth()],
         );
         return licMgr.unLicense().then(async () => {
           let noLicensed = async () => {
@@ -916,7 +916,10 @@ export class AdcController extends BaseController {
 
       let doMgr = await OnboardingManager.instanlize(
         this.wafapp,
-        {},
+        {
+          endpoint: adc.getDoEndpoint(),
+          basicAuth: adc.getBasicAuth(),
+        },
         this.reqCxt.name,
       );
       let doBody = await doMgr.assembleDo(

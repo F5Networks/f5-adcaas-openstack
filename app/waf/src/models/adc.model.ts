@@ -220,6 +220,20 @@ export class Adc extends CommonEntity {
   constructor(data?: Partial<Adc>) {
     super(data);
   }
+
+  getBasicAuth(): string {
+    return Buffer.from(
+      `${this.management.connection!.username}:${
+        this.management.connection!.password
+      }`,
+    ).toString('base64');
+  }
+
+  getDoEndpoint(): string {
+    return `https://${this.management.connection!.ipAddress}:${
+      this.management.connection!.tcpPort
+    }`;
+  }
 }
 
 export class ActionsResponse extends Entity {

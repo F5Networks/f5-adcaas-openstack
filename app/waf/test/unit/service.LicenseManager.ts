@@ -56,6 +56,8 @@ describe('test LicenseManager', async () => {
     return await instantiateClass(LicenseManager, wafapp, undefined, [
       settings,
       'any',
+      'https://localhost:' + RestApplicationPort.SSLCustom,
+      'hello',
     ]);
   };
 
@@ -86,6 +88,8 @@ describe('test LicenseManager', async () => {
       await instantiateClass(LicenseManager, wafapp, undefined, [
         settings,
         'any',
+        'https://localhost',
+        'hello',
       ]);
       expect('should not be here').eql('');
     } catch (error) {

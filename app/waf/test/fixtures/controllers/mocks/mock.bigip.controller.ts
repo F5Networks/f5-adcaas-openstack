@@ -66,6 +66,18 @@ export class MockBigipController extends MockBaseController {
     );
   }
 
+  @post('/mgmt/shared/declarative-onboarding')
+  async doOnboard(): Promise<object> {
+    return await ResponseWith.bigip_post_mgmt_shared_declaration_onboarding!();
+  }
+
+  @get('/mgmt/shared/declarative-onboarding/task/{taskId}')
+  async doTaskResult(
+    @param.path.string('taskId') taskId: string,
+  ): Promise<object> {
+    return await ResponseWith.bigip_get_mgmt_shared_declaration_onboarding_task_taskId!();
+  }
+
   @post('/mgmt/shared/file-transfer/uploads/{filename}')
   async doUpload(
     @param.path.string('filename') filename: string,

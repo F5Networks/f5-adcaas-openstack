@@ -39,6 +39,8 @@ export class LicenseManager {
   constructor(
     private settings: LicConfig,
     requestId: string,
+    private doEndpoint: string,
+    private doBasicAuth: string,
     @inject('services.DOService')
     private doService: DOService,
   ) {
@@ -64,11 +66,6 @@ export class LicenseManager {
 
     return {
       class: 'DO',
-      targetHost: target.ipAddress,
-      targetPort: target.tcpPort,
-      targetUsername: target.username,
-      targetPassphrase: target.password,
-      targetTimeout: biqSettings.timeout!.toString(),
       declaration: {
         schemaVersion: '1.5.0',
         class: 'Device',
@@ -94,17 +91,13 @@ export class LicenseManager {
   }
 
   private async postDoBody(body: object): Promise<string> {
-    if (!process.env.DO_ENDPOINT)
-      throw new Error('process.env.DO_ENDPOINT is not set');
-
-    // TODO: base64 coding for admin:admin. Modify it later if needed
-    let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
+    let headers = {Authorization: 'Basic ' + this.doBasicAuth};
 
     this.logger.debug(`postDoBody: ${JSON.stringify(body)}`);
     return this.doService
       .doRest(
         'POST',
-        process.env.DO_ENDPOINT! + '/mgmt/shared/declarative-onboarding',
+        this.doEndpoint + '/mgmt/shared/declarative-onboarding',
         headers,
         body,
       )

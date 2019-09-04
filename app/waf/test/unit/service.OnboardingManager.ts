@@ -45,6 +45,7 @@ describe('test OnboardingManager', async () => {
   let doMgr: OnboardingManager;
   let wafapp: WafApplication;
   let addon: AddonReqValues;
+  let adc: Adc;
 
   before('prework..', async () => {
     await setupEnvs();
@@ -65,6 +66,7 @@ describe('test OnboardingManager', async () => {
     LetResponseWith();
     await setupEnvs();
     doMgr = await OnboardingManager.instanlize(wafapp);
+    adc = new Adc(createAdcObject());
   });
 
   afterEach('for each.after', async () => {
@@ -95,21 +97,20 @@ describe('test OnboardingManager', async () => {
   });
 
   it('assembleDo: ok', async () => {
-    let adc = <Adc>createAdcObject();
     let response = await doMgr.assembleDo(adc, addon);
     expect(response).containDeep({class: 'DO'});
     expect(response.declaration.Common).hasOwnProperty('root');
   });
 
   it('assembleDo: ok with no user sshkey', async () => {
-    let adc = <Adc>createAdcObject({compute: {sshKey: null}});
+    adc = <Adc>createAdcObject({compute: {sshKey: null}});
     let response = await doMgr.assembleDo(adc, addon);
     expect(response).containDeep({class: 'DO'});
     expect(response.declaration.Common).not.hasOwnProperty('root');
   });
 
   it('onboard: ok', async () => {
-    let adc = <Adc>createAdcObject();
+    doMgr.config.endpoint = adc.getDoEndpoint();
     let dobody = await doMgr.assembleDo(adc, addon);
     let response = await doMgr.onboard(dobody);
     expect(response).eql(ExpectedData.doTaskId);
@@ -117,9 +118,8 @@ describe('test OnboardingManager', async () => {
 
   it('onboard: post failed with http error.', async () => {
     LetResponseWith({
-      do_post_mgmt_shared_declaration_onboarding: StubResponses.response401,
+      bigip_post_mgmt_shared_declaration_onboarding: StubResponses.response401,
     });
-    let adc = <Adc>createAdcObject();
     let dobody = await doMgr.assembleDo(adc, addon);
     try {
       await doMgr.onboard(dobody);
@@ -130,13 +130,15 @@ describe('test OnboardingManager', async () => {
   });
 
   it('isDone: true', async () => {
+    doMgr.config.endpoint = adc.getDoEndpoint();
     let response = await doMgr.isDone(ExpectedData.doTaskId);
     expect(response).eql(true);
   });
 
   it('isDone: false', async () => {
+    doMgr.config.endpoint = adc.getDoEndpoint();
     LetResponseWith({
-      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+      bigip_get_mgmt_shared_declaration_onboarding_task_taskId:
         StubResponses.onboardingSucceed202,
     });
     let response = await doMgr.isDone(ExpectedData.doTaskId);
@@ -144,8 +146,9 @@ describe('test OnboardingManager', async () => {
   });
 
   it('isDone: exception while getting', async () => {
+    doMgr.config.endpoint = adc.getDoEndpoint();
     LetResponseWith({
-      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+      bigip_get_mgmt_shared_declaration_onboarding_task_taskId:
         StubResponses.response400,
     });
 
