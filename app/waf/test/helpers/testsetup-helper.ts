@@ -86,14 +86,15 @@ export class TestingApplication extends BootMixin(
 export async function setupRestAppAndClient(
   port: number,
   controllerCtor: typeof MockBaseController,
-  proto?: string,
+  proto?: 'https',
 ): Promise<RestAppAndClient> {
+  let config: {[key: string]: string | number} = {
+    port: port,
+    host: 'localhost',
+  };
+  if (proto) config.protocol = proto;
   const restApp = new TestingApplication({
-    rest: givenHttpServerConfig({
-      port: port,
-      host: 'localhost',
-      protocol: proto ? proto : 'http',
-    }),
+    rest: givenHttpServerConfig(config),
   });
 
   restApp.controller(controllerCtor);
