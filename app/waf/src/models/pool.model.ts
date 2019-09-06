@@ -30,6 +30,9 @@ export class Pool extends CommonEntity {
       example: 'round-robin',
     },
     as3: {},
+    openapi: {
+      enum: ['none', 'round-robin', 'least-connections', 'source-ip'],
+    },
   })
   loadBalancingMode: string;
 
@@ -46,6 +49,11 @@ export class Pool extends CommonEntity {
       response: true,
       example: 1,
     },
+    openapi: {
+      type: 'integer',
+      minimal: '1',
+      maxmium: '10',
+    },
   })
   minimumMembersActive: number;
 
@@ -58,6 +66,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 1,
+    },
+    openapi: {
+      type: 'integer',
+      minimal: '1',
+      maxmium: '10',
     },
   })
   minimumMonitors: number;
@@ -72,6 +85,11 @@ export class Pool extends CommonEntity {
       response: true,
       example: 0,
     },
+    openapi: {
+      type: 'integer',
+      minimal: '0',
+      maxmium: '65535',
+    },
   })
   reselectTries: number;
 
@@ -85,6 +103,9 @@ export class Pool extends CommonEntity {
       response: true,
       example: 'drop',
     },
+    openapi: {
+      enum: ['none', 'drop'],
+    },
   })
   serviceDownAction: string;
 
@@ -97,6 +118,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 10,
+    },
+    openapi: {
+      type: 'integer',
+      minimal: '0',
+      maxmium: '65535',
     },
   })
   slowRampTime: number;
