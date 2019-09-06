@@ -171,6 +171,7 @@ export class AdcController extends BaseController {
     };
 
     try {
+      this.logger.debug(`start to trust ${adc.id}`);
       await this.serialize(adc, {status: AdcState.TRUSTING, lastErr: ''});
       //TODO: Need away to input admin password of BIG-IP HW
       let device = await this.asgMgr.trust(
@@ -182,6 +183,7 @@ export class AdcController extends BaseController {
 
       await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
         async () => {
+          this.logger.debug(`succeed for trusting ${adc.id}`);
           await this.serialize(adc, {
             status: AdcState.TRUSTED,
             management: {
@@ -191,6 +193,7 @@ export class AdcController extends BaseController {
           });
         },
         async e => {
+          this.logger.error(`failed to trust ${adc.id}`);
           let msg: string = e ? 'error' : 'timeout';
           await this.serialize(adc, {
             status: AdcState.TRUSTERR,
@@ -199,6 +202,7 @@ export class AdcController extends BaseController {
         },
       );
     } catch (err) {
+      this.logger.error(`failed to trust ${adc.id}`);
       await this.serialize(adc, {
         status: AdcState.TRUSTERR,
         lastErr: err.message,
@@ -225,6 +229,7 @@ export class AdcController extends BaseController {
 
   async installAS3(adc: Adc): Promise<void> {
     // Install AS3 RPM on target device
+    this.logger.debug(`start to install as3 to ${adc.id}`);
     await this.serialize(adc, {status: AdcState.AS3INSTALLING, lastErr: ''});
     try {
       await this.asgMgr.installAS3(adc.management.trustedDeviceId!);
@@ -234,12 +239,14 @@ export class AdcController extends BaseController {
         60,
       ).then(
         async () => {
+          this.logger.debug(`succeed for installing as3 to ${adc.id}`);
           await this.serialize(adc, {
             status: AdcState.AS3INSTALLED,
             lastErr: '',
           });
         },
         async err => {
+          this.logger.error(`failed to install as3 to ${adc.id}`);
           await this.serialize(adc, {
             status: AdcState.AS3INSTALLERR,
             lastErr: `${AdcState.AS3INSTALLERR}: Fail to install AS3`,
@@ -247,6 +254,7 @@ export class AdcController extends BaseController {
         },
       );
     } catch (err) {
+      this.logger.error(`failed to install as3 to ${adc.id}`);
       await this.serialize(adc, {
         status: AdcState.AS3INSTALLERR,
         lastErr: `${AdcState.AS3INSTALLERR}: ${err.message}`,
@@ -260,21 +268,31 @@ export class AdcController extends BaseController {
     let cnct = adc.management.connection!;
     let paritionObj = new AS3PartitionRequest(adc);
     try {
+      this.logger.debug(`start to install partition to ${adc.id}`);
       await this.serialize(adc, {status: AdcState.PARTITIONING, lastErr: ''});
       await this.asgMgr.deploy(cnct.ipAddress, cnct.tcpPort, paritionObj);
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.PARTITIONED),
         60,
       ).then(
-        async () => this.serialize(adc, {status: AdcState.ACTIVE, lastErr: ''}),
-        async () =>
+        async () => {
+          this.logger.debug(`succeed in installing partition to ${adc.id}`);
+          this.serialize(adc, {status: AdcState.ACTIVE, lastErr: ''});
+        },
+        async () => {
+          this.logger.error(
+            `failed to install partition to ${adc.id}: partition ${tenantName}`,
+          );
           this.serialize(adc, {
             status: AdcState.PARTITIONERR,
             lastErr: `${AdcState.PARTITIONERR}: Fail to create partition`,
-          }),
+          });
+        },
       );
     } catch (err) {
-      this.logger.error(`Creating partition ${tenantName} Error.`);
+      this.logger.error(
+        `failed to install partition to ${adc.id}: partition ${tenantName}`,
+      );
       await this.serialize(adc, {
         status: AdcState.PARTITIONERR,
         lastErr: `${AdcState.PARTITIONERR}: Fail to create partition: ${err.message}`,
@@ -511,18 +529,21 @@ export class AdcController extends BaseController {
 
   private async createOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
+      this.logger.debug(`start to create ${adc.id}`);
       await this.serialize(adc, {status: AdcState.POWERING, lastErr: ''})
         .then(() => this.cNet(adc, addon))
         .then(() => this.cSvr(adc, addon));
 
       await checkAndWait(() => this.adcStCtr.gotTo(AdcState.POWERON), 240)
-        .then(() =>
-          this.serialize(adc, {status: AdcState.POWERON, lastErr: ''}),
-        )
+        .then(() => {
+          this.logger.debug(`succeed for power on ${adc.id}`);
+          this.serialize(adc, {status: AdcState.POWERON, lastErr: ''});
+        })
         .catch(error => {
           throw new Error(`Timeout waiting for: ${AdcState.POWERON}`);
         });
     } catch (error) {
+      this.logger.error(`failed to power on ${adc.id}`);
       await this.serialize(adc, {
         status: AdcState.POWERERR,
         lastErr: `${AdcState.POWERERR}: ${error.message}`,
@@ -776,13 +797,15 @@ export class AdcController extends BaseController {
     };
 
     try {
+      this.logger.debug(`start to reclaim ${adc.id}`);
       this.serialize(adc, {status: AdcState.RECLAIMING, lastErr: ''});
       for (let f of ['trust', 'license', 'vm', 'network']) {
         await reclaimFuncs[f]();
       }
+      this.logger.debug(`succeed for reclaiming ${adc.id}`);
       this.serialize(adc, {status: AdcState.RECLAIMED, lastErr: ''});
     } catch (error) {
-      this.logger.error(`Reclaiming fails: ${error.message}`);
+      this.logger.error(`Reclaiming fails for ${adc.id}: ${error.message}`);
       this.serialize(adc, {
         status: AdcState.RECLAIMERR,
         lastErr: `${AdcState.RECLAIMERR}: ${error.message}; Please try again.`,
@@ -814,7 +837,7 @@ export class AdcController extends BaseController {
 
   private async installDO(adc: Adc): Promise<void> {
     try {
-      this.logger.debug('start to install do rpm to bigip ' + adc.id);
+      this.logger.debug(`start to install do rpm to bigip ${adc.id}`);
       await this.serialize(adc, {status: AdcState.DOINSTALLING});
       // check if do is already installed.
       let cnct = adc.management.connection!;
@@ -836,10 +859,12 @@ export class AdcController extends BaseController {
       await checkAndWait(
         () => this.adcStCtr.gotTo(AdcState.DOINSTALLED),
         240,
-      ).then(() =>
-        this.serialize(adc, {status: AdcState.DOINSTALLED, lastErr: ''}),
-      );
+      ).then(() => {
+        this.logger.debug(`succeed for do installing on ${adc.id}`);
+        this.serialize(adc, {status: AdcState.DOINSTALLED, lastErr: ''});
+      });
     } catch (error) {
+      this.logger.error(`failed to install do on ${adc.id}`);
       await this.serialize(adc, {
         status: AdcState.DOINSTALLERR,
         lastErr: `${AdcState.DOINSTALLERR}: ${error}`,
@@ -849,7 +874,7 @@ export class AdcController extends BaseController {
 
   private async onboard(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
-      this.logger.debug('start to do onbarding');
+      this.logger.debug(`start to do onbarding ${adc.id}`);
       await this.serialize(adc, {status: AdcState.ONBOARDING});
 
       let doMgr = await OnboardingManager.instanlize(
@@ -867,8 +892,12 @@ export class AdcController extends BaseController {
         .then(() =>
           checkAndWait(() => this.adcStCtr.gotTo(AdcState.ONBOARDED), 240),
         )
-        .then(() => this.serialize(adc, {status: AdcState.ONBOARDED}));
+        .then(() => {
+          this.logger.debug(`succeed for onboarding ${adc.id}`);
+          this.serialize(adc, {status: AdcState.ONBOARDED});
+        });
     } catch (error) {
+      this.logger.error(`failed to onboard ${adc.id}`);
       await this.serialize(adc, {
         status: AdcState.ONBOARDERR,
         lastErr: `${AdcState.ONBOARDERR}: ${error}`,
