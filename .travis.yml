@@ -25,13 +25,18 @@ jobs:
         script:
           - scripts/publish_api_ref.sh
     - stage: fvt
+      if: TRAVIS_EVENT_TYPE = cron 
       before_script:
         - pushd test/vpn
         - ./vpn_install.sh
         - ./vpn_connect.sh
-        - popd
+        - popd 
       script:
-        - echo "No test"
+        - pushd test/Auto
+        - export name=`openssl rand -base64 8`
+        - ./auto_test.sh 
+      after_success:
+        - ./auto_clean.sh 
     - stage: publish-image-and-docs
       language: python
       sudo: required
