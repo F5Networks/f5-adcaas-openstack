@@ -27,6 +27,11 @@ export class Monitor extends CommonEntity {
       update: true,
       response: true,
       example: 5,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 3600,
+      },
     },
   })
   interval: number;
@@ -39,6 +44,11 @@ export class Monitor extends CommonEntity {
       update: true,
       response: true,
       example: 16,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 900,
+      },
     },
   })
   timeout: number;
@@ -51,6 +61,9 @@ export class Monitor extends CommonEntity {
       update: true,
       response: true,
       example: '192.168.10.123',
+      openapi: {
+        format: 'ipv4',
+      },
     },
   })
   targetAddress: string;
@@ -63,6 +76,11 @@ export class Monitor extends CommonEntity {
       update: true,
       response: true,
       example: 8080,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 65535,
+      },
     },
   })
   targetPort: number;
@@ -76,6 +94,23 @@ export class Monitor extends CommonEntity {
       update: true,
       response: true,
       example: 'tcp',
+      openapi: {
+        enum: [
+          'dns',
+          'external',
+          'ftp',
+          'http',
+          'https',
+          'icmp',
+          'ldap',
+          'radius',
+          'sip',
+          'smtp',
+          'tcp',
+          'tcp-half-open',
+          'udp',
+        ],
+      },
     },
     as3: {},
   })
@@ -87,6 +122,15 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'string',
     default: 'no-error',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 'no-error',
+      openapi: {
+        enum: ['anything', 'no-error'],
+      },
+    },
   })
   acceptRCODE: string;
 
@@ -99,47 +143,124 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'number',
     default: 500,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 500,
+      openapi: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 10000,
+      },
+    },
   })
   adaptiveDivergenceMilliseconds: number;
 
   @property({
     type: 'number',
     default: 100,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 500,
+      },
+    },
   })
   adaptiveDivergencePercentage: number;
 
   @property({
     type: 'string',
     default: 'relative',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        enum: ['absolute', 'relative'],
+      },
+    },
   })
   adaptiveDivergenceType: string;
 
   @property({
     type: 'number',
     default: 1000,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 10000,
+      },
+    },
   })
   adaptiveLimitMilliseconds: number;
 
   @property({
     type: 'number',
     default: 180,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        type: 'integer',
+        minimum: 60,
+        maximum: 1800,
+      },
+    },
   })
   adaptiveWindow: number;
 
   @property({
     type: 'string',
     default: 'query-type',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 'query-type',
+      openapi: {
+        enum: ['any-type', 'anything', 'query-type'],
+      },
+    },
   })
   answerContains: string;
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: '',
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   arguments: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   base: string;
 
@@ -152,35 +273,95 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   ciphers: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   clientCertificate: string;
 
   @property({
     type: 'array',
     itemType: 'number',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        items: {
+          type: 'integer',
+          minimum: 0,
+        },
+      },
+    },
   })
   codesDown: number[];
 
   @property({
     type: 'array',
     itemType: 'number',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        items: {
+          type: 'integer',
+          minimum: 0,
+        },
+      },
+    },
   })
   codesUp: number[];
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   domain: string;
 
   @property({
     type: 'number',
     default: 0,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 0,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 63,
+      },
+    },
   })
   dscp: number;
 
@@ -192,17 +373,45 @@ export class Monitor extends CommonEntity {
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   filter: string;
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: '',
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   headers: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   label: string;
 
@@ -214,6 +423,14 @@ export class Monitor extends CommonEntity {
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        format: 'ipv4',
+      },
+    },
   })
   nasIpAddress: string;
 
@@ -224,45 +441,119 @@ export class Monitor extends CommonEntity {
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   pathname: string;
 
   @property({
     type: 'string',
     default: 'udp',
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: 'udp',
+      openapi: {
+        enum: ['sips', 'tcp', 'tls', 'udp'],
+      },
+    },
   })
   protocol: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   queryName: string;
 
   @property({
     type: 'string',
     default: 'a',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 'a',
+      openapi: {
+        enum: ['a', 'aaaa'],
+      },
+    },
   })
   queryType: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   receive: string;
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: '',
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   receiveDown: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   remark: string;
 
   @property({
     type: 'string',
     default: '',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: '',
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   request: string;
 
@@ -285,17 +576,45 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'string',
     default: 'none',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      example: 'none',
+      openapi: {
+        enum: ['none', 'ssl', 'tls'],
+      },
+    },
   })
   security: string;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   send: string;
 
   @property({
     type: 'number',
     default: 0,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 1800,
+      },
+    },
   })
   timeUntilUp: number;
 
@@ -308,11 +627,30 @@ export class Monitor extends CommonEntity {
   @property({
     type: 'number',
     default: 0,
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 3600,
+      },
+    },
   })
   upInterval: number;
 
   @property({
     type: 'string',
+    schema: {
+      create: true,
+      update: true,
+      response: false,
+      openapi: {
+        minLength: 1,
+        maxLength: 100,
+      },
+    },
   })
   username: string;
 

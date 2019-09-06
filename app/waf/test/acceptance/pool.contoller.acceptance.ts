@@ -57,6 +57,20 @@ describe('PoolController', () => {
     teardownEnvs();
   });
 
+  it('post ' + prefix + '/pools with invalid serviceDownAction', async () => {
+    let pool = {
+      serviceDownAction: 'invalid testing',
+    };
+    const response = await client
+      .post(prefix + '/pools')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(pool)
+      .expect(422);
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('enum');
+  });
+
   it('post ' + prefix + '/pools', async () => {
     const pool = createPoolObject();
 

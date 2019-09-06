@@ -75,6 +75,26 @@ describe('MemberController', () => {
       .and.type('string');
   });
 
+  it(
+    'post ' + prefix + '/pools/{pool_id}/members with invalid type of port',
+    async () => {
+      const pool = await givenPoolData(wafapp);
+      let member = {
+        address: '1.2.3.4',
+        port: 12.34,
+      };
+
+      const response = await client
+        .post(prefix + `/pools/${pool.id}/members`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send(member)
+        .expect(422);
+
+      expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+      expect(response.body.error.details[0].code).to.equal('type');
+    },
+  );
   it('get ' + prefix + '/pools/{pool_id}/members/{member_id}', async () => {
     const pool = await givenPoolData(wafapp);
     const member = await givenMemberData(wafapp, {id: uuid(), poolId: pool.id});

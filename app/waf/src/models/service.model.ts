@@ -526,7 +526,7 @@ export class Service extends CommonEntity {
       openapi: {
         type: 'integer',
         minimum: 0,
-        maxmium: 65535,
+        maximum: 65535,
       },
     },
     as3: {},
