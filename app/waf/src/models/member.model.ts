@@ -28,6 +28,9 @@ export class Member extends CommonEntity {
       response: true,
       example: '192.168.1.12',
     },
+    openapi: {
+      format: 'ipv4',
+    },
   })
   address: string;
 
@@ -40,6 +43,11 @@ export class Member extends CommonEntity {
       response: true,
       example: 80,
     },
+    openapi: {
+      type: 'integer',
+      minimal: '0',
+      maxmium: '65535',
+    },
   })
   port: number;
 
@@ -49,6 +57,9 @@ export class Member extends CommonEntity {
     schema: {
       response: true,
       example: '2d3h896a-4d82-40ee-8d08-55550dbc191',
+    },
+    openapi: {
+      format: 'uuid',
     },
   })
   poolId: string;
