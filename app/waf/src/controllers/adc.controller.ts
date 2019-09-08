@@ -58,7 +58,7 @@ import {
   ASGServiceProvider,
   AuthedToken,
 } from '../services';
-import {checkAndWait, merge} from '../utils';
+import {checkAndWait, merge, runWithTimer} from '../utils';
 
 const prefix = '/adcaas/v1';
 
@@ -133,20 +133,26 @@ export class AdcController extends BaseController {
       return new Response(Adc, adc);
     }
 
-    (async () => {
+    let createFunc = async () => {
       try {
         if (await this.adcStCtr.readyTo(AdcState.POWERON))
-          await this.createOn(adc, addonReq);
+          await runWithTimer(`${adc.id}.poweron`, () =>
+            this.createOn(adc, addonReq),
+          );
 
         if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
-          await this.installDO(adc);
+          await runWithTimer(`${adc.id}.installdo`, () => this.installDO(adc));
 
         if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
-          await this.onboard(adc, addonReq);
+          await runWithTimer(`${adc.id}.onboard`, () =>
+            this.onboard(adc, addonReq),
+          );
       } catch (error) {
         this.logger.error(`Provisioning is failed for ${adc.id}.`);
       }
-    })();
+    };
+
+    runWithTimer(`${adc.id}.create`, createFunc);
 
     return new Response(Adc, adc);
   }
