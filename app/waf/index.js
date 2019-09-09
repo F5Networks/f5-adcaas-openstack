@@ -25,7 +25,7 @@ if (require.main === module) {
     rest: {
       port: +process.env.ADCAAS_APP_PORT || 3000,
       host: '0.0.0.0',
-      protocol: processs.env.ADCAAS_PROTOCOL || 'http',
+      protocol: process.env.ADCAAS_APP_PROTOCOL || 'http',
       openApiSpec: {
         // useful when used with OASGraph to locate your application
         setServersFromRequest: true,
@@ -33,7 +33,7 @@ if (require.main === module) {
     },
   };
 
-  if (process.env.ADCAAS_PROTOCOL === 'https') {
+  if (process.env.ADCAAS_APP_PROTOCOL === 'https') {
     if (!process.env.ADCAAS_CERT_KEY) {
       console.error('ADCAAS_CERT_KEY is not configred');
       process.exit(1);

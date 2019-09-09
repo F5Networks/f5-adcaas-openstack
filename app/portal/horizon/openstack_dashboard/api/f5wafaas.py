@@ -32,7 +32,7 @@ class ADCInstance(base.APIResourceWrapper):
 
 @profiler.trace
 def adc_list(request):
-    url = '%s/adcaas/v1/adcs' % WAFAAS_URL
+    url = '%s/adcaas/v1/adcs' % ADCAAS_ENDPOINT
     headers = {
         'tenant-id': request.user.tenant_id, 
         'x-auth-token': request.user.token.id,
@@ -65,7 +65,7 @@ def adc_create(request):
                 }
         return rlt
 
-    url = '%s/adcaas/v1/adcs' % WAFAAS_URL
+    url = '%s/adcaas/v1/adcs' % ADCAAS_ENDPOINT
     headers = {
         'tenant-id': request.user.tenant_id, 
         'x-auth-token': request.user.token.id,
@@ -91,7 +91,7 @@ def adc_create(request):
 
 @profiler.trace
 def adc_delete(request, obj_id):
-    url = '%s/adcaas/v1/adcs/%s' % (WAFAAS_URL, obj_id)
+    url = '%s/adcaas/v1/adcs/%s' % (ADCAAS_ENDPOINT, obj_id)
     headers = {
         'tenant-id': request.user.tenant_id, 
         'x-auth-token': request.user.token.id,

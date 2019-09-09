@@ -3,4 +3,6 @@ export PYTHONDONTWRITEBYTECODE=1
 #export ADCAAS_ENDPOINT=http://10.250.11.24:3000
 
 export OS_AUTH_URL=http://10.250.13.69:5000/v3
-export ADCAAS_ENDPOINT=http://localhost:3000
+export ADCAAS_APP_HOST=localhost
+export ADCAAS_APP_PORT=3000
+export ADCAAS_APP_PROTOCOL=http
