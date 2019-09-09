@@ -400,7 +400,7 @@
     function onGetFlavors(data) {
       model.flavors.length = 0;
       var fdata = data.data.items.filter(function(v){
-        return (v.vcpus >= 4 && v.ram >= 8192);
+        return (v.vcpus >= 2 && v.ram >= 4096 && v.disk > 90);
       });
       push.apply(model.flavors, fdata);
     }

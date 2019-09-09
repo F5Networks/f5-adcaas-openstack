@@ -20,6 +20,6 @@ cdir=`cd $(dirname $0); pwd`
     export DATABASE_DATA_DIRECTORY=`pwd`/../data/pg_data
     export ASG_DATA_DIRECTORY=`pwd`/../data/asg_data
 
-    docker-compose -f docker-compose.yml up -d --force-recreate
+    docker-compose -f docker-compose.yml up -d --force-recreate --remove-orphans
 )
 
