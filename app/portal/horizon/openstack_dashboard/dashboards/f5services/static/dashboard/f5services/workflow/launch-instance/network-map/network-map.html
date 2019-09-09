@@ -1,0 +1,51 @@
+<div ng-controller="LaunchInstanceNetworkMapController as ctrl">
+
+    <div id="valid" class="form-control" ng-required="ctrl.allNetReady" ng-hide="true"></div>
+
+    <p class="step-description" translate>
+        Networks provide the communication channels for instances in the cloud.
+    </p>
+    <br>
+
+    <ul id="system_info" class="nav nav-tabs ajax-tabs"
+        data-sticky-tabs="sticky">
+        <li class="active">
+            <a href="?tab=system_info__mgmt" data-toggle="tab"
+                data-target="#system_info__mgmt" data-loaded="true"
+                aria-expanded="false">Management {$ ctrl.asterisk.mgmt $}</a>
+        </li>
+        <li class="">
+            <a href="?tab=system_info__ext" data-toggle="tab"
+                data-target="#system_info__ext" data-loaded="true"
+                aria-expanded="false">External {$ ctrl.asterisk.ext $}</a>
+        </li>
+        <li class="">
+            <a href="?tab=system_info__int" data-toggle="tab"
+                data-target="#system_info__int" data-loaded="true"
+                aria-expanded="true">Internal {$ ctrl.asterisk.int $}</a>
+        </li>
+        <li class="">
+            <a href="?tab=system_info__ha" data-toggle="tab"
+                data-target="#system_info__ha" data-loaded="true"
+                aria-expanded="false">HA {$ ctrl.asterisk.ha $}</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="system_info__mgmt" class="tab-pane active">
+            <ng-include src="ctrl.networkPages.mgmt"></ng-include>
+        </div>
+
+        <div id="system_info__ext" class="tab-pane">
+            <ng-include src="ctrl.networkPages.ext"></ng-include>
+        </div>
+
+        <div id="system_info__int" class="tab-pane">
+            <ng-include src="ctrl.networkPages.int"></ng-include>
+        </div>
+
+        <div id="system_info__ha" class="tab-pane">
+            <ng-include src="ctrl.networkPages.ha"></ng-include>
+        </div>
+    </div>
+</div>

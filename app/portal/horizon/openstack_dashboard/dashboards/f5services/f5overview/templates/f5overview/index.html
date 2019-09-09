@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "F5 Services Overview" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("F5 Services Overview") %}
+{% endblock page_header %}
+
+{% block main %}
+
+<!-- <div style="margin-top: 100px" align="center">
+</div> -->
+<br><br>
+<pre>
+we are here  ---->                  +------------+
+                                    |   PORTAL   |----------------------------------------+
+                                    +------------+                                        |
+                                           |                                              |
+                            +--------------+---------------+                              |
+                            |                              |                              |
+        +-------------------------------------+     +------------+                        |
+        |       LTMAAS/DNSAAS/..(future)      |     |   WAFAAS   |-----------+------------+
+        +-------------------------------------+     +------------+           |            |
+                            |                              |                 |            |
+                 +----------+-----+-------------+----------+                 |            |
+                 |                |             |          |                 |            |
+           +---+---+---+   +------------+    +-----+   +------+      +-----------------------[ OPENSTACK ]--+
+           | E | F | K |   |  POSTGRES  |    | ASG |   | (DO) |      |       |            |                 |
+           +---+---+---+   +------------+    +-----+   +------+      |       |            +--[keystone]     |
+                 |                              |          |         |       |            |                 |
+                >*<                             +-----+----+         |       |            |                 |
+                 ^                                    |              |       |            +- [glance]       |
+                                                      +--------------|-- (BIG-IP VE) -----+- [nova]         |
+                                                                     |                    +- [neutron]      |
+                                                                     +--------------------------------------+
+</pre>
+
+<div align="center">
+    F5 Services Integration with OPENSTACK
+</div>
+{% endblock %}
+
+

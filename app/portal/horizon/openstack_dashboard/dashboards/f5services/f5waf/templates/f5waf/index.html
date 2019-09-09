@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Web Application Firewall" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Web Application Firewall") %}
+{% endblock page_header %}
+
+{% block main %}
+
+{% include "f5services/f5waf/_sample.html" %}
+
+{% endblock %}
+
+

@@ -19,10 +19,12 @@ WORKDIR /root
 RUN git clone https://opendev.org/openstack/horizon -b stable/queens --depth=1
 WORKDIR /root/horizon
 RUN pip install -c https://opendev.org/openstack/requirements/raw/branch/stable/queens/upper-constraints.txt .
-
-COPY src /root/src
-COPY load_scripts /root/load_scripts
-RUN chmod -R +x /root/load_scripts/*
-RUN /root/load_scripts/load.sh /root/src /root/horizon
+COPY horizon /root/horizon
+ENV OS_AUTH_URL='http://keystone-endpoint:5000/v3'
+ENV ADCAAS_APP_HOST='adcaas-server'
+ENV ADCAAS_APP_PORT=3000
+ENV ADCAAS_PROTOCOL=http
+RUN python /root/horizon/manage.py collectstatic --no-input
+RUN python /root/horizon/manage.py compress --force
 
 ENTRYPOINT python /root/horizon/manage.py runserver 0:80

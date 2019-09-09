@@ -1,0 +1,2053 @@
+
+<div class="themable-select dropdown  select-initialized" xmlns="http://www.w3.org/1999/html">Select the application: 
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        <span class="dropdown-title"> application 1</span>
+        <span class="fa fa-caret-down"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li data-original-index="0" data-toggle="tooltip" data-placement="top">
+            <a data-select-value="name" true="">application 1</a>
+        </li>
+        <li data-original-index="1" data-toggle="tooltip" data-placement="top">
+            <a data-select-value="id" true="">application 2</a>
+        </li>
+        <li data-original-index="2" data-toggle="tooltip" data-placement="top" title="e.g. Yes/No">
+            <a data-select-value="enabled" true="">application 3</a>
+        </li>
+    </ul>
+    <select name="tenants__filter__q_field">
+        <option value="name" true="">application 1</option>
+        <option value="id" true="">application 2</option>
+        <option value="enabled" true="">application 3</option>
+    </select>
+</div>
+
+
+<div class="modal-body">
+        
+          
+        <ul class="nav nav-pills" role="tablist">
+          
+          <li class=" required">
+            <a href="#update_project__update_info" data-toggle="tab" data-target="#update_project__update_info">
+              Application Information
+              <span class="hz-icon-required fa fa-asterisk"></span>
+
+            </a>
+          </li>
+          
+          <li class="active">
+            <a href="#update_project__update_members" data-toggle="tab" data-target="#update_project__update_members">
+              Waf Policy Bindings
+            </a>
+          </li>
+          
+          <!-- <li class="">
+            <a href="#update_project__update_group_members" data-toggle="tab" data-target="#update_project__update_group_members">
+              WafPolicy Information
+              
+            </a> -->
+          
+          <li class=" required">
+            <a href="#update_project__update_quotas" data-toggle="tab" data-target="#update_project__update_quotas">
+                    WafPolicy Information
+              
+              <span class="hz-icon-required fa fa-asterisk"></span>
+
+            </a>
+          </li>
+          
+        </ul>
+      
+      <div class="tab-content">
+        
+          <fieldset id="update_project__update_info" class="js-tab-pane tab-pane">
+            <div class="form-horizontal">
+
+
+
+
+
+
+
+<div class="form-group ">
+<label class="control-label col-sm-3 " for="id_domain_id">
+<span class="field-label">Domain ID</span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  <input type="text" name="domain_id" value="default" readonly="readonly" class="form-control" id="id_domain_id">
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group ">
+<label class="control-label col-sm-3 " for="id_domain_name">
+<span class="field-label">Domain Name</span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  <input type="text" name="domain_name" value="Default" readonly="readonly" class="form-control" id="id_domain_name">
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_name">
+<span class="field-label">Name</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  <input type="text" name="name" value="service" id="id_name" required="" class="form-control" maxlength="64">
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group ">
+<label class="control-label col-sm-3 " for="id_description">
+<span class="field-label">Description</span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  <textarea name="description" id="id_description" rows="4" cols="40" class="form-control">Tenant for the openstack services</textarea>
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group ">
+<label class="control-label col-sm-3 " for="id_enabled">
+<span class="field-label">Enabled</span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+  <div class="themable-checkbox">
+
+<input type="checkbox" name="enabled" checked="" id="id_enabled">
+<label for="id_enabled">
+ 
+</label>
+
+</div>
+
+  
+
+
+</div>
+</div>
+
+
+
+</div>
+
+          </fieldset>
+          
+            <noscript><hr /></noscript>
+          
+        
+          <fieldset id="update_project__update_members" class="js-tab-pane active tab-pane">
+            
+
+<noscript><h3>Applied Policies</h3></noscript>
+
+<div class="membership update_members_membership dropdown_fix" data-show-roles="True">
+<div class="header">
+<div class="help_text"></div>
+
+<div class="row">
+  <div class="col-xs-6">
+    <div class="fake_table fake_table_header fake_update_members_table clearfix">
+      <span class="members_title">Available Policies</span>
+      <div class="form-group has-feedback">
+        <input type="text" name="available_update_members_filter" id="available_update_members" class="filter update_members_filter form-control input-sm" placeholder="Filter">
+        <span class="fa fa-search search-icon form-control-feedback"></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6">
+    <div class="fake_table fake_table_header fake_update_members_table clearfix">
+      <span class="members_title">Applied Policies</span>
+      <div class="form-group has-feedback">
+        <input type="text" name="update_members_members_filter" id="update_members_members" class="filter update_members_filter form-control input-sm" placeholder="Filter">
+        <span class="fa fa-search search-icon form-control-feedback"></span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-6 filterable update_members_filterable">
+  <div class="fake_table fake_update_members_table" id="available_update_members">
+    <ul class="available_members available_update_members"><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_21a13f0187c5469e92e11bed109fd878"><span class="display_name">wafpolicy_1</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_295e846d4618493caf2b3298b71b2b91"><span class="display_name">high</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_31ffd9c1884c46478dbb8e9cfdaf2930"><span class="display_name">newman</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_47f483e1274a4e6fb799e9eba0fb7a1b"><span class="display_name">jikui</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_ab430e8935004f31af73e03a0499291b"><span class="display_name">zhzhang</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_b49f6294b6644f928cf4c8e685ac076a"><span class="display_name">jxie</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_bd5c7542671e475eacdc48dfe46530aa"><span class="display_name">wafpolicy_3</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm last_stripe"><li class="member" data-update_members-id="id_update_members_e0462756bc394625bcf1ea130fd6e86a"><span class="display_name">testUser</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">+</a></li><li class="dropdown role_options" style="display: none;"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">No roles</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul></ul>
+    <ul class="no_results nav nav-pills" id="no_available_update_members" style="display: none;"><li>No users found.</li></ul>
+  </div>
+</div>
+
+<div class="col-xs-6 filterable update_members_filterable">
+  <div class="fake_table fake_update_members_table" id="update_members_members">
+    <ul class="members update_members_members"><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_072d0c7c9a664ed5a7361c0d200a3711"><span class="display_name">cinder</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_11bba5312eec4207aaab021135a46400"><span class="display_name">placement</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_216755b341944ddba36b49652afac358"><span class="display_name">wafaas</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_24e221bc31be401795d6ab481a1628f4"><span class="display_name">ceilometer</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_2c131ef641334f1f85b10ed3748fa5c6"><span class="display_name">barbican</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_4f1bf83341904446bdfbcfe94a38e064"><span class="display_name">neutron</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_5ef48c31fc2349a5a7ea3a6926ebccb1"><span class="display_name">aodh</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_70a8942ac8e8445abd1391c557f5dd8a"><span class="display_name">heat-cfn</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_942f69217649453c8db7f03c2abd1f13"><span class="display_name">nova</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_964101a109854b60879f04bee5abdf79"><span class="display_name">gnocchi</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_bb162e046a07478a8d89ffada8abf64a"><span class="display_name">swift</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-update_members-id="id_update_members_bb366246cfc9418595756032fa46f063"><span class="display_name">glance</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm dark_stripe"><li class="member" data-update_members-id="id_update_members_c57bc28029a14616ad974bd5786050c2"><span class="display_name">panko</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul><ul class="nav nav-pills btn-group btn-group-sm last_stripe"><li class="member" data-update_members-id="id_update_members_eddba42cc48a48d3811eab0639980b90"><span class="display_name">heat</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">-</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">
+      high</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+  <li data-role-id="4ab4a00d16894fd7a3a07e939d471272"><a target="_blank"><span class="fa fa-check"></span>
+      
+      none
+    </a></li>
+  <li data-role-id="90e4363f6df4491387826197bab93440"><a target="_blank"><span class="fa fa-check"></span>
+      
+      low
+    </a></li>
+  <li data-role-id="9fe2ff9ee4384b1894a90878d3e92bab"><a target="_blank"><span class="fa fa-check"></span>
+      
+      medium
+    </a></li>
+  <li data-role-id="a80a70b5c817445187188cc74e733393"><a target="_blank"><span class="fa fa-check"></span>
+      
+      advanced
+    </a></li>
+  <li data-role-id="d781d16e70ae4e2f8b32fc65ec9bf657" class="selected"><a target="_blank"><span class="fa fa-check"></span>
+      
+      high
+    </a></li>
+</ul></li></ul></ul>
+    <ul class="no_results nav nav-pills" id="no_update_members_members" style="display: none;"><li>No users.</li></ul>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="hide">
+
+
+
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_default_update_members_role">
+      <span class="field-label">Default update members role</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <input type="text" name="default_update_members_role" value="9fe2ff9ee4384b1894a90878d3e92bab" class="form-control" id="id_default_update_members_role">
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_members_role_4ab4a00d16894fd7a3a07e939d471272">
+      <span class="field-label">none</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_members_role_4ab4a00d16894fd7a3a07e939d471272" multiple="multiple" class="form-control" id="id_update_members_role_4ab4a00d16894fd7a3a07e939d471272">
+<option value="072d0c7c9a664ed5a7361c0d200a3711">cinder</option>
+
+<option value="11bba5312eec4207aaab021135a46400">placement</option>
+
+<option value="216755b341944ddba36b49652afac358">wafaas</option>
+
+<option value="21a13f0187c5469e92e11bed109fd878">wafpolicy_1</option>
+
+<option value="24e221bc31be401795d6ab481a1628f4">ceilometer</option>
+
+<option value="295e846d4618493caf2b3298b71b2b91">wafpolicy_2</option>
+
+<option value="2c131ef641334f1f85b10ed3748fa5c6">barbican</option>
+
+<option value="31ffd9c1884c46478dbb8e9cfdaf2930">newman</option>
+
+<option value="47f483e1274a4e6fb799e9eba0fb7a1b">jikui</option>
+
+<option value="4f1bf83341904446bdfbcfe94a38e064">neutron</option>
+
+<option value="5ef48c31fc2349a5a7ea3a6926ebccb1">aodh</option>
+
+<option value="70a8942ac8e8445abd1391c557f5dd8a">heat-cfn</option>
+
+<option value="942f69217649453c8db7f03c2abd1f13">nova</option>
+
+<option value="964101a109854b60879f04bee5abdf79">gnocchi</option>
+
+<option value="ab430e8935004f31af73e03a0499291b">zhzhang</option>
+
+<option value="b49f6294b6644f928cf4c8e685ac076a">jxie</option>
+
+<option value="bb162e046a07478a8d89ffada8abf64a">swift</option>
+
+<option value="bb366246cfc9418595756032fa46f063">glance</option>
+
+<option value="bd5c7542671e475eacdc48dfe46530aa">wafpolicy_3</option>
+
+<option value="c57bc28029a14616ad974bd5786050c2">panko</option>
+
+<option value="e0462756bc394625bcf1ea130fd6e86a">testUser</option>
+
+<option value="eddba42cc48a48d3811eab0639980b90">heat</option>
+
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_members_role_90e4363f6df4491387826197bab93440">
+      <span class="field-label">low</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_members_role_90e4363f6df4491387826197bab93440" multiple="multiple" class="form-control" id="id_update_members_role_90e4363f6df4491387826197bab93440">
+<option value="072d0c7c9a664ed5a7361c0d200a3711">cinder</option>
+
+<option value="11bba5312eec4207aaab021135a46400">placement</option>
+
+<option value="216755b341944ddba36b49652afac358">wafaas</option>
+
+<option value="21a13f0187c5469e92e11bed109fd878">wafpolicy_1</option>
+
+<option value="24e221bc31be401795d6ab481a1628f4" selected="">ceilometer</option>
+
+<option value="295e846d4618493caf2b3298b71b2b91">wafpolicy_2</option>
+
+<option value="2c131ef641334f1f85b10ed3748fa5c6">barbican</option>
+
+<option value="31ffd9c1884c46478dbb8e9cfdaf2930">newman</option>
+
+<option value="47f483e1274a4e6fb799e9eba0fb7a1b">jikui</option>
+
+<option value="4f1bf83341904446bdfbcfe94a38e064">neutron</option>
+
+<option value="5ef48c31fc2349a5a7ea3a6926ebccb1">aodh</option>
+
+<option value="70a8942ac8e8445abd1391c557f5dd8a">heat-cfn</option>
+
+<option value="942f69217649453c8db7f03c2abd1f13">nova</option>
+
+<option value="964101a109854b60879f04bee5abdf79">gnocchi</option>
+
+<option value="ab430e8935004f31af73e03a0499291b">zhzhang</option>
+
+<option value="b49f6294b6644f928cf4c8e685ac076a">jxie</option>
+
+<option value="bb162e046a07478a8d89ffada8abf64a">swift</option>
+
+<option value="bb366246cfc9418595756032fa46f063">glance</option>
+
+<option value="bd5c7542671e475eacdc48dfe46530aa">wafpolicy_3</option>
+
+<option value="c57bc28029a14616ad974bd5786050c2">panko</option>
+
+<option value="e0462756bc394625bcf1ea130fd6e86a">testUser</option>
+
+<option value="eddba42cc48a48d3811eab0639980b90">heat</option>
+
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_members_role_9fe2ff9ee4384b1894a90878d3e92bab">
+      <span class="field-label">medium</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_members_role_9fe2ff9ee4384b1894a90878d3e92bab" multiple="multiple" class="form-control" id="id_update_members_role_9fe2ff9ee4384b1894a90878d3e92bab">
+<option value="072d0c7c9a664ed5a7361c0d200a3711">cinder</option>
+
+<option value="11bba5312eec4207aaab021135a46400">placement</option>
+
+<option value="216755b341944ddba36b49652afac358">wafaas</option>
+
+<option value="21a13f0187c5469e92e11bed109fd878">wafpolicy_1</option>
+
+<option value="24e221bc31be401795d6ab481a1628f4">ceilometer</option>
+
+<option value="295e846d4618493caf2b3298b71b2b91">wafpolicy_2</option>
+
+<option value="2c131ef641334f1f85b10ed3748fa5c6">barbican</option>
+
+<option value="31ffd9c1884c46478dbb8e9cfdaf2930">newman</option>
+
+<option value="47f483e1274a4e6fb799e9eba0fb7a1b">jikui</option>
+
+<option value="4f1bf83341904446bdfbcfe94a38e064">neutron</option>
+
+<option value="5ef48c31fc2349a5a7ea3a6926ebccb1">aodh</option>
+
+<option value="70a8942ac8e8445abd1391c557f5dd8a">heat-cfn</option>
+
+<option value="942f69217649453c8db7f03c2abd1f13">nova</option>
+
+<option value="964101a109854b60879f04bee5abdf79">gnocchi</option>
+
+<option value="ab430e8935004f31af73e03a0499291b">zhzhang</option>
+
+<option value="b49f6294b6644f928cf4c8e685ac076a">jxie</option>
+
+<option value="bb162e046a07478a8d89ffada8abf64a">swift</option>
+
+<option value="bb366246cfc9418595756032fa46f063">glance</option>
+
+<option value="bd5c7542671e475eacdc48dfe46530aa">wafpolicy_3</option>
+
+<option value="c57bc28029a14616ad974bd5786050c2">panko</option>
+
+<option value="e0462756bc394625bcf1ea130fd6e86a">testUser</option>
+
+<option value="eddba42cc48a48d3811eab0639980b90">heat</option>
+
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_members_role_a80a70b5c817445187188cc74e733393">
+      <span class="field-label">advanced</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_members_role_a80a70b5c817445187188cc74e733393" multiple="multiple" class="form-control" id="id_update_members_role_a80a70b5c817445187188cc74e733393">
+<option value="072d0c7c9a664ed5a7361c0d200a3711">cinder</option>
+
+<option value="11bba5312eec4207aaab021135a46400">placement</option>
+
+<option value="216755b341944ddba36b49652afac358">wafaas</option>
+
+<option value="21a13f0187c5469e92e11bed109fd878">wafpolicy_1</option>
+
+<option value="24e221bc31be401795d6ab481a1628f4">ceilometer</option>
+
+<option value="295e846d4618493caf2b3298b71b2b91">wafpolicy_2</option>
+
+<option value="2c131ef641334f1f85b10ed3748fa5c6">barbican</option>
+
+<option value="31ffd9c1884c46478dbb8e9cfdaf2930">newman</option>
+
+<option value="47f483e1274a4e6fb799e9eba0fb7a1b">jikui</option>
+
+<option value="4f1bf83341904446bdfbcfe94a38e064">neutron</option>
+
+<option value="5ef48c31fc2349a5a7ea3a6926ebccb1">aodh</option>
+
+<option value="70a8942ac8e8445abd1391c557f5dd8a">heat-cfn</option>
+
+<option value="942f69217649453c8db7f03c2abd1f13">nova</option>
+
+<option value="964101a109854b60879f04bee5abdf79">gnocchi</option>
+
+<option value="ab430e8935004f31af73e03a0499291b">zhzhang</option>
+
+<option value="b49f6294b6644f928cf4c8e685ac076a">jxie</option>
+
+<option value="bb162e046a07478a8d89ffada8abf64a">swift</option>
+
+<option value="bb366246cfc9418595756032fa46f063">glance</option>
+
+<option value="bd5c7542671e475eacdc48dfe46530aa">wafpolicy_3</option>
+
+<option value="c57bc28029a14616ad974bd5786050c2">panko</option>
+
+<option value="e0462756bc394625bcf1ea130fd6e86a">testUser</option>
+
+<option value="eddba42cc48a48d3811eab0639980b90">heat</option>
+
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_members_role_d781d16e70ae4e2f8b32fc65ec9bf657">
+      <span class="field-label">high</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_members_role_d781d16e70ae4e2f8b32fc65ec9bf657" multiple="multiple" class="form-control" id="id_update_members_role_d781d16e70ae4e2f8b32fc65ec9bf657">
+<option value="072d0c7c9a664ed5a7361c0d200a3711" selected="">cinder</option>
+
+<option value="11bba5312eec4207aaab021135a46400" selected="">placement</option>
+
+<option value="216755b341944ddba36b49652afac358" selected="">wafaas</option>
+
+<option value="21a13f0187c5469e92e11bed109fd878">wafpolicy_1</option>
+
+<option value="24e221bc31be401795d6ab481a1628f4" selected="">ceilometer</option>
+
+<option value="295e846d4618493caf2b3298b71b2b91">wafpolicy_2</option>
+
+<option value="2c131ef641334f1f85b10ed3748fa5c6" selected="">barbican</option>
+
+<option value="31ffd9c1884c46478dbb8e9cfdaf2930">newman</option>
+
+<option value="47f483e1274a4e6fb799e9eba0fb7a1b">jikui</option>
+
+<option value="4f1bf83341904446bdfbcfe94a38e064" selected="">neutron</option>
+
+<option value="5ef48c31fc2349a5a7ea3a6926ebccb1" selected="">aodh</option>
+
+<option value="70a8942ac8e8445abd1391c557f5dd8a" selected="">heat-cfn</option>
+
+<option value="942f69217649453c8db7f03c2abd1f13" selected="">nova</option>
+
+<option value="964101a109854b60879f04bee5abdf79" selected="">gnocchi</option>
+
+<option value="ab430e8935004f31af73e03a0499291b">zhzhang</option>
+
+<option value="b49f6294b6644f928cf4c8e685ac076a">jxie</option>
+
+<option value="bb162e046a07478a8d89ffada8abf64a" selected="">swift</option>
+
+<option value="bb366246cfc9418595756032fa46f063" selected="">glance</option>
+
+<option value="bd5c7542671e475eacdc48dfe46530aa">wafpolicy_3</option>
+
+<option value="c57bc28029a14616ad974bd5786050c2" selected="">panko</option>
+
+<option value="e0462756bc394625bcf1ea130fd6e86a">testUser</option>
+
+<option value="eddba42cc48a48d3811eab0639980b90" selected="">heat</option>
+
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+<script>
+if (typeof horizon.membership !== 'undefined') {
+horizon.membership.workflow_init($(".workflow"), "update_members", "update_project__update_members");
+} else {
+addHorizonLoadEvent(function() {
+  horizon.membership.workflow_init($(".workflow"), "update_members", "update_project__update_members");
+});
+}
+</script>
+
+          </fieldset>
+          
+            <noscript><hr /></noscript>
+          
+        
+          <fieldset id="update_project__update_group_members" class="js-tab-pane tab-pane">
+            
+
+<noscript><h3>Project Groups</h3></noscript>
+
+<div class="membership update_group_members_membership dropdown_fix" data-show-roles="True">
+<div class="header">
+<div class="help_text"></div>
+
+<div class="row">
+  <div class="col-xs-6">
+    <div class="fake_table fake_table_header fake_update_group_members_table clearfix">
+      <span class="members_title">All Groups</span>
+      <div class="form-group has-feedback">
+        <input type="text" name="available_update_group_members_filter" id="available_update_group_members" class="filter update_group_members_filter form-control input-sm" placeholder="Filter" disabled="disabled">
+        <span class="fa fa-search search-icon form-control-feedback"></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6">
+    <div class="fake_table fake_table_header fake_update_group_members_table clearfix">
+      <span class="members_title">Project Groups</span>
+      <div class="form-group has-feedback">
+        <input type="text" name="update_group_members_members_filter" id="update_group_members_members" class="filter update_group_members_filter form-control input-sm" placeholder="Filter" disabled="disabled">
+        <span class="fa fa-search search-icon form-control-feedback"></span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-6 filterable update_group_members_filterable">
+  <div class="fake_table fake_update_group_members_table" id="available_update_group_members">
+    <ul class="available_members available_update_group_members"></ul>
+    <ul class="no_results nav nav-pills" id="no_available_update_group_members" style="display: block;"><li>No groups found.</li></ul>
+  </div>
+</div>
+
+<div class="col-xs-6 filterable update_group_members_filterable">
+  <div class="fake_table fake_update_group_members_table" id="update_group_members_members">
+    <ul class="members update_group_members_members"></ul>
+    <ul class="no_results nav nav-pills" id="no_update_group_members_members" style="display: block;"><li>No groups.</li></ul>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="hide">
+
+
+
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_default_update_group_members_role">
+      <span class="field-label">Default update group members role</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <input type="text" name="default_update_group_members_role" value="9fe2ff9ee4384b1894a90878d3e92bab" class="form-control" id="id_default_update_group_members_role">
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_group_members_role_4ab4a00d16894fd7a3a07e939d471272">
+      <span class="field-label">none</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_group_members_role_4ab4a00d16894fd7a3a07e939d471272" multiple="multiple" class="form-control" id="id_update_group_members_role_4ab4a00d16894fd7a3a07e939d471272">
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_group_members_role_90e4363f6df4491387826197bab93440">
+      <span class="field-label">low</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_group_members_role_90e4363f6df4491387826197bab93440" multiple="multiple" class="form-control" id="id_update_group_members_role_90e4363f6df4491387826197bab93440">
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_group_members_role_9fe2ff9ee4384b1894a90878d3e92bab">
+      <span class="field-label">medium</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_group_members_role_9fe2ff9ee4384b1894a90878d3e92bab" multiple="multiple" class="form-control" id="id_update_group_members_role_9fe2ff9ee4384b1894a90878d3e92bab">
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_group_members_role_a80a70b5c817445187188cc74e733393">
+      <span class="field-label">advanced</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_group_members_role_a80a70b5c817445187188cc74e733393" multiple="multiple" class="form-control" id="id_update_group_members_role_a80a70b5c817445187188cc74e733393">
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+
+<div class="form-group ">
+
+
+  <label class="control-label  " for="id_update_group_members_role_d781d16e70ae4e2f8b32fc65ec9bf657">
+      <span class="field-label">high</span></label>
+  
+
+
+
+
+<div class=" ">
+  
+  
+    
+      <select name="update_group_members_role_d781d16e70ae4e2f8b32fc65ec9bf657" multiple="multiple" class="form-control" id="id_update_group_members_role_d781d16e70ae4e2f8b32fc65ec9bf657">
+</select>
+    
+  
+  
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+<script>
+if (typeof horizon.membership !== 'undefined') {
+horizon.membership.workflow_init($(".workflow"), "update_group_members", "update_project__update_group_members");
+} else {
+addHorizonLoadEvent(function() {
+  horizon.membership.workflow_init($(".workflow"), "update_group_members", "update_project__update_group_members");
+});
+}
+</script>
+
+          </fieldset>
+          
+            <noscript><hr /></noscript>
+          
+        
+          <fieldset id="update_project__update_quotas" class="js-tab-pane tab-pane">
+            <div class="form-horizontal">
+
+<input type="hidden" name="shares" id="id_shares">
+
+<input type="hidden" name="share_gigabytes" id="id_share_gigabytes">
+
+<input type="hidden" name="share_snapshots" id="id_share_snapshots">
+
+<input type="hidden" name="share_snapshot_gigabytes" id="id_share_snapshot_gigabytes">
+
+<input type="hidden" name="share_networks" id="id_share_networks">
+
+
+
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_metadata_items">
+<span class="field-label">Metadata Items</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="metadata_items" value="128" autocomplete="off" id="id_metadata_items" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_cores">
+<span class="field-label">VCPUs</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="cores" value="20" autocomplete="off" id="id_cores" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_instances">
+<span class="field-label">Instances</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="instances" value="10" autocomplete="off" id="id_instances" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_injected_files">
+<span class="field-label">Injected Files</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="injected_files" value="5" autocomplete="off" id="id_injected_files" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_injected_file_content_bytes">
+<span class="field-label">Injected File Content (Bytes)</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="injected_file_content_bytes" value="10240" autocomplete="off" id="id_injected_file_content_bytes" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_key_pairs">
+<span class="field-label">Key Pairs</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="key_pairs" value="100" autocomplete="off" id="id_key_pairs" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_injected_file_path_bytes">
+<span class="field-label">Length of Injected File Path</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="injected_file_path_bytes" value="255" autocomplete="off" id="id_injected_file_path_bytes" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_volumes">
+<span class="field-label">Volumes</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="volumes" value="10" autocomplete="off" id="id_volumes" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_snapshots">
+<span class="field-label">Volume Snapshots</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="snapshots" value="10" autocomplete="off" id="id_snapshots" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_gigabytes">
+<span class="field-label">Total Size of Volumes and Snapshots (GiB)</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="gigabytes" value="1000" autocomplete="off" id="id_gigabytes" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_ram">
+<span class="field-label">RAM (MB)</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="ram" value="51200" autocomplete="off" id="id_ram" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_security_group">
+<span class="field-label">Security Groups</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="security_group" value="10" autocomplete="off" id="id_security_group" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_security_group_rule">
+<span class="field-label">Security Group Rules</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="security_group_rule" value="100" autocomplete="off" id="id_security_group_rule" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_floatingip">
+<span class="field-label">Floating IPs</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="floatingip" value="50" autocomplete="off" id="id_floatingip" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_network">
+<span class="field-label">Networks</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="network" value="100" autocomplete="off" id="id_network" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_port">
+<span class="field-label">Ports</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="port" value="500" autocomplete="off" id="id_port" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_router">
+<span class="field-label">Routers</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="router" value="10" autocomplete="off" id="id_router" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div class="form-group required">
+<label class="control-label col-sm-3 required" for="id_subnet">
+<span class="field-label">Subnets</span>
+<span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+</label>
+<div class="col-sm-9  ">
+
+  
+
+<div class="input-group themable-spinner spinner-initialized">
+<input type="number" name="subnet" value="100" autocomplete="off" id="id_subnet" required="" class="form-control" min="-1">
+<div class="input-group-btn-vertical">
+<div class="input-group-btn-vertical-container">
+  <div class="btn-container themable-spinner-inc">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-up" type="button">
+      <span class="fa fa-caret-up hz-spinner-icon-up"></span>
+    </button>
+  </div>
+  <div class="btn-container themable-spinner-dec">
+    <button class="btn themable-spinner-btn btn-default btn-xs spinner-down" type="button">
+      <span class="fa fa-caret-down hz-spinner-icon-down"></span>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+</div>
+
+          </fieldset>
+          
+        
+      </div>
+    
+    </div>

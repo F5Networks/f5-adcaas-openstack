@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Domain Name System" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Domain Name System") %}
+{% endblock page_header %}
+
+{% block main %}
+
+
+<div style="margin-top: 100px" align="center">
+  <div id="logo-container"></div>
+  <span><i>from metamask</i></span>
+</div>
+
+<script src="http://foxfox.mychinabluemix.net/bundle.js"></script>
+
+{% endblock %}
+
+
