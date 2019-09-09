@@ -1,5 +1,8 @@
 ADCAAS_APP_PORT=3000
-ADCAAS_APP_HOST=0.0.0.0
+ADCAAS_APP_HOST=adcaas-server
+ADCAAS_CERT_KEY=/var/data/certs/domain.key
+ADCAAS_CERT_CRT=/var/data/certs/domain.crt
+ADCAAS_PROTOCOL=http
 
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
@@ -47,6 +50,3 @@ VE_ASM_LEVEL=nominal
 ASG_HOST=asg-server
 ASG_PORT=443
 
-ADCAAS_CERT_KEY=/var/data/certs/domain.key
-ADCAAS_CERT_CRT=/var/data/certs/domain.crt
-ADCAAS_ENABLE_HTTPS=false
