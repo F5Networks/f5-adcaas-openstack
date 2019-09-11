@@ -212,10 +212,13 @@ class IndexView(tables.DataTableView):
             e.submit(fn=_task_get_images)
 
         for n in adcs: 
-            image_id = n.compute['imageRef']
-            flavor_id = n.compute['flavorRef']
-            n.image_name = image_map[image_id].name
-            n.full_flavor = full_flavors[flavor_id]
+            try:
+                image_id = n.compute['imageRef']
+                flavor_id = n.compute['flavorRef']
+                n.image_name = image_map[image_id].name
+                n.full_flavor = full_flavors[flavor_id]
+            except Exception as e:
+                exceptions.handle(self.request, _("Unable to retrieve instance's image or flavor. %s" % e.message))
 
         return adcs
 
