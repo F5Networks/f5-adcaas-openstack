@@ -613,7 +613,9 @@ export class AdcController extends BaseController {
               ipAddress: <string>(() => {
                 for (let net in adc.networks) {
                   if (adc.networks[net].type === 'mgmt') {
-                    return adc.management.networks[net].fixedIp;
+                    return adc.management.networks[net].floatingIp
+                      ? adc.management.networks[net].floatingIp
+                      : adc.management.networks[net].fixedIp;
                   }
                 }
               })(),
