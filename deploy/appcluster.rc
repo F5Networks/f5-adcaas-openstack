@@ -2,7 +2,7 @@ ADCAAS_APP_PORT=3000
 ADCAAS_APP_HOST=adcaas-server
 ADCAAS_CERT_KEY=/var/data/certs/domain.key
 ADCAAS_CERT_CRT=/var/data/certs/domain.crt
-ADCAAS_PROTOCOL=http
+ADCAAS_APP_PROTOCOL=http
 
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
