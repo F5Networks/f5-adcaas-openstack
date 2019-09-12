@@ -174,3 +174,42 @@ export function findByKey(
 
   return rlt;
 }
+
+/**
+ * Run a function and collect execution time.
+ *
+ * @param metric: the metric name to define the time scope.
+ * @param func: function to return Promise<void>, no argument.
+ *    Use () => { funcWithArg(...args);} to wrap function-with-arguments.
+ * @param callBack: callback to handle(report) the duration.
+ */
+export async function runWithTimer(
+  metric: string,
+  func: () => Promise<void>,
+  callBack?: (metric: string, value: number) => Promise<void>,
+): Promise<void> {
+  let err = undefined;
+  utilsLogger.debug(`runWithTimer begins for ${metric}`);
+  let start = Date.now();
+  try {
+    await func();
+  } catch (error) {
+    err = error;
+  } finally {
+    let end = Date.now();
+    utilsLogger.debug(`runWithTimer ends for ${metric}`);
+
+    utilsLogger.debug(`${metric}: ${end - start}`);
+    if (callBack)
+      // async, call the callback function without exception handling.
+      (async () => {
+        try {
+          await callBack(metric, end - start);
+        } catch (error) {
+          // log it and ignore.
+          utilsLogger.error(`error happens for callback: ${error.message}`);
+        }
+      })();
+    if (err) throw err;
+  }
+}
