@@ -3720,6 +3720,9 @@
                         },
                         "monitorType": {
                           "type": "string"
+                        },
+                        "protocol": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -3732,7 +3735,8 @@
                         "timeout": 16,
                         "targetAddress": "192.168.10.123",
                         "targetPort": 8080,
-                        "monitorType": "tcp"
+                        "monitorType": "tcp",
+                        "protocol": "udp"
                       }
                     }
                   }
@@ -3885,6 +3889,9 @@
                           },
                           "monitorType": {
                             "type": "string"
+                          },
+                          "protocol": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -3897,7 +3904,8 @@
                           "timeout": 16,
                           "targetAddress": "192.168.10.123",
                           "targetPort": 8080,
-                          "monitorType": "tcp"
+                          "monitorType": "tcp",
+                          "protocol": "udp"
                         }
                       }
                     }
@@ -3972,6 +3980,9 @@
                         },
                         "monitorType": {
                           "type": "string"
+                        },
+                        "protocol": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -3984,7 +3995,8 @@
                         "timeout": 16,
                         "targetAddress": "192.168.10.123",
                         "targetPort": 8080,
-                        "monitorType": "tcp"
+                        "monitorType": "tcp",
+                        "protocol": "udp"
                       }
                     }
                   }
@@ -4404,19 +4416,220 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "interval": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3600
                   },
                   "timeout": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 900
                   },
                   "targetAddress": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "ipv4"
                   },
                   "targetPort": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "monitorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "dns",
+                      "external",
+                      "ftp",
+                      "http",
+                      "https",
+                      "icmp",
+                      "ldap",
+                      "radius",
+                      "sip",
+                      "smtp",
+                      "tcp",
+                      "tcp-half-open",
+                      "udp"
+                    ]
+                  },
+                  "acceptRCODE": {
+                    "type": "string",
+                    "enum": [
+                      "anything",
+                      "no-error"
+                    ]
+                  },
+                  "adaptiveDivergenceMilliseconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "adaptiveDivergencePercentage": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
+                  },
+                  "adaptiveDivergenceType": {
+                    "type": "string",
+                    "enum": [
+                      "absolute",
+                      "relative"
+                    ]
+                  },
+                  "adaptiveLimitMilliseconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "adaptiveWindow": {
+                    "type": "integer",
+                    "minimum": 60,
+                    "maximum": 1800
+                  },
+                  "answerContains": {
+                    "type": "string",
+                    "enum": [
+                      "any-type",
+                      "anything",
+                      "query-type"
+                    ]
+                  },
+                  "arguments": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "base": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "ciphers": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "clientCertificate": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "codesDown": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "codesUp": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "domain": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "dscp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 63
+                  },
+                  "filter": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "headers": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "nasIpAddress": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "pathname": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "protocol": {
+                    "type": "string",
+                    "enum": [
+                      "sips",
+                      "tcp",
+                      "tls",
+                      "udp"
+                    ]
+                  },
+                  "queryName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "queryType": {
+                    "type": "string",
+                    "enum": [
+                      "a",
+                      "aaaa"
+                    ]
+                  },
+                  "receive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "receiveDown": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "request": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "security": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "ssl",
+                      "tls"
+                    ]
+                  },
+                  "send": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "timeUntilUp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1800
+                  },
+                  "upInterval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3600
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
                   }
                 },
                 "example": {
@@ -4426,7 +4639,18 @@
                   "timeout": 16,
                   "targetAddress": "192.168.10.123",
                   "targetPort": 8080,
-                  "monitorType": "tcp"
+                  "monitorType": "tcp",
+                  "acceptRCODE": "no-error",
+                  "adaptiveDivergenceMilliseconds": 500,
+                  "answerContains": "query-type",
+                  "arguments": "",
+                  "dscp": 0,
+                  "headers": "",
+                  "protocol": "udp",
+                  "queryType": "a",
+                  "receiveDown": "",
+                  "request": "",
+                  "security": "none"
                 }
               }
             }
@@ -4485,6 +4709,9 @@
                           },
                           "monitorType": {
                             "type": "string"
+                          },
+                          "protocol": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -4497,7 +4724,8 @@
                           "timeout": 16,
                           "targetAddress": "192.168.10.123",
                           "targetPort": 8080,
-                          "monitorType": "tcp"
+                          "monitorType": "tcp",
+                          "protocol": "udp"
                         }
                       }
                     }
@@ -4661,6 +4889,9 @@
                         },
                         "monitorType": {
                           "type": "string"
+                        },
+                        "protocol": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -4673,7 +4904,8 @@
                         "timeout": 16,
                         "targetAddress": "192.168.10.123",
                         "targetPort": 8080,
-                        "monitorType": "tcp"
+                        "monitorType": "tcp",
+                        "protocol": "udp"
                       }
                     }
                   }
@@ -4770,19 +5002,220 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "interval": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3600
                   },
                   "timeout": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 900
                   },
                   "targetAddress": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "ipv4"
                   },
                   "targetPort": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "monitorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "dns",
+                      "external",
+                      "ftp",
+                      "http",
+                      "https",
+                      "icmp",
+                      "ldap",
+                      "radius",
+                      "sip",
+                      "smtp",
+                      "tcp",
+                      "tcp-half-open",
+                      "udp"
+                    ]
+                  },
+                  "acceptRCODE": {
+                    "type": "string",
+                    "enum": [
+                      "anything",
+                      "no-error"
+                    ]
+                  },
+                  "adaptiveDivergenceMilliseconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "adaptiveDivergencePercentage": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
+                  },
+                  "adaptiveDivergenceType": {
+                    "type": "string",
+                    "enum": [
+                      "absolute",
+                      "relative"
+                    ]
+                  },
+                  "adaptiveLimitMilliseconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "adaptiveWindow": {
+                    "type": "integer",
+                    "minimum": 60,
+                    "maximum": 1800
+                  },
+                  "answerContains": {
+                    "type": "string",
+                    "enum": [
+                      "any-type",
+                      "anything",
+                      "query-type"
+                    ]
+                  },
+                  "arguments": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "base": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "ciphers": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "clientCertificate": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "codesDown": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "codesUp": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "domain": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "dscp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 63
+                  },
+                  "filter": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "headers": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "nasIpAddress": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "pathname": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "protocol": {
+                    "type": "string",
+                    "enum": [
+                      "sips",
+                      "tcp",
+                      "tls",
+                      "udp"
+                    ]
+                  },
+                  "queryName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "queryType": {
+                    "type": "string",
+                    "enum": [
+                      "a",
+                      "aaaa"
+                    ]
+                  },
+                  "receive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "receiveDown": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "request": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "security": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "ssl",
+                      "tls"
+                    ]
+                  },
+                  "send": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "timeUntilUp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1800
+                  },
+                  "upInterval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3600
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
                   }
                 },
                 "example": {
@@ -4792,7 +5225,18 @@
                   "timeout": 16,
                   "targetAddress": "192.168.10.123",
                   "targetPort": 8080,
-                  "monitorType": "tcp"
+                  "monitorType": "tcp",
+                  "acceptRCODE": "no-error",
+                  "adaptiveDivergenceMilliseconds": 500,
+                  "answerContains": "query-type",
+                  "arguments": "",
+                  "dscp": 0,
+                  "headers": "",
+                  "protocol": "udp",
+                  "queryType": "a",
+                  "receiveDown": "",
+                  "request": "",
+                  "security": "none"
                 }
               }
             }
@@ -4851,6 +5295,9 @@
                           },
                           "monitorType": {
                             "type": "string"
+                          },
+                          "protocol": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -4863,7 +5310,8 @@
                           "timeout": 16,
                           "targetAddress": "192.168.10.123",
                           "targetPort": 8080,
-                          "monitorType": "tcp"
+                          "monitorType": "tcp",
+                          "protocol": "udp"
                         }
                       }
                     }
@@ -5136,17 +5584,25 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "address": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "ipv4"
                   },
                   "port": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "poolId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
                   "address": "192.168.1.12",
-                  "port": 80
+                  "port": 80,
+                  "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
                 }
               }
             }
@@ -5443,17 +5899,25 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "address": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "ipv4"
                   },
                   "port": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "poolId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "example": {
                   "name": "My name",
                   "description": "My description",
                   "address": "192.168.1.12",
-                  "port": 80
+                  "port": 80,
+                  "poolId": "2d3h896a-4d82-40ee-8d08-55550dbc191"
                 }
               }
             }
@@ -5659,6 +6123,9 @@
                         },
                         "monitorType": {
                           "type": "string"
+                        },
+                        "protocol": {
+                          "type": "string"
                         }
                       },
                       "example": {
@@ -5671,7 +6138,8 @@
                         "timeout": 16,
                         "targetAddress": "192.168.10.123",
                         "targetPort": 8080,
-                        "monitorType": "tcp"
+                        "monitorType": "tcp",
+                        "protocol": "udp"
                       }
                     }
                   }
@@ -5792,6 +6260,9 @@
                           },
                           "monitorType": {
                             "type": "string"
+                          },
+                          "protocol": {
+                            "type": "string"
                           }
                         },
                         "example": {
@@ -5804,7 +6275,8 @@
                           "timeout": 16,
                           "targetAddress": "192.168.10.123",
                           "targetPort": 8080,
-                          "monitorType": "tcp"
+                          "monitorType": "tcp",
+                          "protocol": "udp"
                         }
                       }
                     }
@@ -5909,22 +6381,57 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "loadBalancingMode": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "dynamic-ratio-member",
+                      "dynamic-ratio-node",
+                      "fastest-app-response",
+                      "fastest-node",
+                      "least-connections-member",
+                      "least-connections-node",
+                      "least-sessions",
+                      "observed-member",
+                      "observed-node",
+                      "predictive-member",
+                      "predictive-node",
+                      "ratio-least-connections-member",
+                      "ratio-least-connections-node",
+                      "ratio-member",
+                      "ratio-node",
+                      "ratio-session",
+                      "round-robin",
+                      "weighted-least-connections-member",
+                      "weighted-least-connections-node"
+                    ]
                   },
                   "minimumMembersActive": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "minimumMonitors": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 63
                   },
                   "reselectTries": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "serviceDownAction": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "drop",
+                      "reselect",
+                      "reset"
+                    ]
                   },
                   "slowRampTime": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 900
                   }
                 },
                 "example": {
@@ -6285,22 +6792,57 @@
                   "createdAt": false,
                   "updatedAt": false,
                   "loadBalancingMode": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "dynamic-ratio-member",
+                      "dynamic-ratio-node",
+                      "fastest-app-response",
+                      "fastest-node",
+                      "least-connections-member",
+                      "least-connections-node",
+                      "least-sessions",
+                      "observed-member",
+                      "observed-node",
+                      "predictive-member",
+                      "predictive-node",
+                      "ratio-least-connections-member",
+                      "ratio-least-connections-node",
+                      "ratio-member",
+                      "ratio-node",
+                      "ratio-session",
+                      "round-robin",
+                      "weighted-least-connections-member",
+                      "weighted-least-connections-node"
+                    ]
                   },
                   "minimumMembersActive": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "minimumMonitors": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 63
                   },
                   "reselectTries": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
                   },
                   "serviceDownAction": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "drop",
+                      "reselect",
+                      "reset"
+                    ]
                   },
                   "slowRampTime": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 900
                   }
                 },
                 "example": {
@@ -10059,7 +10601,7 @@
                   "virtualPort": {
                     "type": "integer",
                     "minimum": 0,
-                    "maxmium": 65535
+                    "maximum": 65535
                   }
                 },
                 "example": {
