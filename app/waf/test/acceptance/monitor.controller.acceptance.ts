@@ -73,6 +73,22 @@ describe('MointorController', () => {
     expect(response.body.monitor).to.containDeep(toJSON(monitor));
   });
 
+  it('post ' + prefix + '/monitors with invalid tyype', async () => {
+    let monitor = {
+      protocol: 'test',
+    };
+
+    const response = await client
+      .post(prefix + '/monitors')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(monitor)
+      .expect(422);
+
+    expect(response.body.error.code).to.equal('VALIDATION_FAILED');
+    expect(response.body.error.details[0].code).to.equal('enum');
+  });
+
   it('get ' + prefix + '/monitors', async () => {
     const monitor = await givenMonitorData(wafapp);
     const response = await client

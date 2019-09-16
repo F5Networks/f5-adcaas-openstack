@@ -28,6 +28,29 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 'round-robin',
+      openapi: {
+        enum: [
+          'dynamic-ratio-member',
+          'dynamic-ratio-node',
+          'fastest-app-response',
+          'fastest-node',
+          'least-connections-member',
+          'least-connections-node',
+          'least-sessions',
+          'observed-member',
+          'observed-node',
+          'predictive-member',
+          'predictive-node',
+          'ratio-least-connections-member',
+          'ratio-least-connections-node',
+          'ratio-member',
+          'ratio-node',
+          'ratio-session',
+          'round-robin',
+          'weighted-least-connections-member',
+          'weighted-least-connections-node',
+        ],
+      },
     },
     as3: {},
   })
@@ -45,6 +68,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 1,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 65535,
+      },
     },
   })
   minimumMembersActive: number;
@@ -58,6 +86,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 1,
+      openapi: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 63,
+      },
     },
   })
   minimumMonitors: number;
@@ -71,6 +104,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 0,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 65535,
+      },
     },
   })
   reselectTries: number;
@@ -84,6 +122,9 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 'drop',
+      openapi: {
+        enum: ['none', 'drop', 'reselect', 'reset'],
+      },
     },
   })
   serviceDownAction: string;
@@ -97,6 +138,11 @@ export class Pool extends CommonEntity {
       update: true,
       response: true,
       example: 10,
+      openapi: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 900,
+      },
     },
   })
   slowRampTime: number;
