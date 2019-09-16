@@ -169,10 +169,10 @@ export class AdcController extends BaseController {
             case 'CREATED':
               return false;
             default:
-              return Promise.reject(true);
+              return Promise.reject('Trusted device state is ' + state);
           }
         },
-        () => Promise.reject(true),
+        err => Promise.reject(err),
       );
     };
 
@@ -198,12 +198,11 @@ export class AdcController extends BaseController {
             lastErr: '',
           });
         },
-        async e => {
+        async reason => {
           this.logger.error(`failed to trust ${adc.id}`);
-          let msg: string = e ? 'error' : 'timeout';
           await this.serialize(adc, {
             status: AdcState.TRUSTERR,
-            lastErr: `${AdcState.TRUSTERR}: Trusting ${msg}`,
+            lastErr: `${AdcState.TRUSTERR}: ${reason}`,
           });
         },
       );
@@ -896,14 +895,28 @@ export class AdcController extends BaseController {
       );
       let doId = await doMgr.onboard(doBody);
 
-      await checkAndWait(() => doMgr.isDone(doId), 240)
-        .then(() =>
-          checkAndWait(() => this.adcStCtr.gotTo(AdcState.ONBOARDED), 240),
-        )
-        .then(() => {
-          this.logger.debug(`succeed for onboarding ${adc.id}`);
-          this.serialize(adc, {status: AdcState.ONBOARDED});
-        });
+      await checkAndWait(() => doMgr.isDone(doId), 240).then(
+        () => {
+          checkAndWait(() => this.adcStCtr.gotTo(AdcState.ONBOARDED), 240).then(
+            () => {
+              this.logger.debug(`succeed for onboarding ${adc.id}`);
+              this.serialize(adc, {status: AdcState.ONBOARDED});
+            },
+            reason => {
+              this.serialize(adc, {
+                status: AdcState.ONBOARDERR,
+                lastErr: `${AdcState.ONBOARDERR}: ${reason}`,
+              });
+            },
+          );
+        },
+        reason => {
+          this.serialize(adc, {
+            status: AdcState.ONBOARDERR,
+            lastErr: `${AdcState.ONBOARDERR}: ${reason}`,
+          });
+        },
+      );
     } catch (error) {
       this.logger.error(`failed to onboard ${adc.id}`);
       await this.serialize(adc, {

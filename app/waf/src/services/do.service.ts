@@ -494,7 +494,6 @@ export class OnboardingManager {
       );
   }
 
-  //TODO: support quiting immediately
   async isDone(doId: string): Promise<boolean> {
     // TODO: base64 coding for admin:admin. Modify it later if needed
     let headers = {Authorization: 'Basic YWRtaW46YWRtaW4='};
@@ -517,7 +516,8 @@ export class OnboardingManager {
           let mesg =
             'Failed to query onboarding status: ' + JSON.stringify(reason);
           this.logger.error(mesg);
-          throw new Error(mesg);
+          // quit immediately
+          return Promise.reject(mesg);
         },
       );
   }

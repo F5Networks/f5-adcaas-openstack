@@ -9,9 +9,10 @@ describe('checkAndWait test', () => {
   it('checkAndWait test', async () => {
     let resT = 0; //should be 1
     let resF = 0; //should be 3
-    let rejT = 0; //should be 1
-    let rejF = 0; //should be 3
-    let retE = 0; //should be 3
+    let rejS = 0; //should be 1
+    let rejE = 0; //should be 1
+    let rejF = 0; //should be 1
+    let retE = 0; //should be 1
     let resolveTrue = () => {
       resT += 1;
       return Promise.resolve(true);
@@ -20,9 +21,13 @@ describe('checkAndWait test', () => {
       resF += 1;
       return Promise.resolve(false);
     };
-    let rejectTrue = () => {
-      rejT += 1;
-      return Promise.reject(true);
+    let rejectString = () => {
+      rejS += 1;
+      return Promise.reject('haha');
+    };
+    let rejectError = () => {
+      rejE += 1;
+      return Promise.reject(new Error('hahaha'));
     };
     let rejectFalse = () => {
       rejF += 1;
@@ -30,7 +35,7 @@ describe('checkAndWait test', () => {
     };
     let returnError = () => {
       retE += 1;
-      throw new Error();
+      throw new Error('help');
     };
 
     await checkAndWait(resolveTrue, 3, [], 1).then(
@@ -47,17 +52,26 @@ describe('checkAndWait test', () => {
         expect(true).eql(false);
       },
       b => {
-        expect(b).eql(false);
+        expect(b).eql('timeout');
         expect(resF).eql(3);
       },
     );
-    await checkAndWait(rejectTrue, 3, [], 1).then(
+    await checkAndWait(rejectString, 3, [], 1).then(
       () => {
         expect(true).eql(false);
       },
       b => {
-        expect(b).eql(true);
-        expect(rejT).eql(1);
+        expect(b).eql('haha');
+        expect(rejS).eql(1);
+      },
+    );
+    await checkAndWait(rejectError, 3, [], 1).then(
+      () => {
+        expect(true).eql(false);
+      },
+      b => {
+        expect(b).eql('hahaha');
+        expect(rejE).eql(1);
       },
     );
     await checkAndWait(rejectFalse, 3, [], 1).then(
@@ -65,8 +79,8 @@ describe('checkAndWait test', () => {
         expect(true).eql(false);
       },
       b => {
-        expect(b).eql(false);
-        expect(rejF).eql(3);
+        expect(b).eql('checkAndWait terminates due to unknown error');
+        expect(rejF).eql(1);
       },
     );
     await checkAndWait(returnError, 3, [], 1).then(
@@ -74,8 +88,8 @@ describe('checkAndWait test', () => {
         expect(true).eql(false);
       },
       b => {
-        expect(b).eql(false);
-        expect(retE).eql(3);
+        expect(b.message).eql('help');
+        expect(retE).eql(1);
       },
     );
     let x = 0;

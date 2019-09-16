@@ -30,6 +30,7 @@ import {
   teardownDepApps,
   setupDepApps,
 } from '../helpers/testsetup-helper';
+import {stubConsoleLog, restoreConsoleLog} from '../helpers/logging.helpers';
 import {
   givenEmptyDatabase,
   givenAdcData,
@@ -1071,7 +1072,9 @@ describe('AdcController test', () => {
       await checkAndWait(checkFunc, 50, [], 5).then(() => {
         expect(true).eql(true);
       });
-      expect(response.body.adc.lastErr).eql(`TRUSTERROR: Trusting error`);
+      expect(response.body.adc.lastErr).eql(
+        'TRUSTERROR: Trusted device state is ERROR',
+      );
     },
   );
 
@@ -1100,7 +1103,7 @@ describe('AdcController test', () => {
         ],
       });
 
-      queryStub.throws('Not working');
+      queryStub.throws(new Error('Not working'));
 
       let response = await client
         .post(prefix + '/adcs')
@@ -1121,7 +1124,7 @@ describe('AdcController test', () => {
       await checkAndWait(checkFunc, 50, [], 5).then(() => {
         expect(true).eql(true);
       });
-      expect(response.body.adc.lastErr).eql(`TRUSTERROR: Trusting error`);
+      expect(response.body.adc.lastErr).eql('TRUSTERROR: Not working');
     },
   );
 
@@ -1187,7 +1190,7 @@ describe('AdcController test', () => {
       .expect(200);
 
     expect(response.body.adc.status).to.equal('TRUSTERROR');
-    expect(response.body.adc.lastErr).to.equal(`TRUSTERROR: Trusting timeout`);
+    expect(response.body.adc.lastErr).to.equal('TRUSTERROR: timeout');
   });
 
   it(
@@ -1786,6 +1789,91 @@ describe('AdcController test', () => {
     expect(response.body.adc.management.connection.rootPass).not.eql('default');
   });
 
+  it('post ' + prefix + '/adcs: onboard error', async () => {
+    let adc = createAdcObject({
+      type: 'VE',
+      management: {},
+    });
+
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
+        StubResponses.bigipDOChange2OK200,
+      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+        StubResponses.onboardingServerError500,
+    });
+
+    stubConsoleLog();
+
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).hasOwnProperty('id');
+    let adcId = response.body.adc.id;
+    ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
+
+    let checkStatus = async () => {
+      response = await client
+        .get(prefix + '/adcs/' + adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      return response.body.adc.status === 'ONBOARDERROR';
+    };
+
+    await checkAndWait(checkStatus, 200, [], 5).then(() => {});
+    expect(response.body.adc.status).eql('ONBOARDERROR');
+    expect(response.body.adc.lastErr).startWith(
+      'ONBOARDERROR: Failed to query onboarding status:',
+    );
+    expect(response.body.adc.management.connection.rootPass).not.eql('default');
+
+    restoreConsoleLog();
+  });
+
+  it('post ' + prefix + '/adcs: onboard timeout', async () => {
+    let adc = createAdcObject({
+      type: 'VE',
+      management: {},
+    });
+
+    LetResponseWith({
+      bigip_get_mgmt_shared_declarative_onboarding_info:
+        StubResponses.bigipDOChange2OK200,
+      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+        StubResponses.onboardingSucceed202,
+    });
+    let response = await client
+      .post(prefix + '/adcs')
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .send(adc)
+      .expect(200);
+
+    expect(response.body.adc).hasOwnProperty('id');
+    let adcId = response.body.adc.id;
+    ExpectedData.bigipMgmt.hostname = adcId + '.f5bigip.local';
+
+    let checkStatus = async () => {
+      response = await client
+        .get(prefix + '/adcs/' + adcId)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(200);
+
+      return response.body.adc.status === 'ONBOARDERROR';
+    };
+
+    await checkAndWait(checkStatus, 200, [], 5).then(() => {});
+    expect(response.body.adc.status).eql('ONBOARDERROR');
+    expect(response.body.adc.lastErr).eql('ONBOARDERROR: timeout');
+    expect(response.body.adc.management.connection.rootPass).not.eql('default');
+  }).timeout(5000);
+
   it(`post ${prefix}/adcs: create failed with wrong floatingip state`, async () => {
     setupEnvs({
       VE_RANDOM_PASS: 'false',
@@ -2031,19 +2119,19 @@ describe('AdcController test', () => {
       .set('tenant-id', ExpectedData.tenantId)
       .expect(204);
 
+    let resp = {status: 200};
     let checkStatus = async () => {
-      await client
+      resp = await client
         .get(prefix + '/adcs/' + adc.id)
         .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(404);
+        .set('tenant-id', ExpectedData.tenantId);
 
-      return true;
+      return resp.status === 404;
     };
 
-    await checkAndWait(checkStatus, 50, [], 5).then(() => {
-      expect(true).true();
-    });
+    await checkAndWait(checkStatus, 50, [], 5);
+
+    expect(resp.status).equal(404);
   });
 
   //TODO: the timeout can only be tested through unit test?
