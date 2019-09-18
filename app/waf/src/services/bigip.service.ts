@@ -20,7 +20,7 @@ import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
 import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
-import path = require('path');
+//import path = require('path');
 import {Logger} from 'typescript-logging';
 
 export const BigipBuiltInProperties = {
@@ -228,87 +228,88 @@ export class BigIpManager {
     return resObj;
   }
 
-  async uploadDO(): Promise<string> {
-    await this.mustBeReachable();
-    const filename = process.env.DO_RPM_PACKAGE!;
-    let fs = require('fs');
-    if (!filename || filename === '' || !fs.existsSync(filename)) {
-      throw new Error(`DO RPM file doesn't exist: '${filename}'`);
-    }
-    let fstats = fs.statSync(filename);
-    try {
-      let url = `${
-        this.baseUrl
-      }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
-      let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
-      let response = await this.bigipService.uploadDO(
-        url,
-        this.cred64Encoded,
-        fstats.size - 1,
-        fstats.size,
-        buffer,
-      );
-      let resObj = JSON.stringify(response);
-      return resObj;
-    } catch (error) {
-      throw new Error(
-        `Upload DO RPM file error with error message ${error.message}`,
-      );
-    }
-  }
+  // async uploadDO(): Promise<string> {
+  //   await this.mustBeReachable();
+  //   const filename = process.env.DO_RPM_PACKAGE!;
+  //   let fs = require('fs');
+  //   if (!filename || filename === '' || !fs.existsSync(filename)) {
+  //     throw new Error(`DO RPM file doesn't exist: '${filename}'`);
+  //   }
+  //   let fstats = fs.statSync(filename);
+  //   try {
+  //     let url = `${
+  //       this.baseUrl
+  //     }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
+  //     let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
+  //     let response = await this.bigipService.uploadDO(
+  //       url,
+  //       this.cred64Encoded,
+  //       fstats.size - 1,
+  //       fstats.size,
+  //       buffer,
+  //     );
+  //     let resObj = JSON.stringify(response);
+  //     return resObj;
+  //   } catch (error) {
+  //     throw new Error(
+  //       `Upload DO RPM file error with error message ${error.message}`,
+  //     );
+  //   }
+  // }
 
-  async installDO(): Promise<string> {
-    await this.mustBeReachable();
-    let body = {
-      operation: 'INSTALL',
-      packageFilePath: `/var/config/rest/downloads/${path.basename(
-        process.env.DO_RPM_PACKAGE!,
-      )}`,
-    };
-    try {
-      let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
-      let response = await this.bigipService.installDO(
-        url,
-        this.cred64Encoded,
-        body,
-      );
-      let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
-      let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
+  // async installDO(): Promise<string> {
+  //   await this.mustBeReachable();
+  //   let body = {
+  //     operation: 'INSTALL',
+  //     packageFilePath: `/var/config/rest/downloads/${path.basename(
+  //       process.env.DO_RPM_PACKAGE!,
+  //     )}`,
+  //   };
+  //   try {
+  //     let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
+  //     let response = await this.bigipService.installDO(
+  //       url,
+  //       this.cred64Encoded,
+  //       body,
+  //     );
+  //     let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
+  //     let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
 
-      let impFunc = async () => {
-        let checkinfo = await this.bigipService.getInfo(
-          dourl,
-          this.cred64Encoded,
-        );
-        let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
-        this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
-        return resObj;
-      };
+  //     let impFunc = async () => {
+  //       let checkinfo = await this.bigipService.getInfo(
+  //         dourl,
+  //         this.cred64Encoded,
+  //       );
+  //       let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
+  //       this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
+  //       return resObj;
+  //     };
 
-      let checkFunc = async () => {
-        return await impFunc().then(resObj => {
-          let status = resObj['status'];
-          if (status === 'FINISHED') return true;
-        });
-      };
+  //     let checkFunc = async () => {
+  //       return await impFunc().then(resObj => {
+  //         let status = resObj['status'];
+  //         if (status === 'FINISHED') return true;
+  //       });
+  //     };
 
-      return await checkAndWait(checkFunc, 60).then(
-        async () => {
-          return await impFunc().then(resObj => {
-            let status = resObj['status'];
-            return status;
-          });
-        },
-        () => {
-          throw new Error('Install DO failed.');
-        },
-      );
-    } catch (error) {
-      throw new Error(
-        `Install DO RPM file error with error message ${error.message}`,
-      );
-    }
-  }
+  //     return await checkAndWait(checkFunc, 60).then(
+  //       async () => {
+  //         return await impFunc().then(resObj => {
+  //           let status = resObj['status'];
+  //           return status;
+  //         });
+  //       },
+  //       () => {
+  //         throw new Error('Install DO failed.');
+  //       },
+  //     );
+  //   } catch (error) {
+  //     throw new Error(
+  //       `Install DO RPM file error with error message ${error.message}`,
+  //     );
+  //   }
+  // }
+
   async getAS3Info(): Promise<object> {
     await this.mustBeReachable();
 

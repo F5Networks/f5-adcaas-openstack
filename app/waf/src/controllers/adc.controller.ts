@@ -140,8 +140,8 @@ export class AdcController extends BaseController {
             this.createOn(adc, addonReq),
           );
 
-        if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
-          await runWithTimer(`${adc.id}.installdo`, () => this.installDO(adc));
+        // if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
+        //   await runWithTimer(`${adc.id}.installdo`, () => this.installDO(adc));
 
         if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
           await runWithTimer(`${adc.id}.onboard`, () =>
@@ -841,42 +841,42 @@ export class AdcController extends BaseController {
     }
   }
 
-  private async installDO(adc: Adc): Promise<void> {
-    try {
-      this.logger.debug(`start to install do rpm to bigip ${adc.id}`);
-      await this.serialize(adc, {status: AdcState.DOINSTALLING});
-      // check if do is already installed.
-      let cnct = adc.management.connection!;
-      let bigipMgr = await BigIpManager.instanlize(
-        {
-          username: cnct.username,
-          password: cnct.password,
-          ipAddr: cnct.ipAddress,
-          port: cnct.tcpPort,
-        },
-        this.reqCxt.name,
-      );
+  // private async installDO(adc: Adc): Promise<void> {
+  //   try {
+  //     this.logger.debug(`start to install do rpm to bigip ${adc.id}`);
+  //     await this.serialize(adc, {status: AdcState.DOINSTALLING});
+  //     // check if do is already installed.
+  //     let cnct = adc.management.connection!;
+  //     let bigipMgr = await BigIpManager.instanlize(
+  //       {
+  //         username: cnct.username,
+  //         password: cnct.password,
+  //         ipAddr: cnct.ipAddress,
+  //         port: cnct.tcpPort,
+  //       },
+  //       this.reqCxt.name,
+  //     );
 
-      if ((await this.isDOReady(adc)) === false) {
-        await bigipMgr.uploadDO();
-        await bigipMgr.installDO();
-      }
+  //     if ((await this.isDOReady(adc)) === false) {
+  //       await bigipMgr.uploadDO();
+  //       await bigipMgr.installDO();
+  //     }
 
-      await checkAndWait(
-        () => this.adcStCtr.gotTo(AdcState.DOINSTALLED),
-        240,
-      ).then(() => {
-        this.logger.debug(`succeed for do installing on ${adc.id}`);
-        this.serialize(adc, {status: AdcState.DOINSTALLED, lastErr: ''});
-      });
-    } catch (error) {
-      this.logger.error(`failed to install do on ${adc.id}`);
-      await this.serialize(adc, {
-        status: AdcState.DOINSTALLERR,
-        lastErr: `${AdcState.DOINSTALLERR}: ${error}`,
-      });
-    }
-  }
+  //     await checkAndWait(
+  //       () => this.adcStCtr.gotTo(AdcState.DOINSTALLED),
+  //       240,
+  //     ).then(() => {
+  //       this.logger.debug(`succeed for do installing on ${adc.id}`);
+  //       this.serialize(adc, {status: AdcState.DOINSTALLED, lastErr: ''});
+  //     });
+  //   } catch (error) {
+  //     this.logger.error(`failed to install do on ${adc.id}`);
+  //     await this.serialize(adc, {
+  //       status: AdcState.DOINSTALLERR,
+  //       lastErr: `${AdcState.DOINSTALLERR}: ${error}`,
+  //     });
+  //   }
+  // }
 
   private async onboard(adc: Adc, addon: AddonReqValues): Promise<void> {
     try {
@@ -947,12 +947,12 @@ export class AdcStateCtrlr {
       failure: AdcState.POWERERR,
       state: AdcState.POWERON,
       check: this.accessible,
-      next: [AdcState.DOINSTALLED, AdcState.RECLAIMED],
-    },
-    {
-      failure: AdcState.DOINSTALLERR,
-      state: AdcState.DOINSTALLED,
-      check: this.doInstalled,
+      //   next: [AdcState.DOINSTALLED, AdcState.RECLAIMED],
+      // },
+      // {
+      //   failure: AdcState.DOINSTALLERR,
+      //   state: AdcState.DOINSTALLED,
+      //   check: this.doInstalled,
       next: [AdcState.ONBOARDED, AdcState.RECLAIMED],
     },
     {

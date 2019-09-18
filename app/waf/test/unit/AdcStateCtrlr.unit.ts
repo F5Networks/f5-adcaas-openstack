@@ -76,18 +76,29 @@ describe('test AdcStateCtrlr', () => {
   //let statuses = Object.keys(AdcState);
 
   myit('NEW -> POWERON ✓', {});
-  myit('POWERON -> DOINSTALLED ✓', {
-    management: {
-      connection: {
-        ipAddress: ExpectedData.networks.management.ipAddr,
-        tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
-      },
-    },
-  });
+  // myit('POWERON -> DOINSTALLED ✓', {
+  //   management: {
+  //     connection: {
+  //       ipAddress: ExpectedData.networks.management.ipAddr,
+  //       tcpPort: ExpectedData.bigipMgmt.tcpPort,
+  //       username: BigipBuiltInProperties.admin,
+  //       password: 'admin',
+  //     },
+  //   },
+  // });
 
-  myit('DOINSTALLED -> ONBOARDED ✓', {
+  // myit('DOINSTALLED -> ONBOARDED ✓', {
+  //   management: {
+  //     connection: {
+  //       ipAddress: ExpectedData.networks.management.ipAddr,
+  //       tcpPort: ExpectedData.bigipMgmt.tcpPort,
+  //       username: BigipBuiltInProperties.admin,
+  //       password: 'admin',
+  //     },
+  //   },
+  // });
+
+  myit('POWERON -> ONBOARDED ✓', {
     management: {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
