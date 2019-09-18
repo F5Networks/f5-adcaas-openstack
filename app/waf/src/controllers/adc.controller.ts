@@ -58,7 +58,7 @@ import {
   ASGServiceProvider,
   AuthedToken,
 } from '../services';
-import {checkAndWait, merge, runWithTimer} from '../utils';
+import {checkAndWait, merge, runWithTimer, cbPostInflux} from '../utils';
 import {LicConfig, LicenseManager} from '../services/license.service';
 
 const prefix = '/adcaas/v1';
@@ -137,12 +137,18 @@ export class AdcController extends BaseController {
     let createFunc = async () => {
       try {
         if (await this.adcStCtr.readyTo(AdcState.POWERON))
-          await runWithTimer(`${adc.id}.poweron`, () =>
-            this.createOn(adc, addonReq),
+          await runWithTimer(
+            `duration,step=poweron,type=adc,id=${adc.id}`,
+            () => this.createOn(adc, addonReq),
+            cbPostInflux,
           );
 
         if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
-          await runWithTimer(`${adc.id}.installdo`, () => this.installDO(adc));
+          await runWithTimer(
+            `duration,step=installdo,type=adc,id=${adc.id}`,
+            () => this.installDO(adc),
+            cbPostInflux,
+          );
 
         if (await this.adcStCtr.readyTo(AdcState.LICENSED))
           await runWithTimer(`${adc.id}.license`, () =>
@@ -150,15 +156,21 @@ export class AdcController extends BaseController {
           );
 
         if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
-          await runWithTimer(`${adc.id}.onboard`, () =>
-            this.onboard(adc, addonReq),
+          await runWithTimer(
+            `duration,step=onboard,type=adc,id=${adc.id}`,
+            () => this.onboard(adc, addonReq),
+            cbPostInflux,
           );
       } catch (error) {
         this.logger.error(`Provisioning is failed for ${adc.id}.`);
       }
     };
 
-    runWithTimer(`${adc.id}.create`, createFunc);
+    runWithTimer(
+      `duration,step=createadc,type=adc,id=${adc.id}`,
+      createFunc,
+      cbPostInflux,
+    );
 
     return new Response(Adc, adc);
   }

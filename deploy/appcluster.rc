@@ -49,3 +49,5 @@ VE_ASM_LEVEL=nominal
 
 ASG_HOST=asg-server
 ASG_PORT=443
+
+INFLUXDB_URL=http://influxdb-server:8086

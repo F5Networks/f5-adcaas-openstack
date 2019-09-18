@@ -49,6 +49,7 @@ export const Environments: {[key: string]: string} = {
   ASG_HOST: '127.0.0.1',
   ASG_PORT: `${RestApplicationPort.ASG}`,
   VE_RANDOM_PASS: 'true',
+  //INFLUXDB_URL: 'http://localhost:8086',
 };
 
 export const ExpectedData = {

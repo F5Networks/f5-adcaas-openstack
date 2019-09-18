@@ -15,6 +15,7 @@
  */
 
 import {factory} from './log4ts';
+import * as WebRequest from 'web-request';
 
 const utilsLogger = factory.getLogger('utils.logger');
 
@@ -211,4 +212,26 @@ export async function runWithTimer(
       })();
     if (err) throw err;
   }
+}
+
+/**
+ * Post data to influx db.
+ * @param metric: example: cpu_load_short,host=server01,region=us-west
+ * @param value: any numberic value.
+ */
+export async function cbPostInflux(
+  metric: string,
+  value: number,
+): Promise<void> {
+  if (!process.env.INFLUXDB_URL) {
+    utilsLogger.warn('process.env.INFLUXDB_URL is not configured.');
+    return;
+  }
+  let url = `${process.env.INFLUXDB_URL}/write?db=mydb`;
+
+  WebRequest.post(url, undefined, `${metric} value=${value}`).then(r => {
+    utilsLogger.info(
+      `post data to influx ${r.statusCode}: ${metric} value=${value}`,
+    );
+  });
 }

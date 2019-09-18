@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import {runWithTimer, checkAndWait} from '../../src/utils';
-import {expect} from '@loopback/testlab';
+import {runWithTimer, cbPostInflux, checkAndWait} from '../../src/utils';
+import {expect, sinon} from '@loopback/testlab';
 import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
+import * as WebRequest from 'web-request';
+import {setupEnvs, teardownEnvs} from '../helpers/testsetup-helper';
 
 describe('test runWithTimer', async () => {
+  let stubPost: sinon.SinonStub;
   let sum = 0;
   let f = async () => {
     let max = 100;
@@ -35,6 +38,18 @@ describe('test runWithTimer', async () => {
 
   after('after', () => {
     restoreLogger();
+  });
+
+  beforeEach('before each', async () => {
+    await setupEnvs({
+      INFLUXDB_URL: 'http://localhost:8086',
+    });
+    stubPost = sinon.stub(WebRequest, 'post');
+  });
+
+  afterEach('after each', async () => {
+    await teardownEnvs();
+    stubPost.restore();
   });
 
   it('async function with no callback', async () => {
@@ -133,5 +148,20 @@ describe('test runWithTimer', async () => {
     await runWithTimer('any', fff, cb);
     expect(runTime).greaterThan(300);
     expect(runTime).lessThan(600);
+  });
+
+  it('async function with callback cbPostInflux not called', async () => {
+    delete process.env.INFLUXDB_URL;
+    stubPost.callsFake(() => {});
+
+    await runWithTimer('any', async () => {}, cbPostInflux);
+    expect(stubPost.calledOnce).eql(false);
+  });
+
+  it('async function with callback cbPostInflux called.', async () => {
+    stubPost.callsFake(() => {});
+
+    await runWithTimer('any', async () => {}, cbPostInflux);
+    expect(stubPost.calledOnce).eql(true);
   });
 });
