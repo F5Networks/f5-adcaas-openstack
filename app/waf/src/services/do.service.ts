@@ -377,7 +377,7 @@ export class OnboardingManager {
         },
         this.reqId,
       ).then(async bigipMgr => {
-        return await bigipMgr.getInterfaces();
+        return await bigipMgr.getInterfacesNoNone();
       }),
       subnets: await this.subnetInfo(obData, addon),
       onboarding: addon.onboarding === true,
