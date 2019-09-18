@@ -6,7 +6,8 @@ cdir=`cd $(dirname $0); pwd`
 (
     cd $cdir/../dependencies
     if [ ! -f  `basename $as3file` ]; then 
-	    wget $as3file
+        wget -nv $as3file # $as3file.sha256
+        #sha256sum -c $as3file.sha256
    fi
 )
 

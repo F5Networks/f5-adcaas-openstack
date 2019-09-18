@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function check() {
+    echo Checking running dependencies...
+
+    ready=1
+    for n in wget docker docker-compose; do
+        which $n > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            ready=0
+            echo $n not installed.
+        fi
+    done
+    if [ $ready -ne 1 ]; then exit 1; fi
+
+    docker ps > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "docker damon is not running."
+        exit 1
+    fi
+}
+
+check
+
 cdir=`cd $(dirname $0); pwd`
 (
     set -e
