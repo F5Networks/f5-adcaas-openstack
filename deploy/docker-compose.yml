@@ -82,7 +82,8 @@ services:
         tag: f5-asg
 
   DO:
-    image: f5devcentral/f5-do-container:1.5.0
+    build: ./docker/do
+    image: f5devcentral/f5-openstack-services:do-1.5.0
     container_name: DO
     ports:
       - 9443:443
@@ -104,6 +105,7 @@ services:
       - discovery.type=single-node
 
   FLUENTD:
+    build: ./docker/fluent
     image: f5devcentral/f5-openstack-services:fluentd-v1.3.2
     container_name: FLUENTD
     ports:
