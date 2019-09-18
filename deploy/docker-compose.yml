@@ -4,7 +4,7 @@ services:
     image: f5devcentral/f5-openstack-services:portal-latest
     container_name: PORTAL
     env_file:
-      - ./appcluster.rc
+      - ${ENVIRON_FILE}
     ports:
       - 8245:80
     depends_on:
@@ -21,7 +21,7 @@ services:
     image: f5devcentral/f5-openstack-services:adcaas-latest
     container_name: ADCAAS
     env_file:
-      - ./appcluster.rc
+      - ${ENVIRON_FILE}
     ports:
       - ${ADCAAS_APP_PORT:-3000}:3000
     depends_on:

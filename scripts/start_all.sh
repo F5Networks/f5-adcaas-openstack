@@ -1,6 +1,26 @@
 #!/bin/bash
 
-cdir=`cd $(dirname $0); pwd`
+pwddir=$PWD
+cdir=$pwddir/$(dirname $0)
+
+envfile=$cdir/../deploy/appcluster.rc
+
+while getopts 'e:h' option; do
+    case $option in
+        h) echo "$0 [-e <env file>]"; exit 0; ;;
+        e) envfile="$2"; shift; shift; ;;
+    esac
+done
+
+echo $envfile | grep -E "^/" > /dev/null
+if [ $? -ne 0 ]; then envfile=$pwddir/$envfile; fi
+
+echo Using $envfile ...
+if [ ! -f $envfile ]; then
+    echo "file $envfile not exists. quit."
+    exit 1
+fi
+
 (
     set -e
     cd $cdir
@@ -20,6 +40,7 @@ cdir=`cd $(dirname $0); pwd`
     export DATABASE_DATA_DIRECTORY=`pwd`/../data/pg_data
     export ASG_DATA_DIRECTORY=`pwd`/../data/asg_data
 
+    export ENVIRON_FILE=$envfile
     docker-compose -f docker-compose.yml up -d --force-recreate --remove-orphans
 )
 
