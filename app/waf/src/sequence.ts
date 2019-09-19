@@ -81,8 +81,8 @@ export class MySequence implements SequenceHandler {
       headers: req.headers,
       path: req.path,
       params: req.params,
-      body: req.body,
-      cookies: req.cookies,
+      body: req.body ? req.body : '<Empty>',
+      cookies: req.cookies ? req.cookies : '<Empty>',
       // others.
     };
     this.logger.info('Request: ' + JSON.stringify(logObj));
@@ -95,7 +95,7 @@ export class MySequence implements SequenceHandler {
       statusCode: res.statusCode,
       statusMessage: res.statusMessage,
       headers: res.getHeaders(),
-      body: result,
+      body: result ? result : '<Empty>',
     };
 
     this.logger.info('Response: ' + JSON.stringify(logObj));

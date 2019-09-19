@@ -102,6 +102,8 @@ services:
       - 9200:9200
     environment:
       - discovery.type=single-node
+    volumes:
+     - ${ELASTICSEARCH_DATA_DIRECTORY}:/usr/share/elasticsearch/data
 
   FLUENTD:
     image: f5devcentral/f5-openstack-services:fluentd-v1.3.2
