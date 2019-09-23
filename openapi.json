@@ -2431,370 +2431,7 @@
         "operationId": "EndpointpolicyController.count"
       }
     },
-    "/adcaas/v1/endpointpolicies/{endpointpolicyId}/rules/{ruleId}": {
-      "patch": {
-        "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "updateRuleByID",
-        "tags": [
-          "EndpointpolicyController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Rule model instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Rule"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "endpointpolicyId",
-            "description": "Endpointpolicy resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "ruleId",
-            "description": "Rule resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Rule resource properties that need to be updated",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [],
-                "properties": {
-                  "id": false,
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 50
-                  },
-                  "description": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 200
-                  },
-                  "tenantId": false,
-                  "createdAt": false,
-                  "updatedAt": false,
-                  "endpointpolicyId": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                },
-                "example": {
-                  "name": "My name",
-                  "description": "My description",
-                  "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
-                }
-              }
-            }
-          },
-          "x-parameter-index": 2
-        },
-        "operationId": "EndpointpolicyController.updateRuleByID"
-      },
-      "get": {
-        "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "getRuleByID",
-        "tags": [
-          "EndpointpolicyController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully retrieve rule resources",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rules": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "description": {
-                            "type": "string"
-                          },
-                          "tenantId": {
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "type": "date"
-                          },
-                          "updatedAt": {
-                            "type": "date"
-                          },
-                          "endpointpolicyId": {
-                            "type": "string"
-                          }
-                        },
-                        "example": {
-                          "id": "11111111-2222-3333-4444-555555555555",
-                          "name": "My name",
-                          "description": "My description",
-                          "createdAt": "2019-03-05T08:40:25.000Z",
-                          "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "endpointpolicyId",
-            "description": "Endpointpolicy resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "ruleId",
-            "description": "Rule resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "EndpointpolicyController.getRuleByID"
-      },
-      "delete": {
-        "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "deleteRuleByID",
-        "tags": [
-          "EndpointpolicyController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Rules DELETE success"
-          }
-        },
-        "parameters": [
-          {
-            "name": "endpointpolicyId",
-            "description": "Endpointpolicy resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "ruleId",
-            "description": "Rule resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "EndpointpolicyController.deleteRuleByID"
-      }
-    },
     "/adcaas/v1/endpointpolicies/{endpointpolicyId}/rules": {
-      "post": {
-        "x-controller-name": "EndpointpolicyController",
-        "x-operation-name": "createEndpointpolicyRule",
-        "tags": [
-          "EndpointpolicyController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully create rule resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rule": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string"
-                        },
-                        "tenantId": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "date"
-                        },
-                        "updatedAt": {
-                          "type": "date"
-                        },
-                        "endpointpolicyId": {
-                          "type": "string"
-                        }
-                      },
-                      "example": {
-                        "id": "11111111-2222-3333-4444-555555555555",
-                        "name": "My name",
-                        "description": "My description",
-                        "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "endpointpolicyId": "2d3h896a-4d82-40ee-8d08-55550db1234"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid Rule resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "details": {
-                      "type": "array"
-                    }
-                  },
-                  "example": {
-                    "statusCode": 400,
-                    "name": "BadRequestError"
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Rule resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "details": {
-                      "type": "array"
-                    }
-                  },
-                  "example": {
-                    "statusCode": 422,
-                    "name": "UnprocessableEntityError",
-                    "message": "The request body is invalid. See error object `details` property for more info.",
-                    "code": "VALIDATION_FAILED"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "endpointpolicyId",
-            "description": "Endpointpolicy resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Rule resource that need to be created",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [],
-                "properties": {
-                  "id": false,
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 50
-                  },
-                  "description": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 200
-                  },
-                  "tenantId": false,
-                  "createdAt": false,
-                  "updatedAt": false
-                },
-                "example": {
-                  "name": "My name",
-                  "description": "My description"
-                }
-              }
-            }
-          },
-          "x-parameter-index": 1
-        },
-        "operationId": "EndpointpolicyController.createEndpointpolicyRule"
-      },
       "get": {
         "x-controller-name": "EndpointpolicyController",
         "x-operation-name": "getRules",
@@ -3603,12 +3240,12 @@
         "operationId": "EndpointpolicyController.find"
       }
     },
-    "/adcaas/v1/members/{memberId}/monitors/{monitorId}": {
+    "/adcaas/v1/monitors/{monitorId}/members/{memberId}": {
       "post": {
-        "x-controller-name": "MemberMonitorAssociationController",
+        "x-controller-name": "MonitorController",
         "x-operation-name": "associateMemberMonitor",
         "tags": [
-          "MemberMonitorAssociationController"
+          "MonitorController"
         ],
         "responses": {
           "204": {
@@ -3649,16 +3286,6 @@
         },
         "parameters": [
           {
-            "name": "memberId",
-            "description": "Member resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
             "name": "monitorId",
             "description": "Monitor resource ID",
             "in": "path",
@@ -3667,275 +3294,25 @@
               "type": "string",
               "format": ""
             }
+          },
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
           }
         ],
-        "operationId": "MemberMonitorAssociationController.associateMemberMonitor"
+        "operationId": "MonitorController.associateMemberMonitor"
       },
       "get": {
-        "x-controller-name": "MemberMonitorAssociationController",
-        "x-operation-name": "findMonitor",
-        "tags": [
-          "MemberMonitorAssociationController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully retrieve  Monitor resources",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "monitor": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string"
-                        },
-                        "tenantId": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "date"
-                        },
-                        "updatedAt": {
-                          "type": "date"
-                        },
-                        "interval": {
-                          "type": "number"
-                        },
-                        "timeout": {
-                          "type": "number"
-                        },
-                        "targetAddress": {
-                          "type": "string"
-                        },
-                        "targetPort": {
-                          "type": "number"
-                        },
-                        "monitorType": {
-                          "type": "string"
-                        },
-                        "protocol": {
-                          "type": "string"
-                        }
-                      },
-                      "example": {
-                        "id": "11111111-2222-3333-4444-555555555555",
-                        "name": "My name",
-                        "description": "My description",
-                        "createdAt": "2019-03-05T08:40:25.000Z",
-                        "updatedAt": "2019-03-05T08:40:25.100Z",
-                        "interval": 5,
-                        "timeout": 16,
-                        "targetAddress": "192.168.10.123",
-                        "targetPort": 8080,
-                        "monitorType": "tcp",
-                        "protocol": "udp"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Cannot find assoociation or Monitor resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "details": {
-                      "type": "array"
-                    }
-                  },
-                  "example": {
-                    "statusCode": 404,
-                    "name": "Error",
-                    "code": "ENTITY_NOT_FOUND"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "memberId",
-            "description": "Member resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "monitorId",
-            "description": "Monitor resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "MemberMonitorAssociationController.findMonitor"
-      },
-      "delete": {
-        "x-controller-name": "MemberMonitorAssociationController",
-        "x-operation-name": "deassociateMemberMonitor",
-        "tags": [
-          "MemberMonitorAssociationController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successfully deassociate Member and Monitor"
-          }
-        },
-        "parameters": [
-          {
-            "name": "memberId",
-            "description": "Member resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "monitorId",
-            "description": "Monitor resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "MemberMonitorAssociationController.deassociateMemberMonitor"
-      }
-    },
-    "/adcaas/v1/members/{memberId}/monitors": {
-      "get": {
-        "x-controller-name": "MemberMonitorAssociationController",
-        "x-operation-name": "findMonitors",
-        "tags": [
-          "MemberMonitorAssociationController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully retrieve Monitor resources",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "monitors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "description": {
-                            "type": "string"
-                          },
-                          "tenantId": {
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "type": "date"
-                          },
-                          "updatedAt": {
-                            "type": "date"
-                          },
-                          "interval": {
-                            "type": "number"
-                          },
-                          "timeout": {
-                            "type": "number"
-                          },
-                          "targetAddress": {
-                            "type": "string"
-                          },
-                          "targetPort": {
-                            "type": "number"
-                          },
-                          "monitorType": {
-                            "type": "string"
-                          },
-                          "protocol": {
-                            "type": "string"
-                          }
-                        },
-                        "example": {
-                          "id": "11111111-2222-3333-4444-555555555555",
-                          "name": "My name",
-                          "description": "My description",
-                          "createdAt": "2019-03-05T08:40:25.000Z",
-                          "updatedAt": "2019-03-05T08:40:25.100Z",
-                          "interval": 5,
-                          "timeout": 16,
-                          "targetAddress": "192.168.10.123",
-                          "targetPort": 8080,
-                          "monitorType": "tcp",
-                          "protocol": "udp"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "memberId",
-            "description": "Member resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "MemberMonitorAssociationController.findMonitors"
-      }
-    },
-    "/adcaas/v1/monitors/{monitorId}/members/{memberId}": {
-      "get": {
-        "x-controller-name": "MemberMonitorAssociationController",
+        "x-controller-name": "MonitorController",
         "x-operation-name": "findMember",
         "tags": [
-          "MemberMonitorAssociationController"
+          "MonitorController"
         ],
         "responses": {
           "200": {
@@ -4059,15 +3436,50 @@
             }
           }
         ],
-        "operationId": "MemberMonitorAssociationController.findMember"
+        "operationId": "MonitorController.findMember"
+      },
+      "delete": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "deassociateMemberMonitor",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deassociate Member and Monitor"
+          }
+        },
+        "parameters": [
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MonitorController.deassociateMemberMonitor"
       }
     },
     "/adcaas/v1/monitors/{monitorId}/members": {
       "get": {
-        "x-controller-name": "MemberMonitorAssociationController",
+        "x-controller-name": "MonitorController",
         "x-operation-name": "findMembers",
         "tags": [
-          "MemberMonitorAssociationController"
+          "MonitorController"
         ],
         "responses": {
           "200": {
@@ -4140,15 +3552,82 @@
             }
           }
         ],
-        "operationId": "MemberMonitorAssociationController.findMembers"
+        "operationId": "MonitorController.findMembers"
       }
     },
     "/adcaas/v1/monitors/{monitorId}/pools/{poolId}": {
+      "post": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "associatePoolMonitor",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully associate Pool and Monitor"
+          },
+          "404": {
+            "description": "Cannot find Pool resource or Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MonitorController.associatePoolMonitor"
+      },
       "get": {
-        "x-controller-name": "PoolMonitorAssocationController",
+        "x-controller-name": "MonitorController",
         "x-operation-name": "findPool",
         "tags": [
-          "PoolMonitorAssocationController"
+          "MonitorController"
         ],
         "responses": {
           "200": {
@@ -4240,15 +3719,50 @@
             }
           }
         ],
-        "operationId": "PoolMonitorAssocationController.findPool"
+        "operationId": "MonitorController.findPool"
+      },
+      "delete": {
+        "x-controller-name": "MonitorController",
+        "x-operation-name": "deassociatePoolMonitor",
+        "tags": [
+          "MonitorController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deassociate Pool and Monitor "
+          }
+        },
+        "parameters": [
+          {
+            "name": "monitorId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "MonitorController.deassociatePoolMonitor"
       }
     },
     "/adcaas/v1/monitors/{monitorId}/pools": {
       "get": {
-        "x-controller-name": "PoolMonitorAssocationController",
+        "x-controller-name": "MonitorController",
         "x-operation-name": "findPools",
         "tags": [
-          "PoolMonitorAssocationController"
+          "MonitorController"
         ],
         "responses": {
           "200": {
@@ -4333,7 +3847,7 @@
             }
           }
         ],
-        "operationId": "PoolMonitorAssocationController.findPools"
+        "operationId": "MonitorController.findPools"
       }
     },
     "/adcaas/v1/monitors/{monitorId}": {
@@ -5519,6 +5033,251 @@
         "operationId": "MonitorController.find"
       }
     },
+    "/adcaas/v1/pools/{poolId}/members/{memberId}/monitors/{monitorId}": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findMonitorOfMember",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve  Monitor resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "interval": {
+                          "type": "number"
+                        },
+                        "timeout": {
+                          "type": "number"
+                        },
+                        "targetAddress": {
+                          "type": "string"
+                        },
+                        "targetPort": {
+                          "type": "number"
+                        },
+                        "monitorType": {
+                          "type": "string"
+                        },
+                        "protocol": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "interval": 5,
+                        "timeout": 16,
+                        "targetAddress": "192.168.10.123",
+                        "targetPort": 8080,
+                        "monitorType": "tcp",
+                        "protocol": "udp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cannot find assoociation or Monitor resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "monitorId",
+            "description": "Monitor resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolController.findMonitorOfMember"
+      }
+    },
+    "/adcaas/v1/pools/{poolId}/members/{memberId}/monitors": {
+      "get": {
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findMonitorsOfMember",
+        "tags": [
+          "PoolController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Monitor resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "interval": {
+                            "type": "number"
+                          },
+                          "timeout": {
+                            "type": "number"
+                          },
+                          "targetAddress": {
+                            "type": "string"
+                          },
+                          "targetPort": {
+                            "type": "number"
+                          },
+                          "monitorType": {
+                            "type": "string"
+                          },
+                          "protocol": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "interval": 5,
+                          "timeout": 16,
+                          "targetAddress": "192.168.10.123",
+                          "targetPort": 8080,
+                          "monitorType": "tcp",
+                          "protocol": "udp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "poolId",
+            "description": "Pool resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "memberId",
+            "description": "Member resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "PoolController.findMonitorsOfMember"
+      }
+    },
     "/adcaas/v1/pools/{poolId}/members/{memberId}": {
       "patch": {
         "x-controller-name": "PoolController",
@@ -6007,78 +5766,11 @@
       }
     },
     "/adcaas/v1/pools/{poolId}/monitors/{monitorId}": {
-      "post": {
-        "x-controller-name": "PoolMonitorAssocationController",
-        "x-operation-name": "create",
-        "tags": [
-          "PoolMonitorAssocationController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successfully associate Pool and Monitor"
-          },
-          "404": {
-            "description": "Cannot find Pool resource or Monitor resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "details": {
-                      "type": "array"
-                    }
-                  },
-                  "example": {
-                    "statusCode": 404,
-                    "name": "Error",
-                    "code": "ENTITY_NOT_FOUND"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "poolId",
-            "description": "Pool resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "monitorId",
-            "description": "Pool resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "PoolMonitorAssocationController.create"
-      },
       "get": {
-        "x-controller-name": "PoolMonitorAssocationController",
-        "x-operation-name": "findMointor",
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findMointorOfPool",
         "tags": [
-          "PoolMonitorAssocationController"
+          "PoolController"
         ],
         "responses": {
           "200": {
@@ -6170,50 +5862,15 @@
             }
           }
         ],
-        "operationId": "PoolMonitorAssocationController.findMointor"
-      },
-      "delete": {
-        "x-controller-name": "PoolMonitorAssocationController",
-        "x-operation-name": "deleteById",
-        "tags": [
-          "PoolMonitorAssocationController"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successfully deassociate Pool and Monitor "
-          }
-        },
-        "parameters": [
-          {
-            "name": "poolId",
-            "description": "Pool resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          },
-          {
-            "name": "monitorId",
-            "description": "Pool resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "PoolMonitorAssocationController.deleteById"
+        "operationId": "PoolController.findMointorOfPool"
       }
     },
     "/adcaas/v1/pools/{poolId}/monitors": {
       "get": {
-        "x-controller-name": "PoolMonitorAssocationController",
-        "x-operation-name": "findMonitors",
+        "x-controller-name": "PoolController",
+        "x-operation-name": "findMonitorsOfPool",
         "tags": [
-          "PoolMonitorAssocationController"
+          "PoolController"
         ],
         "responses": {
           "200": {
@@ -6298,7 +5955,7 @@
             }
           }
         ],
-        "operationId": "PoolMonitorAssocationController.findMonitors"
+        "operationId": "PoolController.findMonitorsOfPool"
       }
     },
     "/adcaas/v1/pools/{poolId}": {
@@ -12149,38 +11806,6 @@
         },
         "required": [
           "id"
-        ]
-      },
-      "Rule": {
-        "title": "Rule",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "tenantId": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endpointpolicyId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "endpointpolicyId"
         ]
       },
       "Monitor": {
