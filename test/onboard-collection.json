@@ -1114,7 +1114,7 @@
 									"    pm.expect(resp.adc.status).to.not.have.string('ERROR');",
 									"});",
 									"",
-									"if (resp.adc.status !== 'ONBOARDED') {",
+									"if (resp.adc.status !== 'ONBOARDED' && resp.adc.status !== 'ONBOARDERROR') {",
 									"    postman.setNextRequest('wait-adc-onboard');",
 									"    setTimeout(function(){}, 10000)",
 									"}",
@@ -1866,16 +1866,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"my_rule\"\n}"
+							"raw": "{\n  \"name\": \"my_rule\",\n  \"endpointpolicyId\": \"{{POLICY_ID}}\"\n}"
 						},
 						"url": {
-							"raw": "{{ADCAAS_URL}}/endpointpolicies/{{POLICY_ID}}/rules",
+							"raw": "{{ADCAAS_URL}}/rules",
 							"host": [
 								"{{ADCAAS_URL}}"
 							],
 							"path": [
-								"endpointpolicies",
-								"{{POLICY_ID}}",
 								"rules"
 							]
 						}
