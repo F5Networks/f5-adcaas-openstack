@@ -405,8 +405,15 @@ export class AdcController extends BaseController {
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
 
     if (await this.adcStCtr.readyTo(AdcState.RECLAIMED)) {
-      this.deleteOn(adc, addonReq).then(() =>
-        this.adcRepository.deleteById(id),
+      this.deleteOn(adc, addonReq).then(
+        () => this.adcRepository.deleteById(id),
+        err => {
+          this.logger.error(`Reclaiming fails for ${adc.id}: ${err.message}`);
+          this.serialize(adc, {
+            status: AdcState.RECLAIMERR,
+            lastErr: `${AdcState.RECLAIMERR}: ${err.message}; Please try again.`,
+          });
+        },
       );
     } else
       throw new HttpErrors.UnprocessableEntity(
@@ -803,21 +810,13 @@ export class AdcController extends BaseController {
       install: () => {},
     };
 
-    try {
-      this.logger.debug(`start to reclaim ${adc.id}`);
-      this.serialize(adc, {status: AdcState.RECLAIMING, lastErr: ''});
-      for (let f of ['trust', 'license', 'vm', 'network']) {
-        await reclaimFuncs[f]();
-      }
-      this.logger.debug(`succeed for reclaiming ${adc.id}`);
-      this.serialize(adc, {status: AdcState.RECLAIMED, lastErr: ''});
-    } catch (error) {
-      this.logger.error(`Reclaiming fails for ${adc.id}: ${error.message}`);
-      this.serialize(adc, {
-        status: AdcState.RECLAIMERR,
-        lastErr: `${AdcState.RECLAIMERR}: ${error.message}; Please try again.`,
-      });
+    this.logger.debug(`start to reclaim ${adc.id}`);
+    await this.serialize(adc, {status: AdcState.RECLAIMING, lastErr: ''});
+    for (let f of ['trust', 'license', 'vm', 'network']) {
+      await reclaimFuncs[f]();
     }
+    this.logger.debug(`succeed for reclaiming ${adc.id}`);
+    await this.serialize(adc, {status: AdcState.RECLAIMED, lastErr: ''});
   }
 
   private async isDOReady(adc: Adc): Promise<boolean> {
@@ -837,7 +836,7 @@ export class AdcController extends BaseController {
       let code = JSON.parse(resObj)['body'][0][0]['result']['status'];
       return code === 'OK';
     } catch {
-      console.log('DO URI has not been registered.');
+      this.logger.info('DO URI has not been registered.');
       return false;
     }
   }

@@ -2134,6 +2134,42 @@ describe('AdcController test', () => {
     expect(resp.status).equal(404);
   });
 
+  it(
+    'post ' + prefix + '/adcs/{adcId}: delete fail due to reclaim error',
+    async () => {
+      LetResponseWith({
+        bigip_get_mgmt_tm_sys_license: StubResponses.bigipNoLicense200,
+        nova_del_v2_tenantId_servers_serverId: StubResponses.response404,
+      });
+      let adc = await givenAdcData(wafapp, {
+        type: 'VE',
+        status: 'ACTIVE',
+      });
+      ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
+
+      await client
+        .del(prefix + '/adcs/' + adc.id)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(204);
+
+      let resp = {body: {adc: {status: 'ACTIVE', lastErr: ''}}};
+      let checkStatus = async () => {
+        resp = await client
+          .get(prefix + '/adcs/' + adc.id)
+          .set('X-Auth-Token', ExpectedData.userToken)
+          .set('tenant-id', ExpectedData.tenantId);
+
+        return resp.body.adc.status === 'RECLAIMERROR';
+      };
+
+      await checkAndWait(checkStatus, 50, [], 5);
+
+      expect(resp.body.adc.status).equal('RECLAIMERROR');
+      expect(resp.body.adc.lastErr).containEql('NotFoundError');
+    },
+  );
+
   //TODO: the timeout can only be tested through unit test?
   //The following test case leads all tests fail.
   // it(
