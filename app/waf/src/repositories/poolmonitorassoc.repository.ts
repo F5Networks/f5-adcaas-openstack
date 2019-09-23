@@ -19,7 +19,7 @@ import {PoolMonitorAssociation} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
-export class PoolMonitorAssocRepository extends DefaultCrudRepository<
+export class PoolMonitorAssociationRepository extends DefaultCrudRepository<
   PoolMonitorAssociation,
   typeof PoolMonitorAssociation.prototype.poolId
 > {
