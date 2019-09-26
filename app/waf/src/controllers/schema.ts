@@ -222,6 +222,15 @@ export class Schema {
     return buildParameterSchema(name, 'path', true, 'string', '', desc);
   }
 
+  static queryParameter(
+    name: string,
+    desc: string,
+    type: string,
+    format?: string,
+  ): ParameterObject {
+    return buildParameterSchema(name, 'query', false, type, format || '', desc);
+  }
+
   static createRequest(entity: typeof Entity, desc: string): object {
     let props = buildProperties(entity);
     return buildRequestSchema(
