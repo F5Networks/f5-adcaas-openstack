@@ -10,9 +10,9 @@ DATABASE_DB=postgres
 DATABASE_PORT=5432
 DATABASE_HOST=postgres-server
 
-OS_AUTH_URL=http://10.250.13.69:5000/v3
+OS_AUTH_URL=http://localhost:5000/v3
 OS_USERNAME=admin
-OS_PASSWORD=4KR8trkTFQxJv4R2VuVPgrBUb
+OS_PASSWORD=wrong
 OS_TENANT_ID=610be7617fff469c88b71301cffd4c06
 OS_FLOATINGIP_NETWORK_ID=a33f84be-e058-482b-9efd-5cef248a6ca4
 # Required if identity version is v3
@@ -27,9 +27,9 @@ OS_INTERFACE=public
 
 # OnBoarding Parameters
 DO_ENDPOINT=https://do-server:443
-DO_BIGIQ_HOST=10.250.11.138
+DO_BIGIQ_HOST=localhost
 DO_BIGIQ_USERNAME=admin
-DO_BIGIQ_PASSWORD=admin
+DO_BIGIQ_PASSWORD=wrong
 DO_BIGIQ_POOL=newman-pool
 DO_RPM_PACKAGE=/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm
 AS3_RPM_URL=file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm
@@ -49,4 +49,3 @@ VE_ASM_LEVEL=nominal
 
 ASG_HOST=asg-server
 ASG_PORT=443
-
