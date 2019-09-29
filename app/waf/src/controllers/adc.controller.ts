@@ -385,10 +385,19 @@ export class AdcController extends BaseController {
   })
   async deleteById(
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
+    @param(
+      Schema.queryParameter('force', 'Force delete ADC resource', 'boolean'),
+    )
+    force: boolean = false,
   ): Promise<void> {
     let adc = await this.adcRepository.findById(id, undefined, {
       tenantId: await this.tenantId,
     });
+
+    if (force) {
+      await this.adcRepository.deleteById(id);
+      return;
+    }
 
     if (adc.type === 'HW') {
       if (!(await this.untrustAdc(adc)))
@@ -706,7 +715,7 @@ export class AdcController extends BaseController {
     return userDataB64Encoded;
   }
 
-  private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
+  public async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     let reclaimFuncs: {[key: string]: Function} = {
       license: async () => {
         let doMgr = await OnboardingManager.instanlize(

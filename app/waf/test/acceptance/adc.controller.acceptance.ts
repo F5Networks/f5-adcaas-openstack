@@ -2103,7 +2103,7 @@ describe('AdcController test', () => {
     });
   });
 
-  it('post ' + prefix + '/adcs/{adcId}: delete done', async () => {
+  it('delete ' + prefix + '/adcs/{adcId}: delete done', async () => {
     LetResponseWith({
       bigip_get_mgmt_tm_sys_license: StubResponses.bigipNoLicense200,
     });
@@ -2132,6 +2132,45 @@ describe('AdcController test', () => {
     await checkAndWait(checkStatus, 50, [], 5);
 
     expect(resp.status).equal(404);
+  });
+
+  it('delete ' + prefix + '/adcs/{adcId}: force delete', async () => {
+    let adc = await givenAdcData(wafapp, {
+      type: 'VE',
+      status: 'ACTIVE',
+    });
+
+    let stub = sinon.stub(controller, 'deleteOn');
+
+    await client
+      .del(`${prefix}/adcs/${adc.id}?force=true`)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(204);
+
+    await client
+      .get(`${prefix}/adcs/${adc.id}`)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(404);
+
+    expect(!stub.called);
+    stub.restore();
+  });
+
+  it('delete ' + prefix + '/adcs/{adcId}: wrong force parameter', async () => {
+    let adc = await givenAdcData(wafapp, {
+      type: 'VE',
+      status: 'ACTIVE',
+    });
+
+    let resp = await client
+      .del(`${prefix}/adcs/${adc.id}?force=abc`)
+      .set('X-Auth-Token', ExpectedData.userToken)
+      .set('tenant-id', ExpectedData.tenantId)
+      .expect(400);
+
+    expect(resp.body.error.code).equal('INVALID_PARAMETER_VALUE');
   });
 
   //TODO: the timeout can only be tested through unit test?
