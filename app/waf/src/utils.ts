@@ -67,15 +67,12 @@ export async function checkAndWait(
   }
 
   let hdlr = async (b: boolean): Promise<boolean> => {
+    utilsLogger.debug(
+      `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
+    );
     if (b) {
-      utilsLogger.debug(
-        `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
-      );
       return true;
     } else {
-      utilsLogger.debug(
-        `'${funcName}' response with ${b}, countdown: ${tryTimes}`,
-      );
       await sleep(intervalInMSecs);
       return await checkAndWait(
         checkFunc,
@@ -87,11 +84,11 @@ export async function checkAndWait(
   };
 
   let errHdlr = async (reason: string | Error): Promise<boolean> => {
-    utilsLogger.error(`'${funcName}' failure quit.`);
+    utilsLogger.debug(`'${funcName}' failure quit.`);
     if (typeof reason === 'string') {
       return Promise.reject(reason);
     } else if (reason instanceof Error) {
-      return Promise.reject(reason.message);
+      return hdlr(false);
     } else {
       return Promise.reject('checkAndWait terminates due to unknown error');
     }

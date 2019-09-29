@@ -1103,8 +1103,6 @@ describe('AdcController test', () => {
         ],
       });
 
-      queryStub.throws(new Error('Not working'));
-
       let response = await client
         .post(prefix + '/adcs')
         .set('X-Auth-Token', ExpectedData.userToken)
@@ -1124,7 +1122,7 @@ describe('AdcController test', () => {
       await checkAndWait(checkFunc, 50, [], 5).then(() => {
         expect(true).eql(true);
       });
-      expect(response.body.adc.lastErr).eql('TRUSTERROR: Not working');
+      expect(response.body.adc.lastErr).eql('TRUSTERROR: timeout');
     },
   );
 
