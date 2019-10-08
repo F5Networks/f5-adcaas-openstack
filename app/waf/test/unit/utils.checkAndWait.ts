@@ -70,8 +70,8 @@ describe('checkAndWait test', () => {
         expect(true).eql(false);
       },
       b => {
-        expect(b).eql('hahaha');
-        expect(rejE).eql(1);
+        expect(b).eql('timeout');
+        expect(rejE).eql(3);
       },
     );
     await checkAndWait(rejectFalse, 3, [], 1).then(
