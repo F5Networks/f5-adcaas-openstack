@@ -15,12 +15,16 @@
  */
 
 import {factory} from './log4ts';
+import {WafApplication} from './application';
 
 const utilsLogger = factory.getLogger('utils.logger');
 
 let defaultInterval = +process.env.DEFAULT_INTERVAL! || 1000;
 
 export type AnyType = undefined | string | number | boolean | object;
+export class GlobalVars {
+  static globalApp: WafApplication;
+}
 
 export function getDefaultInterval(): number {
   return defaultInterval;

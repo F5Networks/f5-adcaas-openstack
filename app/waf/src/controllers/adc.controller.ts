@@ -57,6 +57,7 @@ import {
   BigipBuiltInProperties,
   ASGServiceProvider,
   AuthedToken,
+  instantiateBigIpManager,
 } from '../services';
 import {checkAndWait, merge, runWithTimer} from '../utils';
 import {LicConfig, LicenseManager} from '../services/license.service';
@@ -851,16 +852,7 @@ export class AdcController extends BaseController {
   }
 
   private async isDOReady(adc: Adc): Promise<boolean> {
-    let cnct = adc.management.connection!;
-    let bigipMgr = await BigIpManager.instanlize(
-      {
-        username: cnct.username,
-        password: cnct.password,
-        ipAddr: cnct.ipAddress,
-        port: cnct.tcpPort,
-      },
-      this.reqCxt.name,
-    );
+    let bigipMgr = await instantiateBigIpManager(adc.management.connection!);
 
     try {
       let resObj = await bigipMgr.getDOStatus();
@@ -877,16 +869,7 @@ export class AdcController extends BaseController {
       this.logger.debug(`start to install do rpm to bigip ${adc.id}`);
       await this.serialize(adc, {status: AdcState.DOINSTALLING});
       // check if do is already installed.
-      let cnct = adc.management.connection!;
-      let bigipMgr = await BigIpManager.instanlize(
-        {
-          username: cnct.username,
-          password: cnct.password,
-          ipAddr: cnct.ipAddress,
-          port: cnct.tcpPort,
-        },
-        this.reqCxt.name,
-      );
+      let bigipMgr = await instantiateBigIpManager(adc.management.connection!);
 
       if ((await this.isDOReady(adc)) === false) {
         await bigipMgr.uploadDO();
@@ -1081,16 +1064,7 @@ export class AdcStateCtrlr {
         `The management session of ADC is empty, cannot initialize bigip manager.`,
       );
 
-    let cnct = this.adc.management.connection;
-    return BigIpManager.instanlize(
-      {
-        username: cnct.username,
-        password: cnct.password,
-        ipAddr: cnct.ipAddress,
-        port: cnct.tcpPort,
-      },
-      this.addon.reqId,
-    );
+    return instantiateBigIpManager(this.adc.management.connection!);
   }
 
   private async getAsgMgr(): Promise<ASGManager> {

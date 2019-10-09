@@ -28,6 +28,7 @@ import {MySequence} from './sequence';
 import {WafBindingKeys} from './keys';
 import {factory} from './log4ts';
 import {OpenStackComponent} from './components';
+import {GlobalVars} from './utils';
 
 export class WafApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -70,5 +71,7 @@ export class WafApplication extends BootMixin(
         nested: true,
       },
     };
+
+    GlobalVars.globalApp = this;
   }
 }

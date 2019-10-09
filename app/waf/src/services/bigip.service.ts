@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-import {Provider, inject} from '@loopback/core';
+import {Provider, inject, instantiateClass} from '@loopback/core';
 import {BIGIPDataSource} from '../datasources/bigip.datasource';
 import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
-import {checkAndWait} from '../utils';
+import {checkAndWait, GlobalVars} from '../utils';
 import path = require('path');
 import {Logger} from 'typescript-logging';
+import {RequestContext, RestBindings} from '@loopback/rest';
+import {ConfigTypes} from '../models';
 
 export const BigipBuiltInProperties = {
   admin: 'admin',
@@ -50,13 +52,36 @@ export class BigipServiceProvider implements Provider<BigipService> {
   }
 }
 
+export async function instantiateBigIpManager(
+  config: ConfigTypes['management']['connection'],
+) {
+  let bConfig: BigipConfig = {
+    username: config!.username,
+    password: config!.password,
+    ipAddr: config!.ipAddress,
+    port: config!.tcpPort,
+  };
+  return instantiateClass<BigIpManager>(
+    BigIpManager,
+    GlobalVars.globalApp,
+    undefined,
+    [bConfig],
+  );
+}
+
 export class BigIpManager {
-  private bigipService: BigipService;
   private baseUrl: string;
   private cred64Encoded: string;
   private logger: Logger;
 
-  constructor(private config: BigipConfig, private reqId: string) {
+  constructor(
+    @inject('services.BigipService')
+    private bigipService: BigipService,
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+    private config: BigipConfig,
+  ) {
+    let reqId = reqCxt ? reqCxt.name : '';
     this.logger = factory.getLogger(reqId + ': services.BigIpManager');
     this.baseUrl = `https://${this.config.ipAddr}:${this.config.port}`;
     this.cred64Encoded =
@@ -64,15 +89,6 @@ export class BigIpManager {
       Buffer.from(`${this.config.username}:${this.config.password}`).toString(
         'base64',
       );
-  }
-
-  static async instanlize(
-    config: BigipConfig,
-    reqId = 'Unknown',
-  ): Promise<BigIpManager> {
-    let bigIpMgr = new BigIpManager(config, reqId);
-    bigIpMgr.bigipService = await new BigipServiceProvider().value();
-    return bigIpMgr;
   }
 
   async getSys(): Promise<object> {
@@ -392,7 +408,7 @@ export class BigIpManager {
   }
 }
 
-type BigipConfig = {
+export type BigipConfig = {
   username: string;
   password: string;
   ipAddr: string;

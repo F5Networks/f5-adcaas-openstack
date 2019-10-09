@@ -19,7 +19,7 @@ import {inject, Provider} from '@loopback/core';
 import {DoDataSource} from '../datasources';
 import {Adc} from '../models';
 import {factory} from '../log4ts';
-import {BigIpManager} from './bigip.service';
+import {instantiateBigIpManager} from './bigip.service';
 import {RestApplication} from '@loopback/rest';
 import {WafBindingKeys} from '../keys';
 import {AddonReqValues} from '../controllers';
@@ -372,14 +372,8 @@ export class OnboardingManager {
 
     let addonInfo: {[key: string]: object | boolean} = {
       // get bigip interfaces information: name.
-      interfaces: await BigIpManager.instanlize(
-        {
-          username: bigip.username,
-          password: bigip.password,
-          ipAddr: bigip.ipAddress,
-          port: bigip.tcpPort,
-        },
-        this.reqId,
+      interfaces: await instantiateBigIpManager(
+        obData.management.connection!,
       ).then(async bigipMgr => {
         return await bigipMgr.getInterfaces();
       }),
