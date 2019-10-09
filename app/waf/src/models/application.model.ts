@@ -16,6 +16,8 @@
 
 import {CommonEntity, Declaration, AS3Declaration, Service} from '.';
 import {model, property, hasMany} from '@loopback/repository';
+import {as3ExtendedName} from './as3.model';
+import {AnyType} from '../utils';
 
 @model()
 export class Application extends CommonEntity {
@@ -96,8 +98,26 @@ export class Application extends CommonEntity {
       service.policies.forEach(policy => {
         obj[policy.getAS3Name()] = policy.getAS3Declaration();
       });
+
+      if (service.profileHTTPCompression) {
+        this.solveDeclarDefs('profileHTTPCompression', obj, service);
+      }
     });
 
     return obj;
+  }
+
+  private solveDeclarDefs(
+    id: string,
+    obj: {[k: string]: AnyType},
+    service: Service,
+  ) {
+    let extObj = <{refs: object; defs: {[k: string]: object}}>(
+      service[as3ExtendedName(id)]
+    );
+    let defs = extObj.defs;
+    Object.keys(defs).forEach(k => {
+      obj[k] = defs[k];
+    });
   }
 }

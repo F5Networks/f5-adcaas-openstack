@@ -67,8 +67,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'bigip',
     },
   })
   clientTLS?: string;
@@ -150,6 +154,21 @@ export class Service extends CommonEntity {
     required: false,
   })
   mirroring?: string;
+
+  @property({
+    type: 'boolean',
+    required: false,
+    schema: {
+      response: true,
+    },
+    as3: {
+      type: '',
+    },
+  })
+  // TODO: "nat64Enabled": true, reports as following, need to confirm with AS3 team.
+  // "code": 422,
+  // "message": "Invalid data property: nat64Enabled",
+  nat64Enabled?: boolean;
 
   @property({
     type: 'array',
@@ -241,6 +260,19 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
+      create: true,
+      update: true,
+    },
+    as3: {
+      type: 'bigip',
+    },
+  })
+  profileConnectivity?: string;
+
+  @property({
+    type: 'string',
+    required: false,
+    schema: {
       create: false,
       update: false,
     },
@@ -311,6 +343,26 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'bigip',
+    },
+  })
+  /**
+   *
+   "statusCode": 422,
+   "name": "UnprocessableEntityError",
+   "message": Deployment is something wrong: "Invalid data property: profileHTTP2"
+   */
+  profileHTTP2?: string;
+
+  @property({
+    type: 'string',
+    required: false,
+    schema: {
       create: false,
       update: false,
     },
@@ -321,8 +373,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'extends',
     },
   })
   profileHTTPCompression?: string;
@@ -442,8 +498,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'bigip',
     },
   })
   serverTLS?: string;
@@ -533,8 +593,6 @@ export class Service extends CommonEntity {
   })
   virtualPort: number;
 
-  // TODO: why not extends Service to keep 'defaultPool', 'policies'?
-  // Model should be the shadow of db schema, should be used as the database definition.
   defaultPool?: Pool;
   policies: Endpointpolicy[] = [];
 
@@ -543,6 +601,15 @@ export class Service extends CommonEntity {
   //TODO: many-to-many relation to other objects
   // iRules
   // allowVlans
+  // nat64Enabled
+  // policyEndpoint
+  // profileAccess
+  // profileAnalyticsTcp
+  // profileConnectivity
+  // profileFPS
+  // profileHTTP2
+  // profileSSHProxy
+  // profileStream
   // rejectVlans
   // securityLogProfiles
 

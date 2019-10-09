@@ -30,6 +30,10 @@ export function as3Name(id: string) {
   return 'F5_' + id.replace(/-/g, '_');
 }
 
+export function as3ExtendedName(propName: string) {
+  return `__AS3_${propName}_`;
+}
+
 export class AS3PatchOp {
   op: string = 'add';
   path: string;

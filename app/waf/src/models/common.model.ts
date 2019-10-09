@@ -18,9 +18,11 @@ import {Entity, property} from '@loopback/repository';
 import {MetadataInspector} from '@loopback/metadata';
 import {MODEL_PROPERTIES_KEY, PropertyDefinition} from '@loopback/repository';
 import {AS3Declaration, as3Name} from '.';
+import {as3ExtendedName} from './as3.model';
+import {AnyType} from '../utils';
 
 export abstract class CommonEntity extends Entity {
-  [key: string]: undefined | string | number | boolean | object;
+  [key: string]: AnyType;
 
   @property({
     type: 'string',
@@ -64,7 +66,7 @@ export abstract class CommonEntity extends Entity {
       response: true,
       example: 'My description',
       openapi: {
-        minLength: 1,
+        minLength: 0,
         maxLength: 200,
       },
     },
@@ -156,12 +158,32 @@ export abstract class CommonEntity extends Entity {
             };
             break;
           }
+          /**
+           * TODO: how to handle array of [bigip]?
+           *
+           * iRules (array<string | Service_HTTPS_iRules>), where
+           *
+           * Service_HTTP_iRules is `bigip` format.
+                format: f5bigip 	Pathname of existing BIG-IP iRule
+           */
           case 'bigip': {
             obj[propName] = {
               bigip: '/Common/' + this[key],
             };
             break;
           }
+
+          case 'extends': {
+            let extObj = <{refs: object; defs: object}>(
+              this[as3ExtendedName(key)]
+            );
+            if (!extObj)
+              throw new Error(`extends key ${as3ExtendedName(key)} not found.`);
+
+            obj[propName] = extObj.refs;
+            break;
+          }
+
           default: {
             obj[propName] = this[key];
             break;

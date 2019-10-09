@@ -39,6 +39,8 @@ import {
   AS3DeployRequest,
   Adc,
   AS3Declaration,
+  as3ExtendedName,
+  as3Name,
 } from '../models';
 import {inject, CoreBindings} from '@loopback/core';
 import {
@@ -54,6 +56,7 @@ import {
   RuleRepository,
   ActionRepository,
   AdcRepository,
+  ProfileHTTPCompressionRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {ASGManager, PortsUpdateParams} from '../services';
@@ -95,6 +98,8 @@ export class DeclarationController extends BaseController {
     public actionRepository: ActionRepository,
     @repository(AdcRepository)
     public adcRepository: AdcRepository,
+    @repository(ProfileHTTPCompressionRepository)
+    private profileHTTPCompressionRepository: ProfileHTTPCompressionRepository,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -142,6 +147,30 @@ export class DeclarationController extends BaseController {
 
     for (let policy of service.policies) {
       await this.loadEndpointpolicy(policy);
+    }
+
+    if (service.profileHTTPCompression) {
+      let refs: {[k: string]: string} = {};
+      let defs: {[k: string]: object} = {};
+      if (
+        await this.profileHTTPCompressionRepository.exists(
+          service.profileHTTPCompression,
+        )
+      ) {
+        let decl = await this.profileHTTPCompressionRepository
+          .findById(service.profileHTTPCompression)
+          .then(prof => prof.getAS3Declaration());
+        defs[as3Name(service.profileHTTPCompression)] = decl;
+        refs = {use: as3Name(service.profileHTTPCompression)};
+      } else {
+        refs = {bigip: `/Common/${service.profileHTTPCompression}`};
+      }
+
+      let extName = as3ExtendedName('profileHTTPCompression');
+      service[extName] = {
+        refs: refs,
+        defs: defs,
+      };
     }
   }
 
