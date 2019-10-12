@@ -109,7 +109,7 @@ describe('test runWithTimer', async () => {
       let n: number;
       for (n = 0; n < 3; n++) {
         await runWithTimer('any', f, cb);
-        expect(runTime).greaterThan(100);
+        expect(runTime).greaterThanOrEqual(99);
         expect(runTime).lessThan(200);
       }
     };

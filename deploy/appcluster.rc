@@ -32,7 +32,7 @@ DO_BIGIQ_USERNAME=admin
 DO_BIGIQ_PASSWORD=wrong
 DO_BIGIQ_POOL=newman-pool
 DO_RPM_PACKAGE=/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm
-AS3_RPM_URL=file:///var/dependencies/f5-appsvcs-3.10.0-5.noarch.rpm
+AS3_RPM_URL=file:///var/dependencies/f5-appsvcs-3.14.0-4.noarch.rpm
 
 # OnBoarding VE Parameters, for these two items, please use the common to seperate them.
 # for example, 8.8.8.8,7.7.7.7 openstack.local1,openstack.local2
