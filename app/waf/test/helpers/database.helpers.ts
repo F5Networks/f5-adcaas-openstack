@@ -20,7 +20,6 @@ import {
   ApplicationRepository,
   AdcTenantAssociationRepository,
   DeclarationRepository,
-  ServiceRepository,
   ServiceEndpointpolicyAssociationRepository,
   PoolRepository,
   MemberRepository,
@@ -58,46 +57,11 @@ import {merge} from '../../src/utils';
 import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
 
 export async function givenEmptyDatabase(wafapp: WafApplication) {
-  const wafpolicyrepo = await wafapp.getRepository(WafpolicyRepository);
-  await wafpolicyrepo.deleteAll();
-
-  const apprepo = await wafapp.getRepository(ApplicationRepository);
-  await apprepo.deleteAll();
-
-  const adcrepo = await wafapp.getRepository(AdcRepository);
-  await adcrepo.deleteAll();
-
-  const tenantRepo = await wafapp.getRepository(AdcTenantAssociationRepository);
-  await tenantRepo.deleteAll();
-
-  const serviceRepo = await wafapp.getRepository(ServiceRepository);
-  await serviceRepo.deleteAll();
-
-  const poolRepo = await wafapp.getRepository(PoolRepository);
-  await poolRepo.deleteAll();
-
-  const memberRepo = await wafapp.getRepository(MemberRepository);
-  await memberRepo.deleteAll();
-
-  const ruleRepo = await wafapp.getRepository(RuleRepository);
-  await ruleRepo.deleteAll();
-
-  const endpointpolicyRepo = await wafapp.getRepository(
-    EndpointpolicyRepository,
-  );
-  await endpointpolicyRepo.deleteAll();
-
-  const monitorRepo = await wafapp.getRepository(MonitorRepository);
-  await monitorRepo.deleteAll();
-
-  const memberMonitorRepo = await wafapp.getRepository(
-    MemberMonitorAssociationRepository,
-  );
-  await memberMonitorRepo.deleteAll();
-  const poolmonitorRepo = await wafapp.getRepository(
-    PoolMonitorAssociationRepository,
-  );
-  await poolmonitorRepo.deleteAll();
+  await Promise.all(
+    wafapp
+      .find(/^repositories.*/)
+      .map(b => wafapp.getRepository(b.valueConstructor!)),
+  ).then(repos => repos.forEach(r => r.deleteAll()));
 }
 
 export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
