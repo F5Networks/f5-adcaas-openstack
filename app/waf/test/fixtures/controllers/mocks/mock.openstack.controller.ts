@@ -85,7 +85,7 @@ export class MockNovaController extends MockBaseController {
     @param.path.string('tenantId') tenantId: string,
     @param.path.string('serverId') serverid: string,
   ): Promise<void> {
-    return ResponseWith.neutron_del_v2_0_ports_portId!();
+    return ResponseWith.nova_del_v2_tenantId_servers_serverId!();
   }
 
   @get('/v2/{tenantId}/servers/{serverId}')
