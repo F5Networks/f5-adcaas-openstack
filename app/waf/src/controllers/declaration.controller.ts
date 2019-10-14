@@ -57,6 +57,7 @@ import {
   ActionRepository,
   AdcRepository,
   ProfileHTTPCompressionRepository,
+  IRuleRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {ASGManager, PortsUpdateParams} from '../services';
@@ -100,6 +101,8 @@ export class DeclarationController extends BaseController {
     public adcRepository: AdcRepository,
     @repository(ProfileHTTPCompressionRepository)
     private profileHTTPCompressionRepository: ProfileHTTPCompressionRepository,
+    @repository(IRuleRepository)
+    private iRuleRepository: IRuleRepository,
     //Suppress get injection binding exeption by using {optional: true}
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
@@ -167,6 +170,29 @@ export class DeclarationController extends BaseController {
       }
 
       let extName = as3ExtendedName('profileHTTPCompression');
+      service[extName] = {
+        refs: refs,
+        defs: defs,
+      };
+    }
+
+    if (service.iRules) {
+      let refs: (string | object)[] = [];
+      let defs: {[k: string]: object} = {};
+
+      for (let i of service.iRules) {
+        let bExists = await this.iRuleRepository.exists(i);
+        if (bExists) {
+          defs[as3Name(i)] = await this.iRuleRepository
+            .findById(i)
+            .then(irule => irule.getAS3Declaration());
+          refs.push(as3Name(i));
+        } else {
+          refs.push({bigip: `/Common/${i}`});
+        }
+      }
+
+      let extName = as3ExtendedName('iRules');
       service[extName] = {
         refs: refs,
         defs: defs,

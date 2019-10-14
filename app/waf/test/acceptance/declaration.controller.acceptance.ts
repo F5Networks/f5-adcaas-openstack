@@ -42,6 +42,7 @@ import {
   givenServiceEndpointpolicyAssociationData,
   givenAdcData,
   givenProfileHTTPCompressionData,
+  givenIRuleData,
 } from '../helpers/database.helpers';
 import {
   StubResponses,
@@ -173,31 +174,10 @@ describe('DeclarationController', () => {
     async () => {
       const application = await givenApplicationData(wafapp);
 
-      let pool = await givenPoolData(wafapp, {
-        name: 'pool1',
-      });
-
       let profileCompress = await givenProfileHTTPCompressionData(wafapp);
 
       await givenServiceData(wafapp, application.id, {
-        defaultPoolId: pool.id,
         profileHTTPCompression: profileCompress.id,
-      });
-
-      let member = await givenMemberData(wafapp, {
-        poolId: pool.id,
-      });
-
-      let monitor = await givenMonitorData(wafapp);
-
-      await givePoolMonitorAssociationData(wafapp, {
-        poolId: pool.id,
-        monitorId: monitor.id,
-      });
-
-      giveMemberMonitorAssociationData(wafapp, {
-        memberId: member.id,
-        monitorId: monitor.id,
       });
 
       let response = await client
@@ -227,29 +207,8 @@ describe('DeclarationController', () => {
     async () => {
       const application = await givenApplicationData(wafapp);
 
-      let pool = await givenPoolData(wafapp, {
-        name: 'pool1',
-      });
-
       await givenServiceData(wafapp, application.id, {
-        defaultPoolId: pool.id,
         profileHTTPCompression: 'wan-optimized-compression',
-      });
-
-      let member = await givenMemberData(wafapp, {
-        poolId: pool.id,
-      });
-
-      let monitor = await givenMonitorData(wafapp);
-
-      await givePoolMonitorAssociationData(wafapp, {
-        poolId: pool.id,
-        monitorId: monitor.id,
-      });
-
-      giveMemberMonitorAssociationData(wafapp, {
-        memberId: member.id,
-        monitorId: monitor.id,
       });
 
       let response = await client
@@ -275,22 +234,126 @@ describe('DeclarationController', () => {
   it(
     'post ' +
       prefix +
-      '/applications/{applicationId}/declarations: create declaration and policy has no rule',
+      '/applications/{applicationId}/declarations: create declaration with builtin irules.',
     async () => {
       const application = await givenApplicationData(wafapp);
 
-      let pool = await givenPoolData(wafapp, {
-        name: 'pool1',
+      await givenServiceData(wafapp, application.id, {
+        iRules: [
+          '_sys_APM_ExchangeSupport_main',
+          '_sys_APM_ExchangeSupport_OA_BasicAuth',
+        ],
       });
 
-      let service = await givenServiceData(wafapp, application.id, {
-        defaultPoolId: pool.id,
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('_sys_APM_ExchangeSupport_main'),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'iRules')[0],
+      ).containDeep([
+        {bigip: '/Common/_sys_APM_ExchangeSupport_main'},
+        {bigip: '/Common/_sys_APM_ExchangeSupport_OA_BasicAuth'},
+      ]);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with customized irules.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+      const iRule1 = await givenIRuleData(wafapp);
+      const iRule2 = await givenIRuleData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        iRules: [iRule1.id, iRule2.id],
       });
 
-      await givenMemberData(wafapp, {
-        poolId: pool.id,
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(iRule1.id),
+      );
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(iRule2.id),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'iRules')[0],
+      ).containDeep([`${as3Name(iRule1.id)}`, `${as3Name(iRule2.id)}`]);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with mixture irules.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+      const iRule1 = await givenIRuleData(wafapp);
+      const iRule2 = await givenIRuleData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        iRules: [
+          iRule1.id,
+          iRule2.id,
+          '_sys_APM_ExchangeSupport_main',
+          '_sys_APM_ExchangeSupport_OA_BasicAuth',
+        ],
       });
 
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(iRule1.id),
+      );
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(iRule2.id),
+      );
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('_sys_APM_ExchangeSupport_main'),
+      );
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('_sys_APM_ExchangeSupport_OA_BasicAuth'),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'iRules')[0],
+      ).containDeep([
+        `${as3Name(iRule1.id)}`,
+        `${as3Name(iRule2.id)}`,
+        {bigip: '/Common/_sys_APM_ExchangeSupport_main'},
+        {bigip: '/Common/_sys_APM_ExchangeSupport_OA_BasicAuth'},
+      ]);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration and policy has no rule',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+      let service = await givenServiceData(wafapp, application.id, {});
       let epp = await givenEndpointpolicyData(wafapp, {
         name: 'epp1',
       });

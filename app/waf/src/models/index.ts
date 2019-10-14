@@ -35,3 +35,4 @@ export * from './membermonitor.model';
 export * from './poolmonitorassoc.model';
 export * from './wafpolicyondevice.model';
 export * from './profiles/http_compress.model';
+export * from './irule.model';

@@ -152,20 +152,13 @@ export abstract class CommonEntity extends Entity {
             obj[propName] = as3Name(this[key] as string);
             break;
           }
+
           case 'use': {
             obj[propName] = {
               use: as3Name(this[key] as string),
             };
             break;
           }
-          /**
-           * TODO: how to handle array of [bigip]?
-           *
-           * iRules (array<string | Service_HTTPS_iRules>), where
-           *
-           * Service_HTTP_iRules is `bigip` format.
-                format: f5bigip 	Pathname of existing BIG-IP iRule
-           */
           case 'bigip': {
             obj[propName] = {
               bigip: '/Common/' + this[key],

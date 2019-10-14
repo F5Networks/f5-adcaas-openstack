@@ -102,6 +102,10 @@ export class Application extends CommonEntity {
       if (service.profileHTTPCompression) {
         this.solveDeclarDefs('profileHTTPCompression', obj, service);
       }
+
+      if (service.iRules) {
+        this.solveDeclarDefs('iRules', obj, service);
+      }
     });
 
     return obj;
