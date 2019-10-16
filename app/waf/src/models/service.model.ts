@@ -365,6 +365,7 @@ export class Service extends CommonEntity {
   })
   profileHTTP?: string;
 
+  // 01070734:3: Configuration error: In Virtual Server (/F5_610be7617fff469c88b71301cffd4c06/F5_7ed1ed90_cc91_43cc_8908_90174f7f9d5c/F5_1204a557_181f_423e_a89a_85866079f169) http2 specified activation mode requires a client ssl profile
   @property({
     type: 'string',
     required: false,
