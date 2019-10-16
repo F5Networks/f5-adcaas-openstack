@@ -43,6 +43,7 @@ import {
   givenAdcData,
   givenProfileHTTPCompressionData,
   givenIRuleData,
+  givenProfileHTTPProfileData,
 } from '../helpers/database.helpers';
 import {
   StubResponses,
@@ -228,6 +229,64 @@ describe('DeclarationController', () => {
           'profileHTTPCompression',
         )[0],
       ).containDeep({bigip: '/Common/wan-optimized-compression'});
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with builtin http profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        profileHTTP: 'http',
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('http'),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'profileHTTP')[0],
+      ).containDeep({bigip: '/Common/http'});
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with customizd http profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let profileHttp = await givenProfileHTTPProfileData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        profileHTTP: profileHttp.id,
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(profileHttp.id),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'profileHTTP')[0],
+      ).containDeep({use: as3Name(profileHttp.id)});
     },
   );
 

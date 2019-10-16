@@ -106,6 +106,10 @@ export class Application extends CommonEntity {
       if (service.iRules) {
         this.solveDeclarDefs('iRules', obj, service);
       }
+
+      if (service.profileHTTP) {
+        this.solveDeclarDefs('profileHTTP', obj, service);
+      }
     });
 
     return obj;
