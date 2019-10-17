@@ -36,7 +36,6 @@ for file in swagger-ui.css swagger-ui-bundle.js swagger-ui-standalone-preset.js 
 done
 
 sed -i 's/LoopBack API Explorer/F5 ADCaaS API Specification/g' index.html
-sed -i 's/\/openapi.json/.\/openapi.json/g' index.html
 
 git config --global user.email "q.zhao@f5.com"
 git config --global user.name "Qin Zhao"
