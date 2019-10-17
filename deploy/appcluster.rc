@@ -27,6 +27,7 @@ OS_INTERFACE=public
 
 # OnBoarding Parameters
 BIGIQ_HOST=localhost
+BIGIQ_PORT=443
 BIGIQ_USERNAME=admin
 BIGIQ_PASSWORD=wrong
 BIGIQ_POOL=newman-pool

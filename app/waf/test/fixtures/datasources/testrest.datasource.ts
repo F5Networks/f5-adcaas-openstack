@@ -25,6 +25,7 @@ export enum RestApplicationPort {
   Onboarding = 8081,
   ASG = 8443,
   Nova = 8774,
+  BigIq = 8888,
   Neutron = 9696,
   SSLCustom = 10443,
   IdentityAdmin = 35357,
@@ -2186,6 +2187,33 @@ Reason:
   },
 
   installTrustedExtensions200: () => {},
+
+  bigiqLoginSucceed200: () => {
+    return {
+      token: {
+        token: 'abcdefgh',
+        exp: new Date().getTime() / 1000 + 300,
+      },
+    };
+  },
+
+  bigiqRevokeLicenseSucceed202: () => {
+    return {
+      id: '12345678',
+    };
+  },
+
+  bigiqRevokeTaskFailed200: () => {
+    return {
+      status: 'FAILED',
+    };
+  },
+
+  bigiqRevokeTaskFinished200: () => {
+    return {
+      status: 'FINISHED',
+    };
+  },
 };
 
 type TypeResponseWith = {
@@ -2235,6 +2263,11 @@ type TypeResponseWith = {
   asg_del_mgmt_shared_trusteddevices_deviceId?: Function;
   asg_post_mgmt_shared_trustedextensions_deviceId?: Function;
   asg_get_mgmt_shared_trustedextensions_deviceId?: Function;
+
+  // BIG-IQ APIs
+  bigiq_post_login?: Function;
+  bigiq_post_revoke_license?: Function;
+  bigiq_get_revoke_task?: Function;
 };
 
 export const DefaultResponseWith: TypeResponseWith = {
@@ -2291,6 +2324,10 @@ export const DefaultResponseWith: TypeResponseWith = {
     StubResponses.installTrustedExtensions200,
   asg_get_mgmt_shared_trustedextensions_deviceId:
     StubResponses.queryTrustedExtensionsAvailable200,
+
+  bigiq_post_login: StubResponses.bigiqLoginSucceed200,
+  bigiq_post_revoke_license: StubResponses.bigiqRevokeLicenseSucceed202,
+  bigiq_get_revoke_task: StubResponses.bigiqRevokeTaskFinished200,
 };
 
 export const ResponseWith: TypeResponseWith = {};

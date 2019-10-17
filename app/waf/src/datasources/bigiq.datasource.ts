@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-export * from './asg.service';
-export * from './identity.service';
-export * from './compute.service';
-export * from './network.service';
-export * from './do.service';
-export * from './bigip.service';
-export * from './bigiq.service';
-export * from './license.service';
+import {inject} from '@loopback/core';
+import {juggler} from '@loopback/repository';
+import * as config from './bigiq.datasource.json';
+
+export class BigIqDataSource extends juggler.DataSource {
+  static dataSourceName = 'bigiq';
+
+  constructor(
+    @inject('datasources.config.bigiq', {optional: true})
+    dsConfig: object = config,
+  ) {
+    super(dsConfig);
+  }
+}
