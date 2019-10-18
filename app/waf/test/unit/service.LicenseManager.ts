@@ -45,10 +45,10 @@ describe('test LicenseManager', async () => {
   let createLicMgr = async (a: Adc) => {
     let settings: LicConfig = {
       BIGIQSetting: {
-        hostname: process.env.DO_BIGIQ_HOST!,
-        username: process.env.DO_BIGIQ_USERNAME!,
-        password: process.env.DO_BIGIQ_PASSWORD!,
-        poolname: process.env.DO_BIGIQ_POOL!,
+        hostname: process.env.BIGIQ_HOST!,
+        username: process.env.BIGIQ_USERNAME!,
+        password: process.env.BIGIQ_PASSWORD!,
+        poolname: process.env.BIGIQ_POOL!,
       },
       BIGIPSetting: a,
       licenseKey: a.license,
@@ -111,7 +111,7 @@ describe('test LicenseManager', async () => {
   });
 
   it('test license() via DO failed because of missing ENVs', async () => {
-    delete process.env.DO_BIGIQ_HOST;
+    delete process.env.BIGIQ_HOST;
     try {
       await createLicMgr(adc).then(lm => lm.license());
       expect('should not be here').eql('');

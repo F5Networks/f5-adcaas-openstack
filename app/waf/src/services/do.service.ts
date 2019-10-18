@@ -102,11 +102,10 @@ export class OnboardingManager {
 
     let expectedEmpty = [];
     for (let n of [
-      'DO_BIGIQ_HOST',
-      'DO_BIGIQ_USERNAME',
-      'DO_BIGIQ_PASSWORD',
-      'DO_BIGIQ_POOL',
-      'DO_ENDPOINT',
+      'BIGIQ_HOST',
+      'BIGIQ_USERNAME',
+      'BIGIQ_PASSWORD',
+      'BIGIQ_POOL',
     ]) {
       if (!process.env[n] || process.env[n] === '') {
         expectedEmpty.push(n);
@@ -118,15 +117,15 @@ export class OnboardingManager {
       );
 
     this.config = {
-      endpoint: process.env.DO_ENDPOINT!,
+      endpoint: '',
       basicAuth: '',
       async: true,
       timeout: 900, // from onboarding prompt: should be <= 900
       licPool: {
-        host: process.env.DO_BIGIQ_HOST!,
-        username: process.env.DO_BIGIQ_USERNAME!,
-        password: process.env.DO_BIGIQ_PASSWORD!,
-        poolName: process.env.DO_BIGIQ_POOL!,
+        host: process.env.BIGIQ_HOST!,
+        username: process.env.BIGIQ_USERNAME!,
+        password: process.env.BIGIQ_PASSWORD!,
+        poolName: process.env.BIGIQ_POOL!,
       },
       veDNS: {
         servers: dnsservers.replace(/\ +/g, '').split(','),

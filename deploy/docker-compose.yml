@@ -27,12 +27,10 @@ services:
     depends_on:
       - postgres
       - ASG
-      - DO
       - FLUENTD
     links:
       - postgres:postgres-server
       - ASG:asg-server
-      - DO:do-server
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${DATA_DIRECTORY}:/var/data
@@ -80,20 +78,6 @@ services:
       options:
         fluentd-address: "0.0.0.0:24224"
         tag: f5-asg
-
-  DO:
-    image: f5devcentral/f5-do-container:1.5.0
-    container_name: DO
-    ports:
-      - 9443:443
-      - 8081:80
-    depends_on:
-      - FLUENTD
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: f5-do
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0

@@ -80,18 +80,20 @@ describe('test OnboardingManager', async () => {
   });
 
   it('instanlize: ok', async () => {
-    expect(doMgr.config).containDeep({endpoint: Environments.DO_ENDPOINT});
+    expect(doMgr.config).containDeep({
+      licPool: {host: Environments.BIGIQ_HOST},
+    });
   });
 
   it('instanlize: failed because of missing envs', async () => {
-    delete process.env.DO_ENDPOINT;
+    delete process.env.BIGIQ_HOST;
 
     try {
       await OnboardingManager.instanlize(wafapp);
       expect('call').eql('should not happen.');
     } catch (error) {
       expect(error.message).startWith(
-        'Environments should be set: ["DO_ENDPOINT"]',
+        'Environments should be set: ["BIGIQ_HOST"]',
       );
     }
   });
