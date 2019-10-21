@@ -62,7 +62,8 @@ services:
         tag: postgres
 
   ASG:
-    image: f5devcentral/f5-api-services-gateway:1.0.12
+    build: ./docker/asg
+    image: f5devcentral/f5-openstack-services:asg-1.0.12
     container_name: ASG
     environment:
       - AUTH=DISABLE
