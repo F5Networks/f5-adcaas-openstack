@@ -278,11 +278,8 @@ RestOperationNetworkHandler.prototype.onHttpResponse = function (options, resp) 
             if (statusCode >= oThis.wellKnownPorts.STATUS_FAILURE_THRESHOLD) {
                 let errorMessage = "",
                     errObj = restOp.getBody();
-                if (errObj && errObj.error && errObj.error.message) { // restnoded error response format
-                    errorMessage = errObj.error.message;
-                } else {
-                    errorMessage = errObj.message || errorMessage; // restjavad error response format
-                }
+                logger.severe("error Object: " + JSON.stringify(errObj));
+                errorMessage = JSON.stringify(errObj); // Need the entire error body instead of message only.
                 let err = new Error(errorMessage);
 
                 // This method allows for the retrieval of the error response in the case a caller
