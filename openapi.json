@@ -270,7 +270,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -671,7 +671,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -1269,7 +1269,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -1600,7 +1600,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -1859,7 +1859,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -2197,7 +2197,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -2546,7 +2546,22 @@
                         "applicationId": {
                           "type": "string"
                         },
+                        "clientTLS": {
+                          "type": "string"
+                        },
+                        "nat64Enabled": {
+                          "type": "boolean"
+                        },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP2": {
+                          "type": "string"
+                        },
+                        "profileHTTPCompression": {
+                          "type": "string"
+                        },
+                        "serverTLS": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -2646,7 +2661,22 @@
                           "applicationId": {
                             "type": "string"
                           },
+                          "clientTLS": {
+                            "type": "string"
+                          },
+                          "nat64Enabled": {
+                            "type": "boolean"
+                          },
                           "defaultPoolId": {
+                            "type": "string"
+                          },
+                          "profileHTTP2": {
+                            "type": "string"
+                          },
+                          "profileHTTPCompression": {
+                            "type": "string"
+                          },
+                          "serverTLS": {
                             "type": "string"
                           },
                           "virtualAddresses": {
@@ -2766,7 +2796,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -3070,7 +3100,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -3923,7 +3953,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -4509,7 +4539,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -5336,7 +5366,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -5651,7 +5681,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -6031,7 +6061,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -6442,7 +6472,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -6713,6 +6743,679 @@
         "operationId": "PoolController.find"
       }
     },
+    "/adcaas/v1/profiles/http_compress_profiles/{profileId}": {
+      "delete": {
+        "x-controller-name": "ProfileHTTPCompressionController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "ProfileHTTPCompressionController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete ProfileHTTPCompress resource"
+          },
+          "404": {
+            "description": "Can not find ProfileHTTPCompress resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "profileId",
+            "description": "ProfileHTTPCompress resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ProfileHTTPCompressionController.deleteById"
+      }
+    },
+    "/adcaas/v1/profiles/http_compress_profiles": {
+      "post": {
+        "x-controller-name": "ProfileHTTPCompressionController",
+        "x-operation-name": "create",
+        "tags": [
+          "ProfileHTTPCompressionController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create HTTP_Compress profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttpcompression": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "allowHTTP10": {
+                          "type": "boolean"
+                        },
+                        "bufferSize": {
+                          "type": "number"
+                        },
+                        "contentTypeExcludes": {
+                          "type": "array"
+                        },
+                        "contentTypeIncludes": {
+                          "type": "array"
+                        },
+                        "cpuSaver": {
+                          "type": "boolean"
+                        },
+                        "cpuSaverHigh": {
+                          "type": "number"
+                        },
+                        "cpuSaverLow": {
+                          "type": "number"
+                        },
+                        "gzipLevel": {
+                          "type": "number"
+                        },
+                        "gzipMemory": {
+                          "type": "number"
+                        },
+                        "gzipWindowSize": {
+                          "type": "number"
+                        },
+                        "keepAcceptEncoding": {
+                          "type": "boolean"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "minimumSize": {
+                          "type": "number"
+                        },
+                        "preferMethod": {
+                          "type": "string"
+                        },
+                        "remark": {
+                          "type": "string"
+                        },
+                        "selective": {
+                          "type": "boolean"
+                        },
+                        "uriExcludes": {
+                          "type": "array"
+                        },
+                        "uriIncludes": {
+                          "type": "array"
+                        },
+                        "varyHeader": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "allowHTTP10": true,
+                        "bufferSize": 4096,
+                        "contentTypeExcludes": [
+                          "application/json",
+                          "text/xml"
+                        ],
+                        "contentTypeIncludes": [
+                          "application/json",
+                          "text/xml"
+                        ],
+                        "cpuSaver": true,
+                        "cpuSaverHigh": 90,
+                        "cpuSaverLow": 75,
+                        "gzipLevel": 1,
+                        "gzipMemory": 8,
+                        "gzipWindowSize": 16,
+                        "keepAcceptEncoding": true,
+                        "minimumSize": 1024,
+                        "preferMethod": "gzip",
+                        "remark": "any string",
+                        "selective": true,
+                        "uriExcludes": [
+                          "http://example.org"
+                        ],
+                        "uriIncludes": [
+                          "http://example.org"
+                        ],
+                        "varyHeader": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "ProfileHTTPCompress resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "allowHTTP10": {
+                    "type": "boolean"
+                  },
+                  "bufferSize": {
+                    "type": "integer",
+                    "minimum": 256,
+                    "maximum": 32768
+                  },
+                  "contentTypeExcludes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "contentTypeIncludes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "cpuSaver": {
+                    "type": "boolean"
+                  },
+                  "cpuSaverHigh": {
+                    "type": "integer",
+                    "minimum": 15,
+                    "maximum": 99
+                  },
+                  "cpuSaverLow": {
+                    "type": "integer",
+                    "minimum": 10,
+                    "maximum": 95
+                  },
+                  "gzipLevel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9
+                  },
+                  "gzipMemory": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 256
+                  },
+                  "gzipWindowSize": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "keepAcceptEncoding": {
+                    "type": "boolean"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "minimumSize": {
+                    "type": "integer",
+                    "minimum": 128,
+                    "maximum": 131072
+                  },
+                  "preferMethod": {
+                    "type": "string",
+                    "enum": [
+                      "gzip",
+                      "deflate"
+                    ]
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "selective": {
+                    "type": "boolean"
+                  },
+                  "uriExcludes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri",
+                      "maxLength": 1024
+                    }
+                  },
+                  "uriIncludes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri",
+                      "maxLength": 1024
+                    }
+                  },
+                  "varyHeader": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "allowHTTP10": true,
+                  "bufferSize": 4096,
+                  "contentTypeExcludes": [
+                    "application/json",
+                    "text/xml"
+                  ],
+                  "contentTypeIncludes": [
+                    "application/json",
+                    "text/xml"
+                  ],
+                  "cpuSaver": true,
+                  "cpuSaverHigh": 90,
+                  "cpuSaverLow": 75,
+                  "gzipLevel": 1,
+                  "gzipMemory": 8,
+                  "gzipWindowSize": 16,
+                  "keepAcceptEncoding": true,
+                  "minimumSize": 1024,
+                  "preferMethod": "gzip",
+                  "remark": "any string",
+                  "selective": true,
+                  "uriExcludes": [
+                    "http://example.org"
+                  ],
+                  "uriIncludes": [
+                    "http://example.org"
+                  ],
+                  "varyHeader": true
+                }
+              }
+            }
+          }
+        },
+        "operationId": "ProfileHTTPCompressionController.create"
+      },
+      "get": {
+        "x-controller-name": "ProfileHTTPCompressionController",
+        "x-operation-name": "find",
+        "tags": [
+          "ProfileHTTPCompressionController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve ProfileHTTPCompress resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttpcompressions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "allowHTTP10": {
+                            "type": "boolean"
+                          },
+                          "bufferSize": {
+                            "type": "number"
+                          },
+                          "contentTypeExcludes": {
+                            "type": "array"
+                          },
+                          "contentTypeIncludes": {
+                            "type": "array"
+                          },
+                          "cpuSaver": {
+                            "type": "boolean"
+                          },
+                          "cpuSaverHigh": {
+                            "type": "number"
+                          },
+                          "cpuSaverLow": {
+                            "type": "number"
+                          },
+                          "gzipLevel": {
+                            "type": "number"
+                          },
+                          "gzipMemory": {
+                            "type": "number"
+                          },
+                          "gzipWindowSize": {
+                            "type": "number"
+                          },
+                          "keepAcceptEncoding": {
+                            "type": "boolean"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "minimumSize": {
+                            "type": "number"
+                          },
+                          "preferMethod": {
+                            "type": "string"
+                          },
+                          "remark": {
+                            "type": "string"
+                          },
+                          "selective": {
+                            "type": "boolean"
+                          },
+                          "uriExcludes": {
+                            "type": "array"
+                          },
+                          "uriIncludes": {
+                            "type": "array"
+                          },
+                          "varyHeader": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "allowHTTP10": true,
+                          "bufferSize": 4096,
+                          "contentTypeExcludes": [
+                            "application/json",
+                            "text/xml"
+                          ],
+                          "contentTypeIncludes": [
+                            "application/json",
+                            "text/xml"
+                          ],
+                          "cpuSaver": true,
+                          "cpuSaverHigh": 90,
+                          "cpuSaverLow": 75,
+                          "gzipLevel": 1,
+                          "gzipMemory": 8,
+                          "gzipWindowSize": 16,
+                          "keepAcceptEncoding": true,
+                          "minimumSize": 1024,
+                          "preferMethod": "gzip",
+                          "remark": "any string",
+                          "selective": true,
+                          "uriExcludes": [
+                            "http://example.org"
+                          ],
+                          "uriIncludes": [
+                            "http://example.org"
+                          ],
+                          "varyHeader": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "allowHTTP10": {
+                      "type": "boolean"
+                    },
+                    "bufferSize": {
+                      "type": "boolean"
+                    },
+                    "contentTypeExcludes": {
+                      "type": "boolean"
+                    },
+                    "contentTypeIncludes": {
+                      "type": "boolean"
+                    },
+                    "cpuSaver": {
+                      "type": "boolean"
+                    },
+                    "cpuSaverHigh": {
+                      "type": "boolean"
+                    },
+                    "cpuSaverLow": {
+                      "type": "boolean"
+                    },
+                    "gzipLevel": {
+                      "type": "boolean"
+                    },
+                    "gzipMemory": {
+                      "type": "boolean"
+                    },
+                    "gzipWindowSize": {
+                      "type": "boolean"
+                    },
+                    "keepAcceptEncoding": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "boolean"
+                    },
+                    "minimumSize": {
+                      "type": "boolean"
+                    },
+                    "preferMethod": {
+                      "type": "boolean"
+                    },
+                    "remark": {
+                      "type": "boolean"
+                    },
+                    "selective": {
+                      "type": "boolean"
+                    },
+                    "uriExcludes": {
+                      "type": "boolean"
+                    },
+                    "uriIncludes": {
+                      "type": "boolean"
+                    },
+                    "varyHeader": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "operationId": "ProfileHTTPCompressionController.find"
+      }
+    },
     "/adcaas/v1/rules/count": {
       "get": {
         "x-controller-name": "RuleController",
@@ -6809,7 +7512,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -7268,7 +7971,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -7552,7 +8255,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -8347,7 +9050,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -8964,7 +9667,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -9283,7 +9986,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -9785,7 +10488,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -9794,7 +10497,9 @@
                   "type": false,
                   "applicationId": false,
                   "addressStatus": false,
-                  "clientTLS": false,
+                  "clientTLS": {
+                    "type": "string"
+                  },
                   "clonePools": false,
                   "enable": false,
                   "fallbackPersistenceMethod": false,
@@ -9811,6 +10516,9 @@
                     "type": "string"
                   },
                   "profileClassification": false,
+                  "profileConnectivity": {
+                    "type": "string"
+                  },
                   "profileDiameterEndpoint": false,
                   "profileDNS": false,
                   "profileDOS": false,
@@ -9818,8 +10526,13 @@
                   "profileFIX": false,
                   "profileFTP": false,
                   "profileHTTP": false,
+                  "profileHTTP2": {
+                    "type": "string"
+                  },
                   "profileHTTPAcceleration": false,
-                  "profileHTTPCompression": false,
+                  "profileHTTPCompression": {
+                    "type": "string"
+                  },
                   "profileIPOther": false,
                   "profileMultiplex": false,
                   "profileL4": false,
@@ -9831,7 +10544,9 @@
                   "profileTrafficLog": false,
                   "profileUDP": false,
                   "redirect80": false,
-                  "serverTLS": false,
+                  "serverTLS": {
+                    "type": "string"
+                  },
                   "snat": false,
                   "translateClientPort": false,
                   "translateServerAddress": false,
@@ -9892,7 +10607,22 @@
                         "applicationId": {
                           "type": "string"
                         },
+                        "clientTLS": {
+                          "type": "string"
+                        },
+                        "nat64Enabled": {
+                          "type": "boolean"
+                        },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP2": {
+                          "type": "string"
+                        },
+                        "profileHTTPCompression": {
+                          "type": "string"
+                        },
+                        "serverTLS": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -10069,7 +10799,22 @@
                         "applicationId": {
                           "type": "string"
                         },
+                        "clientTLS": {
+                          "type": "string"
+                        },
+                        "nat64Enabled": {
+                          "type": "boolean"
+                        },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP2": {
+                          "type": "string"
+                        },
+                        "profileHTTPCompression": {
+                          "type": "string"
+                        },
+                        "serverTLS": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -10185,7 +10930,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -10203,7 +10948,9 @@
                     "format": "uuid"
                   },
                   "addressStatus": false,
-                  "clientTLS": false,
+                  "clientTLS": {
+                    "type": "string"
+                  },
                   "clonePools": false,
                   "enable": false,
                   "fallbackPersistenceMethod": false,
@@ -10221,6 +10968,9 @@
                   },
                   "profileAnalytics": false,
                   "profileClassification": false,
+                  "profileConnectivity": {
+                    "type": "string"
+                  },
                   "profileDiameterEndpoint": false,
                   "profileDNS": false,
                   "profileDOS": false,
@@ -10228,8 +10978,13 @@
                   "profileFIX": false,
                   "profileFTP": false,
                   "profileHTTP": false,
+                  "profileHTTP2": {
+                    "type": "string"
+                  },
                   "profileHTTPAcceleration": false,
-                  "profileHTTPCompression": false,
+                  "profileHTTPCompression": {
+                    "type": "string"
+                  },
                   "profileIPOther": false,
                   "profileMultiplex": false,
                   "profileL4": false,
@@ -10241,7 +10996,9 @@
                   "profileTrafficLog": false,
                   "profileUDP": false,
                   "redirect80": false,
-                  "serverTLS": false,
+                  "serverTLS": {
+                    "type": "string"
+                  },
                   "snat": false,
                   "translateClientPort": false,
                   "translateServerAddress": false,
@@ -10319,7 +11076,22 @@
                         "applicationId": {
                           "type": "string"
                         },
+                        "clientTLS": {
+                          "type": "string"
+                        },
+                        "nat64Enabled": {
+                          "type": "boolean"
+                        },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP2": {
+                          "type": "string"
+                        },
+                        "profileHTTPCompression": {
+                          "type": "string"
+                        },
+                        "serverTLS": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -10419,6 +11191,9 @@
                     "mirroring": {
                       "type": "boolean"
                     },
+                    "nat64Enabled": {
+                      "type": "boolean"
+                    },
                     "persistenceMethods": {
                       "type": "boolean"
                     },
@@ -10443,6 +11218,9 @@
                     "profileClassification": {
                       "type": "boolean"
                     },
+                    "profileConnectivity": {
+                      "type": "boolean"
+                    },
                     "profileDiameterEndpoint": {
                       "type": "boolean"
                     },
@@ -10462,6 +11240,9 @@
                       "type": "boolean"
                     },
                     "profileHTTP": {
+                      "type": "boolean"
+                    },
+                    "profileHTTP2": {
                       "type": "boolean"
                     },
                     "profileHTTPAcceleration": {
@@ -11235,7 +12016,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -11569,7 +12350,7 @@
                   },
                   "description": {
                     "type": "string",
-                    "minLength": 1,
+                    "minLength": 0,
                     "maxLength": 200
                   },
                   "tenantId": false,
@@ -12222,6 +13003,9 @@
           "mirroring": {
             "type": "string"
           },
+          "nat64Enabled": {
+            "type": "boolean"
+          },
           "persistenceMethods": {
             "type": "array",
             "items": {
@@ -12249,6 +13033,9 @@
           "profileClassification": {
             "type": "string"
           },
+          "profileConnectivity": {
+            "type": "string"
+          },
           "profileDiameterEndpoint": {
             "type": "string"
           },
@@ -12268,6 +13055,9 @@
             "type": "string"
           },
           "profileHTTP": {
+            "type": "string"
+          },
+          "profileHTTP2": {
             "type": "string"
           },
           "profileHTTPAcceleration": {
