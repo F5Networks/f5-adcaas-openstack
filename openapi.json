@@ -2549,10 +2549,16 @@
                         "clientTLS": {
                           "type": "string"
                         },
+                        "iRules": {
+                          "type": "array"
+                        },
                         "nat64Enabled": {
                           "type": "boolean"
                         },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP": {
                           "type": "string"
                         },
                         "profileHTTP2": {
@@ -2579,6 +2585,10 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "iRules": [
+                          "irule1",
+                          "irule2"
+                        ],
                         "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
@@ -2664,10 +2674,16 @@
                           "clientTLS": {
                             "type": "string"
                           },
+                          "iRules": {
+                            "type": "array"
+                          },
                           "nat64Enabled": {
                             "type": "boolean"
                           },
                           "defaultPoolId": {
+                            "type": "string"
+                          },
+                          "profileHTTP": {
                             "type": "string"
                           },
                           "profileHTTP2": {
@@ -2694,6 +2710,10 @@
                           "updatedAt": "2019-03-05T08:40:25.100Z",
                           "type": "HTTP",
                           "applicationId": "11111111-2222-3333-4444-555555555555",
+                          "iRules": [
+                            "irule1",
+                            "irule2"
+                          ],
                           "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                           "virtualAddresses": [
                             "10.100.0.1"
@@ -3268,6 +3288,393 @@
           }
         ],
         "operationId": "EndpointpolicyController.find"
+      }
+    },
+    "/adcaas/v1/irules/{iRuleId}": {
+      "delete": {
+        "x-controller-name": "IRuleController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "IRuleController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete irule resource"
+          },
+          "404": {
+            "description": "Can not find irule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "iRuleId",
+            "description": "irule resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "IRuleController.deleteById"
+      }
+    },
+    "/adcaas/v1/irules": {
+      "post": {
+        "x-controller-name": "IRuleController",
+        "x-operation-name": "create",
+        "tags": [
+          "IRuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create irule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "irule": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "expand": {
+                          "type": "boolean"
+                        },
+                        "iRule": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "remark": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "expand": true,
+                        "iRule": "when CLIENT_ACCEPTED {\n}\n",
+                        "label": "iRule_name",
+                        "remark": "any string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid irule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable irule resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "ProfileHTTPCompress resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "expand": {
+                    "type": "boolean"
+                  },
+                  "iRule": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 65536
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "expand": true,
+                  "iRule": "when CLIENT_ACCEPTED {\n}\n",
+                  "label": "iRule_name",
+                  "remark": "any string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "IRuleController.create"
+      },
+      "get": {
+        "x-controller-name": "IRuleController",
+        "x-operation-name": "find",
+        "tags": [
+          "IRuleController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve ProfileHTTPCompress resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "irules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "expand": {
+                            "type": "boolean"
+                          },
+                          "iRule": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "remark": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "expand": true,
+                          "iRule": "when CLIENT_ACCEPTED {\n}\n",
+                          "label": "iRule_name",
+                          "remark": "any string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "expand": {
+                      "type": "boolean"
+                    },
+                    "iRule": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "boolean"
+                    },
+                    "remark": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "operationId": "IRuleController.find"
       }
     },
     "/adcaas/v1/monitors/{monitorId}/members/{memberId}": {
@@ -10503,6 +10910,12 @@
                   "clonePools": false,
                   "enable": false,
                   "fallbackPersistenceMethod": false,
+                  "iRules": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
                   "lastHop": false,
                   "layer4": false,
                   "maxConnections": false,
@@ -10525,7 +10938,9 @@
                   "profileEnforcement": false,
                   "profileFIX": false,
                   "profileFTP": false,
-                  "profileHTTP": false,
+                  "profileHTTP": {
+                    "type": "string"
+                  },
                   "profileHTTP2": {
                     "type": "string"
                   },
@@ -10557,6 +10972,10 @@
                 "example": {
                   "name": "My name",
                   "description": "My description",
+                  "iRules": [
+                    "irule1",
+                    "irule2"
+                  ],
                   "defaultPoolId": "11111111-2222-3333-4444-555555555555"
                 }
               }
@@ -10610,10 +11029,16 @@
                         "clientTLS": {
                           "type": "string"
                         },
+                        "iRules": {
+                          "type": "array"
+                        },
                         "nat64Enabled": {
                           "type": "boolean"
                         },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP": {
                           "type": "string"
                         },
                         "profileHTTP2": {
@@ -10640,6 +11065,10 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "iRules": [
+                          "irule1",
+                          "irule2"
+                        ],
                         "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
@@ -10802,10 +11231,16 @@
                         "clientTLS": {
                           "type": "string"
                         },
+                        "iRules": {
+                          "type": "array"
+                        },
                         "nat64Enabled": {
                           "type": "boolean"
                         },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP": {
                           "type": "string"
                         },
                         "profileHTTP2": {
@@ -10832,6 +11267,10 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "iRules": [
+                          "irule1",
+                          "irule2"
+                        ],
                         "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
@@ -10954,6 +11393,12 @@
                   "clonePools": false,
                   "enable": false,
                   "fallbackPersistenceMethod": false,
+                  "iRules": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
                   "lastHop": false,
                   "layer4": false,
                   "maxConnections": false,
@@ -10977,7 +11422,9 @@
                   "profileEnforcement": false,
                   "profileFIX": false,
                   "profileFTP": false,
-                  "profileHTTP": false,
+                  "profileHTTP": {
+                    "type": "string"
+                  },
                   "profileHTTP2": {
                     "type": "string"
                   },
@@ -11023,6 +11470,10 @@
                   "description": "My description",
                   "type": "HTTP",
                   "applicationId": "11111111-2222-3333-4444-555555555555",
+                  "iRules": [
+                    "irule1",
+                    "irule2"
+                  ],
                   "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                   "virtualAddresses": [
                     "10.100.0.1"
@@ -11079,10 +11530,16 @@
                         "clientTLS": {
                           "type": "string"
                         },
+                        "iRules": {
+                          "type": "array"
+                        },
                         "nat64Enabled": {
                           "type": "boolean"
                         },
                         "defaultPoolId": {
+                          "type": "string"
+                        },
+                        "profileHTTP": {
                           "type": "string"
                         },
                         "profileHTTP2": {
@@ -11109,6 +11566,10 @@
                         "updatedAt": "2019-03-05T08:40:25.100Z",
                         "type": "HTTP",
                         "applicationId": "11111111-2222-3333-4444-555555555555",
+                        "iRules": [
+                          "irule1",
+                          "irule2"
+                        ],
                         "defaultPoolId": "11111111-2222-3333-4444-555555555555",
                         "virtualAddresses": [
                           "10.100.0.1"
@@ -11174,6 +11635,9 @@
                       "type": "boolean"
                     },
                     "fallbackPersistenceMethod": {
+                      "type": "boolean"
+                    },
+                    "iRules": {
                       "type": "boolean"
                     },
                     "lastHop": {
@@ -12987,6 +13451,12 @@
           },
           "fallbackPersistenceMethod": {
             "type": "string"
+          },
+          "iRules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "lastHop": {
             "type": "string"
