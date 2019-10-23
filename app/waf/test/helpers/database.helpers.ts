@@ -30,6 +30,7 @@ import {
   MonitorRepository,
   MemberMonitorAssociationRepository,
   PoolMonitorAssociationRepository,
+  ProfileHTTPCompressionRepository,
 } from '../../src/repositories';
 
 import {
@@ -48,6 +49,7 @@ import {
   Monitor,
   MemberMonitorAssociation,
   PoolMonitorAssociation,
+  ProfileHTTPCompression,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -100,6 +102,7 @@ export function createConditionObject(data?: Partial<Condition>) {
     data,
   );
 }
+
 export function createActionObject(data?: Partial<Action>) {
   return Object.assign(
     {
@@ -108,6 +111,25 @@ export function createActionObject(data?: Partial<Action>) {
     data,
   );
 }
+
+export function createProfileHTTPCompressionObject(
+  data?: Partial<ProfileHTTPCompression>,
+) {
+  return Object.assign({}, data);
+}
+
+export async function givenProfileHTTPCompressionData(
+  wafapp: WafApplication,
+  data?: Partial<ProfileHTTPCompression>,
+) {
+  const profrepo = await wafapp.getRepository(ProfileHTTPCompressionRepository);
+  const obj = createProfileHTTPCompressionObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+
+  return await profrepo.create(obj);
+}
+
 export async function givenEndpointpolicyData(
   wafapp: WafApplication,
   data?: Partial<Endpointpolicy>,

@@ -41,6 +41,7 @@ import {
   giveMemberMonitorAssociationData,
   givenServiceEndpointpolicyAssociationData,
   givenAdcData,
+  givenProfileHTTPCompressionData,
 } from '../helpers/database.helpers';
 import {
   StubResponses,
@@ -48,6 +49,8 @@ import {
 } from '../fixtures/datasources/testrest.datasource';
 import {ASGServiceProvider, ASGService} from '../../src/services/asg.service';
 import {ExpectedData} from '../fixtures/datasources/testrest.datasource';
+import {as3Name} from '../../src/models';
+import {findByKey} from '../../src/utils';
 
 describe('DeclarationController', () => {
   let wafapp: WafApplication;
@@ -160,6 +163,112 @@ describe('DeclarationController', () => {
         .set('tenant-id', ExpectedData.tenantId)
         .send({name: 'a-declaration'})
         .expect(200);
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with customizd http compression profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+      });
+
+      let profileCompress = await givenProfileHTTPCompressionData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        defaultPoolId: pool.id,
+        profileHTTPCompression: profileCompress.id,
+      });
+
+      let member = await givenMemberData(wafapp, {
+        poolId: pool.id,
+      });
+
+      let monitor = await givenMonitorData(wafapp);
+
+      await givePoolMonitorAssociationData(wafapp, {
+        poolId: pool.id,
+        monitorId: monitor.id,
+      });
+
+      giveMemberMonitorAssociationData(wafapp, {
+        memberId: member.id,
+        monitorId: monitor.id,
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(profileCompress.id),
+      );
+      expect(
+        findByKey(
+          response.body.declaration.content,
+          'profileHTTPCompression',
+        )[0],
+      ).containDeep({use: as3Name(profileCompress.id)});
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with builtin http compression profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let pool = await givenPoolData(wafapp, {
+        name: 'pool1',
+      });
+
+      await givenServiceData(wafapp, application.id, {
+        defaultPoolId: pool.id,
+        profileHTTPCompression: 'wan-optimized-compression',
+      });
+
+      let member = await givenMemberData(wafapp, {
+        poolId: pool.id,
+      });
+
+      let monitor = await givenMonitorData(wafapp);
+
+      await givePoolMonitorAssociationData(wafapp, {
+        poolId: pool.id,
+        monitorId: monitor.id,
+      });
+
+      giveMemberMonitorAssociationData(wafapp, {
+        memberId: member.id,
+        monitorId: monitor.id,
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('wan-optimized-compression'),
+      );
+      expect(
+        findByKey(
+          response.body.declaration.content,
+          'profileHTTPCompression',
+        )[0],
+      ).containDeep({bigip: '/Common/wan-optimized-compression'});
     },
   );
 
