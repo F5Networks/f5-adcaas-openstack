@@ -15,7 +15,7 @@
  */
 
 import {Client, expect} from '@loopback/testlab';
-import {WafApplication} from '../../..';
+import {WafApplication} from '../..';
 import {
   setupApplication,
   teardownApplication,
@@ -23,22 +23,22 @@ import {
   teardownEnvs,
   setupDepApps,
   teardownDepApps,
-} from '../../helpers/testsetup-helper';
+} from '../helpers/testsetup-helper';
 import {
   givenEmptyDatabase,
-  createProfileHTTPCompressionObject,
-  givenProfileHTTPCompressionData,
-} from '../../helpers/database.helpers';
+  givenIRuleData,
+  createIRuleObject,
+} from '../helpers/database.helpers';
 import {
   ExpectedData,
   LetResponseWith,
-} from '../../fixtures/datasources/testrest.datasource';
+} from '../fixtures/datasources/testrest.datasource';
 
 describe('ProfileHTTPCompressionController', () => {
   let wafapp: WafApplication;
   let client: Client;
 
-  const prefix = '/adcaas/v1/profiles';
+  const prefix = '/adcaas/v1';
 
   before('setupApplication', async () => {
     await setupDepApps();
@@ -56,50 +56,50 @@ describe('ProfileHTTPCompressionController', () => {
     teardownEnvs();
   });
 
-  it('post ' + prefix + '/http_compress_profiles', async () => {
-    const prof = createProfileHTTPCompressionObject();
+  it('post ' + prefix + '/irules', async () => {
+    const irule = createIRuleObject();
     const response = await client
-      .post(prefix + `/http_compress_profiles`)
+      .post(prefix + `/irules`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
-      .send(prof)
+      .send(irule)
       .expect(200);
 
-    expect(response.body.profilehttpcompression.id)
+    expect(response.body.irule.id)
       .to.not.empty()
       .and.type('string');
   });
 
-  it('get ' + prefix + '/http_compress_profiles', async () => {
-    await givenProfileHTTPCompressionData(wafapp);
+  it('get ' + prefix + '/irules', async () => {
+    await givenIRuleData(wafapp);
 
     const response = await client
-      .get(prefix + `/http_compress_profiles`)
+      .get(prefix + `/irules`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.profilehttpcompressions)
+    expect(response.body.irules)
       .be.instanceOf(Array)
       .and.have.length(1);
   });
 
-  it('delete ' + prefix + '/http_compress_profiles/{id}', async () => {
-    const prof = await givenProfileHTTPCompressionData(wafapp);
+  it('delete ' + prefix + '/irules/{id}', async () => {
+    const prof = await givenIRuleData(wafapp);
 
     await client
-      .del(prefix + `/http_compress_profiles/${prof.id}`)
+      .del(prefix + `/irules/${prof.id}`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .expect(204);
 
     let response = await client
-      .get(prefix + `/http_compress_profiles`)
+      .get(prefix + `/irules`)
       .set('X-Auth-Token', ExpectedData.userToken)
       .set('tenant-id', ExpectedData.tenantId)
       .expect(200);
 
-    expect(response.body.profilehttpcompressions)
+    expect(response.body.irules)
       .be.instanceOf(Array)
       .and.have.length(0);
   });

@@ -31,6 +31,7 @@ import {
   MemberMonitorAssociationRepository,
   PoolMonitorAssociationRepository,
   ProfileHTTPCompressionRepository,
+  IRuleRepository,
 } from '../../src/repositories';
 
 import {
@@ -50,6 +51,7 @@ import {
   MemberMonitorAssociation,
   PoolMonitorAssociation,
   ProfileHTTPCompression,
+  IRule,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -110,6 +112,26 @@ export function createActionObject(data?: Partial<Action>) {
     },
     data,
   );
+}
+export function createIRuleObject(data?: Partial<IRule>) {
+  return Object.assign(
+    {
+      iRule: 'when HTTP_REQUEST {\n}\n',
+    },
+    data,
+  );
+}
+
+export async function givenIRuleData(
+  wafapp: WafApplication,
+  data?: Partial<IRule>,
+) {
+  const iRuleRepo = await wafapp.getRepository(IRuleRepository);
+  const obj = createIRuleObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+
+  return await iRuleRepo.create(obj);
 }
 
 export function createProfileHTTPCompressionObject(

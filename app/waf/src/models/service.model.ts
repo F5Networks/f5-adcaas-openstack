@@ -109,6 +109,28 @@ export class Service extends CommonEntity {
   fallbackPersistenceMethod?: string;
 
   @property({
+    type: 'array',
+    itemType: 'string',
+    required: false,
+    default: [],
+    schema: {
+      create: true,
+      update: true,
+      response: true,
+      example: ['irule1', 'irule2'],
+      openapi: {
+        items: {
+          type: 'string',
+        },
+      },
+    },
+    as3: {
+      type: 'extends',
+    },
+  })
+  iRules: string[];
+
+  @property({
     type: 'string',
     required: false,
     schema: {
@@ -333,8 +355,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'extends',
     },
   })
   profileHTTP?: string;
@@ -348,7 +374,7 @@ export class Service extends CommonEntity {
       response: true,
     },
     as3: {
-      type: 'bigip',
+      type: 'extends',
     },
   })
   /**
@@ -492,7 +518,7 @@ export class Service extends CommonEntity {
       update: false,
     },
   })
-  redirect80?: boolean;
+  redirect80: boolean;
 
   @property({
     type: 'string',

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-export * from './schema';
-export * from './base.controller';
-export * from './ping.controller';
-export * from './application.controller';
-export * from './declaration.controller';
-export * from './tenantassoc.controller';
-export * from './adc.controller';
-export * from './service.controller';
-export * from './pool.controller';
-export * from './endpointpolicy.controller';
-export * from './rule.controller';
-export * from './wafpolicy.controller';
-export * from './monitor.controller';
-export * from './profiles/http_compress.controller';
-export * from './irule.controller';
+import {CommonRepository} from '.';
+import {IRule} from '../models';
+import {DbDataSource} from '../datasources';
+import {inject} from '@loopback/core';
+import {RequestContext, RestBindings} from '@loopback/rest';
+
+export class IRuleRepository extends CommonRepository<
+  IRule,
+  typeof IRule.prototype.id
+> {
+  constructor(
+    @inject(RestBindings.Http.CONTEXT, {optional: true})
+    protected reqCxt: RequestContext,
+    @inject('datasources.db') dataSource: DbDataSource,
+  ) {
+    super(IRule, dataSource, reqCxt);
+  }
+}
