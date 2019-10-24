@@ -42,9 +42,6 @@ export type ConfigTypes = {
     connection?: {
       ipAddress: string; // mostly floatingIp.
       tcpPort: number;
-      username: string;
-      password: string;
-      rootPass: string;
     };
     vmId?: string; // cannot be appointed.
     networks: {
@@ -217,16 +214,18 @@ export class Adc extends CommonEntity {
   })
   lastErr: ConfigTypes['lastErr'];
 
+  username: string = 'admin';
+
+  password: string = 'admin';
+
+  rootPass: string = 'default';
+
   constructor(data?: Partial<Adc>) {
     super(data);
   }
 
   getBasicAuth(): string {
-    return Buffer.from(
-      `${this.management.connection!.username}:${
-        this.management.connection!.password
-      }`,
-    ).toString('base64');
+    return Buffer.from(`${this.username}:${this.password}`).toString('base64');
   }
 
   getDoEndpoint(): string {

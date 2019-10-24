@@ -49,14 +49,8 @@
 			"enabled": true
 		},
 		{
-			"key": "ONBOARD_RETRY",
-			"value": "60",
-			"description": "",
-			"enabled": true
-		},
-		{
 			"key": "ACTIVE_RETRY",
-			"value": "30",
+			"value": "100",
 			"description": "",
 			"enabled": true
 		},
@@ -270,6 +264,6 @@
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2019-08-15T09:18:14.463Z",
+	"_postman_exported_at": "2019-10-28T09:02:47.409Z",
 	"_postman_exported_using": "Postman/6.7.4"
 }

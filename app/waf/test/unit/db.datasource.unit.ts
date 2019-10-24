@@ -17,9 +17,18 @@
 import {DbDataSource} from '../../src/datasources';
 import {expect} from '@loopback/testlab';
 import {testdb_config} from '../fixtures/datasources/testdb.datasource';
+import {stubConsoleLog, restoreConsoleLog} from '../helpers/logging.helpers';
 
 describe('datasource function', () => {
   let dbsrc: DbDataSource;
+
+  before(async () => {
+    stubConsoleLog();
+  });
+
+  after(async () => {
+    restoreConsoleLog();
+  });
 
   it('test DbDatasource with config', async () => {
     dbsrc = new DbDataSource(testdb_config);

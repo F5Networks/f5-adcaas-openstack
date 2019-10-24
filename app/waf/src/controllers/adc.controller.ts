@@ -34,13 +34,7 @@ import {
   RestBindings,
   RequestContext,
 } from '@loopback/rest';
-import {
-  Adc,
-  Tenant,
-  ActionsResponse,
-  AS3PartitionRequest,
-  as3Name,
-} from '../models';
+import {Adc, Tenant, AS3PartitionRequest, as3Name} from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {inject, CoreBindings, instantiateClass} from '@loopback/core';
@@ -116,7 +110,7 @@ export class AdcController extends BaseController {
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
       reqId: this.reqCxt.name,
     };
-    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
+    this.adcStCtr = new AdcStateCtrlr(adc, addonReq, this.asgMgr);
     if (adc.type === 'HW') {
       //TODO: Disable this path after VE path is stable.
       //TODO: Do this check in API validator
@@ -152,6 +146,11 @@ export class AdcController extends BaseController {
         if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
           await runWithTimer(`${adc.id}.onboard`, () =>
             this.onboard(adc, addonReq),
+          );
+
+        if (await this.adcStCtr.readyTo(AdcState.TRUSTED))
+          await runWithTimer(`${adc.id}.setup`, () =>
+            this.setupOn(adc, addonReq),
           );
       } catch (error) {
         this.logger.error(`Provisioning is failed for ${adc.id}.`);
@@ -224,8 +223,8 @@ export class AdcController extends BaseController {
       let device = await this.asgMgr.trust(
         adc.management.connection!.ipAddress,
         adc.management.connection!.tcpPort,
-        adc.management.connection!.username,
-        adc.management.connection!.password,
+        adc.username,
+        adc.password,
       );
 
       await checkAndWait(isTrusted, 30, [device.targetUUID]).then(
@@ -443,7 +442,7 @@ export class AdcController extends BaseController {
       tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
       reqId: this.reqCxt.name,
     };
-    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
+    this.adcStCtr = new AdcStateCtrlr(adc, addonReq, this.asgMgr);
 
     if (await this.adcStCtr.readyTo(AdcState.RECLAIMED)) {
       this.deleteOn(adc, addonReq).then(
@@ -520,46 +519,6 @@ export class AdcController extends BaseController {
         }),
       );
     }
-  }
-
-  // TODO: schema.response not work well here.
-  // It shows the below in Example Value:
-  // {
-  //   "actionsresponse": {
-  //     "id": "11111111-2222-3333-4444-555555555555"
-  //   }
-  // }
-  @post(prefix + '/adcs/{adcId}/setup', {
-    responses: {
-      '200': Schema.response(ActionsResponse, 'Adc Id for the actions.'),
-    },
-  })
-  async provision(
-    @param(Schema.pathParameter('adcId', 'ADC resource ID')) id: string,
-  ): Promise<object | undefined> {
-    let adc = await this.adcRepository.findById(id, undefined, {
-      tenantId: await this.tenantId,
-    });
-
-    let addonReq = {
-      userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),
-      tenantId: await this.reqCxt.get(WafBindingKeys.Request.KeyTenantId),
-      reqId: this.reqCxt.name,
-    };
-    this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
-
-    if (adc.status.endsWith('ING'))
-      throw new HttpErrors.UnprocessableEntity(
-        `Adc status is ' ${adc.status}. Cannot be operated on, please wait for its finish.`,
-      );
-
-    if (await this.adcStCtr.readyTo(AdcState.TRUSTED)) {
-      this.setupOn(adc, addonReq);
-      return {id: adc.id};
-    } else
-      throw new HttpErrors.UnprocessableEntity(
-        `Not ready for bigip VE to : ${AdcState.ONBOARDED}`,
-      );
   }
 
   private async setupOn(adc: Adc, addon: AddonReqValues): Promise<void> {
@@ -652,10 +611,10 @@ export class AdcController extends BaseController {
         await computeHelper
           .createServer(addon.userToken!, serverParams)
           .then(response => {
+            adc.username = BigipBuiltInProperties.admin;
+            adc.password = adminPass;
+            adc.rootPass = rootPass;
             adc.management.connection = {
-              username: BigipBuiltInProperties.admin,
-              password: adminPass,
-              rootPass: rootPass,
               tcpPort: BigipBuiltInProperties.port,
               ipAddress: <string>(() => {
                 for (let net in adc.networks) {
@@ -846,8 +805,8 @@ export class AdcController extends BaseController {
     let cnct = adc.management.connection!;
     let bigipMgr = await BigIpManager.instanlize(
       {
-        username: cnct.username,
-        password: cnct.password,
+        username: adc.username,
+        password: adc.password,
         ipAddr: cnct.ipAddress,
         port: cnct.tcpPort,
       },
@@ -872,8 +831,8 @@ export class AdcController extends BaseController {
       let cnct = adc.management.connection!;
       let bigipMgr = await BigIpManager.instanlize(
         {
-          username: cnct.username,
-          password: cnct.password,
+          username: adc.username,
+          password: adc.password,
           ipAddr: cnct.ipAddress,
           port: cnct.tcpPort,
         },
@@ -921,8 +880,11 @@ export class AdcController extends BaseController {
       let doId = await doMgr.onboard(doBody);
 
       await checkAndWait(() => doMgr.isDone(doId), 240).then(
-        () => {
-          checkAndWait(() => this.adcStCtr.gotTo(AdcState.ONBOARDED), 240).then(
+        async () => {
+          await checkAndWait(
+            () => this.adcStCtr.gotTo(AdcState.ONBOARDED),
+            240,
+          ).then(
             () => {
               this.logger.debug(`succeed for onboarding ${adc.id}`);
               this.serialize(adc, {status: AdcState.ONBOARDED});
@@ -1029,6 +991,7 @@ export class AdcStateCtrlr {
   constructor(
     private adc: Adc,
     private addon: AddonReqValues, //private reqId: string,
+    private asgMgr?: ASGManager,
   ) {}
 
   async readyTo(state: string): Promise<boolean> {
@@ -1079,8 +1042,8 @@ export class AdcStateCtrlr {
     let cnct = this.adc.management.connection;
     return BigIpManager.instanlize(
       {
-        username: cnct.username,
-        password: cnct.password,
+        username: this.adc.username,
+        password: this.adc.password,
         ipAddr: cnct.ipAddress,
         port: cnct.tcpPort,
       },
@@ -1089,8 +1052,11 @@ export class AdcStateCtrlr {
   }
 
   private async getAsgMgr(): Promise<ASGManager> {
-    let svc = await new ASGServiceProvider().value();
-    return new ASGManager(svc, this.addon.reqId);
+    if (!this.asgMgr) {
+      let svc = await new ASGServiceProvider().value();
+      this.asgMgr = new ASGManager(svc, this.addon.reqId);
+    }
+    return this.asgMgr;
   }
 
   // Notices:
@@ -1162,11 +1128,14 @@ export class AdcStateCtrlr {
   }
 
   private async partitioned(ctrl: AdcStateCtrlr): Promise<boolean> {
-    let bigipMgr = await ctrl.getBigipMgr();
+    let asgMgr = await ctrl.getAsgMgr();
     let partition = as3Name(ctrl.adc.tenantId);
-    let resObj = await bigipMgr.getPartition(partition);
-    let code = JSON.parse(resObj)['body'][0]['name'];
-    return code === partition;
+    let resp = await asgMgr.getPartition(
+      ctrl.adc.management.trustedDeviceId!,
+      partition,
+    );
+    // @ts-ignore
+    return resp.name === partition;
   }
 
   private async accessible(ctrl: AdcStateCtrlr): Promise<boolean> {
@@ -1175,17 +1144,14 @@ export class AdcStateCtrlr {
   }
 
   private async installed(ctrl: AdcStateCtrlr): Promise<boolean> {
-    return Promise.all([ctrl.getAsgMgr(), ctrl.getBigipMgr()])
-      .then(([asgMgr, bigipMgr]) => {
-        return Promise.all([
-          asgMgr.getAS3State(ctrl.adc.management.trustedDeviceId!),
-          bigipMgr.getAS3Info(),
-        ]);
-      })
-      .then(([state, as3Info]) => {
-        // @ts-ignore as3Info must contain version.
-        return state === 'AVAILABLE' && as3Info.version !== 'not-exists';
-      });
+    let asgMgr = await ctrl.getAsgMgr();
+    return Promise.all([
+      asgMgr.getAS3State(ctrl.adc.management.trustedDeviceId!),
+      asgMgr.getAS3Info(ctrl.adc.management.trustedDeviceId!),
+    ]).then(([state, as3Info]) => {
+      // @ts-ignore as3Info must contain version.
+      return state === 'AVAILABLE' && as3Info.version !== 'not-exists';
+    });
   }
 }
 
