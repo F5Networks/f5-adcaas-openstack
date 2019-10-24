@@ -34,3 +34,4 @@ export * from './poolmonitorassoc.repository';
 export * from './profiles/http_compress.repository';
 export * from './irule.repository';
 export * from './profiles/http_profile.repository';
+export * from './profiles/http2_profile.repository';

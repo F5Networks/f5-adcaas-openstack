@@ -44,6 +44,7 @@ import {
   givenProfileHTTPCompressionData,
   givenIRuleData,
   givenProfileHTTPProfileData,
+  givenProfileHTTP2ProfileData,
 } from '../helpers/database.helpers';
 import {
   StubResponses,
@@ -287,6 +288,64 @@ describe('DeclarationController', () => {
       expect(
         findByKey(response.body.declaration.content, 'profileHTTP')[0],
       ).containDeep({use: as3Name(profileHttp.id)});
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with builtin http2 profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        profileHTTP2: 'http2',
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).not.hasOwnProperty(
+        as3Name('http2'),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'profileHTTP2')[0],
+      ).containDeep({bigip: '/Common/http2'});
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
+      '/applications/{applicationId}/declarations: create declaration with customizd http2 profile.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let profileHttp2 = await givenProfileHTTP2ProfileData(wafapp);
+
+      await givenServiceData(wafapp, application.id, {
+        profileHTTP2: profileHttp2.id,
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(response.body.declaration.content).hasOwnProperty(
+        as3Name(profileHttp2.id),
+      );
+      expect(
+        findByKey(response.body.declaration.content, 'profileHTTP2')[0],
+      ).containDeep({use: as3Name(profileHttp2.id)});
     },
   );
 

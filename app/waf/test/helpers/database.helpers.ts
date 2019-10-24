@@ -33,6 +33,7 @@ import {
   ProfileHTTPCompressionRepository,
   IRuleRepository,
   ProfileHTTPProfileRepository,
+  ProfileHTTP2ProfileRepository,
 } from '../../src/repositories';
 
 import {
@@ -54,6 +55,7 @@ import {
   ProfileHTTPCompression,
   IRule,
   ProfileHttpProfile,
+  ProfileHTTP2Profile,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -170,6 +172,24 @@ export async function givenProfileHTTPProfileData(
   );
 
   return await profrepo.create(obj);
+}
+
+export function createProfileHTTP2ProfileObject(
+  data?: Partial<ProfileHTTP2Profile>,
+) {
+  return Object.assign({}, data);
+}
+
+export async function givenProfileHTTP2ProfileData(
+  wafapp: WafApplication,
+  data?: Partial<ProfileHTTP2Profile>,
+) {
+  const prof2repo = await wafapp.getRepository(ProfileHTTP2ProfileRepository);
+  const obj = createProfileHTTP2ProfileObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+
+  return await prof2repo.create(obj);
 }
 
 export async function givenEndpointpolicyData(
