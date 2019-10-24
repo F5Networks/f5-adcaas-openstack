@@ -102,7 +102,6 @@ export class AdcController extends BaseController {
   ): Promise<Response> {
     reqBody.tenantId = await this.tenantId;
 
-    //TODO: Reject create ADC HW request with duplicated mgmt IP address
     let adc: Adc;
     try {
       adc = await this.adcRepository.create(reqBody);
@@ -116,22 +115,6 @@ export class AdcController extends BaseController {
       reqId: this.reqCxt.name,
     };
     this.adcStCtr = new AdcStateCtrlr(adc, addonReq);
-    if (adc.type === 'HW') {
-      //TODO: Disable this path after VE path is stable.
-      //TODO: Do this check in API validator
-      if (!adc.management.connection || !adc.management.connection.ipAddress) {
-        throw new HttpErrors.BadRequest(
-          'IP address and admin passphrase are required to trust ADC hardware',
-        );
-      }
-
-      this.trustAdc(adc).then(() => {
-        if (adc.status === AdcState.TRUSTED) {
-          this.installAS3(adc);
-        }
-      });
-      return new Response(Adc, adc);
-    }
 
     let createFunc = async () => {
       try {
@@ -179,7 +162,6 @@ export class AdcController extends BaseController {
     try {
       this.logger.debug(`start to trust ${adc.id}`);
       await this.serialize(adc, {status: AdcState.TRUSTING, lastErr: ''});
-      //TODO: Need away to input admin password of BIG-IP HW
       let device = await this.asgMgr.trust(
         adc.management.connection!.ipAddress,
         adc.management.connection!.tcpPort,
@@ -389,13 +371,6 @@ export class AdcController extends BaseController {
     let adc = await this.adcRepository.findById(id, undefined, {
       tenantId: await this.tenantId,
     });
-
-    if (adc.type === 'HW') {
-      if (!(await this.untrustAdc(adc)))
-        throw new HttpErrors.UnprocessableEntity('Fail to untrust device');
-      await this.adcRepository.deleteById(id);
-      return;
-    }
 
     let addonReq = {
       userToken: await this.reqCxt.get(WafBindingKeys.Request.KeyUserToken),

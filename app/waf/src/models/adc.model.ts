@@ -76,8 +76,7 @@ export class Adc extends CommonEntity {
       required: true,
       example: 'VE',
       openapi: {
-        // modify this list when deleting HW path
-        enum: ['VE', 'HW'],
+        enum: ['VE'],
       },
     },
   })

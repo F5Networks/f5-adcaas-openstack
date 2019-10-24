@@ -282,7 +282,7 @@ export function createAdcObject(data?: object) {
     {
       name: 'adc target',
       description: 'my adc description',
-      type: 'HW',
+      type: 'VE',
       networks: {
         mgmt1: {
           type: 'mgmt',
