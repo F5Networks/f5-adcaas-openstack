@@ -7150,6 +7150,525 @@
         "operationId": "PoolController.find"
       }
     },
+    "/adcaas/v1/profiles/http2_profiles/{profileId}": {
+      "delete": {
+        "x-controller-name": "ProfileHTTP2ProfileController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "ProfileHTTP2ProfileController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete ProfileHTTP2Profile resource"
+          },
+          "404": {
+            "description": "Can not find ProfileHTTP2Profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "profileId",
+            "description": "ProfileHTTP2Profile resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ProfileHTTP2ProfileController.deleteById"
+      }
+    },
+    "/adcaas/v1/profiles/http2_profiles": {
+      "post": {
+        "x-controller-name": "ProfileHTTP2ProfileController",
+        "x-operation-name": "create",
+        "tags": [
+          "ProfileHTTP2ProfileController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create HTTP2_Profile profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttp2profile": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "activationMode": {
+                          "type": "string"
+                        },
+                        "concurrentStreamsPerConnection": {
+                          "type": "number"
+                        },
+                        "connectionIdleTimeout": {
+                          "type": "number"
+                        },
+                        "enforceTlsRequirements": {
+                          "type": "boolean"
+                        },
+                        "frameSize": {
+                          "type": "number"
+                        },
+                        "headerTableSize": {
+                          "type": "number"
+                        },
+                        "includeContentLength": {
+                          "type": "boolean"
+                        },
+                        "insertHeader": {
+                          "type": "boolean"
+                        },
+                        "insertHeaderName": {
+                          "type": "string"
+                        },
+                        "receiveWindow": {
+                          "type": "number"
+                        },
+                        "remark": {
+                          "type": "string"
+                        },
+                        "writeSize": {
+                          "type": "number"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "activationMode": "always",
+                        "concurrentStreamsPerConnection": 10,
+                        "connectionIdleTimeout": 300,
+                        "enforceTlsRequirements": true,
+                        "frameSize": 300,
+                        "headerTableSize": 300,
+                        "includeContentLength": true,
+                        "insertHeader": true,
+                        "insertHeaderName": "",
+                        "receiveWindow": 32,
+                        "remark": "",
+                        "writeSize": 16384
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "ProfileHTTP2Profile resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "activationMode": {
+                    "type": "string",
+                    "enum": [
+                      "always",
+                      "alpn"
+                    ]
+                  },
+                  "concurrentStreamsPerConnection": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 256
+                  },
+                  "connectionIdleTimeout": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 4294967295
+                  },
+                  "enforceTlsRequirements": {
+                    "type": "boolean"
+                  },
+                  "frameSize": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 16384
+                  },
+                  "headerTableSize": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "includeContentLength": {
+                    "type": "boolean"
+                  },
+                  "insertHeader": {
+                    "type": "boolean"
+                  },
+                  "insertHeaderName": {
+                    "type": "string"
+                  },
+                  "receiveWindow": {
+                    "type": "integer",
+                    "minimum": 16,
+                    "maximum": 128
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "writeSize": {
+                    "type": "integer",
+                    "minimum": 2048,
+                    "maximum": 32768
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "activationMode": "always",
+                  "concurrentStreamsPerConnection": 10,
+                  "connectionIdleTimeout": 300,
+                  "enforceTlsRequirements": true,
+                  "frameSize": 300,
+                  "headerTableSize": 300,
+                  "includeContentLength": true,
+                  "insertHeader": true,
+                  "insertHeaderName": "",
+                  "receiveWindow": 32,
+                  "remark": "",
+                  "writeSize": 16384
+                }
+              }
+            }
+          }
+        },
+        "operationId": "ProfileHTTP2ProfileController.create"
+      },
+      "get": {
+        "x-controller-name": "ProfileHTTP2ProfileController",
+        "x-operation-name": "find",
+        "tags": [
+          "ProfileHTTP2ProfileController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve ProfileHTTP2Profile resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttp2profiles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "activationMode": {
+                            "type": "string"
+                          },
+                          "concurrentStreamsPerConnection": {
+                            "type": "number"
+                          },
+                          "connectionIdleTimeout": {
+                            "type": "number"
+                          },
+                          "enforceTlsRequirements": {
+                            "type": "boolean"
+                          },
+                          "frameSize": {
+                            "type": "number"
+                          },
+                          "headerTableSize": {
+                            "type": "number"
+                          },
+                          "includeContentLength": {
+                            "type": "boolean"
+                          },
+                          "insertHeader": {
+                            "type": "boolean"
+                          },
+                          "insertHeaderName": {
+                            "type": "string"
+                          },
+                          "receiveWindow": {
+                            "type": "number"
+                          },
+                          "remark": {
+                            "type": "string"
+                          },
+                          "writeSize": {
+                            "type": "number"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "activationMode": "always",
+                          "concurrentStreamsPerConnection": 10,
+                          "connectionIdleTimeout": 300,
+                          "enforceTlsRequirements": true,
+                          "frameSize": 300,
+                          "headerTableSize": 300,
+                          "includeContentLength": true,
+                          "insertHeader": true,
+                          "insertHeaderName": "",
+                          "receiveWindow": 32,
+                          "remark": "",
+                          "writeSize": 16384
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "activationMode": {
+                      "type": "boolean"
+                    },
+                    "concurrentStreamsPerConnection": {
+                      "type": "boolean"
+                    },
+                    "connectionIdleTimeout": {
+                      "type": "boolean"
+                    },
+                    "enforceTlsRequirements": {
+                      "type": "boolean"
+                    },
+                    "frameSize": {
+                      "type": "boolean"
+                    },
+                    "headerTableSize": {
+                      "type": "boolean"
+                    },
+                    "includeContentLength": {
+                      "type": "boolean"
+                    },
+                    "insertHeader": {
+                      "type": "boolean"
+                    },
+                    "insertHeaderName": {
+                      "type": "boolean"
+                    },
+                    "receiveWindow": {
+                      "type": "boolean"
+                    },
+                    "remark": {
+                      "type": "boolean"
+                    },
+                    "writeSize": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "operationId": "ProfileHTTP2ProfileController.find"
+      }
+    },
     "/adcaas/v1/profiles/http_compress_profiles/{profileId}": {
       "delete": {
         "x-controller-name": "ProfileHTTPCompressionController",
