@@ -7823,6 +7823,1069 @@
         "operationId": "ProfileHTTPCompressionController.find"
       }
     },
+    "/adcaas/v1/profiles/http_profiles/{profileId}": {
+      "delete": {
+        "x-controller-name": "ProfileHttpProfileController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "ProfileHttpProfileController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete ProfileHTTPProfile resource"
+          },
+          "404": {
+            "description": "Can not find ProfileHTTPProfile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "profileId",
+            "description": "ProfileHTTPProfile resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "ProfileHttpProfileController.deleteById"
+      }
+    },
+    "/adcaas/v1/profiles/http_profiles": {
+      "post": {
+        "x-controller-name": "ProfileHttpProfileController",
+        "x-operation-name": "create",
+        "tags": [
+          "ProfileHttpProfileController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create HTTP_Profile profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttpprofile": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "allowedResponseHeaders": {
+                          "type": "array"
+                        },
+                        "badRequestMessage": {
+                          "type": "string"
+                        },
+                        "badResponseMessage": {
+                          "type": "string"
+                        },
+                        "connectErrorMessage": {
+                          "type": "string"
+                        },
+                        "defaultConnectAction": {
+                          "type": "string"
+                        },
+                        "dnsErrorMessage": {
+                          "type": "string"
+                        },
+                        "doNotProxyHosts": {
+                          "type": "array"
+                        },
+                        "encryptCookies": {
+                          "type": "array"
+                        },
+                        "fallbackRedirect": {
+                          "type": "string"
+                        },
+                        "fallbackStatusCodes": {
+                          "type": "array"
+                        },
+                        "hstsIncludeSubdomains": {
+                          "type": "boolean"
+                        },
+                        "hstsInsert": {
+                          "type": "boolean"
+                        },
+                        "hstsPeriod": {
+                          "type": "number"
+                        },
+                        "hstsPreload": {
+                          "type": "boolean"
+                        },
+                        "ipv6": {
+                          "type": "boolean"
+                        },
+                        "knownMethods": {
+                          "type": "array"
+                        },
+                        "maxHeaderCount": {
+                          "type": "number"
+                        },
+                        "maxHeaderSize": {
+                          "type": "number"
+                        },
+                        "maxRequests": {
+                          "type": "number"
+                        },
+                        "multiplexTransformations": {
+                          "type": "boolean"
+                        },
+                        "otherXFF": {
+                          "type": "array"
+                        },
+                        "pipelineAction": {
+                          "type": "string"
+                        },
+                        "proxyType": {
+                          "type": "string"
+                        },
+                        "remark": {
+                          "type": "string"
+                        },
+                        "requestChunking": {
+                          "type": "string"
+                        },
+                        "responseChunking": {
+                          "type": "string"
+                        },
+                        "rewriteRedirects": {
+                          "type": "string"
+                        },
+                        "routeDomain": {
+                          "type": "number"
+                        },
+                        "serverHeaderValue": {
+                          "type": "string"
+                        },
+                        "truncatedRedirects": {
+                          "type": "boolean"
+                        },
+                        "trustXFF": {
+                          "type": "boolean"
+                        },
+                        "tunnelName": {
+                          "type": "string"
+                        },
+                        "unknownMethodAction": {
+                          "type": "string"
+                        },
+                        "viaHost": {
+                          "type": "string"
+                        },
+                        "viaRequest": {
+                          "type": "string"
+                        },
+                        "viaResponse": {
+                          "type": "string"
+                        },
+                        "webSocketMasking": {
+                          "type": "string"
+                        },
+                        "webSocketsEnabled": {
+                          "type": "boolean"
+                        },
+                        "whiteOutHeader": {
+                          "type": "string"
+                        },
+                        "xForwardedFor": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "allowedResponseHeaders": [
+                          "content-type",
+                          "cookie"
+                        ],
+                        "badRequestMessage": "<html><head><title>Bad Request</title></head><body><h2>Invalid proxy request</h2></body></html>",
+                        "badResponseMessage": "<html><head><title>Bad Response</title></head><body><h2>Proxy request provoked invalid response</h2></body></html>",
+                        "connectErrorMessage": "<html><head><title>Connection Error</title></head><body><h2>Unable to connect to host in proxy request</h2></body></html>",
+                        "defaultConnectAction": "allow",
+                        "dnsErrorMessage": "<html><head><title>DNS Resolution Error</title></head><body><h2>Cannot resolve hostname in proxy request</h2></body></html>",
+                        "doNotProxyHosts": [
+                          "hosta",
+                          "hostb"
+                        ],
+                        "encryptCookies": [
+                          "content-type",
+                          "cookie"
+                        ],
+                        "fallbackRedirect": "http://example.com",
+                        "fallbackStatusCodes": [
+                          400,
+                          401
+                        ],
+                        "hstsIncludeSubdomains": true,
+                        "hstsInsert": true,
+                        "hstsPeriod": 7862400,
+                        "hstsPreload": true,
+                        "ipv6": true,
+                        "knownMethods": [],
+                        "maxHeaderCount": 64,
+                        "maxHeaderSize": 32768,
+                        "maxRequests": 0,
+                        "multiplexTransformations": true,
+                        "otherXFF": [],
+                        "pipelineAction": "allow",
+                        "proxyType": "reverse",
+                        "remark": "",
+                        "requestChunking": "preserve",
+                        "responseChunking": "selective",
+                        "rewriteRedirects": "none",
+                        "routeDomain": 0,
+                        "serverHeaderValue": "BigIP",
+                        "truncatedRedirects": true,
+                        "trustXFF": true,
+                        "tunnelName": "http-tunnel",
+                        "unknownMethodAction": "allow",
+                        "viaHost": "",
+                        "viaRequest": "remove",
+                        "viaResponse": "remove",
+                        "webSocketMasking": "unmask",
+                        "webSocketsEnabled": true,
+                        "whiteOutHeader": "",
+                        "xForwardedFor": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable profile resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "ProfileHTTPProfile resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "allowedResponseHeaders": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "badRequestMessage": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "badResponseMessage": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "connectErrorMessage": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "defaultConnectAction": {
+                    "type": "string",
+                    "enum": [
+                      "deny",
+                      "allow"
+                    ]
+                  },
+                  "dnsErrorMessage": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "doNotProxyHosts": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 256
+                    }
+                  },
+                  "encryptCookies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "fallbackRedirect": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "fallbackStatusCodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 100,
+                      "maximum": 999
+                    }
+                  },
+                  "hstsIncludeSubdomains": {
+                    "type": "boolean"
+                  },
+                  "hstsInsert": {
+                    "type": "boolean"
+                  },
+                  "hstsPeriod": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 31557600
+                  },
+                  "hstsPreload": {
+                    "type": "boolean"
+                  },
+                  "ipv6": {
+                    "type": "boolean"
+                  },
+                  "knownMethods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 32
+                    }
+                  },
+                  "maxHeaderCount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1024
+                  },
+                  "maxHeaderSize": {
+                    "type": "integer",
+                    "minimum": 9,
+                    "maximum": 262144
+                  },
+                  "maxRequests": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "multiplexTransformations": {
+                    "type": "boolean"
+                  },
+                  "otherXFF": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "pipelineAction": {
+                    "type": "string",
+                    "enum": [
+                      "allow",
+                      "pass-through",
+                      "reject"
+                    ]
+                  },
+                  "proxyType": {
+                    "type": "string",
+                    "enum": [
+                      "reverse",
+                      "transparent",
+                      "explicit"
+                    ]
+                  },
+                  "remark": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "requestChunking": {
+                    "type": "string",
+                    "enum": [
+                      "preserve",
+                      "selective",
+                      "rechunk"
+                    ]
+                  },
+                  "responseChunking": {
+                    "type": "string",
+                    "enum": [
+                      "selective",
+                      "preserve",
+                      "unchunk",
+                      "rechunk"
+                    ]
+                  },
+                  "rewriteRedirects": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "all",
+                      "matching",
+                      "addresses"
+                    ]
+                  },
+                  "routeDomain": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "serverHeaderValue": {
+                    "type": "string",
+                    "enum": [
+                      "BigIP"
+                    ]
+                  },
+                  "truncatedRedirects": {
+                    "type": "boolean"
+                  },
+                  "trustXFF": {
+                    "type": "boolean"
+                  },
+                  "tunnelName": {
+                    "type": "string",
+                    "enum": [
+                      "http-tunnel"
+                    ]
+                  },
+                  "unknownMethodAction": {
+                    "type": "string",
+                    "enum": [
+                      "allow",
+                      "pass-through",
+                      "reject"
+                    ]
+                  },
+                  "viaHost": {
+                    "type": "string"
+                  },
+                  "viaRequest": {
+                    "type": "string",
+                    "enum": [
+                      "remove",
+                      "append",
+                      "preserve"
+                    ]
+                  },
+                  "viaResponse": {
+                    "type": "string",
+                    "enum": [
+                      "remove",
+                      "append",
+                      "preserve"
+                    ]
+                  },
+                  "webSocketMasking": {
+                    "type": "string",
+                    "enum": [
+                      "unmask",
+                      "preserve",
+                      "remask",
+                      "selective"
+                    ]
+                  },
+                  "webSocketsEnabled": {
+                    "type": "boolean"
+                  },
+                  "whiteOutHeader": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "xForwardedFor": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "allowedResponseHeaders": [
+                    "content-type",
+                    "cookie"
+                  ],
+                  "badRequestMessage": "<html><head><title>Bad Request</title></head><body><h2>Invalid proxy request</h2></body></html>",
+                  "badResponseMessage": "<html><head><title>Bad Response</title></head><body><h2>Proxy request provoked invalid response</h2></body></html>",
+                  "connectErrorMessage": "<html><head><title>Connection Error</title></head><body><h2>Unable to connect to host in proxy request</h2></body></html>",
+                  "defaultConnectAction": "allow",
+                  "dnsErrorMessage": "<html><head><title>DNS Resolution Error</title></head><body><h2>Cannot resolve hostname in proxy request</h2></body></html>",
+                  "doNotProxyHosts": [
+                    "hosta",
+                    "hostb"
+                  ],
+                  "encryptCookies": [
+                    "content-type",
+                    "cookie"
+                  ],
+                  "fallbackRedirect": "http://example.com",
+                  "fallbackStatusCodes": [
+                    400,
+                    401
+                  ],
+                  "hstsIncludeSubdomains": true,
+                  "hstsInsert": true,
+                  "hstsPeriod": 7862400,
+                  "hstsPreload": true,
+                  "ipv6": true,
+                  "knownMethods": [],
+                  "maxHeaderCount": 64,
+                  "maxHeaderSize": 32768,
+                  "maxRequests": 0,
+                  "multiplexTransformations": true,
+                  "otherXFF": [],
+                  "pipelineAction": "allow",
+                  "proxyType": "reverse",
+                  "remark": "",
+                  "requestChunking": "preserve",
+                  "responseChunking": "selective",
+                  "rewriteRedirects": "none",
+                  "routeDomain": 0,
+                  "serverHeaderValue": "BigIP",
+                  "truncatedRedirects": true,
+                  "trustXFF": true,
+                  "tunnelName": "http-tunnel",
+                  "unknownMethodAction": "allow",
+                  "viaHost": "",
+                  "viaRequest": "remove",
+                  "viaResponse": "remove",
+                  "webSocketMasking": "unmask",
+                  "webSocketsEnabled": true,
+                  "whiteOutHeader": "",
+                  "xForwardedFor": true
+                }
+              }
+            }
+          }
+        },
+        "operationId": "ProfileHttpProfileController.create"
+      },
+      "get": {
+        "x-controller-name": "ProfileHttpProfileController",
+        "x-operation-name": "find",
+        "tags": [
+          "ProfileHttpProfileController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve ProfileHTTPProfile resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profilehttpprofiles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "allowedResponseHeaders": {
+                            "type": "array"
+                          },
+                          "badRequestMessage": {
+                            "type": "string"
+                          },
+                          "badResponseMessage": {
+                            "type": "string"
+                          },
+                          "connectErrorMessage": {
+                            "type": "string"
+                          },
+                          "defaultConnectAction": {
+                            "type": "string"
+                          },
+                          "dnsErrorMessage": {
+                            "type": "string"
+                          },
+                          "doNotProxyHosts": {
+                            "type": "array"
+                          },
+                          "encryptCookies": {
+                            "type": "array"
+                          },
+                          "fallbackRedirect": {
+                            "type": "string"
+                          },
+                          "fallbackStatusCodes": {
+                            "type": "array"
+                          },
+                          "hstsIncludeSubdomains": {
+                            "type": "boolean"
+                          },
+                          "hstsInsert": {
+                            "type": "boolean"
+                          },
+                          "hstsPeriod": {
+                            "type": "number"
+                          },
+                          "hstsPreload": {
+                            "type": "boolean"
+                          },
+                          "ipv6": {
+                            "type": "boolean"
+                          },
+                          "knownMethods": {
+                            "type": "array"
+                          },
+                          "maxHeaderCount": {
+                            "type": "number"
+                          },
+                          "maxHeaderSize": {
+                            "type": "number"
+                          },
+                          "maxRequests": {
+                            "type": "number"
+                          },
+                          "multiplexTransformations": {
+                            "type": "boolean"
+                          },
+                          "otherXFF": {
+                            "type": "array"
+                          },
+                          "pipelineAction": {
+                            "type": "string"
+                          },
+                          "proxyType": {
+                            "type": "string"
+                          },
+                          "remark": {
+                            "type": "string"
+                          },
+                          "requestChunking": {
+                            "type": "string"
+                          },
+                          "responseChunking": {
+                            "type": "string"
+                          },
+                          "rewriteRedirects": {
+                            "type": "string"
+                          },
+                          "routeDomain": {
+                            "type": "number"
+                          },
+                          "serverHeaderValue": {
+                            "type": "string"
+                          },
+                          "truncatedRedirects": {
+                            "type": "boolean"
+                          },
+                          "trustXFF": {
+                            "type": "boolean"
+                          },
+                          "tunnelName": {
+                            "type": "string"
+                          },
+                          "unknownMethodAction": {
+                            "type": "string"
+                          },
+                          "viaHost": {
+                            "type": "string"
+                          },
+                          "viaRequest": {
+                            "type": "string"
+                          },
+                          "viaResponse": {
+                            "type": "string"
+                          },
+                          "webSocketMasking": {
+                            "type": "string"
+                          },
+                          "webSocketsEnabled": {
+                            "type": "boolean"
+                          },
+                          "whiteOutHeader": {
+                            "type": "string"
+                          },
+                          "xForwardedFor": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "allowedResponseHeaders": [
+                            "content-type",
+                            "cookie"
+                          ],
+                          "badRequestMessage": "<html><head><title>Bad Request</title></head><body><h2>Invalid proxy request</h2></body></html>",
+                          "badResponseMessage": "<html><head><title>Bad Response</title></head><body><h2>Proxy request provoked invalid response</h2></body></html>",
+                          "connectErrorMessage": "<html><head><title>Connection Error</title></head><body><h2>Unable to connect to host in proxy request</h2></body></html>",
+                          "defaultConnectAction": "allow",
+                          "dnsErrorMessage": "<html><head><title>DNS Resolution Error</title></head><body><h2>Cannot resolve hostname in proxy request</h2></body></html>",
+                          "doNotProxyHosts": [
+                            "hosta",
+                            "hostb"
+                          ],
+                          "encryptCookies": [
+                            "content-type",
+                            "cookie"
+                          ],
+                          "fallbackRedirect": "http://example.com",
+                          "fallbackStatusCodes": [
+                            400,
+                            401
+                          ],
+                          "hstsIncludeSubdomains": true,
+                          "hstsInsert": true,
+                          "hstsPeriod": 7862400,
+                          "hstsPreload": true,
+                          "ipv6": true,
+                          "knownMethods": [],
+                          "maxHeaderCount": 64,
+                          "maxHeaderSize": 32768,
+                          "maxRequests": 0,
+                          "multiplexTransformations": true,
+                          "otherXFF": [],
+                          "pipelineAction": "allow",
+                          "proxyType": "reverse",
+                          "remark": "",
+                          "requestChunking": "preserve",
+                          "responseChunking": "selective",
+                          "rewriteRedirects": "none",
+                          "routeDomain": 0,
+                          "serverHeaderValue": "BigIP",
+                          "truncatedRedirects": true,
+                          "trustXFF": true,
+                          "tunnelName": "http-tunnel",
+                          "unknownMethodAction": "allow",
+                          "viaHost": "",
+                          "viaRequest": "remove",
+                          "viaResponse": "remove",
+                          "webSocketMasking": "unmask",
+                          "webSocketsEnabled": true,
+                          "whiteOutHeader": "",
+                          "xForwardedFor": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object"
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "allowedResponseHeaders": {
+                      "type": "boolean"
+                    },
+                    "badRequestMessage": {
+                      "type": "boolean"
+                    },
+                    "badResponseMessage": {
+                      "type": "boolean"
+                    },
+                    "connectErrorMessage": {
+                      "type": "boolean"
+                    },
+                    "defaultConnectAction": {
+                      "type": "boolean"
+                    },
+                    "dnsErrorMessage": {
+                      "type": "boolean"
+                    },
+                    "doNotProxyHosts": {
+                      "type": "boolean"
+                    },
+                    "encryptCookies": {
+                      "type": "boolean"
+                    },
+                    "fallbackRedirect": {
+                      "type": "boolean"
+                    },
+                    "fallbackStatusCodes": {
+                      "type": "boolean"
+                    },
+                    "hstsIncludeSubdomains": {
+                      "type": "boolean"
+                    },
+                    "hstsInsert": {
+                      "type": "boolean"
+                    },
+                    "hstsPeriod": {
+                      "type": "boolean"
+                    },
+                    "hstsPreload": {
+                      "type": "boolean"
+                    },
+                    "ipv6": {
+                      "type": "boolean"
+                    },
+                    "knownMethods": {
+                      "type": "boolean"
+                    },
+                    "maxHeaderCount": {
+                      "type": "boolean"
+                    },
+                    "maxHeaderSize": {
+                      "type": "boolean"
+                    },
+                    "maxRequests": {
+                      "type": "boolean"
+                    },
+                    "multiplexTransformations": {
+                      "type": "boolean"
+                    },
+                    "otherXFF": {
+                      "type": "boolean"
+                    },
+                    "pipelineAction": {
+                      "type": "boolean"
+                    },
+                    "proxyType": {
+                      "type": "boolean"
+                    },
+                    "remark": {
+                      "type": "boolean"
+                    },
+                    "requestChunking": {
+                      "type": "boolean"
+                    },
+                    "responseChunking": {
+                      "type": "boolean"
+                    },
+                    "rewriteRedirects": {
+                      "type": "boolean"
+                    },
+                    "routeDomain": {
+                      "type": "boolean"
+                    },
+                    "serverHeaderValue": {
+                      "type": "boolean"
+                    },
+                    "truncatedRedirects": {
+                      "type": "boolean"
+                    },
+                    "trustXFF": {
+                      "type": "boolean"
+                    },
+                    "tunnelName": {
+                      "type": "boolean"
+                    },
+                    "unknownMethodAction": {
+                      "type": "boolean"
+                    },
+                    "viaHost": {
+                      "type": "boolean"
+                    },
+                    "viaRequest": {
+                      "type": "boolean"
+                    },
+                    "viaResponse": {
+                      "type": "boolean"
+                    },
+                    "webSocketMasking": {
+                      "type": "boolean"
+                    },
+                    "webSocketsEnabled": {
+                      "type": "boolean"
+                    },
+                    "whiteOutHeader": {
+                      "type": "boolean"
+                    },
+                    "xForwardedFor": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "operationId": "ProfileHttpProfileController.find"
+      }
+    },
     "/adcaas/v1/rules/count": {
       "get": {
         "x-controller-name": "RuleController",
