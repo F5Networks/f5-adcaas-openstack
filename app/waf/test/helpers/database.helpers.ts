@@ -32,6 +32,7 @@ import {
   PoolMonitorAssociationRepository,
   ProfileHTTPCompressionRepository,
   IRuleRepository,
+  ProfileHTTPProfileRepository,
 } from '../../src/repositories';
 
 import {
@@ -52,6 +53,7 @@ import {
   PoolMonitorAssociation,
   ProfileHTTPCompression,
   IRule,
+  ProfileHttpProfile,
 } from '../../src/models';
 import uuid = require('uuid');
 import {WafApplication} from '../../src';
@@ -146,6 +148,24 @@ export async function givenProfileHTTPCompressionData(
 ) {
   const profrepo = await wafapp.getRepository(ProfileHTTPCompressionRepository);
   const obj = createProfileHTTPCompressionObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+
+  return await profrepo.create(obj);
+}
+
+export function createProfileHTTPProfileObject(
+  data?: Partial<ProfileHttpProfile>,
+) {
+  return Object.assign({}, data);
+}
+
+export async function givenProfileHTTPProfileData(
+  wafapp: WafApplication,
+  data?: Partial<ProfileHttpProfile>,
+) {
+  const profrepo = await wafapp.getRepository(ProfileHTTPProfileRepository);
+  const obj = createProfileHTTPProfileObject(
     Object.assign({tenantId: ExpectedData.tenantId}, data),
   );
 
