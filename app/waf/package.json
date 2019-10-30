@@ -68,6 +68,7 @@
     "uuid": "^3.3.2",
     "ip": "^1.1.5",
     "network-utils-tcp-ping": "^1.1.1",
+    "is-port-reachable": "^2.0.1",
     "generate-password": "^1.4.2"
   },
   "devDependencies": {

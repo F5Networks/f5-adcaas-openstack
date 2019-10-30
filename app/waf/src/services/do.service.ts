@@ -143,46 +143,6 @@ export class OnboardingManager {
   }
 
   private assembleHandlers: {[key: string]: Function} = {
-    license: (
-      target: TypeDOClassDeclaration['Common'],
-      obData: Adc,
-      additionalInfo?: object,
-    ): TypeDOClassDeclaration['Common'] => {
-      try {
-        let onboarding = JSON.parse(JSON.stringify(additionalInfo))[
-          'onboarding'
-        ];
-        let keyName = onboarding ? 'licensePool' : 'revokeFrom';
-
-        let licData = {};
-        if (obData.license) {
-          licData = {
-            class: 'License',
-            licenseType: 'regKey',
-            regKey: obData.license!,
-            overwrite: true,
-          };
-        } else {
-          licData = {
-            class: 'License',
-            licenseType: 'licensePool',
-            bigIqHost: this.config.licPool.host,
-            bigIqUsername: this.config.licPool.username,
-            bigIqPassword: this.config.licPool.password,
-            [keyName]: this.config.licPool.poolName,
-            reachable: true,
-            bigIpUsername: obData.management.connection!.username,
-            bigIpPassword: obData.management.connection!.password,
-          };
-        }
-        this.logger.debug('Add new license: operation: ' + keyName);
-        return Object.assign(target, {myLicense: licData});
-      } catch (error) {
-        this.logger.debug(`No license found: ${error.message}`);
-        return target;
-      }
-    },
-
     provisions: (
       target: TypeDOClassDeclaration['Common'],
       obData: Adc,
@@ -370,12 +330,13 @@ export class OnboardingManager {
       obData: Adc,
       additionalInfo?: object,
     ): TypeDOClassDeclaration['Common'] => {
+      let bigip = obData.management.connection!;
       if (obData.compute.sshKey) {
         let userInfo = {
           class: 'User',
           userType: 'root',
-          oldPassword: obData.management.connection!.rootPass,
-          newPassword: obData.management.connection!.rootPass,
+          oldPassword: bigip.rootPass,
+          newPassword: bigip.rootPass,
           keys: [obData.compute.sshKey!],
         };
 
@@ -389,12 +350,13 @@ export class OnboardingManager {
   };
 
   async assembleDo(obData: Adc, addon: AddonReqValues): Promise<TypeDOClassDO> {
+    let bigip = obData.management.connection!;
     let doBody: TypeDOClassDO = {
       class: 'DO',
-      targetHost: obData.management.connection!.ipAddress,
-      targetPort: obData.management.connection!.tcpPort,
-      targetUsername: obData.management.connection!.username,
-      targetPassphrase: obData.management.connection!.password,
+      targetHost: bigip.ipAddress,
+      targetPort: bigip.tcpPort,
+      targetUsername: bigip.username,
+      targetPassphrase: bigip.password,
       targetTimeout: this.config.timeout.toString(),
       declaration: {
         schemaVersion: '1.5.0',
@@ -412,10 +374,10 @@ export class OnboardingManager {
       // get bigip interfaces information: name.
       interfaces: await BigIpManager.instanlize(
         {
-          username: obData.management.connection!.username,
-          password: obData.management.connection!.password,
-          ipAddr: obData.management.connection!.ipAddress,
-          port: obData.management.connection!.tcpPort,
+          username: bigip.username,
+          password: bigip.password,
+          ipAddr: bigip.ipAddress,
+          port: bigip.tcpPort,
         },
         this.reqId,
       ).then(async bigipMgr => {
@@ -524,7 +486,7 @@ export class OnboardingManager {
 }
 
 // remote.schema
-type TypeDOClassDO = {
+export type TypeDOClassDO = {
   class: 'DO';
   targetHost?: string;
   targetPort?: number;
