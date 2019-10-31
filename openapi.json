@@ -36,7 +36,8 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": true
             }
           }
         ],
@@ -895,7 +896,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -939,7 +941,8 @@
                     "lastErr": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -947,7 +950,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -959,7 +966,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -997,7 +1005,8 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": true
             }
           }
         ],
@@ -2294,7 +2303,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -2326,7 +2336,8 @@
                     "defaultDeclarationId": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -2334,7 +2345,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -2357,11 +2372,13 @@
                       "scope": {
                         "properties": {
                           "where": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                           },
                           "fields": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {},
+                            "additionalProperties": true
                           },
                           "offset": {
                             "type": "integer",
@@ -2369,7 +2386,11 @@
                           },
                           "limit": {
                             "type": "integer",
-                            "minimum": 0
+                            "minimum": 1,
+                            "examples": [
+                              100
+                            ],
+                            "example": 100
                           },
                           "skip": {
                             "type": "integer",
@@ -2381,12 +2402,14 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "additionalProperties": false
                       }
                     }
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -2424,7 +2447,8 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": true
             }
           }
         ],
@@ -3200,7 +3224,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -3223,7 +3248,8 @@
                     "updatedAt": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -3231,7 +3257,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -3254,11 +3284,13 @@
                       "scope": {
                         "properties": {
                           "where": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                           },
                           "fields": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {},
+                            "additionalProperties": true
                           },
                           "offset": {
                             "type": "integer",
@@ -3266,7 +3298,11 @@
                           },
                           "limit": {
                             "type": "integer",
-                            "minimum": 0
+                            "minimum": 1,
+                            "examples": [
+                              100
+                            ],
+                            "example": 100
                           },
                           "skip": {
                             "type": "integer",
@@ -3278,12 +3314,14 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "additionalProperties": false
                       }
                     }
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -3615,7 +3653,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -3650,7 +3689,8 @@
                     "remark": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -3658,7 +3698,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -3670,7 +3714,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -5282,7 +5327,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -5443,7 +5489,8 @@
                     "username": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -5451,7 +5498,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -5463,7 +5514,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -7042,7 +7094,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -7083,7 +7136,8 @@
                     "slowRampTime": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -7091,7 +7145,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -7114,11 +7172,13 @@
                       "scope": {
                         "properties": {
                           "where": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                           },
                           "fields": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {},
+                            "additionalProperties": true
                           },
                           "offset": {
                             "type": "integer",
@@ -7126,7 +7186,11 @@
                           },
                           "limit": {
                             "type": "integer",
-                            "minimum": 0
+                            "minimum": 1,
+                            "examples": [
+                              100
+                            ],
+                            "example": 100
                           },
                           "skip": {
                             "type": "integer",
@@ -7138,12 +7202,14 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "additionalProperties": false
                       }
                     }
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -7583,7 +7649,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -7642,7 +7709,8 @@
                     "writeSize": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -7650,7 +7718,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -7662,7 +7734,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -8235,7 +8308,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -8315,7 +8389,8 @@
                     "varyHeader": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -8323,7 +8398,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -8335,7 +8414,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -9235,7 +9315,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -9378,7 +9459,8 @@
                     "xForwardedFor": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -9386,7 +9468,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -9398,7 +9484,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -9436,7 +9523,8 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": true
             }
           }
         ],
@@ -12064,7 +12152,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -12090,7 +12179,8 @@
                     "endpointpolicyId": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -12098,7 +12188,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -12121,11 +12215,13 @@
                       "scope": {
                         "properties": {
                           "where": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                           },
                           "fields": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {},
+                            "additionalProperties": true
                           },
                           "offset": {
                             "type": "integer",
@@ -12133,7 +12229,11 @@
                           },
                           "limit": {
                             "type": "integer",
-                            "minimum": 0
+                            "minimum": 1,
+                            "examples": [
+                              100
+                            ],
+                            "example": 100
                           },
                           "skip": {
                             "type": "integer",
@@ -12145,12 +12245,14 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "additionalProperties": false
                       }
                     }
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -13175,7 +13277,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -13351,7 +13454,8 @@
                     "virtualPort": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -13359,7 +13463,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -13371,7 +13479,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -13782,7 +13891,8 @@
             "style": "deepObject",
             "explode": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": true
             }
           }
         ],
@@ -14499,7 +14609,8 @@
               "type": "object",
               "properties": {
                 "where": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": true
                 },
                 "fields": {
                   "type": "object",
@@ -14534,7 +14645,8 @@
                     "public": {
                       "type": "boolean"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "offset": {
                   "type": "integer",
@@ -14542,7 +14654,11 @@
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 1,
+                  "examples": [
+                    100
+                  ],
+                  "example": 100
                 },
                 "skip": {
                   "type": "integer",
@@ -14554,7 +14670,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
@@ -14633,7 +14750,8 @@
         },
         "required": [
           "id"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Monitor": {
         "title": "Monitor",
@@ -14806,7 +14924,8 @@
         "required": [
           "id",
           "monitorType"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Member": {
         "title": "Member",
@@ -14846,7 +14965,8 @@
           "address",
           "port",
           "poolId"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Condition": {
         "title": "Condition",
@@ -14929,7 +15049,8 @@
         "required": [
           "id",
           "ruleId"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Action": {
         "title": "Action",
@@ -14988,7 +15109,8 @@
         "required": [
           "id",
           "ruleId"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Service": {
         "title": "Service",
@@ -15181,7 +15303,8 @@
           "type",
           "applicationId",
           "virtualAddresses"
-        ]
+        ],
+        "additionalProperties": false
       }
     }
   },
