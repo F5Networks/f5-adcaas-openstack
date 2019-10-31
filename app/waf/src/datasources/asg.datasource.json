@@ -116,6 +116,46 @@
           "wafpolicyName"
         ]
       }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedProxy/{deviceId}",
+        "body": {
+          "method": "Get",
+          "uri": "{path}"
+        }
+      },
+      "functions": {
+        "icontrolGet": [
+          "host",
+          "port",
+          "deviceId",
+          "path"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/TrustedProxy/{deviceId}",
+        "body": {
+          "method": "Post",
+          "uri": "{path}",
+          "body": "{body}",
+          "headers": "{headers}"
+        }
+      },
+      "functions": {
+        "icontrolPost": [
+          "host",
+          "port",
+          "deviceId",
+          "path",
+          "body",
+          "headers"
+        ]
+      }
     }
   ]
 }
