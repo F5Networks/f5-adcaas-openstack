@@ -18,7 +18,6 @@ import {Provider, inject} from '@loopback/core';
 import {BIGIPDataSource} from '../datasources/bigip.datasource';
 import {getService} from '@loopback/service-proxy';
 import {factory} from '../log4ts';
-import {probe} from 'network-utils-tcp-ping';
 import {checkAndWait} from '../utils';
 import path = require('path');
 import {Logger} from 'typescript-logging';
@@ -369,22 +368,27 @@ export class BigIpManager {
   }
 
   private async reachable(): Promise<boolean> {
-    return await probe(
-      this.config.port,
-      this.config.ipAddr,
-      this.config.timeout,
-    );
+    let isPortReachable = require('is-port-reachable');
+    return isPortReachable(this.config.port, {
+      host: this.config.ipAddr,
+      timeout: 10000,
+    });
   }
 
   private async mustBeReachable(): Promise<void> {
-    if (!(await this.reachable()))
-      throw new Error(
-        'Host unreachable: ' +
+    return this.reachable()
+      .then(b => {
+        if (!b) throw new Error();
+      })
+      .catch(() => {
+        let msg =
+          'Host unreachable: ' +
           JSON.stringify({
             ipaddr: this.config.ipAddr,
             port: this.config.port,
-          }),
-      );
+          });
+        throw new Error(msg);
+      });
   }
 }
 
