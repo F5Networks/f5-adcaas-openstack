@@ -43,7 +43,7 @@ import {
 } from '../models';
 import {AdcRepository, AdcTenantAssociationRepository} from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
-import {inject, CoreBindings} from '@loopback/core';
+import {inject, CoreBindings, instantiateClass} from '@loopback/core';
 import {factory} from '../log4ts';
 import {WafBindingKeys} from '../keys';
 import {WafApplication} from '../application';
@@ -59,6 +59,7 @@ import {
   AuthedToken,
 } from '../services';
 import {checkAndWait, merge, runWithTimer} from '../utils';
+import {LicConfig, LicenseManager} from '../services/license.service';
 
 const prefix = '/adcaas/v1';
 
@@ -143,6 +144,11 @@ export class AdcController extends BaseController {
         if (await this.adcStCtr.readyTo(AdcState.DOINSTALLED))
           await runWithTimer(`${adc.id}.installdo`, () => this.installDO(adc));
 
+        if (await this.adcStCtr.readyTo(AdcState.LICENSED))
+          await runWithTimer(`${adc.id}.license`, () =>
+            this.licenseAdc(adc, addonReq),
+          );
+
         if (await this.adcStCtr.readyTo(AdcState.ONBOARDED))
           await runWithTimer(`${adc.id}.onboard`, () =>
             this.onboard(adc, addonReq),
@@ -155,6 +161,41 @@ export class AdcController extends BaseController {
     runWithTimer(`${adc.id}.create`, createFunc);
 
     return new Response(Adc, adc);
+  }
+
+  async licenseAdc(adc: Adc, addon: AddonReqValues): Promise<void> {
+    let already = await this.adcStCtr.gotTo(AdcState.LICENSED);
+    if (already) {
+      await this.serialize(adc, {status: AdcState.LICENSED, lastErr: ''});
+      return;
+    }
+
+    let settings: LicConfig = {
+      licenseKey: adc.license,
+      BIGIQSetting: {
+        hostname: process.env.DO_BIGIQ_HOST!,
+        username: process.env.DO_BIGIQ_USERNAME!,
+        password: process.env.DO_BIGIQ_PASSWORD!,
+        poolname: process.env.DO_BIGIQ_POOL!,
+      },
+      BIGIPSetting: adc,
+    };
+
+    let licMgr = await instantiateClass(
+      LicenseManager,
+      this.wafapp,
+      undefined,
+      [settings, this.reqCxt.name],
+    );
+    return licMgr
+      .license()
+      .then(id =>
+        checkAndWait(() => this.adcStCtr.gotTo(AdcState.LICENSED), 60),
+      )
+      .then(b => this.serialize(adc, {status: AdcState.LICENSED, lastErr: ''}))
+      .catch(e =>
+        this.serialize(adc, {status: AdcState.LICENSERROR, lastErr: e}),
+      );
   }
 
   async trustAdc(adc: Adc): Promise<void> {
@@ -716,37 +757,27 @@ export class AdcController extends BaseController {
   private async deleteOn(adc: Adc, addon: AddonReqValues): Promise<void> {
     let reclaimFuncs: {[key: string]: Function} = {
       license: async () => {
-        let doMgr = await OnboardingManager.instanlize(
-          this.wafapp,
-          {},
-          this.reqCxt.name,
-        );
-        let doBody = await doMgr.assembleDo(
-          adc,
-          Object.assign(addon, {onboarding: false}),
-        );
-        this.logger.debug(
-          'Json used for revoke license: ' + JSON.stringify(doBody),
-        );
-        await doMgr.onboard(doBody).then(async () => {
-          // TODO: create a unified bigipMgr
-          let cnct = adc.management.connection!;
-          let bigipMgr = await BigIpManager.instanlize(
-            {
-              username: cnct.username,
-              password: cnct.password,
-              ipAddr: cnct.ipAddress,
-              port: cnct.tcpPort,
-            },
-            this.reqCxt.name,
-          );
+        let settings: LicConfig = {
+          licenseKey: adc.license,
+          BIGIQSetting: {
+            hostname: process.env.DO_BIGIQ_HOST!,
+            username: process.env.DO_BIGIQ_USERNAME!,
+            password: process.env.DO_BIGIQ_PASSWORD!,
+            poolname: process.env.DO_BIGIQ_POOL!,
+          },
+          BIGIPSetting: adc,
+        };
 
-          //TODO: support quiting immediately
+        let licMgr = await instantiateClass(
+          LicenseManager,
+          this.wafapp,
+          undefined,
+          [settings, this.reqCxt.name],
+        );
+        return licMgr.unLicense().then(async () => {
           let noLicensed = async () => {
             if (adc.license) return true;
-            return await bigipMgr.getLicense().then(license => {
-              return license.registrationKey === 'none';
-            });
+            return !(await this.adcStCtr.gotTo(AdcState.LICENSED));
           };
           await checkAndWait(noLicensed, 240).catch(() => {
             throw new Error('Timeout for waiting for reclaiming license.');
@@ -953,6 +984,12 @@ export class AdcStateCtrlr {
       failure: AdcState.DOINSTALLERR,
       state: AdcState.DOINSTALLED,
       check: this.doInstalled,
+      next: [AdcState.LICENSED, AdcState.RECLAIMED],
+    },
+    {
+      failure: AdcState.LICENSERROR,
+      state: AdcState.LICENSED,
+      check: this.licensed,
       next: [AdcState.ONBOARDED, AdcState.RECLAIMED],
     },
     {
@@ -1103,6 +1140,13 @@ export class AdcStateCtrlr {
     return state === 'ACTIVE';
   }
 
+  private async licensed(ctrl: AdcStateCtrlr): Promise<boolean> {
+    return ctrl
+      .getBigipMgr()
+      .then(bigipMgr => bigipMgr.getLicense())
+      .then(license => license.registrationKey !== 'none');
+  }
+
   private async onboarded(ctrl: AdcStateCtrlr): Promise<boolean> {
     let bigipMgr = await ctrl.getBigipMgr();
     return Promise.all([
@@ -1167,6 +1211,10 @@ export enum AdcState {
   DOINSTALLED = 'DOINSTALLED',
   DOINSTALLING = 'DOINSTALLING',
   DOINSTALLERR = 'DOINSTALLERR',
+
+  LICENSED = 'LICENSED',
+  LICENSING = 'LICENSING',
+  LICENSERROR = 'LICENSERROR',
 
   ONBOARDED = 'ONBOARDED',
   ONBOARDING = 'ONBOARDING',

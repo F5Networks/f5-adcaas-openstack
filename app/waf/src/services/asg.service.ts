@@ -131,6 +131,22 @@ export interface ASGService {
   ): Promise<WafpolicyResponse>;
 
   deploy(url: string, body: object): Promise<object>;
+
+  icontrolGet(
+    host: string,
+    port: number,
+    trustDeviceId: string,
+    path: string,
+  ): Promise<object>;
+
+  icontrolPost(
+    host: string,
+    port: number,
+    trustDeviceId: string,
+    path: string,
+    body: object,
+    headers: object,
+  ): Promise<object>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -271,6 +287,53 @@ export class ASGManager {
       e => {
         throw new Error(`Deployment is something wrong: ${e.message}`);
       },
+    );
+  }
+
+  async getAS3Info(trustDeviceId: string): Promise<object> {
+    return await this.icontrolGet(trustDeviceId, '/mgmt/shared/appsvcs/info');
+  }
+
+  async getPartition(
+    trustDeviceId: string,
+    partition: string,
+  ): Promise<object> {
+    return await this.icontrolGet(
+      trustDeviceId,
+      `/mgmt/tm/sys/folder/~${partition}`,
+    );
+  }
+
+  async doOnboard(trustDeviceId: string, body: object): Promise<object> {
+    return await this.icontrolPost(
+      trustDeviceId,
+      '/mgmt/shared/declarative-onboarding',
+      body,
+    );
+  }
+
+  async icontrolGet(trustDeviceId: string, path: string): Promise<object> {
+    return await this.service.icontrolGet(
+      ASG_HOST,
+      ASG_PORT,
+      trustDeviceId,
+      path,
+    );
+  }
+
+  async icontrolPost(
+    trustDeviceId: string,
+    path: string,
+    body: object,
+    headers: object = {},
+  ): Promise<object> {
+    return await this.service.icontrolPost(
+      ASG_HOST,
+      ASG_PORT,
+      trustDeviceId,
+      path,
+      body,
+      headers,
     );
   }
 }
