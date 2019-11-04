@@ -42,7 +42,7 @@
         "responseHeaders": true
       },
       "functions": {
-        "uploadDO": [
+        "uploadFile": [
           "url",
           "cred64en",
           "end",
@@ -65,7 +65,7 @@
         "responseHeaders": true
       },
       "functions": {
-        "installDO": [
+        "installObject": [
           "url",
           "cred64en",
           "body"

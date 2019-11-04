@@ -147,6 +147,16 @@ export interface ASGService {
     body: object,
     headers: object,
   ): Promise<object>;
+
+  uploadFile(
+    host: string,
+    port: number,
+    trustDeviceId: string,
+    path: string,
+    end: number,
+    length: number,
+    body: string,
+  ): Promise<object>;
 }
 
 export class ASGServiceProvider implements Provider<ASGService> {
@@ -289,7 +299,6 @@ export class ASGManager {
       },
     );
   }
-
   async getAS3Info(trustDeviceId: string): Promise<object> {
     return await this.icontrolGet(trustDeviceId, '/mgmt/shared/appsvcs/info');
   }
@@ -309,6 +318,23 @@ export class ASGManager {
       trustDeviceId,
       '/mgmt/shared/declarative-onboarding',
       body,
+    );
+  }
+
+  async uploadFile(
+    trustDeviceId: string,
+    content: string,
+    length: number,
+    name: string,
+  ): Promise<object> {
+    return this.service.uploadFile(
+      ASG_HOST,
+      ASG_PORT,
+      trustDeviceId,
+      `/mgmt/shared/file-transfer/uploads/${name}`,
+      length - 1,
+      length,
+      content,
     );
   }
 

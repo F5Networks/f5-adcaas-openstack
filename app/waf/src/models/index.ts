@@ -27,6 +27,8 @@ export * from './rule.model';
 export * from './endpointpolicy.model';
 export * from './endpointpolicyassoc.model';
 export * from './wafpolicy.model';
+export * from './cert.model';
+export * from './key.model';
 export * from './as3.model';
 export * from './condition.model';
 export * from './action.model';

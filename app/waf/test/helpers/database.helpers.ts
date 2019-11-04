@@ -28,6 +28,8 @@ import {
   ConditionRepository,
   ActionRepository,
   MonitorRepository,
+  CertRepository,
+  KeyRepository,
   MemberMonitorAssociationRepository,
   PoolMonitorAssociationRepository,
   ProfileHTTPCompressionRepository,
@@ -50,6 +52,8 @@ import {
   Condition,
   Action,
   Monitor,
+  Cert,
+  Key,
   MemberMonitorAssociation,
   PoolMonitorAssociation,
   ProfileHTTPCompression,
@@ -77,6 +81,24 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
     {
       name: 'test waf policy',
       url: 'http://unknown',
+    },
+    data,
+  );
+}
+
+export function createCertObject(data?: Partial<Cert>) {
+  return Object.assign(
+    {
+      name: 'test cert',
+    },
+    data,
+  );
+}
+
+export function createKeyObject(data?: Partial<Key>) {
+  return Object.assign(
+    {
+      name: 'test key',
     },
     data,
   );
@@ -252,6 +274,28 @@ export async function givenWafpolicyData(
     Object.assign({tenantId: ExpectedData.tenantId}, data),
   );
   return await wafpolicyrepo.create(obj);
+}
+
+export async function givenCertData(
+  wafapp: WafApplication,
+  data?: Partial<Cert>,
+) {
+  const certrepo = await wafapp.getRepository(CertRepository);
+  const obj = createCertObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await certrepo.create(obj);
+}
+
+export async function givenKeyData(
+  wafapp: WafApplication,
+  data?: Partial<Key>,
+) {
+  const keyrepo = await wafapp.getRepository(KeyRepository);
+  const obj = createKeyObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await keyrepo.create(obj);
 }
 
 export function createApplicationObject(data?: Partial<Application>) {
