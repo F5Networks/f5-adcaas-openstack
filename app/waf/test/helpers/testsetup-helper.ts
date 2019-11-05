@@ -40,7 +40,6 @@ import {
   MockNeutronController,
 } from '../fixtures/controllers/mocks/mock.openstack.controller';
 import {MockBigipController} from '../fixtures/controllers/mocks/mock.bigip.controller';
-import {MockDOController} from '../fixtures/controllers/mocks/mock.do.controller';
 import {MockASGController} from '../fixtures/controllers/mocks/mock.asg.controller';
 
 export async function setupApplication(): Promise<AppWithClient> {
@@ -145,7 +144,6 @@ let mockKeystoneApp: TestingApplication;
 let mockNovaApp: TestingApplication;
 let mockNeutronApp: TestingApplication;
 let mockBigipApp: TestingApplication;
-let mockDOApp: TestingApplication;
 let mockASGApp: TestingApplication;
 
 export async function setupDepApps() {
@@ -161,21 +159,18 @@ export async function setupDepApps() {
       MockBigipController,
       'https',
     ),
-    setupRestAppAndClient(RestApplicationPort.Onboarding, MockDOController),
     setupRestAppAndClient(RestApplicationPort.ASG, MockASGController, 'https'),
-  ]).then(([keystone, nova, neutron, bigip, doapp, asg]) => {
+  ]).then(([keystone, nova, neutron, bigip, asg]) => {
     mockKeystoneApp = keystone.restApp;
     mockNovaApp = nova.restApp;
     mockNeutronApp = neutron.restApp;
     mockBigipApp = bigip.restApp;
-    mockDOApp = doapp.restApp;
     mockASGApp = asg.restApp;
   });
 }
 
 export async function teardownDepApps() {
   await Promise.all([
-    teardownRestAppAndClient(mockDOApp),
     teardownRestAppAndClient(mockBigipApp),
     teardownRestAppAndClient(mockKeystoneApp),
     teardownRestAppAndClient(mockNovaApp),

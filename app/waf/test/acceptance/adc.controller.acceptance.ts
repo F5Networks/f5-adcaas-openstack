@@ -1796,7 +1796,7 @@ describe('AdcController test', () => {
     LetResponseWith({
       bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
-      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+      bigip_get_mgmt_shared_declaration_onboarding_task_taskId:
         StubResponses.onboardingServerError500,
     });
 
@@ -1842,7 +1842,7 @@ describe('AdcController test', () => {
     LetResponseWith({
       bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
-      do_get_mgmt_shared_declaration_onboarding_task_taskId:
+      bigip_get_mgmt_shared_declaration_onboarding_task_taskId:
         StubResponses.onboardingSucceed202,
     });
     let response = await client
