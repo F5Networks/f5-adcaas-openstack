@@ -2,6 +2,7 @@ import {Adc} from '../models';
 import {Logger} from 'typescript-logging';
 import {inject} from '@loopback/core';
 import {DOService, TypeDOClassDO} from './do.service';
+import {BigIqService, BigIqManager} from './bigiq.service';
 import {factory} from '../log4ts';
 
 /**
@@ -35,6 +36,7 @@ export type LicConfig = {
 export class LicenseManager {
   private reachable: boolean;
   private logger: Logger;
+  private biqMgr: BigIqManager;
 
   constructor(
     private settings: LicConfig,
@@ -43,20 +45,23 @@ export class LicenseManager {
     private doBasicAuth: string,
     @inject('services.DOService')
     private doService: DOService,
+    @inject('services.BigIqService')
+    private biqService: BigIqService,
   ) {
     this.logger = factory.getLogger(`[${requestId}]: license.manager`);
 
     if (settings.licenseKey) this.reachable = false;
-    else if (settings.BIGIQSetting) this.reachable = true;
+    else if (settings.BIGIQSetting) this.reachable = false;
     else
       throw new Error('Either licenseKey or BIGIQSetting should be non-empty.');
+
+    this.biqMgr = new BigIqManager(this.biqService, requestId);
   }
 
   private getDoBody(revoke = false, async = true): TypeDOClassDO {
     let keyName = revoke ? 'revokeFrom' : 'licensePool';
     let biqSettings = this.settings.BIGIQSetting!;
     let bipSettings = this.settings.BIGIPSetting;
-    let target = bipSettings.management.connection!;
 
     biqSettings.timeout = biqSettings.timeout ? biqSettings.timeout : 900;
     for (let k of Object.keys(biqSettings)) {
@@ -82,8 +87,7 @@ export class LicenseManager {
             bigIqPassword: biqSettings.password,
             [keyName]: biqSettings.poolname,
             reachable: this.reachable,
-            bigIpUsername: target.username,
-            bigIpPassword: target.password,
+            hypervisor: 'kvm',
           },
         },
       },
@@ -133,7 +137,16 @@ export class LicenseManager {
 
   // // BIG-IQ ✓<-->x BIG-IP
   // private async licViaBIQ() { }
-  // private async unLicViaBIQ() { }
+  private async unLicViaBIQ(adc: Adc): Promise<void> {
+    let address = adc.management.connection!.ipAddress;
+    let mac = '';
+    for (let net of Object.keys(adc.networks)) {
+      if (adc.networks[net].type === 'mgmt') {
+        mac = adc.management.networks[net].macAddr!;
+      }
+    }
+    return this.biqMgr.revokeLicense(address, mac);
+  }
 
   async license(): Promise<string> {
     if (this.settings.licenseKey) return this.licViaKey();
@@ -143,9 +156,10 @@ export class LicenseManager {
       'Either licenseKey or BIGIQSetting should be non-empty.',
     );
   }
-  async unLicense(): Promise<string> {
-    if (this.settings.licenseKey) return 'NoNeed';
-    if (this.settings.BIGIQSetting) return this.unLicViaDO();
+
+  async unLicense(adc: Adc): Promise<void> {
+    if (this.settings.licenseKey) return;
+    if (this.settings.BIGIQSetting) return this.unLicViaBIQ(adc);
 
     return Promise.reject(
       'Either licenseKey or BIGIQSetting should be non-empty.',

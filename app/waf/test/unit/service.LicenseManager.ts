@@ -122,14 +122,12 @@ describe('test LicenseManager', async () => {
 
   it('test unlicense() via DO succeed', async () => {
     it('test license() via DO succeed.', async () => {
-      let response = await createLicMgr(adc).then(lm => lm.unLicense());
-      expect(response).eql(ExpectedData.doTaskId);
+      await createLicMgr(adc).then(lm => lm.unLicense(adc));
     });
   });
 
   it('test unLicense() via Key succeed.', async () => {
     adc.license = 'any';
-    let response = await createLicMgr(adc).then(lm => lm.unLicense());
-    expect(response).eql('NoNeed');
+    await createLicMgr(adc).then(lm => lm.unLicense(adc));
   });
 });

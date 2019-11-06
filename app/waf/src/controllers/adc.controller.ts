@@ -774,15 +774,7 @@ export class AdcController extends BaseController {
           undefined,
           [settings, this.reqCxt.name, adc.getDoEndpoint(), adc.getBasicAuth()],
         );
-        return licMgr.unLicense().then(async () => {
-          let noLicensed = async () => {
-            if (adc.license) return true;
-            return !(await this.adcStCtr.gotTo(AdcState.LICENSED));
-          };
-          await checkAndWait(noLicensed, 240).catch(() => {
-            throw new Error('Timeout for waiting for reclaiming license.');
-          });
-        });
+        await licMgr.unLicense(adc);
       },
 
       network: async () => {
