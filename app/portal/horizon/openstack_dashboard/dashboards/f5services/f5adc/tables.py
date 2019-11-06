@@ -1072,6 +1072,19 @@ def get_flavor(instance):
         return template.loader.render_to_string(template_name, context)
     return _("Not available")
 
+def get_vm_detail(instance):
+    template_name = 'f5services/f5adc/_instance_vm_detail.html'
+    try:
+        context = {
+            'id': instance.id,
+            'name': instance.name,
+            'vm_id': instance.management['vmId'],
+            'ip_address': instance.management['connection']['ipAddress']
+        }
+
+        return template.loader.render_to_string(template_name, context)
+    except Exception as e:
+        return instance.name
 
 def get_keyname(instance):
     if hasattr(instance, "key_name"):
@@ -1283,9 +1296,13 @@ class InstancesTable(tables.DataTable):
         ("shelved_offloaded", True),
     )
     
-    name = tables.WrappingColumn("name",
-                                 link=get_server_detail_link,
-                                 verbose_name=_("Instance Name"))
+    # name = tables.WrappingColumn("name",
+    #                              link=get_server_detail_link,
+    #                              verbose_name=_("Instance Name"))
+
+    name = tables.WrappingColumn(get_vm_detail,
+                                verbose_name=_("Instance Name"))
+
     image_name = tables.WrappingColumn("image_name",
                                        verbose_name=_("Image Name"))
     # ip = tables.Column(get_ips,
