@@ -173,10 +173,10 @@ export class AdcController extends BaseController {
     let settings: LicConfig = {
       licenseKey: adc.license,
       BIGIQSetting: {
-        hostname: process.env.DO_BIGIQ_HOST!,
-        username: process.env.DO_BIGIQ_USERNAME!,
-        password: process.env.DO_BIGIQ_PASSWORD!,
-        poolname: process.env.DO_BIGIQ_POOL!,
+        hostname: process.env.BIGIQ_HOST!,
+        username: process.env.BIGIQ_USERNAME!,
+        password: process.env.BIGIQ_PASSWORD!,
+        poolname: process.env.BIGIQ_POOL!,
       },
       BIGIPSetting: adc,
     };
@@ -760,10 +760,10 @@ export class AdcController extends BaseController {
         let settings: LicConfig = {
           licenseKey: adc.license,
           BIGIQSetting: {
-            hostname: process.env.DO_BIGIQ_HOST!,
-            username: process.env.DO_BIGIQ_USERNAME!,
-            password: process.env.DO_BIGIQ_PASSWORD!,
-            poolname: process.env.DO_BIGIQ_POOL!,
+            hostname: process.env.BIGIQ_HOST!,
+            username: process.env.BIGIQ_USERNAME!,
+            password: process.env.BIGIQ_PASSWORD!,
+            poolname: process.env.BIGIQ_POOL!,
           },
           BIGIPSetting: adc,
         };
