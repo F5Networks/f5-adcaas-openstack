@@ -48,3 +48,4 @@ VE_ASM_LEVEL=nominal
 
 ASG_HOST=asg-server
 ASG_PORT=443
+ENABLE_EFK=true

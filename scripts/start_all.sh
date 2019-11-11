@@ -20,6 +20,15 @@ cdir=`cd $(dirname $0); pwd`
     export DATABASE_DATA_DIRECTORY=`pwd`/../data/pg_data
     export ASG_DATA_DIRECTORY=`pwd`/../data/asg_data
 
-    docker-compose -f docker-compose.yml up -d --force-recreate --remove-orphans
+    . appcluster.rc
+
+    efk_option=""
+    if [ x"$ENABLE_EFK" == x"true" ]
+    then
+      echo 'Package installed with EFK...'
+      efk_option="-f docker-compose-efk.yml "
+    fi
+
+    docker-compose -f docker-compose.yml $efk_option up -d --force-recreate --remove-orphans
 )
 
