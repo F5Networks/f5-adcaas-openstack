@@ -7,15 +7,8 @@ services:
       - ./appcluster.rc
     ports:
       - 8245:80
-    depends_on:
-      - FLUENTD
     links:
       - adcaas:adcaas-server
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: f5-portal
 
   adcaas:
     image: f5devcentral/f5-openstack-services:adcaas-latest
@@ -27,18 +20,12 @@ services:
     depends_on:
       - postgres
       - ASG
-      - FLUENTD
     links:
       - postgres:postgres-server
       - ASG:asg-server
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${DATA_DIRECTORY}:/var/data
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: f5-adcaas
 
   postgres:
     image: postgres:11.1
@@ -51,13 +38,6 @@ services:
       - ${DATABASE_PORT:-5432}:5432
     volumes:
       - ${DATABASE_DATA_DIRECTORY}:/var/lib/postgresql/data
-    depends_on:
-      - FLUENTD
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: postgres
 
   ASG:
     image: f5devcentral/f5-api-services-gateway:1.0.12
@@ -71,48 +51,7 @@ services:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${ASG_EXTENSIONS_DIRECTORY}:/root/lx
       - ${ASG_DATA_DIRECTORY}:/var/config
-    depends_on:
-      - FLUENTD
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "0.0.0.0:24224"
-        tag: f5-asg
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
-    container_name: ELASTICSEARCH
-    ports:
-      - 9200:9200
-    environment:
-      - discovery.type=single-node
-
-  FLUENTD:
-    image: f5devcentral/f5-openstack-services:fluentd-v1.3.2
-    container_name: FLUENTD
-    ports:
-      - 24224:24224
-      - 24224:24224/udp
-      - 20001:20001/udp
-    volumes:
-      - ./fluentd.conf:/fluentd/etc/fluentd.conf
-    depends_on:
-      - elasticsearch
-      - kibana
-    environment:
-      - FLUENTD_CONF=fluentd.conf
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.2.0
-    container_name: KIBANA
-    depends_on:
-      - elasticsearch
-    ports:
-      - 5601:5601
-    expose:
-      - 5601
-    volumes:
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
 # networks:
 #   app_net:
 #     driver: bridge

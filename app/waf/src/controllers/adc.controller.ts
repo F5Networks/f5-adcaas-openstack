@@ -786,9 +786,9 @@ export class AdcController extends BaseController {
       },
 
       network: async () => {
-        let networkMgr = await (await this.wafapp.get(
-          WafBindingKeys.KeyNetworkDriver,
-        )).updateLogger(this.reqCxt.name);
+        let networkMgr = await (
+          await this.wafapp.get(WafBindingKeys.KeyNetworkDriver)
+        ).updateLogger(this.reqCxt.name);
         for (let network of Object.keys(adc.networks)) {
           if (!adc.management.networks[network]) continue;
 
@@ -816,9 +816,9 @@ export class AdcController extends BaseController {
       },
 
       vm: async () => {
-        let computeMgr = await (await this.wafapp.get(
-          WafBindingKeys.KeyComputeManager,
-        )).updateLogger(this.reqCxt.name);
+        let computeMgr = await (
+          await this.wafapp.get(WafBindingKeys.KeyComputeManager)
+        ).updateLogger(this.reqCxt.name);
         if (adc.management.vmId) {
           await computeMgr
             .deleteServer(

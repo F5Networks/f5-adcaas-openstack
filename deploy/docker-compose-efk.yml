@@ -1,0 +1,74 @@
+version: "3"
+services:
+  portal:
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-portal
+
+  adcaas:
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-adcaas
+
+  postgres:
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: postgres
+
+  ASG:
+    depends_on:
+      - FLUENTD
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "0.0.0.0:24224"
+        tag: f5-asg
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    container_name: ELASTICSEARCH
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+
+  FLUENTD:
+    image: f5devcentral/f5-openstack-services:fluentd-v1.3.2
+    container_name: FLUENTD
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+      - 20001:20001/udp
+    volumes:
+      - ./fluentd.conf:/fluentd/etc/fluentd.conf
+    depends_on:
+      - elasticsearch
+      - kibana
+    environment:
+      - FLUENTD_CONF=fluentd.conf
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    container_name: KIBANA
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+    expose:
+      - 5601
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+
+
