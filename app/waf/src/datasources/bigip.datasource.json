@@ -26,6 +26,48 @@
         ]
       }
     },
+   {
+      "template": {
+        "method": "POST",
+        "url": "{url}",
+        "body": {
+	  "baseRegKey":"'{key}'",
+	  "automaticActivation":"false",
+	  "activationMethod":"MANUAL"
+        },
+        "headers": {
+          "Authorization": "{cred64en}",
+          "Content-Type": "application/json"
+        }
+      },
+      "functions": {
+        "installLicenseKey": [
+          "url",
+          "cred64en",
+          "key"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "PUT",
+        "url": "{url}",
+        "body": {
+          "licenseText":"{text}"
+        },
+        "headers": {
+          "Authorization": "{cred64en}",
+          "Content-Type": "application/json"
+        }
+      },
+      "functions": {
+        "installLicenseText": [
+          "url",
+          "cred64en",
+          "text"
+        ]
+      }
+    },
     {
       "template": {
         "method": "POST",
@@ -50,8 +92,7 @@
           "body"
         ]
       }
-    }
-    ,
+    },
     {
       "template": {
         "method": "POST",

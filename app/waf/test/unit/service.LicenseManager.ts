@@ -29,6 +29,7 @@ import {
 import {
   RestApplicationPort,
   LetResponseWith,
+  StubResponses,
   ExpectedData,
 } from '../fixtures/datasources/testrest.datasource';
 import {setDefaultInterval} from '../../src/utils';
@@ -73,6 +74,7 @@ describe('test LicenseManager', async () => {
     adc = <Adc>createAdcObject();
     setupEnvs();
     LetResponseWith();
+    delete process.env.LICENSE_ASSIGN;
   });
 
   afterEach(() => {});
@@ -101,23 +103,33 @@ describe('test LicenseManager', async () => {
 
   it('test license() via Key succeed.', async () => {
     adc.license = 'any';
-    let response = await createLicMgr(adc).then(lm => lm.license());
+    let response = await createLicMgr(adc).then(lm => lm.license(adc));
     expect(response).eql('response_request_id');
   });
 
   it('test license() via DO succeed.', async () => {
-    let response = await createLicMgr(adc).then(lm => lm.license());
+    process.env.LICENSE_ASSIGN = 'DO';
+    let response = await createLicMgr(adc).then(lm => lm.license(adc));
     expect(response).eql(ExpectedData.doTaskId);
   });
 
   it('test license() via DO failed because of missing ENVs', async () => {
+    process.env.LICENSE_ASSIGN = 'DO';
     delete process.env.BIGIQ_HOST;
     try {
-      await createLicMgr(adc).then(lm => lm.license());
+      await createLicMgr(adc).then(lm => lm.license(adc));
       expect('should not be here').eql('');
     } catch (error) {
       expect(error.message).eql('settings.hostname cannot be empty!');
     }
+  });
+
+  it('test license() via BIG-IQ succeed.', async () => {
+    LetResponseWith({
+      bigiq_get_assign_or_revoke_task: StubResponses.bigiqAssignTaskFinished200,
+    });
+
+    await createLicMgr(adc).then(lm => lm.license(adc));
   });
 
   it('test unlicense() via DO succeed', async () => {

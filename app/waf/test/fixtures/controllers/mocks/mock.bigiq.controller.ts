@@ -26,11 +26,16 @@ export class MockBigIqController extends MockBaseController {
 
   @post('/mgmt/cm/device/tasks/licensing/pool/member-management')
   async revoke(@requestBody() reqBody: object): Promise<object> {
-    return ResponseWith.bigiq_post_revoke_license!();
+    // @ts-ignore
+    if (reqBody.command === 'assign') {
+      return ResponseWith.bigiq_post_assign_license!();
+    } else {
+      return ResponseWith.bigiq_post_revoke_license!();
+    }
   }
 
   @get('/mgmt/cm/device/tasks/licensing/pool/member-management/{taskId}')
   async queryTask(): Promise<object> {
-    return ResponseWith.bigiq_get_revoke_task!();
+    return ResponseWith.bigiq_get_assign_or_revoke_task!();
   }
 }

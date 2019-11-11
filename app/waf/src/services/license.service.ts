@@ -1,8 +1,13 @@
 import {Adc} from '../models';
 import {Logger} from 'typescript-logging';
 import {inject} from '@loopback/core';
-import {DOService, TypeDOClassDO} from './do.service';
-import {BigIqService, BigIqManager} from './bigiq.service';
+import {
+  DOService,
+  TypeDOClassDO,
+  BigIpManager,
+  BigIqService,
+  BigIqManager,
+} from '.';
 import {factory} from '../log4ts';
 
 /**
@@ -36,11 +41,12 @@ export type LicConfig = {
 export class LicenseManager {
   private reachable: boolean;
   private logger: Logger;
+  private licenseAssign: string;
   private biqMgr: BigIqManager;
 
   constructor(
     private settings: LicConfig,
-    requestId: string,
+    private requestId: string,
     private doEndpoint: string,
     private doBasicAuth: string,
     @inject('services.DOService')
@@ -48,14 +54,23 @@ export class LicenseManager {
     @inject('services.BigIqService')
     private biqService: BigIqService,
   ) {
-    this.logger = factory.getLogger(`[${requestId}]: license.manager`);
+    this.logger = factory.getLogger(`[${this.requestId}]: license.manager`);
 
-    if (settings.licenseKey) this.reachable = false;
-    else if (settings.BIGIQSetting) this.reachable = false;
-    else
+    // Assign unreachable license
+    this.reachable = false;
+
+    if (!settings.licenseKey && !settings.BIGIQSetting) {
       throw new Error('Either licenseKey or BIGIQSetting should be non-empty.');
+    }
 
-    this.biqMgr = new BigIqManager(this.biqService, requestId);
+    // Assign license via BIGIQ by default
+    if (process.env.LICENSE_ASSIGN === 'DO') {
+      this.licenseAssign = 'DO';
+    } else {
+      this.licenseAssign = 'BIGIQ';
+    }
+
+    this.biqMgr = new BigIqManager(this.biqService, this.requestId);
   }
 
   private getDoBody(revoke = false, async = true): TypeDOClassDO {
@@ -119,24 +134,55 @@ export class LicenseManager {
       );
   }
 
-  // BIG-IQ ✓<-->✓ BIG-IP
+  // BIG-IQ ✓<-->✓ BIG-IP or BIG-IQ ✓<-->x BIG-IP
   private async licViaDo(): Promise<string> {
     let body = this.getDoBody(false, true);
     return this.postDoBody(body);
   }
+
+  // DO NOT use this
   private async unLicViaDO(): Promise<string> {
     let body = this.getDoBody(true, true);
     return this.postDoBody(body);
   }
 
-  // BIG-IQ x<-->x BIG-IP
+  // BYOL
   private async licViaKey(): Promise<string> {
     return Promise.resolve('response_request_id');
   }
-  private async unLicViaKey() {}
+  private async unLicViaKey() {
+    // TODO: revoke BYOL license via iControl
+  }
 
-  // // BIG-IQ ✓<-->x BIG-IP
-  // private async licViaBIQ() { }
+  // BIG-IQ x<-->x BIG-IP or BIG-IQ x<-->✓ BIG-IP
+  private async licViaBIQ(adc: Adc): Promise<string> {
+    let address = adc.management.connection!.ipAddress;
+    let mac = '';
+    for (let net of Object.keys(adc.networks)) {
+      if (adc.networks[net].type === 'mgmt') {
+        mac = adc.management.networks[net].macAddr!;
+      }
+    }
+
+    let lic = await this.biqMgr.assignLicense(address, mac);
+
+    let bigipMgr = await BigIpManager.instanlize(
+      {
+        username: adc.username,
+        password: adc.password,
+        ipAddr: adc.management.connection!.ipAddress,
+        port: adc.management.connection!.tcpPort,
+      },
+      this.requestId,
+    );
+
+    await bigipMgr
+      .installLicenseKey(lic.key)
+      .then(async () => await bigipMgr.installLicenseText(lic.text));
+
+    return '';
+  }
+
   private async unLicViaBIQ(adc: Adc): Promise<void> {
     let address = adc.management.connection!.ipAddress;
     let mac = '';
@@ -148,9 +194,16 @@ export class LicenseManager {
     return this.biqMgr.revokeLicense(address, mac);
   }
 
-  async license(): Promise<string> {
+  async license(adc: Adc): Promise<string> {
     if (this.settings.licenseKey) return this.licViaKey();
-    if (this.settings.BIGIQSetting) return this.licViaDo();
+
+    if (this.settings.BIGIQSetting && this.licenseAssign === 'BIGIQ') {
+      return this.licViaBIQ(adc);
+    }
+
+    if (this.settings.BIGIQSetting && this.licenseAssign === 'DO') {
+      return this.licViaDo();
+    }
 
     return Promise.reject(
       'Either licenseKey or BIGIQSetting should be non-empty.',

@@ -36,6 +36,10 @@ type LoginResponse = {
   token: BigIqToken;
 };
 
+type AssignResponse = {
+  id: string;
+};
+
 type RevokeResponse = {
   id: string;
 };
@@ -43,6 +47,15 @@ type RevokeResponse = {
 type QueryResponse = {
   status: string;
   errorMessage: string;
+  licenseAssignmentReference: {
+    link: string;
+  };
+  licenseText: string;
+};
+
+type UnreachableLicense = {
+  key: string;
+  text: string;
 };
 
 export interface BigIqService {
@@ -52,6 +65,13 @@ export interface BigIqService {
     username: string,
     password: string,
   ): Promise<LoginResponse>;
+
+  assign(
+    host: string,
+    port: number,
+    token: string,
+    body: object,
+  ): Promise<AssignResponse>;
 
   revoke(
     host: string,
@@ -104,6 +124,73 @@ export class BigIqManager {
     }
 
     return BigIqManager.token;
+  }
+
+  async assignLicense(
+    address: string,
+    mac: string,
+    pool: string = BIGIQ_POOL,
+  ): Promise<UnreachableLicense> {
+    let body = {
+      licensePoolName: pool,
+      command: 'assign',
+      address: address,
+      assignmentType: 'UNREACHABLE',
+      macAddress: mac.toUpperCase(),
+      hypervisor: 'kvm',
+    };
+
+    return this.assign(body);
+  }
+
+  async assign(body: object): Promise<UnreachableLicense> {
+    let token = await this.login();
+    let assignResp = await this.service.assign(
+      BIGIQ_HOST,
+      BIGIQ_PORT,
+      token.token,
+      body,
+    );
+
+    let taskId = assignResp.id;
+    let taskFinished = async (): Promise<boolean> => {
+      return await this.service
+        .query(BIGIQ_HOST, BIGIQ_PORT, token.token, taskId)
+        .then(
+          resp => {
+            this.logger.debug(
+              `Assigning license task status is ${resp.status}`,
+            );
+            switch (resp.status) {
+              case 'FINISHED':
+                return true;
+              case 'FAILED':
+                Promise.reject(resp.errorMessage);
+              default:
+                return false;
+            }
+          },
+          err => Promise.reject(err),
+        );
+    };
+
+    await checkAndWait(taskFinished, 30);
+
+    let lic = await this.service.query(
+      BIGIQ_HOST,
+      BIGIQ_PORT,
+      token.token,
+      taskId,
+    );
+    // Parse license key from reference link
+    let licLink = lic.licenseAssignmentReference.link;
+    let begin = licLink.indexOf('offerings') + 10;
+    let licKey = licLink.substr(begin, 31);
+
+    return {
+      key: licKey,
+      text: lic.licenseText,
+    };
   }
 
   async revokeLicense(

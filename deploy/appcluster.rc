@@ -25,6 +25,10 @@ OS_INTERFACE=public
 # Possible useful variable.
 #OS_AVAILABLE_ZONE=nova
 
+# License Parameters
+# LICENSE_ASSIGN = DO or BIGIQ
+LICENSE_ASSIGN=BIGIQ
+
 # OnBoarding Parameters
 BIGIQ_HOST=localhost
 BIGIQ_PORT=443

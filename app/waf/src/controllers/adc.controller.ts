@@ -186,8 +186,9 @@ export class AdcController extends BaseController {
       undefined,
       [settings, this.reqCxt.name, adc.getDoEndpoint(), adc.getBasicAuth()],
     );
+
     return licMgr
-      .license()
+      .license(adc)
       .then(id =>
         checkAndWait(() => this.adcStCtr.gotTo(AdcState.LICENSED), 60),
       )

@@ -36,6 +36,24 @@
         "body": "{body}"
       },
       "functions": {
+        "assign": [
+          "host",
+          "port",
+          "token",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/cm/device/tasks/licensing/pool/member-management",
+        "headers": {
+          "X-F5-Auth-Token": "{token}"
+        },
+        "body": "{body}"
+      },
+      "functions": {
         "revoke": [
           "host",
           "port",

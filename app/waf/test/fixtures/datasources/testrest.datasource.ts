@@ -1094,6 +1094,20 @@ export const StubResponses = {
     };
   },
 
+  bigipInstallLicenseKey200: () => {
+    return {
+      status: 'LICENSING_ACTIVATION_IN_PROGRESS',
+      generation: 1,
+      lastUpdateMicros: 1574069753265791,
+      kind: 'tm:shared:licensing:activation:activatelicenseresponse',
+      selfLink: 'https://localhost/mgmt/tm/shared/licensing/activation',
+    };
+  },
+
+  bigipInstallLicenseText200: () => {
+    return {};
+  },
+
   bigipLiense200: () => {
     return {
       entries: {
@@ -2197,6 +2211,23 @@ Reason:
     };
   },
 
+  bigiqAssignLicenseSucceed202: () => {
+    return {
+      id: '12345678',
+    };
+  },
+
+  bigiqAssignTaskFinished200: () => {
+    return {
+      status: 'FINISHED',
+      licenseAssignmentReference: {
+        link:
+          'https://localhost/mgmt/cm/device/licensing/pool/regkey/licenses/a-uuid/offerings/license-key-is-here/members/another-uuid',
+      },
+      licenseText: 'license text',
+    };
+  },
+
   bigiqRevokeLicenseSucceed202: () => {
     return {
       id: '12345678',
@@ -2246,6 +2277,8 @@ type TypeResponseWith = {
   bigip_get_mgmt_tm_net_self?: Function;
   bigip_get_mgmt_tm_net_vlan?: Function;
   bigip_get_mgmt_tm_sys_global_settings?: Function;
+  bigip_post_mgmt_tm_shared_licensing_activation?: Function;
+  bigip_put_mgmt_tm_shared_licensing_registration?: Function;
   bigip_get_mgmt_tm_sys_license?: Function;
   bigip_get_mgmt_tm_cm_device?: Function;
   bigip_get_mgmt_shared_appsvcs_info?: Function;
@@ -2266,8 +2299,9 @@ type TypeResponseWith = {
 
   // BIG-IQ APIs
   bigiq_post_login?: Function;
+  bigiq_post_assign_license?: Function;
   bigiq_post_revoke_license?: Function;
-  bigiq_get_revoke_task?: Function;
+  bigiq_get_assign_or_revoke_task?: Function;
 };
 
 export const DefaultResponseWith: TypeResponseWith = {
@@ -2301,6 +2335,10 @@ export const DefaultResponseWith: TypeResponseWith = {
   bigip_get_mgmt_tm_net_self: StubResponses.bigipnetSelfips200,
   bigip_get_mgmt_tm_net_vlan: StubResponses.bigipNetVlans200,
   bigip_get_mgmt_tm_sys_global_settings: StubResponses.bigipGlobalSettings200,
+  bigip_post_mgmt_tm_shared_licensing_activation:
+    StubResponses.bigipInstallLicenseKey200,
+  bigip_put_mgmt_tm_shared_licensing_registration:
+    StubResponses.bigipInstallLicenseText200,
   bigip_get_mgmt_tm_sys_license: StubResponses.bigipLiense200,
   bigip_get_mgmt_tm_cm_device: StubResponses.bigipCmDevice200,
   bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info200,
@@ -2326,8 +2364,9 @@ export const DefaultResponseWith: TypeResponseWith = {
     StubResponses.queryTrustedExtensionsAvailable200,
 
   bigiq_post_login: StubResponses.bigiqLoginSucceed200,
+  bigiq_post_assign_license: StubResponses.bigiqAssignLicenseSucceed202,
   bigiq_post_revoke_license: StubResponses.bigiqRevokeLicenseSucceed202,
-  bigiq_get_revoke_task: StubResponses.bigiqRevokeTaskFinished200,
+  bigiq_get_assign_or_revoke_task: StubResponses.bigiqRevokeTaskFinished200,
 };
 
 export const ResponseWith: TypeResponseWith = {};
