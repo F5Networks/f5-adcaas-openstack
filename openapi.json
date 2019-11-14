@@ -951,9 +951,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -2346,9 +2343,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -2387,9 +2381,6 @@
                           "limit": {
                             "type": "integer",
                             "minimum": 1,
-                            "examples": [
-                              100
-                            ],
                             "example": 100
                           },
                           "skip": {
@@ -3258,9 +3249,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -3299,9 +3287,6 @@
                           "limit": {
                             "type": "integer",
                             "minimum": 1,
-                            "examples": [
-                              100
-                            ],
                             "example": 100
                           },
                           "skip": {
@@ -3699,9 +3684,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -5499,9 +5481,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -7146,9 +7125,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -7187,9 +7163,6 @@
                           "limit": {
                             "type": "integer",
                             "minimum": 1,
-                            "examples": [
-                              100
-                            ],
                             "example": 100
                           },
                           "skip": {
@@ -7719,9 +7692,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -8399,9 +8369,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -9469,9 +9436,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -12189,9 +12153,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -12230,9 +12191,6 @@
                           "limit": {
                             "type": "integer",
                             "minimum": 1,
-                            "examples": [
-                              100
-                            ],
                             "example": 100
                           },
                           "skip": {
@@ -13464,9 +13422,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
@@ -14655,9 +14610,6 @@
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [
-                    100
-                  ],
                   "example": 100
                 },
                 "skip": {
