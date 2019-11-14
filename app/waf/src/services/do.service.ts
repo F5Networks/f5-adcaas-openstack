@@ -400,9 +400,9 @@ export class OnboardingManager {
   private async subnetInfo(adc: Adc, addon: AddonReqValues): Promise<object> {
     let rltObj = {};
 
-    let netDriver = await (
-      await this.application.get(WafBindingKeys.KeyNetworkDriver)
-    ).updateLogger(this.reqId);
+    let netDriver = await (await this.application.get(
+      WafBindingKeys.KeyNetworkDriver,
+    )).updateLogger(this.reqId);
 
     for (let net of Object.keys(adc.networks)) {
       let macAddr = adc.management.networks[net].macAddr!;

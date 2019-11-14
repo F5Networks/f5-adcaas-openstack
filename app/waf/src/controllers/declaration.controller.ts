@@ -563,9 +563,9 @@ export class DeclarationController extends BaseController {
       }
     })();
 
-    let netHelper = await (
-      await this.wafapp.get(WafBindingKeys.KeyNetworkDriver)
-    ).updateLogger(this.reqCxt.name);
+    let netHelper = await (await this.wafapp.get(
+      WafBindingKeys.KeyNetworkDriver,
+    )).updateLogger(this.reqCxt.name);
 
     // get port addresses, add one more, then update port.
     // TODO: use async-lock to make the operation automic.
