@@ -2407,6 +2407,806 @@
         "operationId": "ApplicationController.find"
       }
     },
+    "/adcaas/v1/certs/count": {
+      "get": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "count",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Cert model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "operationId": "CertController.count"
+      }
+    },
+    "/adcaas/v1/certs/{id}/adcs/{adcId}": {
+      "post": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "certUpload",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Uploading Cert resource"
+          },
+          "404": {
+            "description": "Can not find trustedDeivceId",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Cert resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentBody"
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "CertController.certUpload"
+      },
+      "get": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "certCheckStatus",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "200": "Status of cert",
+          "404": {
+            "description": "Can not find relative resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Cert resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "CertController.certCheckStatus"
+      }
+    },
+    "/adcaas/v1/certs/{id}": {
+      "patch": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update cert resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Cert resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Cert resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "remotepath": false,
+                  "installed": false
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "CertController.updateById"
+      },
+      "get": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "findById",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cert": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "remotepath": {
+                          "type": "string"
+                        },
+                        "installed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "remotepath": "/Common/Cert",
+                        "installed": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Cert resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "CertController.findById"
+      },
+      "delete": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete Cert resource"
+          },
+          "404": {
+            "description": "Can not find Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Cert resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "CertController.deleteById"
+      }
+    },
+    "/adcaas/v1/certs": {
+      "post": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "create",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cert": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "remotepath": {
+                          "type": "string"
+                        },
+                        "installed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "remotepath": "/Common/Cert",
+                        "installed": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Cert resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "Cert resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "remotepath": {
+                    "type": "string"
+                  },
+                  "installed": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "remotepath": "/Common/Cert",
+                  "installed": true
+                }
+              }
+            }
+          }
+        },
+        "operationId": "CertController.create"
+      },
+      "get": {
+        "x-controller-name": "CertController",
+        "x-operation-name": "find",
+        "tags": [
+          "CertController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Cert resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "certs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "remotepath": {
+                            "type": "string"
+                          },
+                          "installed": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "remotepath": "/Common/Cert",
+                          "installed": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "remotepath": {
+                      "type": "boolean"
+                    },
+                    "installed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "example": 100
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "operationId": "CertController.find"
+      }
+    },
     "/adcaas/v1/endpointpolicies/count": {
       "get": {
         "x-controller-name": "EndpointpolicyController",
@@ -3702,6 +4502,806 @@
           }
         ],
         "operationId": "IRuleController.find"
+      }
+    },
+    "/adcaas/v1/keys/count": {
+      "get": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "count",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Key model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "operationId": "KeyController.count"
+      }
+    },
+    "/adcaas/v1/keys/{id}/adcs/{adcId}": {
+      "post": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "keyUpload",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Uploading Key resource"
+          },
+          "404": {
+            "description": "Can not find trustedDeivceId",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Key resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentBody"
+              }
+            }
+          },
+          "x-parameter-index": 2
+        },
+        "operationId": "KeyController.keyUpload"
+      },
+      "get": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "keyCheckStatus",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "200": "Status of key",
+          "404": {
+            "description": "Can not find relative resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": " Adc is not trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Key resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          },
+          {
+            "name": "adcId",
+            "description": "ADC resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "KeyController.keyCheckStatus"
+      }
+    },
+    "/adcaas/v1/keys/{id}": {
+      "patch": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update Key resource"
+          },
+          "404": {
+            "description": "Can not find ADC resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Key resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Key resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "remotepath": false,
+                  "installed": false
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "KeyController.updateById"
+      },
+      "get": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "findById",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "remotepath": {
+                          "type": "string"
+                        },
+                        "installed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "remotepath": "/Common/Key",
+                        "installed": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Key resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "KeyController.findById"
+      },
+      "delete": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete Key resource"
+          },
+          "404": {
+            "description": "Can not find Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Key resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "KeyController.deleteById"
+      }
+    },
+    "/adcaas/v1/keys": {
+      "post": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "create",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "remotepath": {
+                          "type": "string"
+                        },
+                        "installed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "remotepath": "/Common/Key",
+                        "installed": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Key resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "Key resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "remotepath": {
+                    "type": "string"
+                  },
+                  "installed": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "remotepath": "/Common/Key",
+                  "installed": true
+                }
+              }
+            }
+          }
+        },
+        "operationId": "KeyController.create"
+      },
+      "get": {
+        "x-controller-name": "KeyController",
+        "x-operation-name": "find",
+        "tags": [
+          "KeyController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Key resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "keys": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "remotepath": {
+                            "type": "string"
+                          },
+                          "installed": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "remotepath": "/Common/Key",
+                          "installed": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "remotepath": {
+                      "type": "boolean"
+                    },
+                    "installed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "example": 100
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "operationId": "KeyController.find"
       }
     },
     "/adcaas/v1/monitors/{monitorId}/members/{memberId}": {
@@ -14675,6 +16275,7 @@
   },
   "components": {
     "schemas": {
+      "ContentBody": {},
       "ASGDeployRequest": {},
       "Endpointpolicy": {
         "title": "Endpointpolicy",
