@@ -40,3 +40,5 @@ export * from './profiles/http_compress.model';
 export * from './irule.model';
 export * from './profiles/http_profile.model';
 export * from './profiles/http2_profile.model';
+export * from './tlsserver.model';
+export * from './certificate.model';

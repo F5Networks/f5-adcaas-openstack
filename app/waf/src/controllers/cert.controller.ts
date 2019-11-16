@@ -144,7 +144,7 @@ export class CertController extends BaseController {
     @param(Schema.pathParameter('id', 'Cert resource ID')) id: string,
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
     @requestBody() certObj: ContentBody,
-  ): Promise<void> {
+  ): Promise<Response> {
     let cert: Cert = await this.certRepository.findById(id, {
       where: {
         and: [{or: [{tenantId: await this.tenantId}]}, {id: id}],
@@ -193,6 +193,7 @@ export class CertController extends BaseController {
       cert.installed = true;
       cert.remotepath = `/Common/${name}`;
       await this.certRepository.updateById(id, cert);
+      return new Response(Cert, await this.certRepository.findById(cert.id));
     } catch (error) {
       throw new HttpErrors.UnprocessableEntity(
         'upload cert to asg service failed',
