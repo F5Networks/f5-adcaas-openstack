@@ -120,6 +120,34 @@
     {
       "template": {
         "method": "POST",
+        "timout": 2000,
+        "url": "https://{host}:{port}/mgmt/shared/TrustedProxy/{trustDeviceId}",
+        "body": {
+          "method": "Post",
+          "uri": "{path}",
+          "body": "{body}",
+          "headers": {
+            "Content-Range": "0-{end}/{length}",
+            "Connection": "keep-alive"
+          }
+        }
+
+      },
+      "functions": {
+        "uploadFile": [
+          "host",
+          "port",
+          "trustDeviceId",
+          "path",
+          "end",
+          "length",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
         "url": "https://{host}:{port}/mgmt/shared/TrustedProxy/{deviceId}",
         "body": {
           "method": "Get",

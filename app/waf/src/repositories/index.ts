@@ -26,6 +26,8 @@ export * from './rule.repository';
 export * from './endpointpolicy.repository';
 export * from './endpointpolicyassoc.repository';
 export * from './wafpolicy.repository';
+export * from './cert.repository';
+export * from './key.repository';
 export * from './condition.repository';
 export * from './action.repository';
 export * from './monitor.repository';

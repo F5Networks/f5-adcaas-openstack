@@ -29,14 +29,14 @@ export const BigipBuiltInProperties = {
 
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
-  uploadDO(
+  uploadFile(
     url: string,
     cred64en: string,
     end: number,
     length: number,
     body: object,
   ): Promise<object>;
-  installDO(url: string, cred64en: string, body: object): Promise<object>;
+  installObject(url: string, cred64en: string, body: object): Promise<object>;
 }
 
 export class BigipServiceProvider implements Provider<BigipService> {
@@ -240,7 +240,7 @@ export class BigIpManager {
         this.baseUrl
       }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
       let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
-      let response = await this.bigipService.uploadDO(
+      let response = await this.bigipService.uploadFile(
         url,
         this.cred64Encoded,
         fstats.size - 1,
@@ -266,7 +266,7 @@ export class BigIpManager {
     };
     try {
       let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
-      let response = await this.bigipService.installDO(
+      let response = await this.bigipService.installObject(
         url,
         this.cred64Encoded,
         body,

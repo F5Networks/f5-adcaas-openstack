@@ -26,6 +26,8 @@ export * from './pool.controller';
 export * from './endpointpolicy.controller';
 export * from './rule.controller';
 export * from './wafpolicy.controller';
+export * from './cert.controller';
+export * from './key.controller';
 export * from './monitor.controller';
 export * from './profiles/http_compress.controller';
 export * from './irule.controller';
