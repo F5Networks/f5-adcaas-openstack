@@ -194,7 +194,10 @@ export class AdcController extends BaseController {
       )
       .then(b => this.serialize(adc, {status: AdcState.LICENSED, lastErr: ''}))
       .catch(e =>
-        this.serialize(adc, {status: AdcState.LICENSERROR, lastErr: e}),
+        this.serialize(adc, {
+          status: AdcState.LICENSERROR,
+          lastErr: JSON.stringify(e.message),
+        }),
       );
   }
 
@@ -390,6 +393,7 @@ export class AdcController extends BaseController {
     let data = await this.adcRepository.findById(id, undefined, {
       tenantId: await this.tenantId,
     });
+
     return new Response(Adc, data);
   }
 

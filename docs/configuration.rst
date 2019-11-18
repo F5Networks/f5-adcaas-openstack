@@ -17,6 +17,8 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
   
   ``ADCAAS_ENABLE_HTTPS``: Whether to use https. Default: ``false``.
 
+  ``ENABLE_EFK``: Whether or not to deploy EFK container for control plane log analysis.
+
 * Postgres configuration:
 
   ``DATABASE_USER``: Database username. Default: ``postgres``.
@@ -51,15 +53,13 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
 
 * Onboarding configuration:
 
-  ``DO_ENDPOINT``: DO endpoint. Default: ``https://do-server:443``. ``do-server`` is a link address in docker-compose. Within docker-compose, the DO process listens on ``443``.
+  ``BIGIQ_HOST``: BIG-IQ address. For example: ``10.250.11.138``.
   
-  ``DO_BIGIQ_HOST``: BIG-IQ address. For example: ``10.250.11.138``.
+  ``BIGIQ_USERNAME``: The BIG-IQ username. BIG-IQ is used as a license manager.
   
-  ``DO_BIGIQ_USERNAME``: The BIG-IQ username. BIG-IQ is used as a license manager.
+  ``BIGIQ_PASSWORD``: The BIG-IQ password.
   
-  ``DO_BIGIQ_PASSWORD``: The BIG-IQ password.
-  
-  ``DO_BIGIQ_POOL``: The license pool name on BIG-IQ. 
+  ``BIGIQ_POOL``: The license pool name on BIG-IQ. 
   
   ``DO_RPM_PACKAGE``: DO RPM package. In order to reduce the workload of onboarding, install the DO functionalities to BIG-IP. Default value: ``/var/dependencies/f5-declarative-onboarding-1.5.0-11.noarch.rpm``.
   
@@ -76,6 +76,8 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
   ``VE_LTM_LEVEL``: Onboarding VE parameters. Four values for the LTM and ASM provision levels: ``dedicated`` | ``nominal`` | ``minimum`` | ``none``. Default: `nominal`.
   
   ``VE_ASM_LEVEL``: Nominal.
+
+  ``VE_RANDOM_PASS``: Whether or not to randomize BIG-IP VE's admin(for webUI) and root(ssh login)'s passwords.
 
 * ASG configuration:
 
