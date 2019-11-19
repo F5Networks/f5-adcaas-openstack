@@ -470,17 +470,9 @@ export class OnboardingManager {
           return resObj[0]['result']['code'] === 200;
         },
         reason => {
-          // Wait for iControl LX restarting, ignore 404, 502 and 503
-          if (reason.statusCode === 404 || reason.statusCode > 500) {
-            return false;
-          }
-
-          // if onboarding fails.
-          let mesg =
-            'Failed to query onboarding status: ' + JSON.stringify(reason);
-          this.logger.error(mesg);
-          // quit immediately
-          return Promise.reject(mesg);
+          // Ignore all errors, because iControl LX is restarting
+          this.logger.warn(`DO error: ${reason}`);
+          return false;
         },
       );
   }
