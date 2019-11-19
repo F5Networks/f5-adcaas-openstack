@@ -1825,13 +1825,11 @@ describe('AdcController test', () => {
 
     await checkAndWait(checkStatus, 200, [], 5).then(() => {});
     expect(response.body.adc.status).eql('ONBOARDERROR');
-    expect(response.body.adc.lastErr).startWith(
-      'ONBOARDERROR: Failed to query onboarding status:',
-    );
+    expect(response.body.adc.lastErr).startWith('ONBOARDERROR: timeout');
     expect(response.body.adc.management.connection.rootPass).not.eql('default');
 
     restoreConsoleLog();
-  });
+  }).timeout(5000);
 
   it('post ' + prefix + '/adcs: onboard timeout', async () => {
     let adc = createAdcObject({
