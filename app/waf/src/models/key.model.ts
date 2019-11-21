@@ -35,7 +35,7 @@ export class Key extends CommonEntity {
 
   @property({
     type: 'boolean',
-    required: true,
+    required: false,
     default: false,
     schema: {
       create: true,

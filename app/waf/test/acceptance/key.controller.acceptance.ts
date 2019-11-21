@@ -117,7 +117,7 @@ describe('KeyController', () => {
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .send(name)
-        .expect(204);
+        .expect(200);
     },
   );
 

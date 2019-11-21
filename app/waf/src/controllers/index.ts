@@ -31,3 +31,5 @@ export * from './key.controller';
 export * from './monitor.controller';
 export * from './profiles/http_compress.controller';
 export * from './irule.controller';
+export * from './tlsserver.controller';
+export * from './certificate.controller';

@@ -142,7 +142,7 @@ export class KeyController extends BaseController {
     @param(Schema.pathParameter('id', 'Key resource ID')) id: string,
     @param(Schema.pathParameter('adcId', 'ADC resource ID')) adcId: string,
     @requestBody() keyObj: ContentBody,
-  ): Promise<void> {
+  ): Promise<Response> {
     let key: Key = await this.keyRepository.findById(id, {
       where: {
         and: [{or: [{tenantId: await this.tenantId}]}, {id: id}],
@@ -191,6 +191,7 @@ export class KeyController extends BaseController {
       key.installed = true;
       key.remotepath = `/Common/${name}`;
       await this.keyRepository.updateById(id, key);
+      return new Response(Key, await this.keyRepository.findById(key.id));
     } catch (error) {
       throw new HttpErrors.UnprocessableEntity(
         'upload key to asg service failed',
