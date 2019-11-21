@@ -11,6 +11,7 @@ services:
       - adcaas:adcaas-server
 
   adcaas:
+    network_mode: host
     image: f5devcentral/f5-openstack-services:adcaas-latest
     container_name: ADCAAS
     env_file:
@@ -18,28 +19,13 @@ services:
     ports:
       - ${ADCAAS_APP_PORT:-3000}:3000
     depends_on:
-      - postgres
       - ASG
-    links:
-      - postgres:postgres-server
-      - ASG:asg-server
     volumes:
       - ${DEPENDENCIES_DIRECTORY}:/var/dependencies
       - ${DATA_DIRECTORY}:/var/data
 
-  postgres:
-    image: postgres:11.1
-    container_name: POSTGRES
-    environment:
-      - POSTGRES_USER=${DATABASE_USER:-postgres}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
-      - POSTGRES_DB=${DATABASE_DB:-postgres}
-    ports:
-      - ${DATABASE_PORT:-5432}:5432
-    volumes:
-      - ${DATABASE_DATA_DIRECTORY}:/var/lib/postgresql/data
-
   ASG:
+    network_mode: host
     image: f5devcentral/f5-openstack-services:asg-1.0.12
     container_name: ASG
     environment:

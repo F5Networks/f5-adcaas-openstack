@@ -92,7 +92,18 @@ export class BigIpManager {
     await this.mustBeReachable();
 
     let url = `${this.baseUrl}/mgmt/tm/sys`;
-    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    this.logger.info('zhaoqin in getSys url is ' + url);
+    this.logger.info(
+      'zhaoqin in getSys cred64Encoded is ' + this.cred64Encoded,
+    );
+    let response = {};
+    try {
+      this.logger.info('zhaoqin in getSys before bigipService.getInfo');
+      response = await this.bigipService.getInfo(url, this.cred64Encoded);
+      this.logger.info('zhaoqin in getSys after bigipService.getInfo');
+    } catch (err) {
+      this.logger.info('zhaoqin in getSys err is ' + err.message);
+    }
     return JSON.parse(JSON.stringify(response))['body'][0];
   }
 
@@ -375,7 +386,12 @@ export class BigIpManager {
   private async mustBeReachable(): Promise<void> {
     return this.reachable()
       .then(b => {
-        if (!b) throw new Error();
+        if (!b) {
+          this.logger.info('zhaoqin in mustBeReachable b is false');
+          throw new Error();
+        } else {
+          this.logger.info('zhaoqin in mustBeReachable b is true');
+        }
       })
       .catch(() => {
         let msg =
