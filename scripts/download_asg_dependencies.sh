@@ -16,7 +16,8 @@ mkdir -p $cdir/../dependencies/ASGExtensions
     for n in $filelist; do
         filebase=`basename $n`
         if [ ! -f $filebase ]; then 
-            wget $n
+            wget -nv $n # $n.sha256
+            #sha256sum -c $n.sha256
         fi
     done
 )

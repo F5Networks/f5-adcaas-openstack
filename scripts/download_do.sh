@@ -7,7 +7,8 @@ cdir=`cd $(dirname $0); pwd`
 (
     cd $cdir/../dependencies
     if [ ! -f  `basename $dofile` ]; then 
-	    wget $dofile
+        wget -nv $dofile # $dofile.sha256
+        #sha256sum -c $dofile.sha256
    fi
 )
 
