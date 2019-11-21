@@ -2407,6 +2407,722 @@
         "operationId": "ApplicationController.find"
       }
     },
+    "/adcaas/v1/certificates/count": {
+      "get": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "count",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Certificate model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "operationId": "CertificateController.count"
+      }
+    },
+    "/adcaas/v1/certificates/{certificateId}": {
+      "patch": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update Certificate resource"
+          },
+          "404": {
+            "description": "Can not find Certificate resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "certificateId",
+            "description": "Certificate resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Certificate resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "certificate": {
+                    "type": "string"
+                  },
+                  "chainCA": {
+                    "type": "string"
+                  },
+                  "issuerCertificate": {
+                    "type": "object"
+                  },
+                  "passphrase": {
+                    "type": "string"
+                  },
+                  "pkcs12": {
+                    "type": "string"
+                  },
+                  "pkcs12Options": {
+                    "type": "object"
+                  },
+                  "privateKey": {
+                    "type": "string"
+                  },
+                  "staplerOCSP": {
+                    "type": "object"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "certificate": "d7f34226-69b8-4e25-ac51-ad4849653a8",
+                  "chainCA": "d7f34226-69b8-4e25-ac53-ad4849653a9",
+                  "pkcs12": "d7f34226-69b8-4e25-ac56-ad4849653a0",
+                  "privateKey": "d7f34226-69b8-4xxx-ac56-ad484965aaa"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "CertificateController.updateById"
+      },
+      "get": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "findById",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "responses": {
+            "200": {
+              "description": "Successfully retrieve Certificate resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "certificate": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "certificate": {
+                            "type": "string"
+                          },
+                          "chainCA": {
+                            "type": "string"
+                          },
+                          "issuerCertificate": {
+                            "type": "object"
+                          },
+                          "passphrase": {
+                            "type": "string"
+                          },
+                          "pkcs12": {
+                            "type": "string"
+                          },
+                          "pkcs12Options": {
+                            "type": "object"
+                          },
+                          "privateKey": {
+                            "type": "string"
+                          },
+                          "staplerOCSP": {
+                            "type": "object"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "certificate": "d7f34226-69b8-4e25-ac51-ad4849653a8",
+                          "chainCA": "d7f34226-69b8-4e25-ac53-ad4849653a9",
+                          "pkcs12": "d7f34226-69b8-4e25-ac56-ad4849653a0",
+                          "privateKey": "d7f34226-69b8-4xxx-ac56-ad484965aaa"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Can not find Certificate resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "statusCode": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "details": {
+                        "type": "array"
+                      }
+                    },
+                    "example": {
+                      "statusCode": 404,
+                      "name": "Error",
+                      "code": "ENTITY_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "certificateId",
+            "description": "Certificate resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "CertificateController.findById"
+      },
+      "delete": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete Certificate resource"
+          },
+          "404": {
+            "description": "Can not find Certificate resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "certificateId",
+            "description": "Certificate resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "CertificateController.deleteById"
+      }
+    },
+    "/adcaas/v1/certificates": {
+      "post": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "create",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create Certificate resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "certificate": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "certificate": {
+                          "type": "string"
+                        },
+                        "chainCA": {
+                          "type": "string"
+                        },
+                        "issuerCertificate": {
+                          "type": "object"
+                        },
+                        "passphrase": {
+                          "type": "string"
+                        },
+                        "pkcs12": {
+                          "type": "string"
+                        },
+                        "pkcs12Options": {
+                          "type": "object"
+                        },
+                        "privateKey": {
+                          "type": "string"
+                        },
+                        "staplerOCSP": {
+                          "type": "object"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "certificate": "d7f34226-69b8-4e25-ac51-ad4849653a8",
+                        "chainCA": "d7f34226-69b8-4e25-ac53-ad4849653a9",
+                        "pkcs12": "d7f34226-69b8-4e25-ac56-ad4849653a0",
+                        "privateKey": "d7f34226-69b8-4xxx-ac56-ad484965aaa"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Certificate resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Certificate resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "Certificate resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "certificate": {
+                    "type": "string"
+                  },
+                  "chainCA": {
+                    "type": "string"
+                  },
+                  "issuerCertificate": {
+                    "type": "object"
+                  },
+                  "passphrase": {
+                    "type": "string"
+                  },
+                  "pkcs12": {
+                    "type": "string"
+                  },
+                  "pkcs12Options": {
+                    "type": "object"
+                  },
+                  "privateKey": {
+                    "type": "string"
+                  },
+                  "staplerOCSP": {
+                    "type": "object"
+                  }
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description",
+                  "certificate": "d7f34226-69b8-4e25-ac51-ad4849653a8",
+                  "chainCA": "d7f34226-69b8-4e25-ac53-ad4849653a9",
+                  "pkcs12": "d7f34226-69b8-4e25-ac56-ad4849653a0",
+                  "privateKey": "d7f34226-69b8-4xxx-ac56-ad484965aaa"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "CertificateController.create"
+      },
+      "get": {
+        "x-controller-name": "CertificateController",
+        "x-operation-name": "find",
+        "tags": [
+          "CertificateController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve Certificate resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "certificates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "certificate": {
+                            "type": "string"
+                          },
+                          "chainCA": {
+                            "type": "string"
+                          },
+                          "issuerCertificate": {
+                            "type": "object"
+                          },
+                          "passphrase": {
+                            "type": "string"
+                          },
+                          "pkcs12": {
+                            "type": "string"
+                          },
+                          "pkcs12Options": {
+                            "type": "object"
+                          },
+                          "privateKey": {
+                            "type": "string"
+                          },
+                          "staplerOCSP": {
+                            "type": "object"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "certificate": "d7f34226-69b8-4e25-ac51-ad4849653a8",
+                          "chainCA": "d7f34226-69b8-4e25-ac53-ad4849653a9",
+                          "pkcs12": "d7f34226-69b8-4e25-ac56-ad4849653a0",
+                          "privateKey": "d7f34226-69b8-4xxx-ac56-ad484965aaa"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "certificate": {
+                      "type": "boolean"
+                    },
+                    "chainCA": {
+                      "type": "boolean"
+                    },
+                    "issuerCertificate": {
+                      "type": "boolean"
+                    },
+                    "passphrase": {
+                      "type": "boolean"
+                    },
+                    "pkcs12": {
+                      "type": "boolean"
+                    },
+                    "pkcs12Options": {
+                      "type": "boolean"
+                    },
+                    "privateKey": {
+                      "type": "boolean"
+                    },
+                    "staplerOCSP": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "example": 100
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "operationId": "CertificateController.find"
+      }
+    },
     "/adcaas/v1/certs/count": {
       "get": {
         "x-controller-name": "CertController",
@@ -15415,6 +16131,785 @@
         "operationId": "TenantAssociationController.findAdcs"
       }
     },
+    "/adcaas/v1/tlsservers/count": {
+      "get": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "count",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tlsserver model count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "operationId": "TLSServerController.count"
+      }
+    },
+    "/adcaas/v1/tlsservers/{tlsserverId}": {
+      "patch": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "updateById",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully update TLSServer resource"
+          },
+          "404": {
+            "description": "Can not find TLSServer resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tlsserverId",
+            "description": "TLSServer resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "TLSServer resource properties that need to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "allowExpiredCRL": false,
+                  "authenticationFrequency": false,
+                  "authenticationInviteCA": false,
+                  "authenticationMode": false,
+                  "authenticationTrustCA": false,
+                  "c3dEnabled": false,
+                  "c3dOCSP": false,
+                  "c3dOCSPUnknownStatusAction": false,
+                  "certificates": {
+                    "type": "array"
+                  },
+                  "ciphers": false,
+                  "crlFile": false,
+                  "ldapStartTLS": false,
+                  "requireSNI": false,
+                  "staplerOCSPEnabled": false
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
+              }
+            }
+          },
+          "x-parameter-index": 1
+        },
+        "operationId": "TLSServerController.updateById"
+      },
+      "get": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "findById",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "responses": {
+            "200": {
+              "description": "Successfully retrieve TLSServer resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "tlsserver": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "allowExpiredCRL": {
+                            "type": "boolean"
+                          },
+                          "authenticationFrequency": {
+                            "type": "string"
+                          },
+                          "authenticationInviteCA": {
+                            "type": "string"
+                          },
+                          "authenticationMode": {
+                            "type": "string"
+                          },
+                          "authenticationTrustCA": {
+                            "type": "string"
+                          },
+                          "c3dEnabled": {
+                            "type": "boolean"
+                          },
+                          "c3dOCSP": {
+                            "type": "object"
+                          },
+                          "c3dOCSPUnknownStatusAction": {
+                            "type": "string"
+                          },
+                          "certificates": {
+                            "type": "array"
+                          },
+                          "ciphers": {
+                            "type": "string"
+                          },
+                          "crlFile": {
+                            "type": "object"
+                          },
+                          "ldapStartTLS": {
+                            "type": "string"
+                          },
+                          "requireSNI": {
+                            "type": "boolean"
+                          },
+                          "staplerOCSPEnabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "allowExpiredCRL": true,
+                          "authenticationFrequency": "one-time",
+                          "authenticationMode": "ignore",
+                          "c3dEnabled": false,
+                          "c3dOCSPUnknownStatusAction": "drop",
+                          "ciphers": "DEFAULT",
+                          "ldapStartTLS": "none",
+                          "requireSNI": false,
+                          "staplerOCSPEnabled": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Can not find TLSServer resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "statusCode": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "details": {
+                        "type": "array"
+                      }
+                    },
+                    "example": {
+                      "statusCode": 404,
+                      "name": "Error",
+                      "code": "ENTITY_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tlsserverId",
+            "description": "TLSServer resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "TLSServerController.findById"
+      },
+      "delete": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "deleteById",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete TLSServer resource"
+          },
+          "404": {
+            "description": "Can not find TLSServer resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 404,
+                    "name": "Error",
+                    "code": "ENTITY_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tlsserverId",
+            "description": "TLSServer resource ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": ""
+            }
+          }
+        ],
+        "operationId": "TLSServerController.deleteById"
+      }
+    },
+    "/adcaas/v1/tlsservers": {
+      "post": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "create",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully create TLSServer resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tlsserver": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "date"
+                        },
+                        "updatedAt": {
+                          "type": "date"
+                        },
+                        "allowExpiredCRL": {
+                          "type": "boolean"
+                        },
+                        "authenticationFrequency": {
+                          "type": "string"
+                        },
+                        "authenticationInviteCA": {
+                          "type": "string"
+                        },
+                        "authenticationMode": {
+                          "type": "string"
+                        },
+                        "authenticationTrustCA": {
+                          "type": "string"
+                        },
+                        "c3dEnabled": {
+                          "type": "boolean"
+                        },
+                        "c3dOCSP": {
+                          "type": "object"
+                        },
+                        "c3dOCSPUnknownStatusAction": {
+                          "type": "string"
+                        },
+                        "certificates": {
+                          "type": "array"
+                        },
+                        "ciphers": {
+                          "type": "string"
+                        },
+                        "crlFile": {
+                          "type": "object"
+                        },
+                        "ldapStartTLS": {
+                          "type": "string"
+                        },
+                        "requireSNI": {
+                          "type": "boolean"
+                        },
+                        "staplerOCSPEnabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": {
+                        "id": "11111111-2222-3333-4444-555555555555",
+                        "name": "My name",
+                        "description": "My description",
+                        "createdAt": "2019-03-05T08:40:25.000Z",
+                        "updatedAt": "2019-03-05T08:40:25.100Z",
+                        "allowExpiredCRL": true,
+                        "authenticationFrequency": "one-time",
+                        "authenticationMode": "ignore",
+                        "c3dEnabled": false,
+                        "c3dOCSPUnknownStatusAction": "drop",
+                        "ciphers": "DEFAULT",
+                        "ldapStartTLS": "none",
+                        "requireSNI": false,
+                        "staplerOCSPEnabled": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid TLSServer resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 400,
+                    "name": "BadRequestError"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable TLSServer resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "type": "array"
+                    }
+                  },
+                  "example": {
+                    "statusCode": 422,
+                    "name": "UnprocessableEntityError",
+                    "message": "The request body is invalid. See error object `details` property for more info.",
+                    "code": "VALIDATION_FAILED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "TLSServer resource that need to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "id": false,
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 200
+                  },
+                  "tenantId": false,
+                  "createdAt": false,
+                  "updatedAt": false,
+                  "allowExpiredCRL": false,
+                  "authenticationFrequency": false,
+                  "authenticationInviteCA": false,
+                  "authenticationMode": false,
+                  "authenticationTrustCA": false,
+                  "c3dEnabled": false,
+                  "c3dOCSP": false,
+                  "c3dOCSPUnknownStatusAction": false,
+                  "certificates": {
+                    "type": "array"
+                  },
+                  "ciphers": false,
+                  "crlFile": false,
+                  "ldapStartTLS": false,
+                  "requireSNI": false,
+                  "staplerOCSPEnabled": false
+                },
+                "example": {
+                  "name": "My name",
+                  "description": "My description"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "TLSServerController.create"
+      },
+      "get": {
+        "x-controller-name": "TLSServerController",
+        "x-operation-name": "find",
+        "tags": [
+          "TLSServerController"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve TLSServer resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tlsservers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "date"
+                          },
+                          "updatedAt": {
+                            "type": "date"
+                          },
+                          "allowExpiredCRL": {
+                            "type": "boolean"
+                          },
+                          "authenticationFrequency": {
+                            "type": "string"
+                          },
+                          "authenticationInviteCA": {
+                            "type": "string"
+                          },
+                          "authenticationMode": {
+                            "type": "string"
+                          },
+                          "authenticationTrustCA": {
+                            "type": "string"
+                          },
+                          "c3dEnabled": {
+                            "type": "boolean"
+                          },
+                          "c3dOCSP": {
+                            "type": "object"
+                          },
+                          "c3dOCSPUnknownStatusAction": {
+                            "type": "string"
+                          },
+                          "certificates": {
+                            "type": "array"
+                          },
+                          "ciphers": {
+                            "type": "string"
+                          },
+                          "crlFile": {
+                            "type": "object"
+                          },
+                          "ldapStartTLS": {
+                            "type": "string"
+                          },
+                          "requireSNI": {
+                            "type": "boolean"
+                          },
+                          "staplerOCSPEnabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "example": {
+                          "id": "11111111-2222-3333-4444-555555555555",
+                          "name": "My name",
+                          "description": "My description",
+                          "createdAt": "2019-03-05T08:40:25.000Z",
+                          "updatedAt": "2019-03-05T08:40:25.100Z",
+                          "allowExpiredCRL": true,
+                          "authenticationFrequency": "one-time",
+                          "authenticationMode": "ignore",
+                          "c3dEnabled": false,
+                          "c3dOCSPUnknownStatusAction": "drop",
+                          "ciphers": "DEFAULT",
+                          "ldapStartTLS": "none",
+                          "requireSNI": false,
+                          "staplerOCSPEnabled": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "where": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "fields": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "boolean"
+                    },
+                    "tenantId": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "boolean"
+                    },
+                    "updatedAt": {
+                      "type": "boolean"
+                    },
+                    "allowExpiredCRL": {
+                      "type": "boolean"
+                    },
+                    "authenticationFrequency": {
+                      "type": "boolean"
+                    },
+                    "authenticationInviteCA": {
+                      "type": "boolean"
+                    },
+                    "authenticationMode": {
+                      "type": "boolean"
+                    },
+                    "authenticationTrustCA": {
+                      "type": "boolean"
+                    },
+                    "c3dEnabled": {
+                      "type": "boolean"
+                    },
+                    "c3dOCSP": {
+                      "type": "boolean"
+                    },
+                    "c3dOCSPUnknownStatusAction": {
+                      "type": "boolean"
+                    },
+                    "certificates": {
+                      "type": "boolean"
+                    },
+                    "ciphers": {
+                      "type": "boolean"
+                    },
+                    "crlFile": {
+                      "type": "boolean"
+                    },
+                    "ldapStartTLS": {
+                      "type": "boolean"
+                    },
+                    "requireSNI": {
+                      "type": "boolean"
+                    },
+                    "staplerOCSPEnabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "example": 100
+                },
+                "skip": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "operationId": "TLSServerController.find"
+      }
+    },
     "/adcaas/v1/wafpolicies/count": {
       "get": {
         "x-controller-name": "WafpolicyController",
@@ -16276,6 +17771,60 @@
   "components": {
     "schemas": {
       "ContentBody": {},
+      "Certificate": {
+        "title": "Certificate",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "certificate": {
+            "type": "string"
+          },
+          "chainCA": {
+            "type": "string"
+          },
+          "issuerCertificate": {
+            "type": "object"
+          },
+          "passphrase": {
+            "type": "string"
+          },
+          "pkcs12": {
+            "type": "string"
+          },
+          "pkcs12Options": {
+            "type": "object"
+          },
+          "privateKey": {
+            "type": "string"
+          },
+          "staplerOCSP": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "certificate"
+        ],
+        "additionalProperties": false
+      },
       "ASGDeployRequest": {},
       "Endpointpolicy": {
         "title": "Endpointpolicy",
@@ -16856,6 +18405,80 @@
           "type",
           "applicationId",
           "virtualAddresses"
+        ],
+        "additionalProperties": false
+      },
+      "TLSServer": {
+        "title": "TLSServer",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "allowExpiredCRL": {
+            "type": "boolean"
+          },
+          "authenticationFrequency": {
+            "type": "string"
+          },
+          "authenticationInviteCA": {
+            "type": "string"
+          },
+          "authenticationMode": {
+            "type": "string"
+          },
+          "authenticationTrustCA": {
+            "type": "string"
+          },
+          "c3dEnabled": {
+            "type": "boolean"
+          },
+          "c3dOCSP": {
+            "type": "object"
+          },
+          "c3dOCSPUnknownStatusAction": {
+            "type": "string"
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ciphers": {
+            "type": "string"
+          },
+          "crlFile": {
+            "type": "object"
+          },
+          "ldapStartTLS": {
+            "type": "string"
+          },
+          "requireSNI": {
+            "type": "boolean"
+          },
+          "staplerOCSPEnabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
         ],
         "additionalProperties": false
       }
