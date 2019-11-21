@@ -40,7 +40,6 @@ services:
       - ${DATABASE_DATA_DIRECTORY}:/var/lib/postgresql/data
 
   ASG:
-    build: ./docker/asg
     image: f5devcentral/f5-openstack-services:asg-1.0.12
     container_name: ASG
     environment:
