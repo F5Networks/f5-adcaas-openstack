@@ -15,7 +15,7 @@
  */
 
 import {MockBaseController} from './mock.base.controller';
-import {get, param, post} from '@loopback/rest';
+import {get, param, post, put} from '@loopback/rest';
 import {ResponseWith} from '../../datasources/testrest.datasource';
 
 export class MockBigipController extends MockBaseController {
@@ -41,6 +41,16 @@ export class MockBigipController extends MockBaseController {
   @get('/mgmt/tm/sys/global-settings')
   async globalSettings(): Promise<object> {
     return await ResponseWith.bigip_get_mgmt_tm_sys_global_settings!();
+  }
+
+  @post('/mgmt/tm/shared/licensing/activation')
+  async installLicenseKey(): Promise<object> {
+    return await ResponseWith.bigip_post_mgmt_tm_shared_licensing_activation!();
+  }
+
+  @put('/mgmt/tm/shared/licensing/registration')
+  async installLicenseText(): Promise<object> {
+    return await ResponseWith.bigip_put_mgmt_tm_shared_licensing_registration!();
   }
 
   @get('/mgmt/tm/sys/license')

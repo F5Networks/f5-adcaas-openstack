@@ -19,13 +19,24 @@ import {
   teardownDepApps,
   setupDepApps,
 } from '../helpers/testsetup-helper';
-import {BigipBuiltInProperties, AuthedToken} from '../../src/services';
+import {
+  BigipBuiltInProperties,
+  AuthedToken,
+  ASGManager,
+  ASGService,
+  ASGServiceProvider,
+} from '../../src/services';
 import {setDefaultInterval} from '../../src/utils';
 import {createAdcObject} from '../helpers/database.helpers';
-import {expect} from '@loopback/testlab';
+import {expect, sinon} from '@loopback/testlab';
 import {AdcStateCtrlr, AddonReqValues} from '../../src/controllers';
 import {Adc} from '../../src/models';
-import {stubLogger, restoreLogger} from '../helpers/logging.helpers';
+import {
+  stubLogger,
+  restoreLogger,
+  stubConsoleLog,
+  restoreConsoleLog,
+} from '../helpers/logging.helpers';
 import {
   RestApplicationPort,
   StubResponses,
@@ -41,6 +52,10 @@ type CheckEntry = {
 
 describe('test AdcStateCtrlr', () => {
   let addonReq: AddonReqValues;
+  let svc: ASGService;
+  let asgMgr: ASGManager;
+  let as3InfoStub: sinon.SinonStub;
+  let partitionStub: sinon.SinonStub;
 
   before(async () => {
     await setupDepApps();
@@ -55,12 +70,29 @@ describe('test AdcStateCtrlr', () => {
       }),
     };
     stubLogger();
+    stubConsoleLog();
+
+    svc = await new ASGServiceProvider().value();
+    asgMgr = new ASGManager(svc, addonReq.reqId);
   });
   beforeEach(() => {
     LetResponseWith();
+
+    as3InfoStub = sinon.stub(asgMgr, 'getAS3Info');
+    as3InfoStub.returns({
+      version: 'faked',
+    });
+    partitionStub = sinon.stub(asgMgr, 'getPartition');
+    partitionStub.returns({
+      name: 'F5_' + ExpectedData.tenantId,
+    });
   });
-  afterEach(() => {});
+  afterEach(() => {
+    as3InfoStub.restore();
+    partitionStub.restore();
+  });
   after(async () => {
+    restoreConsoleLog();
     restoreLogger();
     await teardownDepApps();
   });
@@ -81,7 +113,9 @@ describe('test AdcStateCtrlr', () => {
       let adc = <Adc>(
         createAdcObject(Object.assign(adcObj, {status: check.src}))
       );
-      let adcStCtr = new AdcStateCtrlr(adc, addonReq);
+
+      let adcStCtr = new AdcStateCtrlr(adc, addonReq, asgMgr);
+
       if (title.includes('->'))
         expect(await adcStCtr.readyTo(check.dst)).eql(check.exp);
       else if (title.includes('+>'))
@@ -97,8 +131,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -108,8 +140,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -118,8 +148,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -132,8 +160,6 @@ describe('test AdcStateCtrlr', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: BigipBuiltInProperties.admin,
-          password: 'admin',
         },
       },
     },
@@ -147,8 +173,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
       trustedDeviceId: ExpectedData.trustDeviceId,
     },
@@ -159,8 +183,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
       trustedDeviceId: ExpectedData.trustDeviceId,
     },
@@ -172,8 +194,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -195,8 +215,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -206,8 +224,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -226,8 +242,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
       trustedDeviceId: null,
     },
@@ -238,8 +252,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -249,8 +261,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
     },
   });
@@ -302,8 +312,6 @@ describe('test AdcStateCtrlr', () => {
       connection: {
         ipAddress: ExpectedData.networks.management.ipAddr,
         tcpPort: ExpectedData.bigipMgmt.tcpPort,
-        username: BigipBuiltInProperties.admin,
-        password: 'admin',
       },
       //trustedDeviceId: ExpectedData.trustDeviceId,
     },
@@ -334,16 +342,12 @@ describe('test AdcStateCtrlr', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: BigipBuiltInProperties.admin,
-          password: 'admin',
         },
         trustedDeviceId: ExpectedData.trustDeviceId,
       },
     },
     () => {
-      LetResponseWith({
-        bigip_get_mgmt_shared_appsvcs_info: StubResponses.bigipAS3Info404,
-      });
+      as3InfoStub.throws('I am tired.');
     },
   );
 });

@@ -29,6 +29,19 @@ export const BigipBuiltInProperties = {
 
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
+
+  installLicenseKey(
+    url: string,
+    cred64en: string,
+    key: string,
+  ): Promise<object>;
+
+  installLicenseText(
+    url: string,
+    cred64en: string,
+    text: string,
+  ): Promise<object>;
+
   uploadFile(
     url: string,
     cred64en: string,
@@ -164,15 +177,6 @@ export class BigIpManager {
       }
     }
     throw new Error('No configsync IP');
-  }
-
-  async getPartition(partition: string): Promise<string> {
-    await this.mustBeReachable();
-
-    let url = `${this.baseUrl}/mgmt/tm/sys/folder/~${partition}`;
-    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-    let resObj = JSON.stringify(response);
-    return resObj;
   }
 
   async getDOStatus(): Promise<string> {
@@ -336,6 +340,20 @@ export class BigIpManager {
           });
         throw new Error(msg);
       });
+  }
+
+  async installLicenseKey(key: string): Promise<object> {
+    let url = `${this.baseUrl}/mgmt/tm/shared/licensing/activation`;
+    return this.bigipService.installLicenseKey(url, this.cred64Encoded, key);
+  }
+
+  async installLicenseText(text: string): Promise<object> {
+    let url = `${this.baseUrl}/mgmt/tm/shared/licensing/registration`;
+    return await this.bigipService.installLicenseText(
+      url,
+      this.cred64Encoded,
+      text,
+    );
   }
 }
 
