@@ -1,0 +1,83 @@
+{
+  "connector": "rest",
+  "options": {
+    "headers": {
+      "accept": "application/json",
+      "content-type": "application/json"
+    },
+    "strictSSL": false
+  },
+  "operations": [
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/shared/authn/login",
+        "body": {
+          "username":"{username}",
+          "password":"{password}"
+        }
+      },
+      "functions": {
+        "login": [
+          "host",
+          "port",
+          "username",
+          "password"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/cm/device/tasks/licensing/pool/member-management",
+        "headers": {
+          "X-F5-Auth-Token": "{token}"
+        },
+        "body": "{body}"
+      },
+      "functions": {
+        "assign": [
+          "host",
+          "port",
+          "token",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://{host}:{port}/mgmt/cm/device/tasks/licensing/pool/member-management",
+        "headers": {
+          "X-F5-Auth-Token": "{token}"
+        },
+        "body": "{body}"
+      },
+      "functions": {
+        "revoke": [
+          "host",
+          "port",
+          "token",
+          "body"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://{host}:{port}/mgmt/cm/device/tasks/licensing/pool/member-management/{task}",
+        "headers": {
+          "X-F5-Auth-Token": "{token}"
+        }
+      },
+      "functions": {
+        "query": [
+          "host",
+          "port",
+          "token",
+          "task"
+        ]
+      }
+    }
+  ]
+}

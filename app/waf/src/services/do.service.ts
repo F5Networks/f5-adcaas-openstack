@@ -331,13 +331,12 @@ export class OnboardingManager {
       obData: Adc,
       additionalInfo?: object,
     ): TypeDOClassDeclaration['Common'] => {
-      let bigip = obData.management.connection!;
       if (obData.compute.sshKey) {
         let userInfo = {
           class: 'User',
           userType: 'root',
-          oldPassword: bigip.rootPass,
-          newPassword: bigip.rootPass,
+          oldPassword: obData.rootPass,
+          newPassword: obData.rootPass,
           keys: [obData.compute.sshKey!],
         };
 
@@ -370,8 +369,8 @@ export class OnboardingManager {
       // get bigip interfaces information: name.
       interfaces: await BigIpManager.instanlize(
         {
-          username: bigip.username,
-          password: bigip.password,
+          username: obData.username,
+          password: obData.password,
           ipAddr: bigip.ipAddress,
           port: bigip.tcpPort,
         },
