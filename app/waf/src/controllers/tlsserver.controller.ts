@@ -143,7 +143,6 @@ export class TLSServerController extends BaseController {
     @requestBody(Schema.updateRequest(TLSServer, updateDesc))
     tlsserver: TLSServer,
   ): Promise<void> {
-    console.log(id);
     await this.tlsserverRepository.updateById(id, tlsserver, {
       tenantId: await this.tenantId,
     });
