@@ -2032,7 +2032,7 @@ describe('AdcController test', () => {
       return resp.status === 404;
     };
 
-    await checkAndWait(checkStatus, 50, [], 5);
+    await checkAndWait(checkStatus, 150, [], 5);
 
     expect(resp.status).equal(404);
   });
@@ -2066,7 +2066,7 @@ describe('AdcController test', () => {
         return resp.body.adc.status === 'RECLAIMERROR';
       };
 
-      await checkAndWait(checkStatus, 50, [], 5);
+      await checkAndWait(checkStatus, 150, [], 5);
 
       expect(resp.body.adc.status).equal('RECLAIMERROR');
       expect(resp.body.adc.lastErr).containEql('NotFoundError');
