@@ -44,53 +44,6 @@
         "operationId": "AdcController.count"
       }
     },
-    "/adcaas/v1/adcs/{adcId}/setup": {
-      "post": {
-        "x-controller-name": "AdcController",
-        "x-operation-name": "provision",
-        "tags": [
-          "AdcController"
-        ],
-        "responses": {
-          "200": {
-            "description": "Adc Id for the actions.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "actionsresponse": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        }
-                      },
-                      "example": {
-                        "id": "11111111-2222-3333-4444-555555555555"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "adcId",
-            "description": "ADC resource ID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": ""
-            }
-          }
-        ],
-        "operationId": "AdcController.provision"
-      }
-    },
     "/adcaas/v1/adcs/{adcId}/tenants/{tenantId}": {
       "get": {
         "x-controller-name": "AdcController",
