@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function check() {
+    echo Checking running dependencies...
+
+    ready=1
+    for n in wget docker docker-compose; do
+        which $n > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            ready=0
+            echo $n not installed.
+        fi
+    done
+    if [ $ready -ne 1 ]; then exit 1; fi
+
+    docker ps > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "docker damon is not running."
+        exit 1
+    fi
+}
+
+check
+
 cdir=`cd $(dirname $0); pwd`
 (
     set -e
@@ -20,6 +42,15 @@ cdir=`cd $(dirname $0); pwd`
     export DATABASE_DATA_DIRECTORY=`pwd`/../data/pg_data
     export ASG_DATA_DIRECTORY=`pwd`/../data/asg_data
 
-    docker-compose -f docker-compose.yml up -d --force-recreate --remove-orphans
+    . appcluster.rc
+
+    efk_option=""
+    if [ x"$ENABLE_EFK" == x"true" ]
+    then
+      echo 'Package installed with EFK...'
+      efk_option="-f docker-compose-efk.yml "
+    fi
+
+    docker-compose -f docker-compose.yml $efk_option up -d --force-recreate --remove-orphans
 )
 

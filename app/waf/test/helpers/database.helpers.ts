@@ -28,6 +28,10 @@ import {
   ConditionRepository,
   ActionRepository,
   MonitorRepository,
+  CertRepository,
+  CertificateRepository,
+  TLSserverRepository,
+  KeyRepository,
   MemberMonitorAssociationRepository,
   PoolMonitorAssociationRepository,
   ProfileHTTPCompressionRepository,
@@ -50,6 +54,10 @@ import {
   Condition,
   Action,
   Monitor,
+  Cert,
+  Certificate,
+  Key,
+  TLSServer,
   MemberMonitorAssociation,
   PoolMonitorAssociation,
   ProfileHTTPCompression,
@@ -77,6 +85,42 @@ export function createWafpolicyObject(data?: Partial<Wafpolicy>) {
     {
       name: 'test waf policy',
       url: 'http://unknown',
+    },
+    data,
+  );
+}
+
+export function createCertObject(data?: Partial<Cert>) {
+  return Object.assign(
+    {
+      name: 'test cert',
+    },
+    data,
+  );
+}
+export function createTLSServerObject(data?: Partial<TLSServer>) {
+  return Object.assign(
+    {
+      certificates: ['test tlsserver'],
+    },
+    data,
+  );
+}
+
+export function createKeyObject(data?: Partial<Key>) {
+  return Object.assign(
+    {
+      name: 'test key',
+    },
+    data,
+  );
+}
+
+export function createCertificateObject(data?: Partial<Certificate>) {
+  return Object.assign(
+    {
+      certificate: 'd7f34226-69b8-4xxx-ac56-ad484965aaa',
+      privateKey: 'd7f34226-69b8-4xxx-ac56-ad484965bbb',
     },
     data,
   );
@@ -252,6 +296,50 @@ export async function givenWafpolicyData(
     Object.assign({tenantId: ExpectedData.tenantId}, data),
   );
   return await wafpolicyrepo.create(obj);
+}
+
+export async function givenTLSServerData(
+  wafapp: WafApplication,
+  data?: Partial<TLSServer>,
+) {
+  const tlsserverrepo = await wafapp.getRepository(TLSserverRepository);
+  const obj = createTLSServerObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await tlsserverrepo.create(obj);
+}
+
+export async function givenCertificateData(
+  wafapp: WafApplication,
+  data?: Partial<Certificate>,
+) {
+  const certificaterepo = await wafapp.getRepository(CertificateRepository);
+  const obj = createCertificateObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await certificaterepo.create(obj);
+}
+
+export async function givenCertData(
+  wafapp: WafApplication,
+  data?: Partial<Cert>,
+) {
+  const certrepo = await wafapp.getRepository(CertRepository);
+  const obj = createCertObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await certrepo.create(obj);
+}
+
+export async function givenKeyData(
+  wafapp: WafApplication,
+  data?: Partial<Key>,
+) {
+  const keyrepo = await wafapp.getRepository(KeyRepository);
+  const obj = createKeyObject(
+    Object.assign({tenantId: ExpectedData.tenantId}, data),
+  );
+  return await keyrepo.create(obj);
 }
 
 export function createApplicationObject(data?: Partial<Application>) {

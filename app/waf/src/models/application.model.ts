@@ -18,6 +18,7 @@ import {CommonEntity, Declaration, AS3Declaration, Service} from '.';
 import {model, property, hasMany} from '@loopback/repository';
 import {as3ExtendedName} from './as3.model';
 import {AnyType} from '../utils';
+import {as3Name} from './as3.model';
 
 @model()
 export class Application extends CommonEntity {
@@ -93,6 +94,18 @@ export class Application extends CommonEntity {
             obj[monitor.getAS3Name()] = monitor.getAS3Declaration();
           });
         });
+      }
+
+      if (service.serverTLS && service.serverTLSContent) {
+        obj[
+          as3Name(service.serverTLS)
+        ] = service.serverTLSContent.getAS3Declaration();
+
+        for (let cert of service.serverTLSContent.certsContent) {
+          if (cert) {
+            obj[as3Name(cert.id)] = cert.getAS3Declaration();
+          }
+        }
       }
 
       service.policies.forEach(policy => {

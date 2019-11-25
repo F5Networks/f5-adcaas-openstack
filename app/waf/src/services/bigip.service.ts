@@ -29,14 +29,27 @@ export const BigipBuiltInProperties = {
 
 export interface BigipService {
   getInfo(url: string, cred64en: string): Promise<object>;
-  uploadDO(
+
+  installLicenseKey(
+    url: string,
+    cred64en: string,
+    key: string,
+  ): Promise<object>;
+
+  installLicenseText(
+    url: string,
+    cred64en: string,
+    text: string,
+  ): Promise<object>;
+
+  uploadFile(
     url: string,
     cred64en: string,
     end: number,
     length: number,
     body: object,
   ): Promise<object>;
-  installDO(url: string, cred64en: string, body: object): Promise<object>;
+  installObject(url: string, cred64en: string, body: object): Promise<object>;
 }
 
 export class BigipServiceProvider implements Provider<BigipService> {
@@ -209,15 +222,6 @@ export class BigIpManager {
     );
   }
 
-  async getPartition(partition: string): Promise<string> {
-    await this.mustBeReachable();
-
-    let url = `${this.baseUrl}/mgmt/tm/sys/folder/~${partition}`;
-    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-    let resObj = JSON.stringify(response);
-    return resObj;
-  }
-
   async getDOStatus(): Promise<string> {
     await this.mustBeReachable();
 
@@ -240,7 +244,7 @@ export class BigIpManager {
         this.baseUrl
       }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
       let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
-      let response = await this.bigipService.uploadDO(
+      let response = await this.bigipService.uploadFile(
         url,
         this.cred64Encoded,
         fstats.size - 1,
@@ -266,7 +270,7 @@ export class BigIpManager {
     };
     try {
       let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
-      let response = await this.bigipService.installDO(
+      let response = await this.bigipService.installObject(
         url,
         this.cred64Encoded,
         body,
@@ -307,13 +311,6 @@ export class BigIpManager {
         `Install DO RPM file error with error message ${error.message}`,
       );
     }
-  }
-  async getAS3Info(): Promise<object> {
-    await this.mustBeReachable();
-
-    let url = `${this.baseUrl}/mgmt/shared/appsvcs/info`;
-    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-    return JSON.parse(JSON.stringify(response))['body'][0];
   }
 
   async getHostname(): Promise<string> {
@@ -389,6 +386,20 @@ export class BigIpManager {
           });
         throw new Error(msg);
       });
+  }
+
+  async installLicenseKey(key: string): Promise<object> {
+    let url = `${this.baseUrl}/mgmt/tm/shared/licensing/activation`;
+    return this.bigipService.installLicenseKey(url, this.cred64Encoded, key);
+  }
+
+  async installLicenseText(text: string): Promise<object> {
+    let url = `${this.baseUrl}/mgmt/tm/shared/licensing/registration`;
+    return await this.bigipService.installLicenseText(
+      url,
+      this.cred64Encoded,
+      text,
+    );
   }
 }
 

@@ -8,6 +8,8 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
   ``ADCAAS_APP_PORT``: The port ADCaaS listens on. Default: ``3000``, http, or https.
   
   ``ADCAAS_APP_HOST``: Default: ``0.0.0.0``.
+
+  ``ADCAAS_APP_PROTOCOL``: Default: ``http``
   
   ``ADCAAS_CERT_KEY``: Key file when using https. Default: ``/var/data/certs/domain.key``.
   

@@ -56,6 +56,7 @@ describe('AdcController test', () => {
   let untrustStub: sinon.SinonStub;
   let installStub: sinon.SinonStub;
   let queryExtensionsStub: sinon.SinonStub;
+  let icontrolGetStub: sinon.SinonStub;
 
   const prefix = '/adcaas/v1';
 
@@ -82,6 +83,24 @@ describe('AdcController test', () => {
     untrustStub = sinon.stub(controller.asgService, 'untrust');
     installStub = sinon.stub(controller.asgService, 'install');
     queryExtensionsStub = sinon.stub(controller.asgService, 'queryExtensions');
+    icontrolGetStub = sinon.stub(controller.asgService, 'icontrolGet');
+
+    icontrolGetStub.callsFake(function(
+      host: string,
+      port: string,
+      id: string,
+      path: string,
+    ) {
+      if (path === '/mgmt/shared/appsvcs/info') {
+        return {
+          version: 'faked',
+        };
+      } else {
+        return {
+          name: 'F5_' + ExpectedData.tenantId,
+        };
+      }
+    });
 
     LetResponseWith();
   });
@@ -92,6 +111,7 @@ describe('AdcController test', () => {
     untrustStub.restore();
     installStub.restore();
     queryExtensionsStub.restore();
+    icontrolGetStub.restore();
   });
 
   after(async () => {
@@ -113,9 +133,6 @@ describe('AdcController test', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
       },
     });
@@ -196,9 +213,6 @@ describe('AdcController test', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
         networks: {},
         compute: {
@@ -225,9 +239,6 @@ describe('AdcController test', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
         networks: {},
         compute: {},
@@ -270,9 +281,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {},
@@ -301,9 +309,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {
@@ -335,9 +340,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {
@@ -369,9 +371,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {
@@ -403,9 +402,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {
@@ -437,9 +433,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
           compute: {
@@ -472,9 +465,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1Not: {
@@ -528,9 +518,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -589,9 +576,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -639,9 +623,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -695,9 +676,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -751,9 +729,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -808,9 +783,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -864,9 +836,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -920,9 +889,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {
             mgmt1: {
@@ -1027,9 +993,6 @@ describe('AdcController test', () => {
         management: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
       });
 
@@ -1086,9 +1049,6 @@ describe('AdcController test', () => {
         management: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
       });
 
@@ -1141,9 +1101,6 @@ describe('AdcController test', () => {
         connection: {
           ipAddress: ExpectedData.networks.management.ipAddr,
           tcpPort: ExpectedData.bigipMgmt.tcpPort,
-          username: 'admin',
-          password: 'admin',
-          rootPass: 'default',
         },
         networks: {},
       },
@@ -1204,9 +1161,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
         },
@@ -1275,9 +1229,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
         },
@@ -1362,10 +1313,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
         },
@@ -1442,9 +1389,6 @@ describe('AdcController test', () => {
           connection: {
             ipAddress: ExpectedData.networks.management.ipAddr,
             tcpPort: ExpectedData.bigipMgmt.tcpPort,
-            username: 'admin',
-            password: 'admin',
-            rootPass: 'default',
           },
           networks: {},
         },
@@ -1761,6 +1705,46 @@ describe('AdcController test', () => {
       bigip_get_mgmt_shared_declarative_onboarding_info:
         StubResponses.bigipDOChange2OK200,
     });
+
+    let trustDeviceId = uuid();
+    trustStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: ExpectedData.networks.management.ipAddr,
+          state: 'CREATED',
+        },
+      ],
+    });
+
+    queryStub.returns({
+      devices: [
+        {
+          targetUUID: trustDeviceId,
+          targetHost: ExpectedData.networks.management.ipAddr,
+          state: 'ACTIVE',
+        },
+      ],
+    });
+
+    queryExtensionsStub.onCall(0).returns([]);
+
+    queryExtensionsStub.onCall(1).returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'UPLOADING',
+      },
+    ]);
+
+    queryExtensionsStub.returns([
+      {
+        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
+        name: 'f5-appsvcs',
+        state: 'AVAILABLE',
+      },
+    ]);
+
     let response = await client
       .post(prefix + '/adcs')
       .set('X-Auth-Token', ExpectedData.userToken)
@@ -1778,13 +1762,11 @@ describe('AdcController test', () => {
         .set('X-Auth-Token', ExpectedData.userToken)
         .set('tenant-id', ExpectedData.tenantId)
         .expect(200);
-
-      return response.body.adc.status === 'ONBOARDED';
+      return response.body.adc.status === 'ACTIVE';
     };
 
     await checkAndWait(checkStatus, 50, [], 5).then(() => {});
-    expect(response.body.adc.status).eql('ONBOARDED');
-    expect(response.body.adc.management.connection.rootPass).not.eql('default');
+    expect(response.body.adc.status).eql('ACTIVE');
   });
 
   it('post ' + prefix + '/adcs: onboard error', async () => {
@@ -1828,7 +1810,6 @@ describe('AdcController test', () => {
     expect(response.body.adc.lastErr).startWith(
       'ONBOARDERROR: Failed to query onboarding status:',
     );
-    expect(response.body.adc.management.connection.rootPass).not.eql('default');
 
     restoreConsoleLog();
   });
@@ -1869,7 +1850,6 @@ describe('AdcController test', () => {
     await checkAndWait(checkStatus, 200, [], 5).then(() => {});
     expect(response.body.adc.status).eql('ONBOARDERROR');
     expect(response.body.adc.lastErr).eql('ONBOARDERROR: timeout');
-    expect(response.body.adc.management.connection.rootPass).not.eql('default');
   }).timeout(5000);
 
   it(`post ${prefix}/adcs: create failed with wrong floatingip state`, async () => {
@@ -1949,83 +1929,8 @@ describe('AdcController test', () => {
       await checkAndWait(checkStatus, 50, [], 5).then(() => {
         expect(true).true();
       });
-
-      expect(response.body.adc.management.connection.rootPass).eql('default');
     },
   );
-
-  it('post ' + prefix + '/adcs/{adcId}/setup: setup done', async () => {
-    let adc = await givenAdcData(wafapp, {
-      status: 'ONBOARDED',
-    });
-    ExpectedData.bigipMgmt.hostname = adc.id + '.f5bigip.local';
-    ExpectedData.networks.management.ipAddr = adc.management.connection!.ipAddress;
-
-    LetResponseWith({
-      bigip_get_mgmt_shared_declarative_onboarding_info:
-        StubResponses.bigipDOChange2OK200,
-    });
-
-    let trustDeviceId = uuid();
-    trustStub.returns({
-      devices: [
-        {
-          targetUUID: trustDeviceId,
-          targetHost: adc.management.connection!.ipAddress,
-          state: 'CREATED',
-        },
-      ],
-    });
-
-    queryStub.returns({
-      devices: [
-        {
-          targetUUID: trustDeviceId,
-          targetHost: adc.management.connection!.ipAddress,
-          state: 'ACTIVE',
-        },
-      ],
-    });
-
-    queryExtensionsStub.onCall(0).returns([]);
-
-    queryExtensionsStub.onCall(1).returns([
-      {
-        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-        name: 'f5-appsvcs',
-        state: 'UPLOADING',
-      },
-    ]);
-
-    queryExtensionsStub.returns([
-      {
-        rpmFile: 'f5-appsvcs-3.10.0-5.noarch.rpm',
-        name: 'f5-appsvcs',
-        state: 'AVAILABLE',
-      },
-    ]);
-    let response = await client
-      .post(prefix + '/adcs/' + adc.id + '/setup')
-      .set('X-Auth-Token', ExpectedData.userToken)
-      .set('tenant-id', ExpectedData.tenantId)
-      .expect(200);
-
-    expect(response.body).containDeep({id: adc.id});
-
-    let checkStatus = async () => {
-      let resp = await client
-        .get(prefix + '/adcs/' + adc.id)
-        .set('X-Auth-Token', ExpectedData.userToken)
-        .set('tenant-id', ExpectedData.tenantId)
-        .expect(200);
-      return resp.body.adc.status === 'ACTIVE';
-    };
-
-    //TODO: This test can not return comparing failure.
-    await checkAndWait(checkStatus, 50, [], 5).then(() => {
-      expect(true).true();
-    });
-  });
 
   it('post ' + prefix + '/adcs: create done with license key', async () => {
     let adc = createAdcObject({

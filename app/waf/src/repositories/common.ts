@@ -77,7 +77,7 @@ export class CommonRepository<
     let f: Filter = filter || {};
     let builder = new WhereBuilder(f.where);
     f.where = builder.and({id: id}).build();
-    let data = await this.find(f as (Filter<T>), options);
+    let data = await this.find(f as Filter<T>, options);
     if (data.length !== 0) {
       this.logger.debug('find resource ' + data[0].id);
       // return the first one we found.

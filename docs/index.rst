@@ -19,3 +19,4 @@ It enables customers to leverage F5 Services within cloud environments convenien
    openstack-prerequisites
    plug-play-wafpolicies
    devopstest
+   run-it

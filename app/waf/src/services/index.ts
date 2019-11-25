@@ -20,4 +20,5 @@ export * from './compute.service';
 export * from './network.service';
 export * from './do.service';
 export * from './bigip.service';
+export * from './bigiq.service';
 export * from './license.service';

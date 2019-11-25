@@ -41,6 +41,7 @@ import {
   AS3Declaration,
   as3ExtendedName,
   as3Name,
+  TLSServer,
 } from '../models';
 import {inject, CoreBindings} from '@loopback/core';
 import {
@@ -60,6 +61,8 @@ import {
   IRuleRepository,
   ProfileHTTPProfileRepository,
   ProfileHTTP2ProfileRepository,
+  TLSserverRepository,
+  CertificateRepository,
 } from '../repositories';
 import {BaseController, Schema, Response, CollectionResponse} from '.';
 import {ASGManager, PortsUpdateParams} from '../services';
@@ -110,6 +113,10 @@ export class DeclarationController extends BaseController {
     @repository(ProfileHTTP2ProfileRepository)
     private profileHTTP2ProfileRepository: ProfileHTTP2ProfileRepository,
     //Suppress get injection binding exeption by using {optional: true}
+    @repository(TLSserverRepository)
+    public tlsserverRepository: TLSserverRepository,
+    @repository(CertificateRepository)
+    public certificateRepository: CertificateRepository,
     @inject(RestBindings.Http.CONTEXT, {optional: true})
     protected reqCxt: RequestContext,
     @inject(CoreBindings.APPLICATION_INSTANCE)
@@ -137,6 +144,15 @@ export class DeclarationController extends BaseController {
         service.defaultPoolId,
       );
       await this.loadPool(service.defaultPool);
+    }
+
+    if (service.serverTLS) {
+      service.serverTLSContent = await this.tlsserverRepository.findById(
+        service.serverTLS,
+      );
+      if (service.serverTLSContent.certificates) {
+        await this.loadCertificateIndex(service.serverTLSContent);
+      }
     }
 
     let assocs = await this.serviceEndpointpolicyAssociationRepository.find({
@@ -245,6 +261,23 @@ export class DeclarationController extends BaseController {
         refs: refs,
         defs: defs,
       };
+    }
+  }
+
+  private async loadCertificateIndex(server: TLSServer): Promise<void> {
+    for (let cert of server.certificates) {
+      const certList = await this.certificateRepository.find({
+        where: {
+          id: cert,
+        },
+      });
+
+      if (certList.length === 0) {
+        throw new HttpErrors.NotFound(`Cannot find certificate ${cert}`);
+      }
+      server.certsContent.push(certList[0]);
+
+      // await this.loadCertificateData(cert.certContent);
     }
   }
 
@@ -563,9 +596,9 @@ export class DeclarationController extends BaseController {
       }
     })();
 
-    let netHelper = await (await this.wafapp.get(
-      WafBindingKeys.KeyNetworkDriver,
-    )).updateLogger(this.reqCxt.name);
+    let netHelper = await (
+      await this.wafapp.get(WafBindingKeys.KeyNetworkDriver)
+    ).updateLogger(this.reqCxt.name);
 
     // get port addresses, add one more, then update port.
     // TODO: use async-lock to make the operation automic.
