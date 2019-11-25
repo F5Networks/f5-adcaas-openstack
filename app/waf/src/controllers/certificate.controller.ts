@@ -143,7 +143,6 @@ export class CertificateController extends BaseController {
     @requestBody(Schema.updateRequest(Certificate, updateDesc))
     certificate: Certificate,
   ): Promise<void> {
-    console.log(id);
     await this.certificateRepository.updateById(id, certificate, {
       tenantId: await this.tenantId,
     });
