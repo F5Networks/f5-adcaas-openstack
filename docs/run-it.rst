@@ -73,7 +73,7 @@ Basically, the script will process steps below for us:
 **Check ADCaaS Running Status**
 --------------------------------
 
-1. Ater executing ``start_all.sh``, use ``docker ps`` to see the container
+1. After executing ``start_all.sh``, use ``docker ps`` to see the container
 set.
 
 ::
