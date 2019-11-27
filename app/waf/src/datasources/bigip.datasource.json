@@ -11,7 +11,7 @@
     {
       "template": {
         "method": "GET",
-        "timout": 2000,
+        "timeout": 10000,
         "url": "{url}",
         "headers": {
           "Authorization": "{cred64en}"
@@ -26,7 +26,7 @@
         ]
       }
     },
-   {
+    {
       "template": {
         "method": "POST",
         "url": "{url}",

@@ -3,12 +3,11 @@ language: node_js
 node_js:
  - "8.9"
 
-services:
-  - postgresql
-
 jobs:
   include:
     - stage: test-app-waf
+      services:
+        - postgresql
       install:
         - npm --prefix app/waf install
       before_script:
@@ -25,21 +24,46 @@ jobs:
         script:
           - scripts/publish_api_ref.sh
     - stage: fvt
-      if: TRAVIS_EVENT_TYPE = cron 
-      before_script:
+      services:
+        - postgresql
+      sudo: required
+      install:
+        - npm install -g newman newman-reporter-html
         - pushd test/vpn
         - ./vpn_install.sh
+        - popd
+      before_script:
+        # Build ADCaaS image
+        - pushd app/waf
+        - docker build . -t f5devcentral/f5-openstack-services:adcaas-latest
+        - popd
+        # Import config values
+        - for VAR in OS_AUTH_URL OS_PASSWORD BIGIQ_HOST BIGIQ_PORT BIGIQ_PASSWORD ; do
+            TEST_VAR=TEST_$VAR ;
+            sed -i "s/^$VAR=.*$/$VAR="$(echo ${!TEST_VAR} | sed 's/\//\\\//g')"/g" deploy/appcluster.rc ;
+          done
+        - sed -i "s/ENABLE_EFK=true/ENABLE_EFK=false/g" deploy/appcluster.rc
+        - sed -i "s/DATABASE_HOST=postgres-server/DATABASE_HOST=localhost/g" deploy/appcluster.rc
+        - sed -i "s/ASG_HOST=asg-server/ASG_HOST=localhost/g" deploy/appcluster.rc
+        - cat deploy/appcluster.rc
+        # Start ADCaaS
+        - pushd scripts
+        - ./start_all.sh
+        - popd
+        # Connect to lab VPN
+        - pushd test/vpn
         - ./vpn_connect.sh
-        - popd 
+        - popd
       script:
-        - pushd test/Auto
-        - export name=`openssl rand -base64 8`
-        - ./auto_test.sh 
-      after_success:
-        - ./auto_clean.sh 
+        - pushd test
+        - ./test_all.sh & > /dev/null
+        - popd
+        - docker logs -f ADCAAS
     - stage: publish-image-and-docs
       language: python
       sudo: required
+      services:
+        - postgresql
       before_install:
         - docker pull f5devcentral/containthedocs:latest
       install:
