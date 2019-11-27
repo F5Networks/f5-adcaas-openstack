@@ -1,35 +1,43 @@
 Getting Started
 ======================================
 
-To get started with ADCaaS, we'll need to get it on your system. This section will go over installing ADCaaS on your system as well as the basics of how to use it as a brand new user.
+To get started with ADCaaS, we'll need to get it on your system. This section will go over installing ADCaaS on your system.
 
 **Download ADCaaS**
+--------------------
 
 Generally, there are two alternative ways to download the ADCaaS application. 
 
-The first way is dowloading the released version, which is recommended and will be delivered soon. You can go to `ADCaaS docker image set [To Be Coming] <https://github.com/F5Networks/f5-adcaas-openstack/releases>`_ and choose the installation package of tar.gz or rpm to download.
+The first way is dowloading the released version, which is recommended and will be delivered soon. You can go to `ADCaaS docker image set [Coming] <https://github.com/F5Networks/f5-adcaas-openstack/releases>`_ and choose the installation package of tar.gz or rpm to download.
+
 -  For .tar.gz: unzip the file via ``tar zxf <file.tar.gz>``. Then you may find *start\_all.sh* under *dist/scripts/*, we call *dist* the ``localrepo`` in the following description.
 -  For .rpm: run ``rpm -i <file.rpm>`` to install it. 
 
-The second approach is to download the `open-sourced codes of ADCaaS <https://github.com/F5Networks/f5-adcaas-openstack>`_ directly from the F5Networks github. You may use this way if you are planning on contributing or testing codes in the future. 
+The second approach is to download the `ADCaaS Repository <https://github.com/F5Networks/f5-adcaas-openstack>`_ directly from the F5Networks github. You may use this way if you are planning on contributing or testing codes in the future. 
 Basically, we are recommending you to follow the steps below to install ADCaaS locally. 
-1) ``Fork`` the ADCaaS repository to your own repository. You may need to prepare a github account of your own here.
+
+1) ``Fork`` the ADCaaS repository to your own repository. You may need to prepare a github account of your own here. 
 2) ``Clone`` your own repository to your local sandbox.
 Now, you have successfully downloaded the ADCaaS package to your own system. 
 
 **Environment Prerequisite and Configuration**
+------------------------------------------------------------
+
 Before running ADCaaS as a standalone application, we need to enable a few environment prerequisites.
+
 1）`OpenStack <https://github.com/F5Networks/f5-adcaas-openstack/blob/master/docs/openstack-prerequisites.rst>`_
 -  In *<localrepo>/deploy/appcluster.rc*, update ``OS_*`` configuration according to your OpenStack environment. 
 2) `BIGIQ <https://support.f5.com/csp/knowledge-center/software/BIG-IQ?module=BIG-IQ%20Device>`_
 -  Update the ``BIGIQ_*`` configuration in appcluster.rc accordingly.
 3) `Docker CE <https://docs.docker.com/install/>`__
 4) `npm <https://docs.npmjs.com/downloading-and-installing-node-js-and-npm>`__
+
 -  Change the work directory to *<localrepo>/app/waf*, and run ``npm install`` command to install package dependencies.
 
 You may be aware that other configuration variables may need to be customized on your requirements. For more details, see `Environment variable settings <configuration.html>`_ Page.
 
 **Run ADCaaS as Standalone Application**
+----------------------------------------
 
 Use */scripts/start\_all.sh* to start ADCaaS.
 
@@ -53,6 +61,7 @@ Basically, the script will process steps below for us:
    *Solution*: Add ``/var/tmp`` (better) or ``/var/tmp/ASGExtensions`` to the settings as it mentions.
 
 **Check ADCaaS Running Status**
+--------------------------------
 
 1) Ater executing ``start_all.sh``, use ``docker ps`` to see the container
 set.
