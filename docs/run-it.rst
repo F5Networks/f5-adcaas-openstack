@@ -107,9 +107,8 @@ You may find the response below if ADCaaS operating well:
         }
     }
 
-3. Thus we can use Postman(Swagger API definition:
+3. Use Postman(Swagger API definition:
 https://f5networks.github.io/f5-adcaas-openstack/) or access PORTAL
 (port:8245) to provision BIG-IP VE.
-- The username and password for login is the same as your OpenStack.
 
-The PORTAL(port:8245) is integrated with OpenStack platform(Keystone for auth*, neutron for VE network setup, nova for VM sources.), so if `appcluster.rc` is configured correctly, the provisioned BIG-IP VE can be managed/orchestrated within tenant.
+The PORTAL(port:8245) is integrated with OpenStack platform(Keystone for auth*, neutron for VE network setup, nova for VM sources.). Therefore, the username and password for PORTAL login is the same as your OpenStack login. If `appcluster.rc` is configured correctly, the provisioned BIG-IP VE can be managed/orchestrated within tenant. 
