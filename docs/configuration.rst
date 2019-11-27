@@ -33,7 +33,7 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
 
 * OpenStack Configuration: 
 
-   This section you may need to updated when initializing ADCaaS apllication based on your OpenStack environment.
+  This section needs to be updated when initializing ADCaaS based on your OpenStack environment.
 
   ``OS_AUTH_URL``: OpenStack keystone auth URL. Format: ``http://<hostname>:<port>/<version>``. For example: ``http://10.250.11.184:5000/v3``.
   
@@ -55,7 +55,7 @@ The configuration file for ADCaaS application is `appcluster.rc <https://github.
 
 * Onboarding Configuration:
 
-  ``BIGIQ_*`` configurations may need to be updated when initializing ADCaaS based on your BIGIQ.
+  BIGIQ_* configurations needs to be updated when initializing ADCaaS based on your BIGIQ.
 
   ``BIGIQ_HOST``: BIG-IQ address. For example: ``10.250.11.138``.
 
