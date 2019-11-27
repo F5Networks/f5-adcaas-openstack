@@ -16,8 +16,8 @@ The first way is dowloading the released version, which is recommended and will 
 The second approach is to download the `ADCaaS Repository <https://github.com/F5Networks/f5-adcaas-openstack>`_ directly from the F5Networks github. You may use this way if you are planning on contributing or testing codes in the future. 
 Basically, we are recommending you to follow the steps below to install ADCaaS locally. 
 
-1) ``Fork`` the ADCaaS repository to your own repository. You may need to prepare a github account of your own here. 
-2) ``Clone`` your own repository to your local sandbox.
+-  ``Fork`` the ADCaaS repository to your own repository. You may need to prepare a github account of your own here. 
+-  ``Clone`` your own repository to local sandbox.
 Now, you have successfully downloaded the ADCaaS package to your own system. 
 
 **Environment Prerequisite and Configuration**
@@ -25,12 +25,18 @@ Now, you have successfully downloaded the ADCaaS package to your own system.
 
 Before running ADCaaS as a standalone application, we need to enable a few environment prerequisites.
 
-1）`OpenStack <https://github.com/F5Networks/f5-adcaas-openstack/blob/master/docs/openstack-prerequisites.rst>`_
+1)  `OpenStack <https://github.com/F5Networks/f5-adcaas-openstack/blob/master/docs/openstack-prerequisites.rst>`_
+
 -  In *<localrepo>/deploy/appcluster.rc*, update ``OS_*`` configuration according to your OpenStack environment. 
-2) `BIGIQ <https://support.f5.com/csp/knowledge-center/software/BIG-IQ?module=BIG-IQ%20Device>`_
+
+2)  `BIGIQ <https://support.f5.com/csp/knowledge-center/software/BIG-IQ?module=BIG-IQ%20Device>`_
+
 -  Update the ``BIGIQ_*`` configuration in appcluster.rc accordingly.
-3) `Docker CE <https://docs.docker.com/install/>`__
-4) `npm <https://docs.npmjs.com/downloading-and-installing-node-js-and-npm>`__
+
+3)  `Docker CE <https://docs.docker.com/install/>`_
+
+
+4)  `npm <https://docs.npmjs.com/downloading-and-installing-node-js-and-npm>`__
 
 -  Change the work directory to *<localrepo>/app/waf*, and run ``npm install`` command to install package dependencies.
 
@@ -42,9 +48,13 @@ You may be aware that other configuration variables may need to be customized on
 Use */scripts/start\_all.sh* to start ADCaaS.
 
 Basically, the script will process steps below for us:
+
 1) Download dependencies if not exists locally, including dependent rpm files and docker images.
+
 2) Run the container initialization.
+
 3) Enable environment settings depending on appcluster.rc settings.
+
 4) Run ``docker-compose up -d -f <localrepo>/deploy/docker-compose.yml`` to start ADCAAS container and its dependent containers, see that *docker-compose.yml* file.
 
    Note: On MacOSX, running ``start_all.sh`` may get the error:
@@ -63,7 +73,7 @@ Basically, the script will process steps below for us:
 **Check ADCaaS Running Status**
 --------------------------------
 
-1) Ater executing ``start_all.sh``, use ``docker ps`` to see the container
+1. Ater executing ``start_all.sh``, use ``docker ps`` to see the container
 set.
 
 ::
@@ -76,7 +86,7 @@ set.
     04dfcc4fab4a        docker.elastic.co/kibana/kibana:7.2.0                 "/usr/local/bin/kiba…"   45 minutes ago      Up 45 minutes       0.0.0.0:5601->5601/tcp                                                                   KIBANA
     1376e898a717        docker.elastic.co/elasticsearch/elasticsearch:7.2.0   "/usr/local/bin/dock…"   45 minutes ago      Up 45 minutes       0.0.0.0:9200->9200/tcp, 9300/tcp                                                         ELASTICSEARCH
 
-2) run ``curl http://localhost:3000/ping`` to check if ADCaaS runs OK.
+2. Run ``curl http://localhost:3000/ping`` to check if ADCaaS runs OK.
 You may find the response below if ADCaaS operating well:
 
 ::
@@ -97,7 +107,7 @@ You may find the response below if ADCaaS operating well:
         }
     }
 
-3) Thus we can use Postman(Swagger API definition:
+3. Thus we can use Postman(Swagger API definition:
 https://f5networks.github.io/f5-adcaas-openstack/) or access PORTAL
 (port:8245) to provision BIG-IP VE.
 - The username and password for login is the same as your OpenStack.
