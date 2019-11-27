@@ -16,7 +16,7 @@ From the `docker-compose.yml <https://github.com/F5Networks/f5-adcaas-openstack/
 
 * **ADCAAS**
   
-  The main application responsible for providing RESTful APIs for the following:
+  ADCaaS is the main application responsible for providing RESTful APIs for the following:
   
   - Provisioning ADC (BIG-IP VEs) on cloud platforms (**Note**: Currently only OpenStack)
   - Configuring LTM applications (Virtual Server in LTMs) piece-by-piece.
@@ -40,19 +40,15 @@ From the `docker-compose.yml <https://github.com/F5Networks/f5-adcaas-openstack/
 
   The ASG's ``/var/config`` folder is mounted as the volume for data persistence.
 
-* **DO**
-  
-  `Declarative Onboarding <https://github.com/F5Networks/f5-declarative-onboarding>`_ (DO) uses a dedeclarative model to initially configure a BIG-IP device with all of the required settings to get it up and running, such as: hostname, license, modules, configsync, user, networks (interface/vLAN/IPs), DNS, and NTP.
-
 * **PORTAL**
   
   In addition to RESTful APIs, ADCaaS provides a portal for ADC management and application deployment.
 
-  The portal is a `horizon <https://docs.openstack.org/horizon/latest/>`_-based web application running in cotainer.
+  The portal is a `horizon <https://docs.openstack.org/horizon/latest/>`_-based web application running in a container.
 
 * **E / F /  K**
   
-  Refers to three different containers:
+  EFK is enabled as an installation option, which refers to three different containers:
 
   - `Elasticsearch <https://www.elastic.co/>`_
 
@@ -60,18 +56,18 @@ From the `docker-compose.yml <https://github.com/F5Networks/f5-adcaas-openstack/
 
   - `Kibana <https://www.elastic.co/products/kibana>`_
 
-  From the ``docker-compose.yml``, other continers' logs are collected by the Fluentd logging driver and sent to a Fluentd container. By accessing Kibana, DevOps can do log agression or issue locating.
+  From the ``docker-compose.yml``, other containers' logs are collected by the Fluentd logging driver and sent to a Fluentd container. By accessing Kibana, DevOps can do log agression or issue locating.
 
-  Each API call can be traced by a unique request ID.
+  Each API call can be traced by a unique request ID. 
 
 * **POSTGRES**
 
-  The database layer to store kinds of service model and management data. The database schema is auto-migrated at startup. In production, it is possible to switch to a own database of a customer.
+  Postgres is the database layer storing kinds of service model and management data. The database schema is auto-migrated at startup. In production, it is possible to switch to a own database of a customer.
 
-Container interactions 
+Container Interactions 
 ----------------------
 
-The following chart shows the container interactions:
+The following chart shows the container interactions in the ADCaaS service:
 
 ::
 
@@ -82,7 +78,7 @@ The following chart shows the container interactions:
                         +--------------+---------------+
                         |                              |
      +-------------------------------------+     +------------+
-     |     LTMAAS/DNSAAS/..(In future)     |     |   WAFAAS   |
+     |     LTMAAS/DNSAAS/..(TBD)           |     |   WAFAAS   |
      +-------------------------------------+     +------------+
                         |                              |
              +----------+-----+-------------+----------+------------+
@@ -94,18 +90,18 @@ The following chart shows the container interactions:
                                             |          |            |
                                             +-----+----+            |
                                                   |            [ OPENSTACK ]
-                                             (BIG-IP VE)        [ BIG-IQ ]
+                                             (BIG-IP VE)       [  BIG-IQ   ]
 
 
 **Notes**
 
 - Rectangles are container instances.
 
-- `LTMAAS/DNSAAS/..(future)`: In the future, there may be more F5 \*AAS functionalities.
+- `LTMAAS/DNSAAS/..(TBD)`: To be delivered. In the future, there may be more F5 \*AAS functionalities.
 
-- `(DO)` is now a container, but may be installed to a BIG-IP instance; thus, calls to DO change to BIG-IP.
+- `(DO)`: is now a container, but may be installed to a BIG-IP instance; thus, calls to DO change to BIG-IP.
 
-- `(BIG-IP VE)` is the provisioned unit for declaration deployments.
+- `(BIG-IP VE)`: is the provisioned unit for declaration deployments.
 
-- `[ OPENSTACK ]`, `[ BIG-IQ ]` are ADCaaS dependencies. BIG-IQ is the license manager. OpenStack is the cloud platform to provision BIG-IP VE.
+- `[ OPENSTACK ]`, `[ BIG-IQ ]`: are ADCaaS dependencies. BIG-IQ is the license manager. OpenStack is the cloud platform to provision BIG-IP VE.
 
