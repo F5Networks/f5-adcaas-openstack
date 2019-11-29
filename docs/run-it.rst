@@ -8,12 +8,12 @@ To get started with ADCaaS, we'll need to get it on your system. This section wi
 
 Generally, there are two alternative ways to download the ADCaaS application. 
 
-The first way is dowloading the released version, which is recommended and will be delivered soon. You can go to `ADCaaS docker image set [Coming] <https://github.com/F5Networks/f5-adcaas-openstack/releases>`_ and choose the installation package of tar.gz or rpm to download.
+The first way is dowloading the released version, which is recommended and will be delivered soon. You can go to `ADCaaS docker image set  <https://github.com/F5Networks/f5-adcaas-openstack/releases>`_ and choose the installation package of tar.gz or rpm to download.
 
 -  For .tar.gz: unzip the file via ``tar zxf <file.tar.gz>``. Then you may find *start\_all.sh* under *dist/scripts/*, we call *dist* the ``localrepo`` in the following description.
--  For .rpm: run ``rpm -i <file.rpm>`` to install it. 
+-  For .rpm: run ``rpm -i <file.rpm>`` to install it [Coming]. 
 
-The second approach is to download the `ADCaaS Repository <https://github.com/F5Networks/f5-adcaas-openstack>`_ directly from the F5Networks github. You may use this way if you are planning on contributing or testing codes in the future. 
+The second approach is to download the `ADCaaS Repository <https://github.com/F5Networks/f5-adcaas-openstack>`_ directly from the F5Networks github. You may use this way if planning on contributing or testing codes in the future. 
 Basically, we are recommending you to follow the steps below to install ADCaaS locally. 
 
 -  ``Fork`` the ADCaaS repository to your own repository. You may need to prepare a github account of your own here. 
@@ -40,7 +40,7 @@ Before running ADCaaS as a standalone application, we need to enable a few envir
 
 -  Change the work directory to *<localrepo>/app/waf*, and run ``npm install`` command to install package dependencies.
 
-You may be aware that other configuration variables may need to be customized on your requirements. For more details, see `Environment variable settings <configuration.html>`_ Page.
+You may be aware that other configuration variables can be customized on your requirements. For more details, see `Environment variable settings <configuration.html>`_ Page.
 
 **Run ADCaaS as Standalone Application**
 ----------------------------------------
