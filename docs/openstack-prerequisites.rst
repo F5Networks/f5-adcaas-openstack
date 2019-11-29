@@ -1,7 +1,7 @@
-Some preparations in the OpenStack platform
+Preparations in the OpenStack Platform
 ===========================================
 
-**Prepare the BIGIP VE image**:
+**Prepare the BIGIP VE Image**:
 
 Currently, the tested image is 13.1.1. First of all, you need to
 download BIGIP VE image from F5's official website downloads.f5.com.
@@ -11,7 +11,7 @@ you can use CLI. e.g.
 glance image-create --container-format bare --disk-format qcow2 --file
 /home/admin/BIGIP-13.1.1-0.0.4.qcow2 --visibility public --progress
 
-**Prepare the Nova flavors**:
+**Prepare the Nova Flavors**:
 
 -  You can use the OpenStack Dashboard or the openstack CLI to prepare
    the flavors. e.g. 
@@ -25,9 +25,9 @@ glance image-create --container-format bare --disk-format qcow2 --file
    https://clouddocs.f5.com/cloud/openstack/v1/support/openstack\_big-ip\_flavors.html
    https://docs.openstack.org/horizon/latest/admin/manage-flavors.html
 
-**Prepare networks and subnets**:
+**Prepare Networks and Subnets**:
 
--  You need 4 openstack networks for management, internal, external and
+-  You need four openstack networks for management, internal, external and
    HA purposes respectively. Create a subnet in each of the networks.
    You can use the OpenStack Dashboard or the openstack CLI to prepare
    the networks and subnets.

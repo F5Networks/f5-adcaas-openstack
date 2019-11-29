@@ -28,7 +28,7 @@ Development/Test
 
 **Setup**:
 
-Follow the the steps to setup your developing/testing sandbox.
+Follow the steps to setup your developing/testing sandbox.
 
 1) Fork this code repository to your own repository.
 2) Clone your repository to local sandbox.
@@ -108,7 +108,7 @@ is responsible for:
    to start ADCAAS container and its dependent containers, see that
    *docker-compose.yml* file.
 
-Note: On MacOSX, running ``start_all.sh`` may get the error:
+Note: on MacOSX, running ``start_all.sh`` may get the error:
 ``ERROR: for ASG  Cannot start service ASG: Mounts denied:       The path /var/tmp/ASGExtensions is not shared from OS X and is not known to Docker.       You can configure shared paths from Docker -> Preferences... -> File Sharing.       See https://docs.docker.com/docker-for-mac/osxfs/#namespaces for more info.``
 **Solution**: Add ``/var/tmp``\ (better) or ``/var/tmp/ASGExtensions``
 to the settings as it mentions.

@@ -1,4 +1,4 @@
-Plug and play WAF policies
+Plug and Play WAF Policies
 ==========================
 
 For cloud environments, especially the public cloud, there are three
