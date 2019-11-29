@@ -8,8 +8,6 @@ download BIGIP VE image from F5's official website downloads.f5.com.
 Then you can use the OpenStack Dashboard to create an image in Glance or
 you can use CLI. e.g.
 
-.. code-block:: console
-
 glance image-create --container-format bare --disk-format qcow2 --file
 /home/admin/BIGIP-13.1.1-0.0.4.qcow2 --visibility public --progress
 
