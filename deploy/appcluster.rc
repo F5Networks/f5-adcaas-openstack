@@ -46,7 +46,7 @@ VE_DNS_SEARCH=openstack.local
 VE_NTP_SERVERS=0.pool.ntp.org,1.pool.ntp.org
 VE_NTP_TIMEZONE=UTC
 
-# There are four values for the ltm and asm provision levels 
+# There are four values for the ltm and asm provision levels
 # 'dedicated' | 'nominal' | 'minimum' | 'none';
 VE_LTM_LEVEL=nominal
 VE_ASM_LEVEL=nominal

@@ -294,6 +294,35 @@ describe('DeclarationController', () => {
   it(
     'post ' +
       prefix +
+      '/applications/{applicationId}/declarations: create declaration with snat.',
+    async () => {
+      const application = await givenApplicationData(wafapp);
+
+      let profileHttp = await givenProfileHTTPProfileData(wafapp);
+
+      let service = await givenServiceData(wafapp, application.id, {
+        profileHTTP: profileHttp.id,
+        snat: 'test-snat-pool',
+      });
+
+      let response = await client
+        .post(prefix + '/applications/' + application.id + '/declarations')
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .send({name: 'a-declaration'})
+        .expect(200);
+
+      let as3ServiceId = as3Name(service.id);
+      expect(response.body.declaration.content.class).eql('Application');
+      expect(
+        response.body.declaration.content[as3ServiceId]['snat']['bigip'],
+      ).equal('/Common/test-snat-pool');
+    },
+  );
+
+  it(
+    'post ' +
+      prefix +
       '/applications/{applicationId}/declarations: create declaration with builtin http2 profile.',
     async () => {
       const application = await givenApplicationData(wafapp);

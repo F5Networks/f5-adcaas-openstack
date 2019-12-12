@@ -221,6 +221,27 @@ export class DeclarationController extends BaseController {
       };
     }
 
+    if (service.snat) {
+      let refs: string | object = {};
+      let defs: {[k: string]: object} = {};
+
+      const snatOptions = ['none', 'self', 'auto'];
+
+      if (snatOptions.indexOf(service.snat) === -1) {
+        refs = {
+          bigip: '/Common/' + service.snat,
+        };
+      } else {
+        refs = service.snat;
+      }
+
+      let extName = as3ExtendedName('snat');
+      service[extName] = {
+        refs: refs,
+        defs: defs,
+      };
+    }
+
     if (service.profileHTTP) {
       let refs: {[k: string]: string} = {};
       let defs: {[k: string]: object} = {};
