@@ -227,9 +227,11 @@ export class WafpolicyController extends BaseController {
         wafpolicy.id,
       );
     } catch (error) {
-      throw new HttpErrors.unprocessableEntity(
-        'check wafpolicy from asg service failed',
-      );
+      if (error.code === 404) {
+        throw new HttpErrors.NotFound(`ASG error: ${error.message}`);
+      } else {
+        throw new HttpErrors.UnprocessableEntity(`ASG error: ${error.message}`);
+      }
     }
 
     if (!resp || !resp[0]) {
