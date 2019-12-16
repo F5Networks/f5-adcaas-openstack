@@ -41,7 +41,6 @@ jobs:
       language: python
       sudo: required
       env:
-        # - PKG_RELEASE="f5-adcaas-openstack-0.0.0.tar.gz"
         - PKG_RELEASE="f5-adcaas-openstack-$(git describe --tags --abbrev=0).tar.gz"
       before_install:
         - docker pull f5devcentral/containthedocs:latest
@@ -52,7 +51,7 @@ jobs:
         - pushd docs
         - ./docker-docs.sh ./test-docs.sh
         - popd
-        # Build dist & release package
+        # Build release package
         - pushd scripts
         - ./build_dist.sh
         - popd
@@ -68,6 +67,7 @@ jobs:
         skip_cleanup: true
         overwrite: true
         on:
+          branch: master
           repo: F5Networks/f5-adcaas-openstack
           tags: true      
       # Deploy image to Docker Hub
