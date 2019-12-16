@@ -62,8 +62,8 @@ jobs:
       # Released a new version to github 
       - provider: releases
        # TODO-2: use my token to test
-        # api_key:
-        #   secure: "$GITHUB_TOKEN"
+        api_key:
+          secure: "$GITHUB_TOKEN"
         file:
           - ${PKG_RELEASE}
         skip_cleanup: true
