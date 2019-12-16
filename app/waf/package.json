@@ -67,6 +67,7 @@
     "typescript-logging": "^0.6.3",
     "uuid": "^3.3.2",
     "ip": "^1.1.5",
+    "core-js": "2.6.10",
     "network-utils-tcp-ping": "^1.1.1",
     "is-port-reachable": "^2.0.1",
     "generate-password": "^1.4.2"
