@@ -60,12 +60,15 @@ jobs:
       deploy:
       # Released a new version to github 
       - provider: releases
+       # TODO-2: use my token to test
+        api_key:
+          secure: "$GITHUB_TOKEN"
         file:
           - ${PKG_RELEASE}
         skip_cleanup: true
         overwrite: true
         on:
-      #TODO-2: change to F5Networks/f5-adcaas-openstack
+      #TODO-3: change to F5Networks/f5-adcaas-openstack
           repo: JingL1/f5-adcaas-openstack
           tags: true 
       
