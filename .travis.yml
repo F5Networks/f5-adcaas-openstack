@@ -38,7 +38,7 @@ jobs:
       after_success:
         - ./auto_clean.sh
     # TODO-1: Remove comments if not necessary 
-     - stage: publish-image-and-docs
+    - stage: publish-image-and-docs
       language: python
       sudo: required
       env:
