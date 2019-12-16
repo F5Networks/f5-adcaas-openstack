@@ -13,10 +13,10 @@ jobs:
         - npm --prefix app/waf install
       before_script:
         - export PG_HOST=localhost
-      script:
-        - npm --prefix app/waf test
-        - npm --prefix app/waf run coverage
-        - npm --prefix app/waf run coveralls
+      # script:
+      #   - npm --prefix app/waf test
+      #   - npm --prefix app/waf run coverage
+      #   - npm --prefix app/waf run coveralls
       deploy:
         provider: script
         on:
@@ -61,16 +61,16 @@ jobs:
       # Released a new version to github 
       - provider: releases
        # TODO-2: use my token to test
-        api_key:
-          secure: "$GITHUB_TOKEN"
+        # api_key:
+        #   secure: "$GITHUB_TOKEN"
         file:
           - ${PKG_RELEASE}
         skip_cleanup: true
         overwrite: true
         on:
-      #TODO-3: change to F5Networks/f5-adcaas-openstack
-          repo: JingL1/f5-adcaas-openstack
-          tags: true      
+      #TODO-3: remove tag only for ci
+          repo: F5Networks/f5-adcaas-openstack
+          # tags: true      
       # Deploy image to Docker Hub
       - provider: script
         script: scripts/publish_image.sh
