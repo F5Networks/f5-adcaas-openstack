@@ -8,43 +8,42 @@ env:
  - PKG_RELEASE="f5-adcaas-openstack-0.0.0.tar.gz"
  # - PKG_RELEASE="f5-adcaas-openstack-$(git describe --tags --abbrev=0).tar.gz"
 
-# services:
-#   - postgresql
+services:
+  - postgresql
 
 jobs:
   include:
-    # - stage: test-app-waf
-    #   install:
-    #     - npm --prefix app/waf install
-    #   before_script:
-    #     - export PG_HOST=localhost
-    #   script:
-    #     - npm --prefix app/waf test
-    #     - npm --prefix app/waf run coverage
-    #     - npm --prefix app/waf run coveralls
-    #   deploy:
-    #     provider: script
-    #     on:
-    #       branch: master
-    #     skip_cleanup: true
-    #     script:
-    #       - scripts/publish_api_ref.sh
-    # - stage: fvt
-    #   if: TRAVIS_EVENT_TYPE = cron 
-    #   before_script:
-    #     - pushd test/vpn
-    #     - ./vpn_install.sh
-    #     - ./vpn_connect.sh
-    #     - popd 
-    #   script:
-    #     - pushd test/Auto
-    #     - export name=`openssl rand -base64 8`
-    #     - ./auto_test.sh 
-    #   after_success:
-    #     - ./auto_clean.sh
+    - stage: test-app-waf
+      install:
+        - npm --prefix app/waf install
+      before_script:
+        - export PG_HOST=localhost
+      script:
+        - npm --prefix app/waf test
+        - npm --prefix app/waf run coverage
+        - npm --prefix app/waf run coveralls
+      deploy:
+        provider: script
+        on:
+          branch: master
+        skip_cleanup: true
+        script:
+          - scripts/publish_api_ref.sh
+    - stage: fvt
+      if: TRAVIS_EVENT_TYPE = cron 
+      before_script:
+        - pushd test/vpn
+        - ./vpn_install.sh
+        - ./vpn_connect.sh
+        - popd 
+      script:
+        - pushd test/Auto
+        - export name=`openssl rand -base64 8`
+        - ./auto_test.sh 
+      after_success:
+        - ./auto_clean.sh
   
      - stage: version-release
-      language: ruby
       script:
         - scripts/build_dist.sh
         - tar cvzf ${PKG_RELEASE} dist
@@ -60,50 +59,50 @@ jobs:
       overwrite: true
       on:
       #TODO-3: change to F5Networks/f5-adcaas-openstack, remove branch
-        repo: JingL1/f5-adcaas-openstack
-        branch: ci-test
+        branch: master
+        repo: F5Networks/f5-adcaas-openstack
       #TODO-4: depends on tag 
         # tags: true 
     
-    # - stage: publish-image-and-docs
-    #   language: python
-    #   sudo: required
-    #   before_install:
-    #     - docker pull f5devcentral/containthedocs:latest
-    #   install:
-    #     - pip install awscli --upgrade
-    #   script:
-    #     # Rebuild document
-    #     - pushd docs
-    #     - ./docker-docs.sh ./test-docs.sh
-    #     - popd
-    #   deploy:
-    #   # Deploy image to Docker Hub
-    #   - provider: script
-    #     script: scripts/publish_image.sh
-    #     on:
-    #       tags: true
-    #   # DEPLOY DOCS TO STAGING
-    #   - provider: s3
-    #     skip_cleanup: true
-    #     access_key_id: $AWS_ACCESS_KEY_ID
-    #     secret_access_key: $AWS_SECRET_ACCESS_KEY
-    #     bucket: $AWS_S3_STAGING
-    #     local_dir: docs/_build/html
-    #     upload_dir: $AWS_DIR
-    #     on:
-    #       branch: master
-    #       repo: F5Networks/f5-adcaas-openstack
-    #   # DEPLOY DOCS TO PRODUCTION
-    #   - provider: s3
-    #     skip_cleanup: true
-    #     access_key_id: $AWS_ACCESS_KEY_ID
-    #     secret_access_key: $AWS_SECRET_ACCESS_KEY
-    #     bucket: $AWS_S3_BUCKET
-    #     local_dir: docs/_build/html
-    #     upload_dir: $AWS_DIR
-    #     on:
-    #       branch: master
-    #       repo: F5Networks/f5-adcaas-openstack
-    #   after_deploy:
-    #      - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
+    - stage: publish-image-and-docs
+      language: python
+      sudo: required
+      before_install:
+        - docker pull f5devcentral/containthedocs:latest
+      install:
+        - pip install awscli --upgrade
+      script:
+        # Rebuild document
+        - pushd docs
+        - ./docker-docs.sh ./test-docs.sh
+        - popd
+#       deploy:
+#       # Deploy image to Docker Hub
+#       - provider: script
+#         script: scripts/publish_image.sh
+#         on:
+#           tags: true
+      # DEPLOY DOCS TO STAGING
+      - provider: s3
+        skip_cleanup: true
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        bucket: $AWS_S3_STAGING
+        local_dir: docs/_build/html
+        upload_dir: $AWS_DIR
+        on:
+          branch: master
+          repo: F5Networks/f5-adcaas-openstack
+      # DEPLOY DOCS TO PRODUCTION
+      - provider: s3
+        skip_cleanup: true
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        bucket: $AWS_S3_BUCKET
+        local_dir: docs/_build/html
+        upload_dir: $AWS_DIR
+        on:
+          branch: master
+          repo: F5Networks/f5-adcaas-openstack
+      after_deploy:
+         - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
