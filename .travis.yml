@@ -51,10 +51,12 @@ jobs:
         - pip install awscli --upgrade
       script:
         # Rebuild document
-        # - pushd docs
-        - docs/docker-docs.sh ./test-docs.sh
-        # - popd
-        - scripts/build_dist.sh
+        - pushd docs
+        - ./docker-docs.sh ./test-docs.sh
+        - popd
+        - pushd scripts
+        - ./build_dist.sh
+        - popd
         - tar cvzf ${PKG_RELEASE} dist
         - cp ${PKG_RELEASE} dist
       deploy:
