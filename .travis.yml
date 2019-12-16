@@ -44,6 +44,7 @@ jobs:
     #     - ./auto_clean.sh
   
      - stage: version-release
+      language: ruby
       script:
         - scripts/build_dist.sh
         - tar cvzf ${PKG_RELEASE} dist
