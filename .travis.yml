@@ -57,6 +57,7 @@ jobs:
         - pushd scripts
         - ./build_dist.sh
         - popd
+        - echo ${PKG_RELEASE}
         - tar cvzf ${PKG_RELEASE} dist
         - cp ${PKG_RELEASE} dist
       deploy:
