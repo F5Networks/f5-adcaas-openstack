@@ -2,7 +2,7 @@ language: node_js
 
 node_js:
  - "8.9"
-
+ 
 services:
   - postgresql
 
@@ -36,46 +36,68 @@ jobs:
         - export name=`openssl rand -base64 8`
         - ./auto_test.sh 
       after_success:
-        - ./auto_clean.sh 
-    - stage: publish-image-and-docs
+        - ./auto_clean.sh
+    # TODO-1: Remove comments if not necessary 
+     - stage: publish-image-and-docs
       language: python
       sudo: required
+      env:
+        global:
+          - PKG_RELEASE="f5-adcaas-openstack-0.0.0.tar.gz"
+        # - PKG_RELEASE="f5-adcaas-openstack-$(git describe --tags --abbrev=0).tar.gz"
       before_install:
         - docker pull f5devcentral/containthedocs:latest
       install:
         - pip install awscli --upgrade
       script:
         # Rebuild document
-        - pushd docs
-        - ./docker-docs.sh ./test-docs.sh
-        - popd
+        # - pushd docs
+        - docs/docker-docs.sh ./test-docs.sh
+        # - popd
+        - scripts/build_dist.sh
+        - tar cvzf ${PKG_RELEASE} dist
+        - cp ${PKG_RELEASE} dist
       deploy:
-      # Deploy image to Docker Hub
-      - provider: script
-        script: scripts/publish_image.sh
-        on:
-          tags: true
-      # DEPLOY DOCS TO STAGING
-      - provider: s3
+      # Released a new version to github 
+      - provider: releases
+       # TODO-2: use my token to test
+        api_key:
+          secure: "$GITHUB_TOKEN"
+        file:
+          - ${PKG_RELEASE}
         skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID
-        secret_access_key: $AWS_SECRET_ACCESS_KEY
-        bucket: $AWS_S3_STAGING
-        local_dir: docs/_build/html
-        upload_dir: $AWS_DIR
+        overwrite: true
         on:
-          branch: master
+      #TODO-3: change to F5Networks/f5-adcaas-openstack
           repo: F5Networks/f5-adcaas-openstack
-      # DEPLOY DOCS TO PRODUCTION
-      - provider: s3
-        skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID
-        secret_access_key: $AWS_SECRET_ACCESS_KEY
-        bucket: $AWS_S3_BUCKET
-        local_dir: docs/_build/html
-        upload_dir: $AWS_DIR
-        on:
-          branch: master
-          repo: F5Networks/f5-adcaas-openstack
-      after_deploy:
-         - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
+          tags: true 
+      
+#       # Deploy image to Docker Hub
+#       - provider: script
+#         script: scripts/publish_image.sh
+#         on:
+#           tags: true
+#       # DEPLOY DOCS TO STAGING
+#       - provider: s3
+#         skip_cleanup: true
+#         access_key_id: $AWS_ACCESS_KEY_ID
+#         secret_access_key: $AWS_SECRET_ACCESS_KEY
+#         bucket: $AWS_S3_STAGING
+#         local_dir: docs/_build/html
+#         upload_dir: $AWS_DIR
+#         on:
+#           branch: master
+#           repo: F5Networks/f5-adcaas-openstack
+#       # DEPLOY DOCS TO PRODUCTION
+#       - provider: s3
+#         skip_cleanup: true
+#         access_key_id: $AWS_ACCESS_KEY_ID
+#         secret_access_key: $AWS_SECRET_ACCESS_KEY
+#         bucket: $AWS_S3_BUCKET
+#         local_dir: docs/_build/html
+#         upload_dir: $AWS_DIR
+#         on:
+#           branch: master
+#           repo: F5Networks/f5-adcaas-openstack
+#       after_deploy:
+#          - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
