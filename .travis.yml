@@ -19,9 +19,8 @@ jobs:
         - npm --prefix app/waf run coveralls
       deploy:
         provider: script
-        #TODO-0: use test branch instead of 'master'
         on:
-          branch: ci-test
+          branch: master
         skip_cleanup: true
         script:
           - scripts/publish_api_ref.sh
