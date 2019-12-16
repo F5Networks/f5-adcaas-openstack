@@ -8,22 +8,22 @@ services:
 
 jobs:
   include:
-#     - stage: test-app-waf
-#       install:
-#         - npm --prefix app/waf install
-#       before_script:
-#         - export PG_HOST=localhost
-#       script:
-#         - npm --prefix app/waf test
-#         - npm --prefix app/waf run coverage
-#         - npm --prefix app/waf run coveralls
-#       deploy:
-#         provider: script
-#         on:
-#           branch: master
-#         skip_cleanup: true
-#         script:
-#           - scripts/publish_api_ref.sh
+    - stage: test-app-waf
+      install:
+        - npm --prefix app/waf install
+      before_script:
+        - export PG_HOST=localhost
+      script:
+        - npm --prefix app/waf test
+        - npm --prefix app/waf run coverage
+        - npm --prefix app/waf run coveralls
+      deploy:
+        provider: script
+        on:
+          branch: master
+        skip_cleanup: true
+        script:
+          - scripts/publish_api_ref.sh
     - stage: fvt
       if: TRAVIS_EVENT_TYPE = cron 
       before_script:
