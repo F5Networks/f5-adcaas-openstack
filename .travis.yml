@@ -2,14 +2,14 @@ language: node_js
 
 node_js:
  - "8.9"
-
-services:
-  - postgresql
-
+ 
 env:
-  global:
-  - PKG_RELEASE="f5-adcaas-openstack-0.0.0.tar.gz"
-  # - PKG_RELEASE="f5-adcaas-openstack-$(git describe --tags --abbrev=0).tar.gz"
+ global:
+ - PKG_RELEASE="f5-adcaas-openstack-0.0.0.tar.gz"
+ # - PKG_RELEASE="f5-adcaas-openstack-$(git describe --tags --abbrev=0).tar.gz"
+
+# services:
+#   - postgresql
 
 jobs:
   include:
