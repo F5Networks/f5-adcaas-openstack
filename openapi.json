@@ -4054,6 +4054,9 @@
                         "serverTLS": {
                           "type": "string"
                         },
+                        "snat": {
+                          "type": "string"
+                        },
                         "virtualAddresses": {
                           "type": "array"
                         },
@@ -4177,6 +4180,9 @@
                             "type": "string"
                           },
                           "serverTLS": {
+                            "type": "string"
+                          },
+                          "snat": {
                             "type": "string"
                           },
                           "virtualAddresses": {
@@ -14873,7 +14879,9 @@
                   "serverTLS": {
                     "type": "string"
                   },
-                  "snat": false,
+                  "snat": {
+                    "type": "string"
+                  },
                   "translateClientPort": false,
                   "translateServerAddress": false,
                   "translateServerPort": false,
@@ -14959,6 +14967,9 @@
                           "type": "string"
                         },
                         "serverTLS": {
+                          "type": "string"
+                        },
+                        "snat": {
                           "type": "string"
                         },
                         "virtualAddresses": {
@@ -15163,6 +15174,9 @@
                         "serverTLS": {
                           "type": "string"
                         },
+                        "snat": {
+                          "type": "string"
+                        },
                         "virtualAddresses": {
                           "type": "array"
                         },
@@ -15357,7 +15371,9 @@
                   "serverTLS": {
                     "type": "string"
                   },
-                  "snat": false,
+                  "snat": {
+                    "type": "string"
+                  },
                   "translateClientPort": false,
                   "translateServerAddress": false,
                   "translateServerPort": false,
@@ -15460,6 +15476,9 @@
                           "type": "string"
                         },
                         "serverTLS": {
+                          "type": "string"
+                        },
+                        "snat": {
                           "type": "string"
                         },
                         "virtualAddresses": {
