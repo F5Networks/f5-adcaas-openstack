@@ -540,8 +540,12 @@ export class Service extends CommonEntity {
     type: 'string',
     required: false,
     schema: {
-      create: false,
-      update: false,
+      create: true,
+      update: true,
+      response: true,
+    },
+    as3: {
+      type: 'extends',
     },
   })
   snat?: string;
