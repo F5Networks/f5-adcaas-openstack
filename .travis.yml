@@ -61,7 +61,7 @@ jobs:
       # RELEASE ADCAAS 
       - provider: releases
         api_key:
-          secure: "$GITHUB_TOKEN"
+          secure: $GITHUB_TOKEN
         file:
           - ${PKG_RELEASE}
         skip_cleanup: true
