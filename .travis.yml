@@ -61,7 +61,7 @@ jobs:
       # RELEASE ADCAAS 
       - provider: releases
         api_key:
-          secure: "$GITHUB_TOKEN"
+          secure: $GITHUB_TOKEN
         file:
           - ${PKG_RELEASE}
         skip_cleanup: true
@@ -69,7 +69,6 @@ jobs:
         on:
           repo: F5Networks/f5-adcaas-openstack
           tags: true
-      deploy:
       # Deploy image to Docker Hub
       - provider: script
         script: scripts/publish_image.sh
