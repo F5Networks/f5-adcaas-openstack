@@ -1,0 +1,259 @@
+{
+	"id": "3ebea574-662b-4791-ac70-de5ee935b64d",
+	"name": "os-queens",
+	"values": [
+		{
+			"key": "OS_AUTH_URL",
+			"value": "http://10.250.13.69:5000/v3",
+			"enabled": true
+		},
+		{
+			"key": "OS_USERNAME",
+			"value": "zhzhang",
+			"enabled": true
+		},
+		{
+			"key": "OS_PASSWORD",
+			"value": "zhzhang",
+			"enabled": true
+		},
+		{
+			"key": "OS_PROJECT_ID",
+			"value": "62f45871218f4875b6e4359bfb20ce60",
+			"enabled": true
+		},
+		{
+			"key": "ADCAAS_URL",
+			"value": "http://localhost:3000/adcaas/v1",
+			"enabled": true
+		},
+		{
+			"key": "TOKEN",
+			"value": "gAAAAABdeM4l18QRtXEbHQJ2LsrN7VDmHUlG2Yrvs76hcLhpvTr3VJXKquEtJJSWpJoO9qVXPGSrrrBInmF4-T-xnKJPtR5TDPCzGpuJvma2FeZD1M2_dqy-3O6oxxhgJzljSfHlb021n2mhQmLr_TzIistaxG1q9-u9FNqmPOgdJGNPMRhbyR0",
+			"enabled": true
+		},
+		{
+			"key": "ADC_ID",
+			"value": "9f7d6da8-d0f5-441f-b04e-434345474aa9",
+			"enabled": true
+		},
+		{
+			"key": "POWERON_RETRY",
+			"value": 4,
+			"enabled": true
+		},
+		{
+			"key": "ONBOARD_RETRY",
+			"value": 26,
+			"enabled": true
+		},
+		{
+			"key": "ACTIVE_RETRY",
+			"value": 25,
+			"enabled": true
+		},
+		{
+			"key": "DELETE_RETRY",
+			"value": "20",
+			"enabled": true
+		},
+		{
+			"key": "UPLOAD_RETRY",
+			"value": "5",
+			"enabled": true
+		},
+		{
+			"key": "CREATE_NUMBER",
+			"value": "31",
+			"enabled": true
+		},
+		{
+			"key": "MGMT_NET",
+			"value": "vlan15_ipv4",
+			"enabled": true
+		},
+		{
+			"key": "HA_NET",
+			"value": "vlan16_ipv4",
+			"enabled": true
+		},
+		{
+			"key": "INT_NET",
+			"value": "vlan17_ipv4",
+			"enabled": true
+		},
+		{
+			"key": "EXT_NET",
+			"value": "vlan_test",
+			"enabled": true
+		},
+		{
+			"key": "ADC_IMAGE",
+			"value": "BIGIP-13.1.1",
+			"enabled": true
+		},
+		{
+			"key": "APPLICATION_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "POOL_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "MEMBER_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "MONITOR_ICMP_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "MONITOR_HTTP_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "SERVICE_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "POLICY_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "RULE_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "WAF_URL",
+			"value": "https://gitlab.com/zhaoqin/misc/raw/master/asm_demo_jikui_final.xml",
+			"enabled": true
+		},
+		{
+			"key": "WAF_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "WAF_ACTION_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "DECLARATION_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "VIP",
+			"value": "1.2.3.4",
+			"enabled": true
+		},
+		{
+			"key": "MEMBER_IP",
+			"value": "5.6.7.8",
+			"enabled": true
+		},
+		{
+			"key": "NOVA_URL",
+			"value": "http://10.250.13.69:8774/v2.1",
+			"enabled": true
+		},
+		{
+			"key": "ADC_FLAVOR",
+			"value": "newman-test-adc-flavor",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_FLAVOR",
+			"value": "newman-test-web-server-flavor",
+			"enabled": true
+		},
+		{
+			"key": "NEUTRON_URL",
+			"value": "http://10.250.13.69:9696",
+			"enabled": true
+		},
+		{
+			"key": "MGMT_NET_ID",
+			"value": "798b1b24-1bd5-481f-bda9-ec1e65cb4ab9",
+			"enabled": true
+		},
+		{
+			"key": "EXT_NET_ID",
+			"value": "9034cc2f-f8eb-4464-ae11-26675e55a684",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_FLAVOR_ID",
+			"value": "a1fc2d1e-8e1d-47d9-b1ce-15d0fa58aa65",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_ID",
+			"value": "c7cc6c04-617c-4d17-bb6c-887af633299e",
+			"enabled": true
+		},
+		{
+			"key": "HA_NET_ID",
+			"value": "0fe91840-61a2-4a53-af54-1de59b6fde2b",
+			"enabled": true
+		},
+		{
+			"key": "INT_NET_ID",
+			"value": "655a8581-3771-43b4-8cb4-2df01f0fa25c",
+			"enabled": true
+		},
+		{
+			"key": "GLANCE_URL",
+			"value": "http://10.250.13.69:9292",
+			"enabled": true
+		},
+		{
+			"key": "ADC_IMAGE_ID",
+			"value": "0c571ff7-00ff-4e27-9f78-37e8dd31ef6d",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_IMAGE",
+			"value": "ubuntu-bionic-server-cloudimg-amd64-20190501",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_USERDATA",
+			"value": "IyEvYmluL2Jhc2gKd2hpbGUgdHJ1ZSA7IGRvCihlY2hvIC1lICdIVFRQLzEuMSAyMDAgT0sNCic7IGVjaG8gLWUgIldlYiBTZXJ2ZXIgJChob3N0ICQoaG9zdG5hbWUpIHwgaGVhZCAtbjEgfCBhd2sgJ3twcmludCAkNH0nKSIpIHwgbmMgLXEgMCAtcCA4MCAtbCAwLjAuMC4wCmRvbmU=",
+			"enabled": true
+		},
+		{
+			"key": "WEB_SERVER_IMAGE_ID",
+			"value": "be5e25d6-98fc-4f5f-bb27-1f705ae1897e",
+			"enabled": true
+		},
+		{
+			"key": "ADC_FLAVOR_ID",
+			"value": "b720191e-9737-452f-bbf3-741405c018a2",
+			"enabled": true
+		},
+		{
+			"key": "VIP_PORT_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "PING_URL",
+			"value": "http://localhost:3000/ping",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2019-09-11T10:43:59.941Z",
+	"_postman_exported_using": "Postman/7.6.0"
+}

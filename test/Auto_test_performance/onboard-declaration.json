@@ -1,0 +1,548 @@
+{
+	"info": {
+		"_postman_id": "ae1152ba-cea5-4aba-a34c-4ca6a714c35b",
+		"name": "f5-adcaas-openstack-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+        {
+			"name": "deploy-declaration",
+			"item": [
+				{
+					"name": "create-application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"pm.environment.set('APPLICATION_ID', resp.application.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"my_app\",\n  \"description\": \"my-app\",\n  \"adcId\": \"{{ADC_ID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-pool",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"pm.environment.set('POOL_ID', resp.pool.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"my_pool\",\n  \"description\": \"my-pool\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/pools",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"pools"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-memeber",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"pm.environment.set('MEMBER_ID', resp.member.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"{{MEMBER_IP}}\",\n  \"port\": 80\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/pools/{{POOL_ID}}/members",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"pools",
+								"{{POOL_ID}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"pm.environment.set('SERVICE_ID', resp.service.id);",
+									"let retry = Number(pm.environment.get('CREATE_NUMBER'));",
+									"if (retry !== 51) {",
+									"    postman.setNextRequest('create-pool');",
+									"}",
+									"pm.environment.set('CREATE_NUMBER', ++retry);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0a67cfb3-f333-4930-b442-9377d0fc40b8",
+								"exec": [
+									"let VIP_IP = \"111.222.0.\" + Number(pm.environment.get('CREATE_NUMBER'));",
+									"pm.environment.set('VIP', VIP_IP);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"my_service\",\n  \"applicationId\": \"{{APPLICATION_ID}}\",\n  \"type\": \"HTTP\",\n  \"virtualAddresses\": [\"{{VIP}}\"],\n  \"defaultPoolId\": \"{{POOL_ID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/services",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"services"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-declaration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let resp = pm.response.json();",
+									"pm.environment.set('DECLARATION_ID', resp.declaration.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"my-declaration\",\n  \"description\": \"my-declaration\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}/declarations",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications",
+								"{{APPLICATION_ID}}",
+								"declarations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "set-default-declaration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"defaultDeclarationId\": \"{{DECLARATION_ID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications",
+								"{{APPLICATION_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deploy-application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}/deploy",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications",
+								"{{APPLICATION_ID}}",
+								"deploy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deploy-declaration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Tenant-Id",
+								"value": "{{OS_PROJECT_ID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"adcId\": \"{{ADC_ID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}/declarations/{{DECLARATION_ID}}/deploy",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications",
+								"{{APPLICATION_ID}}",
+								"declarations",
+								"{{DECLARATION_ID}}",
+								"deploy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cleanup-application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a7c44c1-f82e-4877-b56b-406c1f5efb7d",
+								"exec": [
+									"pm.test('response code is 204', function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							},
+							{
+								"key": "Tenant-Id",
+								"type": "text",
+								"value": "{{OS_PROJECT_ID}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ADCAAS_URL}}/applications/{{APPLICATION_ID}}/cleanup",
+							"host": [
+								"{{ADCAAS_URL}}"
+							],
+							"path": [
+								"applications",
+								"{{APPLICATION_ID}}",
+								"cleanup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d1210cb3-04f6-4cf4-b946-b05050f1635a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0d5c2188-5665-4570-b629-91c1d70907d1",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "a083f7b9-cc93-4ede-a63a-6202c70928c3",
+			"key": "OS_AUTH_URL",
+			"value": "http://10.250.13.51:5000/v3",
+			"type": "string"
+		},
+		{
+			"id": "8dce988b-af51-46f5-b043-8067b965b9f2",
+			"key": "ADCAAS_URL",
+			"value": "http://localhost:3000/adcaas/v1",
+			"type": "string"
+		}
+	]
+}
