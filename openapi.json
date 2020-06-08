@@ -37,6 +37,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Adc.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -847,12 +848,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Adc.Filter",
               "properties": {
                 "where": {
+                  "title": "Adc.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Adc.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -956,6 +960,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Application.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -2251,12 +2256,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Application.Filter",
               "properties": {
                 "where": {
+                  "title": "Application.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Application.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -2309,8 +2317,10 @@
                   }
                 },
                 "include": {
+                  "title": "Application.IncludeFilter",
                   "type": "array",
                   "items": {
+                    "title": "Application.IncludeFilter.Items",
                     "type": "object",
                     "properties": {
                       "relation": {
@@ -2347,7 +2357,8 @@
                             }
                           }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "title": "Application.ScopeFilter"
                       }
                     }
                   }
@@ -2392,6 +2403,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Certificate.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -2996,12 +3008,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Certificate.Filter",
               "properties": {
                 "where": {
+                  "title": "Certificate.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Certificate.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -3108,6 +3123,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Cert.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -3814,12 +3830,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Cert.Filter",
               "properties": {
                 "where": {
+                  "title": "Cert.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Cert.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -3908,6 +3927,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Endpointpolicy.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -4688,12 +4708,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Endpointpolicy.Filter",
               "properties": {
                 "where": {
+                  "title": "Endpointpolicy.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Endpointpolicy.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -4737,8 +4760,10 @@
                   }
                 },
                 "include": {
+                  "title": "Endpointpolicy.IncludeFilter",
                   "type": "array",
                   "items": {
+                    "title": "Endpointpolicy.IncludeFilter.Items",
                     "type": "object",
                     "properties": {
                       "relation": {
@@ -4775,7 +4800,8 @@
                             }
                           }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "title": "Endpointpolicy.ScopeFilter"
                       }
                     }
                   }
@@ -5111,12 +5137,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "IRule.Filter",
               "properties": {
                 "where": {
+                  "title": "IRule.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "IRule.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -5211,6 +5240,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Key.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -5917,12 +5947,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Key.Filter",
               "properties": {
                 "where": {
+                  "title": "Key.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Key.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -7582,12 +7615,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Monitor.Filter",
               "properties": {
                 "where": {
+                  "title": "Monitor.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Monitor.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -9346,12 +9382,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Pool.Filter",
               "properties": {
                 "where": {
+                  "title": "Pool.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Pool.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -9413,8 +9452,10 @@
                   }
                 },
                 "include": {
+                  "title": "Pool.IncludeFilter",
                   "type": "array",
                   "items": {
+                    "title": "Pool.IncludeFilter.Items",
                     "type": "object",
                     "properties": {
                       "relation": {
@@ -9451,7 +9492,8 @@
                             }
                           }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "title": "Pool.ScopeFilter"
                       }
                     }
                   }
@@ -9895,12 +9937,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "ProfileHTTP2Profile.Filter",
               "properties": {
                 "where": {
+                  "title": "ProfileHTTP2Profile.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "ProfileHTTP2Profile.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -10551,12 +10596,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "ProfileHTTPCompression.Filter",
               "properties": {
                 "where": {
+                  "title": "ProfileHTTPCompression.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "ProfileHTTPCompression.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -11555,12 +11603,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "ProfileHttpProfile.Filter",
               "properties": {
                 "where": {
+                  "title": "ProfileHttpProfile.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "ProfileHttpProfile.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -11763,6 +11814,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Rule.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -14389,12 +14441,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Rule.Filter",
               "properties": {
                 "where": {
+                  "title": "Rule.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Rule.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -14441,8 +14496,10 @@
                   }
                 },
                 "include": {
+                  "title": "Rule.IncludeFilter",
                   "type": "array",
                   "items": {
+                    "title": "Rule.IncludeFilter.Items",
                     "type": "object",
                     "properties": {
                       "relation": {
@@ -14479,7 +14536,8 @@
                             }
                           }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "title": "Rule.ScopeFilter"
                       }
                     }
                   }
@@ -15521,12 +15579,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Service.Filter",
               "properties": {
                 "where": {
+                  "title": "Service.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Service.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -16135,6 +16196,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "TLSServer.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -16784,12 +16846,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "TLSServer.Filter",
               "properties": {
                 "where": {
+                  "title": "TLSServer.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "TLSServer.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -16914,6 +16979,7 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Wafpolicy.WhereFilter",
               "additionalProperties": true
             }
           }
@@ -17629,12 +17695,15 @@
             "explode": true,
             "schema": {
               "type": "object",
+              "title": "Wafpolicy.Filter",
               "properties": {
                 "where": {
+                  "title": "Wafpolicy.WhereFilter",
                   "type": "object",
                   "additionalProperties": true
                 },
                 "fields": {
+                  "title": "Wafpolicy.Fields",
                   "type": "object",
                   "properties": {
                     "id": {
