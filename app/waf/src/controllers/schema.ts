@@ -121,6 +121,7 @@ function buildRequestSchema(
           type: 'object',
           required: requiredProperties,
           properties: properties,
+          additionalProperties: false,
           example: example,
         },
       },
