@@ -100,44 +100,34 @@ export class BigIpManager {
     await this.mustBeReachable();
 
     let url = `${this.baseUrl}/mgmt/tm/net/interface`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+    this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
 
-    let impFunc = async () => {
-      let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-      let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-      this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
-      return resObj;
-    };
+    let items = resObj['items'];
+    let interfaces: BigipInterfaces = {};
+    for (let intf of items) {
+      let macAddr = intf.macAddress;
+      interfaces[macAddr] = {
+        name: intf.name,
+        macAddress: macAddr,
+      };
+    }
 
+    return interfaces;
+  }
+
+  // The interface mac addresses are 'none' at the very beginning of the bigip readiness.
+  // So we need to check and wait it becomes non-none.
+  async getInterfacesNoNone(): Promise<BigipInterfaces> {
+    let infs: BigipInterfaces;
     let checkFunc = async () => {
-      return await impFunc().then(resObj => {
-        let items = resObj['items'];
-        for (let intf of items) {
-          if (intf.macAddress === 'none') {
-            this.logger.warn("bigip interface's mac addr is 'none', waiting..");
-            return false;
-          }
-        }
-        this.logger.debug('bigip mac addresses are ready to get.');
-        return true;
-      });
+      infs = await this.getInterfaces();
+      return Object.keys(infs).indexOf('none') < 0;
     };
 
-    // The interface mac addresses are 'none' at the very beginning of the bigip readiness.
     return await checkAndWait(checkFunc, 60).then(
-      async () => {
-        return await impFunc().then(resObj => {
-          let items = resObj['items'];
-          let interfaces: BigipInterfaces = {};
-          for (let intf of items) {
-            let macAddr = intf.macAddress;
-            interfaces[macAddr] = {
-              name: intf.name,
-              macAddress: macAddr,
-            };
-          }
-          return interfaces;
-        });
-      },
+      () => infs,
       () => {
         throw new Error('bigip mac addresses are not ready to get.');
       },
@@ -176,50 +166,17 @@ export class BigIpManager {
     await this.mustBeReachable();
 
     let url = `${this.baseUrl}/mgmt/tm/cm/device`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    let resObj = JSON.parse(JSON.stringify(response))['body'][0];
+    this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
 
-    let impFunc = async () => {
-      let response = await this.bigipService.getInfo(url, this.cred64Encoded);
-      let resObj = JSON.parse(JSON.stringify(response))['body'][0];
-      this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
-      return resObj;
-    };
-
-    let checkFunc = async () => {
-      return await impFunc().then(resObj => {
-        let items = resObj['items'];
-        for (let item of items) {
-          if (
-            item.managementIp === this.config.ipAddr &&
-            item.configsyncIp !== 'none'
-          ) {
-            return true;
-          } else {
-            this.logger.warn('No configsync IP, waiting...');
-            return false;
-          }
-        }
-        this.logger.debug('Configsync IP is ready.');
-        return true;
-      });
-    };
-
-    return await checkAndWait(checkFunc, 60).then(
-      async () => {
-        return await impFunc().then(resObj => {
-          let items = resObj['items'];
-          let ip = '';
-          for (let item of items) {
-            if (item.managementIp === this.config.ipAddr) {
-              ip = item.configsyncIp;
-            }
-          }
-          return ip;
-        });
-      },
-      () => {
-        throw new Error('No configsync IP');
-      },
-    );
+    let items = resObj['items'];
+    for (let item of items) {
+      if (item.managementIp === this.config.ipAddr) {
+        return item.configsyncIp;
+      }
+    }
+    throw new Error('No configsync IP');
   }
 
   async getDOStatus(): Promise<string> {
@@ -231,7 +188,7 @@ export class BigIpManager {
     return resObj;
   }
 
-  async uploadDO(): Promise<string> {
+  async uploadDO(): Promise<object> {
     await this.mustBeReachable();
     const filename = process.env.DO_RPM_PACKAGE!;
     let fs = require('fs');
@@ -239,25 +196,20 @@ export class BigIpManager {
       throw new Error(`DO RPM file doesn't exist: '${filename}'`);
     }
     let fstats = fs.statSync(filename);
-    try {
-      let url = `${
-        this.baseUrl
-      }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
-      let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
-      let response = await this.bigipService.uploadFile(
-        url,
-        this.cred64Encoded,
-        fstats.size - 1,
-        fstats.size,
-        buffer,
-      );
-      let resObj = JSON.stringify(response);
-      return resObj;
-    } catch (error) {
-      throw new Error(
-        `Upload DO RPM file error with error message ${error.message}`,
-      );
-    }
+
+    let url = `${
+      this.baseUrl
+    }/mgmt/shared/file-transfer/uploads/${path.basename(filename)}`;
+    let buffer = fs.readFileSync(filename, {endcoding: 'utf8'});
+    let response = await this.bigipService.uploadFile(
+      url,
+      this.cred64Encoded,
+      fstats.size - 1,
+      fstats.size,
+      buffer,
+    );
+    let resObj = JSON.parse(JSON.stringify(response)).body[0];
+    return resObj;
   }
 
   async installDO(): Promise<string> {
@@ -268,49 +220,51 @@ export class BigIpManager {
         process.env.DO_RPM_PACKAGE!,
       )}`,
     };
-    try {
-      let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
-      let response = await this.bigipService.installObject(
-        url,
+
+    let url = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks`;
+    let response = await this.bigipService.installObject(
+      url,
+      this.cred64Encoded,
+      body,
+    );
+    let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
+    let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
+
+    let status: string;
+    let resChk: object;
+
+    let checkFunc = async () => {
+      let checkinfo = await this.bigipService.getInfo(
+        dourl,
         this.cred64Encoded,
-        body,
       );
-      let taskid = JSON.parse(JSON.stringify(response))['body'][0]['id'];
-      let dourl = `${this.baseUrl}/mgmt/shared/iapp/package-management-tasks/${taskid}`;
+      let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
+      this.logger.debug(`get ${dourl} responses: ${JSON.stringify(resObj)}`);
+      status = resObj['status'];
+      resChk = resObj;
 
-      let impFunc = async () => {
-        let checkinfo = await this.bigipService.getInfo(
-          dourl,
-          this.cred64Encoded,
+      if (status === 'FAILED') return Promise.reject(true);
+      return status === 'FINISHED';
+    };
+
+    return await checkAndWait(checkFunc, 60).then(
+      async () => status,
+      () => {
+        throw new Error(
+          `Install DO failed: (status: ${status}, detail: ${JSON.stringify(
+            resChk,
+          )})`,
         );
-        let resObj = JSON.parse(JSON.stringify(checkinfo))['body'][0];
-        this.logger.debug(`get ${url} responses: ${JSON.stringify(resObj)}`);
-        return resObj;
-      };
+      },
+    );
+  }
 
-      let checkFunc = async () => {
-        return await impFunc().then(resObj => {
-          let status = resObj['status'];
-          if (status === 'FINISHED') return true;
-        });
-      };
+  async getAS3Info(): Promise<object> {
+    await this.mustBeReachable();
 
-      return await checkAndWait(checkFunc, 60).then(
-        async () => {
-          return await impFunc().then(resObj => {
-            let status = resObj['status'];
-            return status;
-          });
-        },
-        () => {
-          throw new Error('Install DO failed.');
-        },
-      );
-    } catch (error) {
-      throw new Error(
-        `Install DO RPM file error with error message ${error.message}`,
-      );
-    }
+    let url = `${this.baseUrl}/mgmt/shared/appsvcs/info`;
+    let response = await this.bigipService.getInfo(url, this.cred64Encoded);
+    return JSON.parse(JSON.stringify(response))['body'][0];
   }
 
   async getHostname(): Promise<string> {

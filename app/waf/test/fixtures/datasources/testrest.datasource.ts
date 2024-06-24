@@ -61,6 +61,7 @@ export const ExpectedData = {
   bigipMgmt: {
     hostname: 'test-asm.example1234.openstack.com',
     tcpPort: RestApplicationPort.SSLCustom,
+    licenseKey: 'JTSCD-MTSZS-MHVKG-YDMJY-XVSECOT',
   },
   networks: {
     management: {
@@ -99,6 +100,7 @@ export const ExpectedData = {
   memberId: '895cc33f_7af6_4477_adc4_c286908f0e72',
   applicationId: '1c19251d-7e97-411a-8816-6f7a72403707',
   trustDeviceId: '80e5aa54-ff6b-4717-9b53-6e8deafdebad',
+  requestId: 'f488a7a2-bd74-42cb-8d6d-6b842efe24f7',
 };
 
 export const StubResponses = {
@@ -148,6 +150,10 @@ export const StubResponses = {
         },
       }),
     );
+  },
+
+  emptyResponse: () => {
+    return {};
   },
 
   v2AuthToken200: () => {
@@ -1162,7 +1168,7 @@ export const StubResponses = {
                 description: 'Z100',
               },
               registrationKey: {
-                description: 'JTSCD-MTSZS-MHVKG-YDMJY-XVSECOT',
+                description: ExpectedData.bigipMgmt.licenseKey,
               },
               serviceCheckDate: {
                 description: '2019/05/04',
@@ -1176,12 +1182,97 @@ export const StubResponses = {
     };
   },
 
-  bigipCmDevice200: () => {
+  bigipCmDeviceNone200: () => {
     return {
+      kind: 'tm:cm:device:devicecollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/cm/device?ver=13.1.1',
       items: [
         {
+          kind: 'tm:cm:device:devicestate',
+          name: 'bigip1',
+          partition: 'Common',
+          fullPath: '/Common/bigip1',
+          generation: 8,
+          selfLink:
+            'https://localhost/mgmt/tm/cm/device/~Common~bigip1?ver=13.1.1',
+          baseMac: 'fa:16:3e:2d:e4:dd',
+          build: '0.0.4',
+          cert: '/Common/dtdi.crt',
+          certReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/cert/~Common~dtdi.crt?ver=13.1.1',
+          },
+          chassisId: 'c12d30e9-dd5b-b744-4b2259ca2808',
+          chassisType: 'individual',
+          configsyncIp: 'none',
+          edition: 'Final',
+          failoverState: 'active',
+          haCapacity: 0,
+          hostname: 'host-10-250-15-133.openstacklocal',
+          key: '/Common/dtdi.key',
+          keyReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/key/~Common~dtdi.key?ver=13.1.1',
+          },
           managementIp: ExpectedData.networks.management.ipAddr,
-          configsyncIp: '1.2.3.4',
+          marketingName: 'BIG-IP Virtual Edition',
+          mirrorIp: 'any6',
+          mirrorSecondaryIp: 'any6',
+          multicastIp: 'any6',
+          multicastPort: 0,
+          platformId: 'Z100',
+          product: 'BIG-IP',
+          selfDevice: 'true',
+          timeZone: 'America/Los_Angeles',
+          version: '13.1.1',
+        },
+      ],
+    };
+  },
+
+  bigipCmDevice200: () => {
+    return {
+      kind: 'tm:cm:device:devicecollectionstate',
+      selfLink: 'https://localhost/mgmt/tm/cm/device?ver=13.1.1',
+      items: [
+        {
+          kind: 'tm:cm:device:devicestate',
+          name: 'bigip1',
+          partition: 'Common',
+          fullPath: '/Common/bigip1',
+          generation: 8,
+          selfLink:
+            'https://localhost/mgmt/tm/cm/device/~Common~bigip1?ver=13.1.1',
+          baseMac: 'fa:16:3e:2d:e4:dd',
+          build: '0.0.4',
+          cert: '/Common/dtdi.crt',
+          certReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/cert/~Common~dtdi.crt?ver=13.1.1',
+          },
+          chassisId: 'c12d30e9-dd5b-b744-4b2259ca2808',
+          chassisType: 'individual',
+          configsyncIp: ExpectedData.networks.ha.ipAddr,
+          edition: 'Final',
+          failoverState: 'active',
+          haCapacity: 0,
+          hostname: 'host-10-250-15-133.openstacklocal',
+          key: '/Common/dtdi.key',
+          keyReference: {
+            link:
+              'https://localhost/mgmt/tm/cm/key/~Common~dtdi.key?ver=13.1.1',
+          },
+          managementIp: ExpectedData.networks.management.ipAddr,
+          marketingName: 'BIG-IP Virtual Edition',
+          mirrorIp: 'any6',
+          mirrorSecondaryIp: 'any6',
+          multicastIp: 'any6',
+          multicastPort: 0,
+          platformId: 'Z100',
+          product: 'BIG-IP',
+          selfDevice: 'true',
+          timeZone: 'America/Los_Angeles',
+          version: '13.1.1',
         },
       ],
     };
@@ -1209,22 +1300,6 @@ export const StubResponses = {
   },
 
   bigipDOChange2OK200: (state: string = 'OK') => {
-    return [
-      {
-        id: 0,
-        selfLink: 'https://localhost/mgmt/shared/declarative-onboarding/info',
-        result: {
-          class: 'Result',
-          code: 200,
-          status: state,
-          message: '',
-          errors: [],
-        },
-      },
-    ];
-  },
-
-  bigipDOInfo200: (state: string = 'OK') => {
     return [
       {
         id: 0,
@@ -1270,7 +1345,7 @@ export const StubResponses = {
     };
   },
 
-  bigipDOInstall200: () => {
+  bigipDOInstallStatusCreated200: () => {
     return {
       packageFilePath: '/var/config/rest/downloads/abc.rpm',
       operation: 'INSTALL',
@@ -1293,7 +1368,32 @@ export const StubResponses = {
         'https://localhost/mgmt/shared/iapp/package-management-tasks/f3a521d0-b344-44b8-a8c8-757b743a2c12',
     };
   },
-  bigipDOInstallstatus200: () => {
+
+  bigipDOInstallStatusFailed200: () => {
+    return {
+      packageFilePath: '/var/config/rest/downloads/abc.rpm',
+      operation: 'INSTALL',
+      id: 'f3a521d0-b344-44b8-a8c8-757b743a2c12',
+      status: 'FAILED',
+      userReference: {
+        link: 'https://localhost/mgmt/shared/authz/users/admin',
+      },
+      identityReferences: [
+        {
+          link: 'https://localhost/mgmt/shared/authz/users/admin',
+        },
+      ],
+      ownerMachineId: 'f2176dec-24d9-4202-8803-83f8473392b1',
+      generation: 1,
+      lastUpdateMicros: 1562732534678459,
+      kind:
+        'shared:iapp:package-management-tasks:iapppackagemanagementtaskstate',
+      selfLink:
+        'https://localhost/mgmt/shared/iapp/package-management-tasks/f3a521d0-b344-44b8-a8c8-757b743a2c12',
+    };
+  },
+
+  bigipDOInstallStatusFinished200: () => {
     return {
       packageFilePath: '/var/config/rest/downloads/abc.rpm',
       packageName: 'f5-declarative-onboarding-1.5.0-11.noarch',
@@ -1552,6 +1652,46 @@ export const StubResponses = {
     };
   },
 
+  bigipNetInterfacesNone200: () => {
+    return {
+      items: [
+        {
+          bundle: 'not-supported',
+          bundleSpeed: 'not-supported',
+          enabled: true,
+          flowControl: 'tx-rx',
+          forceGigabitFiber: 'disabled',
+          forwardErrorCorrection: 'not-supported',
+          fullPath: '1.1',
+          generation: 29,
+          ifIndex: 48,
+          kind: 'tm:net:interface:interfacestate',
+          lldpAdmin: 'txonly',
+          lldpTlvmap: 130943,
+          macAddress: 'none',
+          mediaActive: 'none',
+          mediaFixed: '10000T-FD',
+          mediaMax: 'auto',
+          mediaSfp: 'auto',
+          mtu: 9198,
+          name: '1.1',
+          portFwdMode: 'l3',
+          preferPort: 'sfp',
+          qinqEthertype: '0x8100',
+          selfLink: 'https://localhost/mgmt/tm/net/interface/1.1?ver=13.1.1',
+          sflow: {
+            pollInterval: 0,
+            pollIntervalGlobal: 'yes',
+          },
+          stp: 'enabled',
+          stpAutoEdgePort: 'enabled',
+          stpEdgePort: 'true',
+          stpLinkType: 'auto',
+        },
+      ],
+    };
+  },
+
   bigipNetInterfaces200: () => {
     return {
       items: [
@@ -1601,7 +1741,7 @@ export const StubResponses = {
           kind: 'tm:net:interface:interfacestate',
           lldpAdmin: 'txonly',
           lldpTlvmap: 130943,
-          macAddress: 'fa:16:3e:f3:1a:b2',
+          macAddress: ExpectedData.networks.internal.macAddr,
           mediaActive: 'none',
           mediaFixed: '10000T-FD',
           mediaMax: 'auto',
@@ -1634,7 +1774,7 @@ export const StubResponses = {
           kind: 'tm:net:interface:interfacestate',
           lldpAdmin: 'txonly',
           lldpTlvmap: 130943,
-          macAddress: 'fa:16:3e:35:da:15',
+          macAddress: ExpectedData.networks.ha.macAddr,
           mediaActive: 'none',
           mediaFixed: '10000T-FD',
           mediaMax: 'auto',
@@ -1667,7 +1807,7 @@ export const StubResponses = {
           kind: 'tm:net:interface:interfacestate',
           lldpAdmin: 'txonly',
           lldpTlvmap: 130943,
-          macAddress: 'fa:16:3e:94:60:40',
+          macAddress: ExpectedData.networks.management.macAddr,
           mediaActive: '100TX-FD',
           mediaFixed: 'auto',
           mediaSfp: 'auto',
@@ -2348,9 +2488,9 @@ export const DefaultResponseWith: TypeResponseWith = {
   bigip_post_mgmt_shared_file_transfer_uploads_filename:
     StubResponses.bigipDOUpload200,
   bigip_post_mgmt_shared_iapp_package_management_tasks:
-    StubResponses.bigipDOInstall200,
+    StubResponses.bigipDOInstallStatusCreated200,
   bigip_get_mgmt_shared_iapp_package_management_tasks_taskId:
-    StubResponses.bigipDOInstallstatus200,
+    StubResponses.bigipDOInstallStatusFinished200,
 
   asg_post_mgmt_shared_trustproxy: StubResponses.trustProxyDeploy200,
   asg_get_mgmt_shared_trusteddevices_deviceId:
