@@ -236,6 +236,62 @@ describe('WafpolicyController', () => {
     },
   );
 
+  it(
+    'get ' +
+      prefix +
+      '/wafpolicies/${id}/adcs/${adcId}: ASG fails when check wafpolicy',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        tenantId: 'a random id',
+        public: true,
+      });
+
+      const adc = await givenAdcData(wafapp, {
+        management: {
+          trustedDeviceId: uuid(),
+        },
+      });
+
+      checkWafpolicyStub.throws(new Error('OMG'));
+
+      const resp = await client
+        .get(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(422);
+
+      expect(resp.body.error.message).equal('ASG error: OMG');
+    },
+  );
+
+  it(
+    'get ' + prefix + '/wafpolicies/${id}/adcs/${adcId}: ASG returns not found',
+    async () => {
+      const wafpolicy = await givenWafpolicyData(wafapp, {
+        tenantId: 'a random id',
+        public: true,
+      });
+
+      const adc = await givenAdcData(wafapp, {
+        management: {
+          trustedDeviceId: uuid(),
+        },
+      });
+
+      let err = new Error('Not found');
+      Object.assign(err, {code: 404});
+      checkWafpolicyStub.throws(err);
+
+      const resp = await client
+        .get(prefix + `/wafpolicies/${wafpolicy.id}/adcs/${adc.id}`)
+        .set('X-Auth-Token', ExpectedData.userToken)
+        .set('tenant-id', ExpectedData.tenantId)
+        .expect(404);
+
+      expect(resp.body.error.message).equal('ASG error: Not found');
+    },
+  );
+
   it('get ' + prefix + '/wafpolicies: of all', async () => {
     const wafpolicy = await givenWafpolicyData(wafapp);
 
